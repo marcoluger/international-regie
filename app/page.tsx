@@ -841,10 +841,10 @@ if (companySettings?.company_logo) {
     doc.addImage(
       logoBase64,
       "PNG",
-      pageWidth - 85,
+      pageWidth - 135,
       8,
-      70,
-      30
+      120,
+      45
     );
   } catch (error) {
     console.error("Logo konnte nicht geladen werden", error);
