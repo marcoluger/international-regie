@@ -54,6 +54,27 @@ type CompanySettings = {
   website?: string;
   tax_number?: string;
 };
+type CurrentCompany = {
+  company_id: string;
+  role: string;
+  companies: {
+    id: string;
+    name: string;
+  };
+};
+
+type CompanyFeatures = {
+  company_id: string;
+  module_reports: boolean;
+  module_work_orders: boolean;
+  module_auto_reports: boolean;
+  photos_enabled: boolean;
+  email_enabled: boolean;
+  signature_enabled: boolean;
+  ai_enabled: boolean;
+  max_employees: number;
+  allowed_languages: string[];
+};
 
 const texts = {
   Deutsch: {
@@ -373,7 +394,8 @@ export default function Home() {
   const [message, setMessage] = useState("");
   const [savedReports, setSavedReports] = useState<SavedReport[]>([]);
   const [days, setDays] = useState<DayEntry[]>(createEmptyDays());
-
+  const [currentCompany, setCurrentCompany] = useState<CurrentCompany | null>(null);
+  const [companyFeatures, setCompanyFeatures] = useState<CompanyFeatures | null>(null);
   const firstDate = days.find((day) => day.date)?.date || "";
   const calendarWeek = getCalendarWeek(firstDate);
 
@@ -383,9 +405,10 @@ export default function Home() {
     setUser(data.user);
 
     if (data.user) {
+      await loadCompanyContext(data.user.id);
       await loadReportsFromDatabase();
       await loadCompanySettings(data.user.id);
-    }
+   }
   }
 
   loadUser();
@@ -445,6 +468,44 @@ export default function Home() {
     setSavedReports([]);
     setMessage("Du wurdest abgemeldet.");
   }
+async function loadCompanyContext(userId: string) {
+  const { data: companyUser, error } = await supabase
+    .from("company_users")
+    .select("company_id, role, companies(id, name)")
+    .eq("user_id", userId)
+    .single();
+
+  if (error) {
+    setMessage("Fehler beim Laden der Firma: " + error.message);
+    return;
+  }
+
+  const companyData = Array.isArray(companyUser.companies)
+    ? companyUser.companies[0]
+    : companyUser.companies;
+
+  setCurrentCompany({
+    company_id: companyUser.company_id,
+    role: companyUser.role,
+    companies: {
+      id: companyData.id,
+      name: companyData.name,
+    },
+  });
+
+  const { data: features, error: featureError } = await supabase
+    .from("company_features")
+    .select("*")
+    .eq("company_id", companyUser.company_id)
+    .single();
+
+  if (featureError) {
+    setMessage("Fehler beim Laden der Module: " + featureError.message);
+    return;
+  }
+
+  setCompanyFeatures(features as CompanyFeatures);
+}
 
   async function loadReportsFromDatabase() {
     const { data, error } = await supabase
@@ -1174,6 +1235,11 @@ Object.entries(projectTotals).forEach(([project, total]) => {
         <p className="text-gray-700">{t.subtitle}</p>
         <p className="text-gray-700">
           {t.loggedInAs}: {user.email}
+          {currentCompany && (
+  <p className="text-gray-700">
+    Firma: {currentCompany.companies.name} | Rolle: {currentCompany.role}
+  </p>
+)}
         </p>
 
         <button
