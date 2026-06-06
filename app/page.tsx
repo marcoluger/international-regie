@@ -1278,14 +1278,15 @@ Object.entries(projectTotals).forEach(([project, total]) => {
       <header>
         <h1 className="text-3xl font-bold text-black">{t.title}</h1>
         <p className="text-gray-700">{t.subtitle}</p>
-        <p className="text-gray-700">
-          {t.loggedInAs}: {user.email}
-          {currentCompany && (
+       
+  <p className="text-gray-700">
+  {t.loggedInAs}: {user.email}
+</p>
+{currentCompany && (
   <p className="text-gray-700">
     Firma: {currentCompany.companies.name} | Rolle: {currentCompany.role}
   </p>
 )}
-        </p>
 
         <button
           type="button"
