@@ -543,6 +543,24 @@ async function addCompanyUser() {
     return;
   }
 
+  async function resetCompanyUserPassword(memberEmail: string) {
+  if (!memberEmail) {
+    setMessage("Keine E-Mail-Adresse vorhanden.");
+    return;
+  }
+
+  const { error } = await supabase.auth.resetPasswordForEmail(memberEmail, {
+    redirectTo: "https://international-regie.vercel.app",
+  });
+
+  if (error) {
+    setMessage("Fehler beim Passwort-Reset: " + error.message);
+    return;
+  }
+
+  setMessage("Passwort-Reset-E-Mail wurde gesendet.");
+}
+
   setNewUserName("");
   setNewUserEmail("");
   setNewUserRole("employee");
@@ -571,6 +589,27 @@ async function loadReportsFromDatabase() {
     copy[index] = { ...copy[index], [field]: value };
     setDays(copy);
   }
+
+async function resetCompanyUserPassword(memberEmail: string) {
+  if (!memberEmail) {
+    setMessage("Keine E-Mail-Adresse vorhanden.");
+    return;
+  }
+
+  const { error } = await supabase.auth.resetPasswordForEmail(
+    memberEmail,
+    {
+      redirectTo: "https://international-regie.vercel.app",
+    }
+  );
+
+  if (error) {
+    setMessage("Fehler beim Passwort-Reset: " + error.message);
+    return;
+  }
+
+  setMessage("Passwort-Reset-E-Mail wurde gesendet.");
+}
 
   function updateFullWeekFromMonday(selectedValue: string) {
     if (!selectedValue) return;
@@ -1347,12 +1386,24 @@ Object.entries(projectTotals).forEach(([project, total]) => {
   <p>Aktuelle Mitarbeiter: {companyUsers.length}</p>
 
   {companyUsers.map((member) => (
-    <div key={member.id} className="border rounded p-3">
-      <strong>{member.full_name || "-"}</strong>
-      <p>{member.email || "-"}</p>
-      <p>Rolle: {member.role}</p>
-    </div>
-  ))}
+  <div key={member.id} className="border rounded p-3 space-y-2">
+    <strong>{member.full_name || "-"}</strong>
+    <p>{member.email || "-"}</p>
+    <p>Rolle: {member.role}</p>
+
+    {member.email && (
+      <button
+        type="button"
+        onClick={() => resetCompanyUserPassword(member.email)}
+        className="bg-gray-700 text-white px-3 py-2 rounded"
+      >
+        Passwort zurücksetzen
+      </button>
+    )}
+  </div>
+))}
+
+
 </section>
   <input
     type="file"
