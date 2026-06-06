@@ -398,6 +398,10 @@ export default function Home() {
   const [companyFeatures, setCompanyFeatures] = useState<CompanyFeatures | null>(null);
   const firstDate = days.find((day) => day.date)?.date || "";
   const calendarWeek = getCalendarWeek(firstDate);
+  const [companyUsers, setCompanyUsers] = useState<any[]>([]);
+  const [newUserEmail, setNewUserEmail] = useState("");
+  const [newUserName, setNewUserName] = useState("");
+  const [newUserRole, setNewUserRole] = useState("employee");
 
   useEffect(() => {
   async function loadUser() {
@@ -505,9 +509,50 @@ async function loadCompanyContext(userId: string) {
   }
 
   setCompanyFeatures(features as CompanyFeatures);
+  await loadCompanyUsers(companyUser.company_id);
+}
+async function loadCompanyUsers(companyId: string) {
+  const { data, error } = await supabase
+    .from("company_users")
+    .select("*")
+    .eq("company_id", companyId)
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    setMessage("Fehler beim Laden der Mitarbeiter: " + error.message);
+    return;
+  }
+
+  setCompanyUsers(data || []);
 }
 
-  async function loadReportsFromDatabase() {
+async function addCompanyUser() {
+  if (!currentCompany) return;
+
+  const { error } = await supabase
+    .from("company_users")
+    .insert({
+      company_id: currentCompany.company_id,
+      full_name: newUserName,
+      email: newUserEmail,
+      role: newUserRole,
+    });
+
+  if (error) {
+    setMessage("Fehler beim Hinzufügen: " + error.message);
+    return;
+  }
+
+  setNewUserName("");
+  setNewUserEmail("");
+  setNewUserRole("employee");
+
+  await loadCompanyUsers(currentCompany.company_id);
+
+  setMessage("Mitarbeiter wurde angelegt.");
+}
+
+async function loadReportsFromDatabase() {
     const { data, error } = await supabase
       .from("reports")
       .select("*")
@@ -1261,6 +1306,53 @@ Object.entries(projectTotals).forEach(([project, total]) => {
     />
   )}
 
+<section className="border rounded p-4 space-y-4 bg-white text-black">
+  <h2 className="text-xl font-bold">Mitarbeiterverwaltung</h2>
+
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+    <input
+      className="border p-3 text-black bg-white"
+      placeholder="Name"
+      value={newUserName}
+      onChange={(e) => setNewUserName(e.target.value)}
+    />
+
+    <input
+      className="border p-3 text-black bg-white"
+      placeholder="E-Mail"
+      value={newUserEmail}
+      onChange={(e) => setNewUserEmail(e.target.value)}
+    />
+
+    <select
+      className="border p-3 text-black bg-white"
+      value={newUserRole}
+      onChange={(e) => setNewUserRole(e.target.value)}
+    >
+      <option value="employee">Mitarbeiter</option>
+      <option value="project_manager">Projektleiter</option>
+      <option value="admin">Admin</option>
+    </select>
+  </div>
+
+  <button
+    type="button"
+    onClick={addCompanyUser}
+    className="bg-blue-700 text-white px-4 py-3 rounded"
+  >
+    Mitarbeiter hinzufügen
+  </button>
+
+  <p>Aktuelle Mitarbeiter: {companyUsers.length}</p>
+
+  {companyUsers.map((member) => (
+    <div key={member.id} className="border rounded p-3">
+      <strong>{member.full_name || "-"}</strong>
+      <p>{member.email || "-"}</p>
+      <p>Rolle: {member.role}</p>
+    </div>
+  ))}
+</section>
   <input
     type="file"
     accept="image/*"
@@ -1580,3 +1672,4 @@ Object.entries(projectTotals).forEach(([project, total]) => {
     </main>
   );
 }
+
