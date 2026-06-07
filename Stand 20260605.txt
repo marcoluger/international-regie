@@ -402,15 +402,6 @@ export default function Home() {
   const [newUserEmail, setNewUserEmail] = useState("");
   const [newUserName, setNewUserName] = useState("");
   const [newUserRole, setNewUserRole] = useState("employee");
-  const [instructionProblems, setInstructionProblems] = useState("");
-  const [instructionTitle, setInstructionTitle] = useState("");
-  const [instructionProject, setInstructionProject] = useState("");
-  const [instructionCustomer, setInstructionCustomer] = useState("");
-  const [instructionSite, setInstructionSite] = useState("");
-  const [instructionDescription, setInstructionDescription] = useState("");
-  const [instructionTasks, setInstructionTasks] = useState<string[]>([""]);
-  const [workInstructions, setWorkInstructions] = useState<any[]>([]);
-
 
   useEffect(() => {
   async function loadUser() {
@@ -430,11 +421,13 @@ export default function Home() {
     (_event, session) => {
       setUser(session?.user || null);
 
-     if (session?.user) {
-  loadCompanyContext(session.user.id);
-  loadReportsFromDatabase();
-  loadCompanySettings(session.user.id);
-}
+      if (session?.user) {
+        loadReportsFromDatabase();
+        loadCompanySettings(session.user.id);
+      } else {
+        setSavedReports([]);
+        setCompanySettings(null);
+      }
     }
   );
 
@@ -517,27 +510,7 @@ async function loadCompanyContext(userId: string) {
 
   setCompanyFeatures(features as CompanyFeatures);
   await loadCompanyUsers(companyUser.company_id);
-  await loadWorkInstructions(companyUser.company_id);
 }
-
-async function loadWorkInstructions(companyId: string) {
-  const { data, error } = await supabase
-    .from("work_instructions")
-    .select(`
-      *,
-      work_instruction_tasks (*)
-    `)
-    .eq("company_id", companyId)
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    setMessage("Fehler beim Laden der Arbeitsanweisungen: " + error.message);
-    return;
-  }
-
-  setWorkInstructions(data || []);
-}
-
 async function loadCompanyUsers(companyId: string) {
   const { data, error } = await supabase
     .from("company_users")
@@ -549,19 +522,17 @@ async function loadCompanyUsers(companyId: string) {
     setMessage("Fehler beim Laden der Mitarbeiter: " + error.message);
     return;
   }
-
-  setCompanyUsers(data || []);
-}
-
 async function addCompanyUser() {
   if (!currentCompany) return;
 
-  const { error } = await supabase.from("company_users").insert({
-    company_id: currentCompany.company_id,
-    full_name: newUserName,
-    email: newUserEmail,
-    role: newUserRole,
-  });
+  const { error } = await supabase
+    .from("company_users")
+    .insert({
+      company_id: currentCompany.company_id,
+      full_name: newUserName,
+      email: newUserEmail,
+      role: newUserRole,
+    });
 
   if (error) {
     setMessage("Fehler beim Hinzufügen: " + error.message);
@@ -576,132 +547,27 @@ async function addCompanyUser() {
 
   setMessage("Mitarbeiter wurde angelegt.");
 }
-
-async function resetCompanyUserPassword(memberEmail: string) {
-  if (!memberEmail) {
-    setMessage("Keine E-Mail-Adresse vorhanden.");
-    return;
-  }
-
-  const { error } = await supabase.auth.resetPasswordForEmail(memberEmail, {
-    redirectTo: "https://international-regie.vercel.app",
-  });
-
-  if (error) {
-    setMessage("Fehler beim Passwort-Reset: " + error.message);
-    return;
-  }
-
-  setMessage("Passwort-Reset-E-Mail wurde gesendet.");
+  setCompanyUsers(data || []);
 }
+  async function loadReportsFromDatabase() {
+    const { data, error } = await supabase
+      .from("reports")
+      .select("*")
+      .order("created_at", { ascending: false });
 
-async function loadReportsFromDatabase() {
-  const { data, error } = await supabase
-    .from("reports")
-    .select("*")
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    setMessage("Fehler beim Laden: " + error.message);
-    return;
-  }
-
-  setSavedReports((data || []) as SavedReport[]);
-}
-
-function updateDay(index: number, field: keyof DayEntry, value: string) {
-  const copy = [...days];
-  copy[index] = { ...copy[index], [field]: value };
-  setDays(copy);
-}
-
-async function saveWorkInstruction() {
-  setMessage("Speichere Arbeitsanweisung...");
-
-  if (!currentCompany) {
-    setMessage("Keine Firma geladen.");
-    return;
-  }
-
-  if (!instructionTitle.trim()) {
-    setMessage("Bitte Titel der Arbeitsanweisung eintragen.");
-    return;
-  }
-
-  const { data: instruction, error } = await supabase
-    .from("work_instructions")
-    .insert({
-      company_id: currentCompany.company_id,
-      created_by: user?.id,
-      title: instructionTitle,
-      project: instructionProject,
-      customer: instructionCustomer,
-      site: instructionSite,
-      description: instructionDescription,
-      problems_text: instructionProblems,
-    })
-    .select()
-    .single();
-
-  if (error) {
-    setMessage("Fehler: " + error.message);
-    return;
-  }
-
-  const taskRows = instructionTasks
-    .filter((task) => task.trim() !== "")
-    .map((task, index) => ({
-      work_instruction_id: instruction.id,
-      task_text: task,
-      sort_order: index,
-    }));
-
-  if (taskRows.length > 0) {
-    const { error: taskError } = await supabase
-      .from("work_instruction_tasks")
-      .insert(taskRows);
-
-    if (taskError) {
-      setMessage(
-        "Arbeitsanweisung gespeichert, aber Schritte nicht: " +
-          taskError.message
-      );
+    if (error) {
+      setMessage("Fehler beim Laden: " + error.message);
       return;
     }
+
+    setSavedReports((data || []) as SavedReport[]);
   }
 
-  setInstructionTitle("");
-  setInstructionProject("");
-  setInstructionCustomer("");
-  setInstructionSite("");
-  setInstructionDescription("");
-  setInstructionTasks([""]);
-  setInstructionProblems("");
-
-  await loadWorkInstructions(currentCompany.company_id);
-
-  setMessage("Arbeitsanweisung gespeichert.");
-setInstructionProblems("");
-  
-}
-
-async function deleteWorkInstruction(id: string) {
-  if (!currentCompany) return;
-
-  const { error } = await supabase
-    .from("work_instructions")
-    .delete()
-    .eq("id", id);
-
-  if (error) {
-    setMessage("Fehler beim Löschen: " + error.message);
-    return;
+  function updateDay(index: number, field: keyof DayEntry, value: string) {
+    const copy = [...days];
+    copy[index] = { ...copy[index], [field]: value };
+    setDays(copy);
   }
-
-  await loadWorkInstructions(currentCompany.company_id);
-
-  setMessage("Arbeitsanweisung gelöscht.");
-}
 
   function updateFullWeekFromMonday(selectedValue: string) {
     if (!selectedValue) return;
@@ -719,24 +585,6 @@ async function deleteWorkInstruction(id: string) {
 
     setDays(copy);
   }
-
-async function updateWorkInstructionNote(id: string, note: string) {
-  const { error } = await supabase
-    .from("work_instructions")
-    .update({ employee_note: note })
-    .eq("id", id);
-
-  if (error) {
-    setMessage("Fehler beim Speichern der Notiz: " + error.message);
-    return;
-  }
-
-  if (currentCompany) {
-    await loadWorkInstructions(currentCompany.company_id);
-  }
-
-  setMessage("Notiz wurde gespeichert.");
-}
 
   function parseHours(value: string) {
     return Number(value.replace(",", ".")) || 0;
@@ -826,22 +674,6 @@ async function loadCompanySettings(userId: string) {
       tax_number: "",
     }
   );
-}
-
-async function toggleTaskCompleted(taskId: string, completed: boolean) {
-  const { error } = await supabase
-    .from("work_instruction_tasks")
-    .update({ completed })
-    .eq("id", taskId);
-
-  if (error) {
-    setMessage("Fehler beim Aktualisieren: " + error.message);
-    return;
-  }
-
-  if (currentCompany) {
-    await loadWorkInstructions(currentCompany.company_id);
-  }
 }
 
 async function saveCompanySettings() {
@@ -1443,15 +1275,14 @@ Object.entries(projectTotals).forEach(([project, total]) => {
       <header>
         <h1 className="text-3xl font-bold text-black">{t.title}</h1>
         <p className="text-gray-700">{t.subtitle}</p>
-       
-  <p className="text-gray-700">
-  {t.loggedInAs}: {user.email}
-</p>
-{currentCompany && (
+        <p className="text-gray-700">
+          {t.loggedInAs}: {user.email}
+          {currentCompany && (
   <p className="text-gray-700">
     Firma: {currentCompany.companies.name} | Rolle: {currentCompany.role}
   </p>
 )}
+        </p>
 
         <button
           type="button"
@@ -1471,215 +1302,40 @@ Object.entries(projectTotals).forEach(([project, total]) => {
       className="h-20 object-contain"
     />
   )}
-
 <section className="border rounded p-4 space-y-4 bg-white text-black">
   <h2 className="text-xl font-bold">Mitarbeiterverwaltung</h2>
-
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-    <input
-      className="border p-3 text-black bg-white"
-      placeholder="Name"
-      value={newUserName}
-      onChange={(e) => setNewUserName(e.target.value)}
-    />
-
-    <input
-      className="border p-3 text-black bg-white"
-      placeholder="E-Mail"
-      value={newUserEmail}
-      onChange={(e) => setNewUserEmail(e.target.value)}
-    />
-
-    <select
-      className="border p-3 text-black bg-white"
-      value={newUserRole}
-      onChange={(e) => setNewUserRole(e.target.value)}
-    >
-      <option value="employee">Mitarbeiter</option>
-      <option value="project_manager">Projektleiter</option>
-      <option value="admin">Admin</option>
-    </select>
-  </div>
-
-  <button
-    type="button"
-    onClick={addCompanyUser}
-    className="bg-blue-700 text-white px-4 py-3 rounded"
-  >
-    Mitarbeiter hinzufügen
-  </button>
-
-  <p>Aktuelle Mitarbeiter: {companyUsers.length}</p>
-
-  {companyUsers.map((member) => (
-  <div key={member.id} className="border rounded p-3 space-y-2">
-    <strong>{member.full_name || "-"}</strong>
-    <p>{member.email || "-"}</p>
-    <p>Rolle: {member.role}</p>
-
-    {member.email && (
-      <button
-        type="button"
-        onClick={() => resetCompanyUserPassword(member.email)}
-        className="bg-gray-700 text-white px-3 py-2 rounded"
-      >
-        Passwort zurücksetzen
-      </button>
-    )}
-  </div>
-))}
-
-<section className="border rounded p-4 space-y-4 bg-white text-black">
-  <h2 className="text-xl font-bold">Arbeitsanweisung</h2>
-
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-    <input
-      className="border p-3 text-black bg-white"
-      placeholder="Titel"
-      value={instructionTitle}
-      onChange={(e) => setInstructionTitle(e.target.value)}
-    />
-
-    <input
-      className="border p-3 text-black bg-white"
-      placeholder="Projekt"
-      value={instructionProject}
-      onChange={(e) => setInstructionProject(e.target.value)}
-    />
-
-    <input
-      className="border p-3 text-black bg-white"
-      placeholder="Kunde"
-      value={instructionCustomer}
-      onChange={(e) => setInstructionCustomer(e.target.value)}
-    />
-
-    <input
-      className="border p-3 text-black bg-white"
-      placeholder="Baustelle"
-      value={instructionSite}
-      onChange={(e) => setInstructionSite(e.target.value)}
-    />
-  </div>
-
-  
-<input
-  className="border p-3 w-full text-black bg-white"
-  placeholder="Probleme / Hinweise"
-  value={instructionProblems}
-  onChange={(e) => setInstructionProblems(e.target.value)}
-/>
-
-  <h3 className="font-bold">Arbeitsschritte</h3>
-
-  {instructionTasks.map((task, index) => (
-    <input
-      key={index}
-      className="border p-3 w-full text-black bg-white"
-      placeholder={`Arbeitsschritt ${index + 1}`}
-      value={task}
-      onChange={(e) => {
-        const copy = [...instructionTasks];
-        copy[index] = e.target.value;
-        setInstructionTasks(copy);
-      }}
-    />
-  ))}
-
-  <button
-    type="button"
-    onClick={() => setInstructionTasks([...instructionTasks, ""])}
-    className="bg-gray-700 text-white px-4 py-3 rounded"
-  >
-    + Arbeitsschritt
-  </button>
-
-  <button
-    type="button"
-    onClick={saveWorkInstruction}
-    className="bg-blue-700 text-white px-4 py-3 rounded"
-  >
-    Arbeitsanweisung speichern
-  </button>
-</section>
-
-<section className="border rounded p-4 space-y-4 bg-white text-black">
-  <h2 className="text-xl font-bold">Gespeicherte Arbeitsanweisungen</h2>
-
-  {workInstructions.length === 0 && (
-    <p className="text-gray-600">Noch keine Arbeitsanweisungen vorhanden.</p>
-  )}
-
-  {workInstructions.map((instruction) => (
-    <div key={instruction.id} className="border rounded p-4 space-y-2">
-      <h3 className="font-bold text-lg">{instruction.title}</h3>
-      <p><strong>Projekt:</strong> {instruction.project || "-"}</p>
-      <p><strong>Kunde:</strong> {instruction.customer || "-"}</p>
-      <p><strong>Baustelle:</strong> {instruction.site || "-"}</p>
-
-{instruction.problems_text && (
-  <div className="bg-yellow-50 border rounded p-3">
-    <strong>Probleme / Hinweise:</strong>
-    <p>{instruction.problems_text}</p>
-  </div>
-)}
-
-      <ul className="list-disc pl-6 mt-2">
-        {(instruction.work_instruction_tasks || [])
-          .sort((a: any, b: any) => a.sort_order - b.sort_order)
-          .map((task: any) => (
-            <li key={task.id} className="flex items-center gap-2">
+<div className="grid grid-cols-1 md:grid-cols-3 gap-3">
   <input
-    type="checkbox"
-    checked={task.completed || false}
-    onChange={() =>
-      toggleTaskCompleted(task.id, !(task.completed || false))
-    }
+    className="border p-3 text-black bg-white"
+    placeholder="Name"
+    value={newUserName}
+    onChange={(e) => setNewUserName(e.target.value)}
   />
 
-<textarea
-  className="border p-3 w-full h-24 text-black bg-white"
-  placeholder="Notiz / Rückmeldung Mitarbeiter"
-  defaultValue={instruction.employee_note || ""}
-  id={`note-${instruction.id}`}
+  <input
+    className="border p-3 text-black bg-white"
+    placeholder="E-Mail"
+    value={newUserEmail}
+    onChange={(e) => setNewUserEmail(e.target.value)}
+  />
+
+  <input
+  type="file"
+  accept="image/*"
+  className="border p-3 w-full text-black bg-white"
+  onChange={(e) => uploadCompanyLogo(e.target.files)}
 />
 
-<button
-  type="button"
-  onClick={() => {
-    const field = document.getElementById(
-      `note-${instruction.id}`
-    ) as HTMLTextAreaElement;
+<div className="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+</div>
+<input
+  type="file"
+  accept="image/*"
+  className="border p-3 w-full text-black bg-white"
+  onChange={(e) => uploadCompanyLogo(e.target.files)}
+/>
 
-    updateWorkInstructionNote(instruction.id, field.value);
-  }}
-  className="bg-gray-700 text-white px-3 py-2 rounded"
->
-  Notiz speichern
-</button>
-
-  <span className={task.completed ? "line-through text-gray-500" : ""}>
-    {task.task_text}
-  </span>
-</li>
-          ))}
-      </ul>
-  {(currentCompany?.role === "owner" ||
-   currentCompany?.role === "project_manager" ||
-  currentCompany?.role === "admin") && (
-  <button
-    type="button"
-    onClick={() => deleteWorkInstruction(instruction.id)}
-    className="bg-red-600 text-white px-3 py-2 rounded"
-  >
-    Arbeitsanweisung löschen
-  </button>
-)}
-
-    </div>
-  ))}
-</section>
-
+  ))
 </section>
   <input
     type="file"
@@ -1916,8 +1572,6 @@ Object.entries(projectTotals).forEach(([project, total]) => {
             onChange={(e) => handlePhotos(index, e.target.files)}
           />
 
-
-
           {day.photos.length > 0 && (
             <div className="grid grid-cols-2 gap-3">
               {day.photos.map((photo, photoIndex) => (
@@ -2002,4 +1656,3 @@ Object.entries(projectTotals).forEach(([project, total]) => {
     </main>
   );
 }
-

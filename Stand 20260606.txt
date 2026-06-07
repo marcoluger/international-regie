@@ -402,7 +402,7 @@ export default function Home() {
   const [newUserEmail, setNewUserEmail] = useState("");
   const [newUserName, setNewUserName] = useState("");
   const [newUserRole, setNewUserRole] = useState("employee");
-  const [instructionProblems, setInstructionProblems] = useState("");
+
   const [instructionTitle, setInstructionTitle] = useState("");
   const [instructionProject, setInstructionProject] = useState("");
   const [instructionCustomer, setInstructionCustomer] = useState("");
@@ -430,11 +430,13 @@ export default function Home() {
     (_event, session) => {
       setUser(session?.user || null);
 
-     if (session?.user) {
-  loadCompanyContext(session.user.id);
-  loadReportsFromDatabase();
-  loadCompanySettings(session.user.id);
-}
+      if (session?.user) {
+        loadReportsFromDatabase();
+        loadCompanySettings(session.user.id);
+      } else {
+        setSavedReports([]);
+        setCompanySettings(null);
+      }
     }
   );
 
@@ -556,28 +558,21 @@ async function loadCompanyUsers(companyId: string) {
 async function addCompanyUser() {
   if (!currentCompany) return;
 
-  const { error } = await supabase.from("company_users").insert({
-    company_id: currentCompany.company_id,
-    full_name: newUserName,
-    email: newUserEmail,
-    role: newUserRole,
-  });
+  const { error } = await supabase
+    .from("company_users")
+    .insert({
+      company_id: currentCompany.company_id,
+      full_name: newUserName,
+      email: newUserEmail,
+      role: newUserRole,
+    });
 
   if (error) {
     setMessage("Fehler beim Hinzufügen: " + error.message);
     return;
   }
 
-  setNewUserName("");
-  setNewUserEmail("");
-  setNewUserRole("employee");
-
-  await loadCompanyUsers(currentCompany.company_id);
-
-  setMessage("Mitarbeiter wurde angelegt.");
-}
-
-async function resetCompanyUserPassword(memberEmail: string) {
+  async function resetCompanyUserPassword(memberEmail: string) {
   if (!memberEmail) {
     setMessage("Keine E-Mail-Adresse vorhanden.");
     return;
@@ -595,30 +590,61 @@ async function resetCompanyUserPassword(memberEmail: string) {
   setMessage("Passwort-Reset-E-Mail wurde gesendet.");
 }
 
-async function loadReportsFromDatabase() {
-  const { data, error } = await supabase
-    .from("reports")
-    .select("*")
-    .order("created_at", { ascending: false });
+  setNewUserName("");
+  setNewUserEmail("");
+  setNewUserRole("employee");
 
-  if (error) {
-    setMessage("Fehler beim Laden: " + error.message);
+  await loadCompanyUsers(currentCompany.company_id);
+
+  setMessage("Mitarbeiter wurde angelegt.");
+}
+
+async function loadReportsFromDatabase() {
+    const { data, error } = await supabase
+      .from("reports")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      setMessage("Fehler beim Laden: " + error.message);
+      return;
+    }
+
+    setSavedReports((data || []) as SavedReport[]);
+  }
+
+  function updateDay(index: number, field: keyof DayEntry, value: string) {
+    const copy = [...days];
+    copy[index] = { ...copy[index], [field]: value };
+    setDays(copy);
+  }
+
+async function resetCompanyUserPassword(memberEmail: string) {
+  if (!memberEmail) {
+    setMessage("Keine E-Mail-Adresse vorhanden.");
     return;
   }
 
-  setSavedReports((data || []) as SavedReport[]);
-}
+  const { error } = await supabase.auth.resetPasswordForEmail(
+    memberEmail,
+    {
+      redirectTo: "https://international-regie.vercel.app",
+    }
+  );
 
-function updateDay(index: number, field: keyof DayEntry, value: string) {
-  const copy = [...days];
-  copy[index] = { ...copy[index], [field]: value };
-  setDays(copy);
+  if (error) {
+    setMessage("Fehler beim Passwort-Reset: " + error.message);
+    return;
+  }
+
+  setMessage("Passwort-Reset-E-Mail wurde gesendet.");
 }
 
 async function saveWorkInstruction() {
   setMessage("Speichere Arbeitsanweisung...");
 
   if (!currentCompany) {
+
     setMessage("Keine Firma geladen.");
     return;
   }
@@ -626,7 +652,33 @@ async function saveWorkInstruction() {
   if (!instructionTitle.trim()) {
     setMessage("Bitte Titel der Arbeitsanweisung eintragen.");
     return;
+
+    
+
   }
+
+  async function loadWorkInstructions(companyId: string) {
+  if (!currentCompany) return;
+
+  const { data, error } = await supabase
+    .from("work_instructions")
+    .select(`
+      *,
+      work_instruction_tasks (*)
+    `)
+    .eq("company_id", currentCompany.company_id)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    setMessage("Fehler beim Laden der Arbeitsanweisungen: " + error.message);
+    return;
+  }
+
+  setWorkInstructions(data || []);
+}
+
+
+ 
 
   const { data: instruction, error } = await supabase
     .from("work_instructions")
@@ -638,7 +690,6 @@ async function saveWorkInstruction() {
       customer: instructionCustomer,
       site: instructionSite,
       description: instructionDescription,
-      problems_text: instructionProblems,
     })
     .select()
     .single();
@@ -649,7 +700,7 @@ async function saveWorkInstruction() {
   }
 
   const taskRows = instructionTasks
-    .filter((task) => task.trim() !== "")
+    .filter((t) => t.trim() !== "")
     .map((task, index) => ({
       work_instruction_id: instruction.id,
       task_text: task,
@@ -657,50 +708,12 @@ async function saveWorkInstruction() {
     }));
 
   if (taskRows.length > 0) {
-    const { error: taskError } = await supabase
+    await supabase
       .from("work_instruction_tasks")
       .insert(taskRows);
-
-    if (taskError) {
-      setMessage(
-        "Arbeitsanweisung gespeichert, aber Schritte nicht: " +
-          taskError.message
-      );
-      return;
-    }
   }
-
-  setInstructionTitle("");
-  setInstructionProject("");
-  setInstructionCustomer("");
-  setInstructionSite("");
-  setInstructionDescription("");
-  setInstructionTasks([""]);
-  setInstructionProblems("");
-
-  await loadWorkInstructions(currentCompany.company_id);
 
   setMessage("Arbeitsanweisung gespeichert.");
-setInstructionProblems("");
-  
-}
-
-async function deleteWorkInstruction(id: string) {
-  if (!currentCompany) return;
-
-  const { error } = await supabase
-    .from("work_instructions")
-    .delete()
-    .eq("id", id);
-
-  if (error) {
-    setMessage("Fehler beim Löschen: " + error.message);
-    return;
-  }
-
-  await loadWorkInstructions(currentCompany.company_id);
-
-  setMessage("Arbeitsanweisung gelöscht.");
 }
 
   function updateFullWeekFromMonday(selectedValue: string) {
@@ -719,24 +732,6 @@ async function deleteWorkInstruction(id: string) {
 
     setDays(copy);
   }
-
-async function updateWorkInstructionNote(id: string, note: string) {
-  const { error } = await supabase
-    .from("work_instructions")
-    .update({ employee_note: note })
-    .eq("id", id);
-
-  if (error) {
-    setMessage("Fehler beim Speichern der Notiz: " + error.message);
-    return;
-  }
-
-  if (currentCompany) {
-    await loadWorkInstructions(currentCompany.company_id);
-  }
-
-  setMessage("Notiz wurde gespeichert.");
-}
 
   function parseHours(value: string) {
     return Number(value.replace(",", ".")) || 0;
@@ -826,22 +821,6 @@ async function loadCompanySettings(userId: string) {
       tax_number: "",
     }
   );
-}
-
-async function toggleTaskCompleted(taskId: string, completed: boolean) {
-  const { error } = await supabase
-    .from("work_instruction_tasks")
-    .update({ completed })
-    .eq("id", taskId);
-
-  if (error) {
-    setMessage("Fehler beim Aktualisieren: " + error.message);
-    return;
-  }
-
-  if (currentCompany) {
-    await loadWorkInstructions(currentCompany.company_id);
-  }
 }
 
 async function saveCompanySettings() {
@@ -1562,13 +1541,12 @@ Object.entries(projectTotals).forEach(([project, total]) => {
     />
   </div>
 
-  
-<input
-  className="border p-3 w-full text-black bg-white"
-  placeholder="Probleme / Hinweise"
-  value={instructionProblems}
-  onChange={(e) => setInstructionProblems(e.target.value)}
-/>
+  <textarea
+    className="border p-3 w-full h-24 text-black bg-white"
+    placeholder="Beschreibung / Ziel der Arbeit"
+    value={instructionDescription}
+    onChange={(e) => setInstructionDescription(e.target.value)}
+  />
 
   <h3 className="font-bold">Arbeitsschritte</h3>
 
@@ -1603,82 +1581,6 @@ Object.entries(projectTotals).forEach(([project, total]) => {
   </button>
 </section>
 
-<section className="border rounded p-4 space-y-4 bg-white text-black">
-  <h2 className="text-xl font-bold">Gespeicherte Arbeitsanweisungen</h2>
-
-  {workInstructions.length === 0 && (
-    <p className="text-gray-600">Noch keine Arbeitsanweisungen vorhanden.</p>
-  )}
-
-  {workInstructions.map((instruction) => (
-    <div key={instruction.id} className="border rounded p-4 space-y-2">
-      <h3 className="font-bold text-lg">{instruction.title}</h3>
-      <p><strong>Projekt:</strong> {instruction.project || "-"}</p>
-      <p><strong>Kunde:</strong> {instruction.customer || "-"}</p>
-      <p><strong>Baustelle:</strong> {instruction.site || "-"}</p>
-
-{instruction.problems_text && (
-  <div className="bg-yellow-50 border rounded p-3">
-    <strong>Probleme / Hinweise:</strong>
-    <p>{instruction.problems_text}</p>
-  </div>
-)}
-
-      <ul className="list-disc pl-6 mt-2">
-        {(instruction.work_instruction_tasks || [])
-          .sort((a: any, b: any) => a.sort_order - b.sort_order)
-          .map((task: any) => (
-            <li key={task.id} className="flex items-center gap-2">
-  <input
-    type="checkbox"
-    checked={task.completed || false}
-    onChange={() =>
-      toggleTaskCompleted(task.id, !(task.completed || false))
-    }
-  />
-
-<textarea
-  className="border p-3 w-full h-24 text-black bg-white"
-  placeholder="Notiz / Rückmeldung Mitarbeiter"
-  defaultValue={instruction.employee_note || ""}
-  id={`note-${instruction.id}`}
-/>
-
-<button
-  type="button"
-  onClick={() => {
-    const field = document.getElementById(
-      `note-${instruction.id}`
-    ) as HTMLTextAreaElement;
-
-    updateWorkInstructionNote(instruction.id, field.value);
-  }}
-  className="bg-gray-700 text-white px-3 py-2 rounded"
->
-  Notiz speichern
-</button>
-
-  <span className={task.completed ? "line-through text-gray-500" : ""}>
-    {task.task_text}
-  </span>
-</li>
-          ))}
-      </ul>
-  {(currentCompany?.role === "owner" ||
-   currentCompany?.role === "project_manager" ||
-  currentCompany?.role === "admin") && (
-  <button
-    type="button"
-    onClick={() => deleteWorkInstruction(instruction.id)}
-    className="bg-red-600 text-white px-3 py-2 rounded"
-  >
-    Arbeitsanweisung löschen
-  </button>
-)}
-
-    </div>
-  ))}
-</section>
 
 </section>
   <input
@@ -1915,8 +1817,6 @@ Object.entries(projectTotals).forEach(([project, total]) => {
             className="border p-3 w-full text-black bg-white"
             onChange={(e) => handlePhotos(index, e.target.files)}
           />
-
-
 
           {day.photos.length > 0 && (
             <div className="grid grid-cols-2 gap-3">

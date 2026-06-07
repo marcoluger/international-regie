@@ -402,7 +402,7 @@ export default function Home() {
   const [newUserEmail, setNewUserEmail] = useState("");
   const [newUserName, setNewUserName] = useState("");
   const [newUserRole, setNewUserRole] = useState("employee");
-  const [instructionProblems, setInstructionProblems] = useState("");
+
   const [instructionTitle, setInstructionTitle] = useState("");
   const [instructionProject, setInstructionProject] = useState("");
   const [instructionCustomer, setInstructionCustomer] = useState("");
@@ -430,11 +430,13 @@ export default function Home() {
     (_event, session) => {
       setUser(session?.user || null);
 
-     if (session?.user) {
-  loadCompanyContext(session.user.id);
-  loadReportsFromDatabase();
-  loadCompanySettings(session.user.id);
-}
+      if (session?.user) {
+        loadReportsFromDatabase();
+        loadCompanySettings(session.user.id);
+      } else {
+        setSavedReports([]);
+        setCompanySettings(null);
+      }
     }
   );
 
@@ -638,7 +640,6 @@ async function saveWorkInstruction() {
       customer: instructionCustomer,
       site: instructionSite,
       description: instructionDescription,
-      problems_text: instructionProblems,
     })
     .select()
     .single();
@@ -676,13 +677,10 @@ async function saveWorkInstruction() {
   setInstructionSite("");
   setInstructionDescription("");
   setInstructionTasks([""]);
-  setInstructionProblems("");
 
   await loadWorkInstructions(currentCompany.company_id);
 
   setMessage("Arbeitsanweisung gespeichert.");
-setInstructionProblems("");
-  
 }
 
 async function deleteWorkInstruction(id: string) {
@@ -719,24 +717,6 @@ async function deleteWorkInstruction(id: string) {
 
     setDays(copy);
   }
-
-async function updateWorkInstructionNote(id: string, note: string) {
-  const { error } = await supabase
-    .from("work_instructions")
-    .update({ employee_note: note })
-    .eq("id", id);
-
-  if (error) {
-    setMessage("Fehler beim Speichern der Notiz: " + error.message);
-    return;
-  }
-
-  if (currentCompany) {
-    await loadWorkInstructions(currentCompany.company_id);
-  }
-
-  setMessage("Notiz wurde gespeichert.");
-}
 
   function parseHours(value: string) {
     return Number(value.replace(",", ".")) || 0;
@@ -1562,13 +1542,12 @@ Object.entries(projectTotals).forEach(([project, total]) => {
     />
   </div>
 
-  
-<input
-  className="border p-3 w-full text-black bg-white"
-  placeholder="Probleme / Hinweise"
-  value={instructionProblems}
-  onChange={(e) => setInstructionProblems(e.target.value)}
-/>
+  <textarea
+    className="border p-3 w-full h-24 text-black bg-white"
+    placeholder="Beschreibung / Ziel der Arbeit"
+    value={instructionDescription}
+    onChange={(e) => setInstructionDescription(e.target.value)}
+  />
 
   <h3 className="font-bold">Arbeitsschritte</h3>
 
@@ -1617,13 +1596,6 @@ Object.entries(projectTotals).forEach(([project, total]) => {
       <p><strong>Kunde:</strong> {instruction.customer || "-"}</p>
       <p><strong>Baustelle:</strong> {instruction.site || "-"}</p>
 
-{instruction.problems_text && (
-  <div className="bg-yellow-50 border rounded p-3">
-    <strong>Probleme / Hinweise:</strong>
-    <p>{instruction.problems_text}</p>
-  </div>
-)}
-
       <ul className="list-disc pl-6 mt-2">
         {(instruction.work_instruction_tasks || [])
           .sort((a: any, b: any) => a.sort_order - b.sort_order)
@@ -1636,27 +1608,6 @@ Object.entries(projectTotals).forEach(([project, total]) => {
       toggleTaskCompleted(task.id, !(task.completed || false))
     }
   />
-
-<textarea
-  className="border p-3 w-full h-24 text-black bg-white"
-  placeholder="Notiz / Rückmeldung Mitarbeiter"
-  defaultValue={instruction.employee_note || ""}
-  id={`note-${instruction.id}`}
-/>
-
-<button
-  type="button"
-  onClick={() => {
-    const field = document.getElementById(
-      `note-${instruction.id}`
-    ) as HTMLTextAreaElement;
-
-    updateWorkInstructionNote(instruction.id, field.value);
-  }}
-  className="bg-gray-700 text-white px-3 py-2 rounded"
->
-  Notiz speichern
-</button>
 
   <span className={task.completed ? "line-through text-gray-500" : ""}>
     {task.task_text}
@@ -1915,8 +1866,6 @@ Object.entries(projectTotals).forEach(([project, total]) => {
             className="border p-3 w-full text-black bg-white"
             onChange={(e) => handlePhotos(index, e.target.files)}
           />
-
-
 
           {day.photos.length > 0 && (
             <div className="grid grid-cols-2 gap-3">
