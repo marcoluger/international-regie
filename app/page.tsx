@@ -410,6 +410,7 @@ export default function Home() {
   const [instructionDescription, setInstructionDescription] = useState("");
   const [instructionTasks, setInstructionTasks] = useState<string[]>([""]);
   const [workInstructions, setWorkInstructions] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState("dashboard");
 
 
   useEffect(() => {
@@ -1461,6 +1462,57 @@ Object.entries(projectTotals).forEach(([project, total]) => {
           {t.logout}
         </button>
       </header>
+      
+
+<div className="flex flex-wrap gap-2">
+  <button
+    type="button"
+    onClick={() => setActiveTab("dashboard")}
+    className="bg-gray-700 text-white px-4 py-2 rounded"
+  >
+    Dashboard
+  </button>
+
+  <button
+    type="button"
+    onClick={() => setActiveTab("tag")}
+    className="bg-gray-700 text-white px-4 py-2 rounded"
+  >
+    Tag
+  </button>
+
+  <button
+    type="button"
+    onClick={() => setActiveTab("woche")}
+    className="bg-gray-700 text-white px-4 py-2 rounded"
+  >
+    Woche
+  </button>
+
+  <button
+    type="button"
+    onClick={() => setActiveTab("monat")}
+    className="bg-gray-700 text-white px-4 py-2 rounded"
+  >
+    Monat
+  </button>
+
+  <button
+    type="button"
+    onClick={() => setActiveTab("projekte")}
+    className="bg-gray-700 text-white px-4 py-2 rounded"
+  >
+    Projekte
+  </button>
+
+  <button
+    type="button"
+    onClick={() => setActiveTab("arbeitsanweisungen")}
+    className="bg-gray-700 text-white px-4 py-2 rounded"
+  >
+    Arbeitsanweisungen
+  </button>
+</div>
 <section className="border rounded p-4 space-y-4 bg-white text-black">
   <h2 className="text-xl font-bold">Firmendaten</h2>
 
