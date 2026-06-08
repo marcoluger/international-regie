@@ -1581,6 +1581,9 @@ Object.entries(projectTotals).forEach(([project, total]) => {
   </div>
 ))}
 
+
+{activeTab === "arbeitsanweisungen" && (
+  <>
 <section className="border rounded p-4 space-y-4 bg-white text-black">
   <h2 className="text-xl font-bold">Arbeitsanweisung</h2>
 
@@ -1731,6 +1734,8 @@ Object.entries(projectTotals).forEach(([project, total]) => {
     </div>
   ))}
 </section>
+ </>
+ )}
 
 </section>
   <input
