@@ -411,7 +411,11 @@ export default function Home() {
   const [instructionTasks, setInstructionTasks] = useState<string[]>([""]);
   const [workInstructions, setWorkInstructions] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState("dashboard");
-
+  const [projects, setProjects] = useState<any[]>([]);
+  const [projectName, setProjectName] = useState("");
+  const [projectCustomer, setProjectCustomer] = useState("");
+  const [projectSite, setProjectSite] = useState("");
+  const [projectManager, setProjectManager] = useState("");
 
   useEffect(() => {
   async function loadUser() {
@@ -519,6 +523,7 @@ async function loadCompanyContext(userId: string) {
   setCompanyFeatures(features as CompanyFeatures);
   await loadCompanyUsers(companyUser.company_id);
   await loadWorkInstructions(companyUser.company_id);
+  await loadProjects();
 }
 
 async function loadWorkInstructions(companyId: string) {
@@ -995,6 +1000,51 @@ async function uploadCompanyLogo(files: FileList | null) {
     setPdfLanguage("Deutsch");
     setDays(createEmptyDays());
   }
+
+async function loadProjects() {
+  if (!currentCompany) return;
+
+  const { data, error } = await supabase
+    .from("projects")
+    .select("*")
+    .eq("company_id", currentCompany.company_id)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    setMessage("Fehler beim Laden der Projekte: " + error.message);
+    return;
+  }
+
+  setProjects(data || []);
+}
+
+async function saveProject() {
+  if (!currentCompany) return;
+
+  const { error } = await supabase
+    .from("projects")
+    .insert({
+      company_id: currentCompany.company_id,
+      name: projectName,
+      customer: projectCustomer,
+      site: projectSite,
+      project_manager: projectManager,
+    });
+
+  if (error) {
+    setMessage("Fehler beim Speichern: " + error.message);
+    return;
+  }
+
+  setProjectName("");
+  setProjectCustomer("");
+  setProjectSite("");
+  setProjectManager("");
+
+  await loadProjects();
+
+  setMessage("Projekt gespeichert.");
+}
 
   async function translateAll() {
     setMessage("");
@@ -1473,6 +1523,8 @@ Object.entries(projectTotals).forEach(([project, total]) => {
     Dashboard
   </button>
 
+
+
   <button
     type="button"
     onClick={() => setActiveTab("tag")}
@@ -1513,6 +1565,49 @@ Object.entries(projectTotals).forEach(([project, total]) => {
     Arbeitsanweisungen
   </button>
 </div>
+
+{activeTab === "projekte" && (
+  <section className="border rounded p-4 space-y-4 bg-white text-black">
+    <h2 className="text-xl font-bold">Projekte</h2>
+
+    <input
+      className="border p-3 w-full"
+      placeholder="Projektname"
+      value={projectName}
+      onChange={(e) => setProjectName(e.target.value)}
+    />
+
+    <input
+      className="border p-3 w-full"
+      placeholder="Kunde"
+      value={projectCustomer}
+      onChange={(e) => setProjectCustomer(e.target.value)}
+    />
+
+    <input
+      className="border p-3 w-full"
+      placeholder="Baustelle"
+      value={projectSite}
+      onChange={(e) => setProjectSite(e.target.value)}
+    />
+
+    <input
+      className="border p-3 w-full"
+      placeholder="Projektleiter"
+      value={projectManager}
+      onChange={(e) => setProjectManager(e.target.value)}
+    />
+
+    <button
+      type="button"
+      onClick={saveProject}
+      className="bg-blue-700 text-white px-4 py-3 rounded"
+    >
+      Projekt speichern
+    </button>
+  </section>
+)}
+
 <section className="border rounded p-4 space-y-4 bg-white text-black">
   <h2 className="text-xl font-bold">Firmendaten</h2>
 
