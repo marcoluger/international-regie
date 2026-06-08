@@ -416,6 +416,7 @@ export default function Home() {
   const [projectCustomer, setProjectCustomer] = useState("");
   const [projectSite, setProjectSite] = useState("");
   const [projectManager, setProjectManager] = useState("");
+  const [selectedProjectId, setSelectedProjectId] = useState("");
 
   useEffect(() => {
   async function loadUser() {
@@ -634,20 +635,24 @@ async function saveWorkInstruction() {
     return;
   }
 
-  const { data: instruction, error } = await supabase
-    .from("work_instructions")
-    .insert({
-      company_id: currentCompany.company_id,
-      created_by: user?.id,
-      title: instructionTitle,
-      project: instructionProject,
-      customer: instructionCustomer,
-      site: instructionSite,
-      description: instructionDescription,
-      problems_text: instructionProblems,
-    })
-    .select()
-    .single();
+  
+
+const { data: instruction, error } = await supabase
+  .from("work_instructions")
+  .insert({
+    company_id: currentCompany.company_id,
+    project_id: selectedProjectId,
+
+    created_by: user?.id,
+    title: instructionTitle,
+    project: instructionProject,
+    customer: instructionCustomer,
+    site: instructionSite,
+    description: instructionDescription,
+    problems_text: instructionProblems,
+  })
+  .select()
+  .single();
 
   if (error) {
     setMessage("Fehler: " + error.message);
@@ -1690,12 +1695,21 @@ Object.entries(projectTotals).forEach(([project, total]) => {
       onChange={(e) => setInstructionTitle(e.target.value)}
     />
 
-    <input
-      className="border p-3 text-black bg-white"
-      placeholder="Projekt"
-      value={instructionProject}
-      onChange={(e) => setInstructionProject(e.target.value)}
-    />
+   
+
+<select
+  className="border p-3 text-black bg-white"
+  value={selectedProjectId}
+  onChange={(e) => setSelectedProjectId(e.target.value)}
+>
+  <option value="">Projekt auswählen</option>
+
+  {projects.map((project) => (
+    <option key={project.id} value={project.id}>
+      {project.name}
+    </option>
+  ))}
+</select>
 
     <input
       className="border p-3 text-black bg-white"
