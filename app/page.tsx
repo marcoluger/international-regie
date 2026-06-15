@@ -395,6 +395,15 @@ function TabButton({
   );
 }
 
+// Hilfsfunktion: allowed_languages sicher als Array holen
+function getAllowedLanguages(companyFeatures: any): string[] {
+  const raw = companyFeatures?.allowed_languages;
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw;
+  // Falls jsonb als String kommt: '["Deutsch","Kroatisch"]'
+  try { return JSON.parse(raw); } catch { return []; }
+}
+
 export default function Home() {
   const [uiLanguage, setUiLanguage] = useState<Language>("Deutsch");
   const t = texts[uiLanguage];
@@ -436,6 +445,8 @@ export default function Home() {
 
   // FIX 1: "dashboard" als Standard-Tab, alle Tabs klar definiert
   const [activeTab, setActiveTab] = useState("dashboard");
+
+
 
   const [projects, setProjects] = useState<any[]>([]);
   const [projectName, setProjectName] = useState("");
@@ -1275,10 +1286,12 @@ export default function Home() {
               <input className="border p-3 text-black bg-white" placeholder={t.employee} value={employee} onChange={(e) => setEmployee(e.target.value)} />
               <input className="border p-3 bg-gray-200 text-black" value={calendarWeek} readOnly placeholder={t.calendarWeek} />
               <select className="border p-3 text-black bg-white" value={fromLanguage} onChange={(e) => setFromLanguage(e.target.value)}>
-                {languages.map((lang) => <option key={lang} value={lang}>{lang}</option>)}
+                {(getAllowedLanguages(companyFeatures).length > 0 ? getAllowedLanguages(companyFeatures) : languages).map((lang) => <option key={lang} value={lang}>{lang}</option>)}
               </select>
               <select className="border p-3 text-black bg-white" value={toLanguage} onChange={(e) => setToLanguage(e.target.value)}>
-                {languages.map((lang) => <option key={lang} value={lang}>{lang}</option>)}
+                {(getAllowedLanguages(companyFeatures).length > 0 ? getAllowedLanguages(companyFeatures) : languages)
+                  .filter((lang) => lang !== "Deutsch")
+                  .map((lang) => <option key={lang} value={lang}>{lang}</option>)}
               </select>
               <input className="border p-3 text-black bg-white md:col-span-2" placeholder={t.recipientEmail} value={emailTo} onChange={(e) => setEmailTo(e.target.value)} />
             </div>
@@ -1515,7 +1528,7 @@ export default function Home() {
           <section className="border rounded p-4 space-y-4 bg-white text-black">
             <h2 className="text-xl font-bold">Gespeicherte Arbeitsanweisungen</h2>
             {workInstructions.length === 0 && <p className="text-gray-600">Noch keine Arbeitsanweisungen vorhanden.</p>}
-            {/* Zielsprache für Übersetzung */}
+            {/* Zielsprache für Übersetzung — nur freigeschaltete Sprachen */}
             <div className="flex items-center gap-3 bg-gray-50 border rounded p-3">
               <label className="text-sm font-medium text-gray-700">🌐 Übersetzen nach:</label>
               <select
@@ -1523,10 +1536,15 @@ export default function Home() {
                 value={instructionToLanguage}
                 onChange={(e) => setInstructionToLanguage(e.target.value)}
               >
-                {["Kroatisch", "Slowenisch", "Polnisch", "Englisch", "Deutsch"].map((lang) => (
-                  <option key={lang} value={lang}>{lang}</option>
-                ))}
+                {getAllowedLanguages(companyFeatures)
+                  .filter((lang) => lang !== "Deutsch")
+                  .map((lang) => (
+                    <option key={lang} value={lang}>{lang}</option>
+                  ))}
               </select>
+              {getAllowedLanguages(companyFeatures).filter((l) => l !== "Deutsch").length === 0 && (
+                <span className="text-sm text-gray-400">🔒 Keine Zielsprachen freigeschaltet</span>
+              )}
             </div>
 
             {workInstructions.map((instruction) => {
