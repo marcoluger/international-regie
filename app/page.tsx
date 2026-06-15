@@ -1197,7 +1197,10 @@ export default function Home() {
             value={uiLanguage}
             onChange={(e) => setUiLanguage(e.target.value as Language)}
           >
-            {languages.map((lang) => (
+            {(getAllowedLanguages(companyFeatures).length > 0
+              ? getAllowedLanguages(companyFeatures).filter(l => languages.includes(l as Language))
+              : languages
+            ).map((lang) => (
               <option key={lang} value={lang}>🌐 {lang}</option>
             ))}
           </select>
@@ -1206,7 +1209,10 @@ export default function Home() {
             value={pdfLanguage}
             onChange={(e) => setPdfLanguage(e.target.value)}
           >
-            {pdfLanguages.map((lang) => (
+            {(getAllowedLanguages(companyFeatures).length > 0
+              ? getAllowedLanguages(companyFeatures).filter(l => pdfLanguages.includes(l))
+              : pdfLanguages
+            ).map((lang) => (
               <option key={lang} value={lang}>📄 {lang}</option>
             ))}
           </select>
