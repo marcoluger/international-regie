@@ -216,6 +216,10 @@ const texts = {
     msgEmailRequired: "Bitte Empfänger-E-Mail eintragen.",
     msgEmailSending: "PDF wird per E-Mail gesendet...",
     msgEmailSent: "PDF wurde per E-Mail gesendet.",
+    statusOpen: "⬜ Offen",
+    statusInProgress: "🟡 In Arbeit",
+    statusStopped: "⛔ Gestoppt",
+    statusCompleted: "✅ Erledigt",
     problemsHints: "Probleme / Hinweise",
     roleEmployee: "Mitarbeiter",
     roleProjectManager: "Projektleiter",
@@ -353,6 +357,10 @@ const texts = {
     msgEmailRequired: "Unesite e-mail primatelja.",
     msgEmailSending: "PDF se šalje e-poštom...",
     msgEmailSent: "PDF je poslan e-poštom.",
+    statusOpen: "⬜ Otvoreno",
+    statusInProgress: "🟡 U tijeku",
+    statusStopped: "⛔ Zaustavljeno",
+    statusCompleted: "✅ Završeno",
     problemsHints: "Problemi / napomene",
     roleEmployee: "Radnik",
     roleProjectManager: "Voditelj projekta",
@@ -490,6 +498,10 @@ const texts = {
     msgEmailRequired: "Vnesite e-pošto prejemnika.",
     msgEmailSending: "PDF se pošilja po e-pošti...",
     msgEmailSent: "PDF je poslan po e-pošti.",
+    statusOpen: "⬜ Odprto",
+    statusInProgress: "🟡 V teku",
+    statusStopped: "⛔ Ustavljeno",
+    statusCompleted: "✅ Končano",
     problemsHints: "Težave / opombe",
     roleEmployee: "Zaposleni",
     roleProjectManager: "Vodja projekta",
@@ -634,6 +646,10 @@ const texts = {
     msgEmailRequired: "Wprowadź e-mail odbiorcy.",
     msgEmailSending: "PDF jest wysyłany e-mailem...",
     msgEmailSent: "PDF został wysłany e-mailem.",
+    statusOpen: "⬜ Otwarte",
+    statusInProgress: "🟡 W toku",
+    statusStopped: "⛔ Zatrzymane",
+    statusCompleted: "✅ Zakończone",
     problemsHints: "Problemy / uwagi",
     roleEmployee: "Pracownik",
     roleProjectManager: "Kierownik projektu",
@@ -1665,10 +1681,10 @@ export default function Home() {
                 <p>{t.dueToday}: <strong>{todayInstructions.length}</strong></p>
 
                 <div className="border rounded p-3 bg-gray-100">
-                  <p>⬜ Offen: {openCount}</p>
-                  <p>🟡 In Arbeit: {progressCount}</p>
-                  <p>⛔ Gestoppt: {stoppedCount}</p>
-                  <p>✅ Erledigt: {completedCount}</p>
+                  <p>{t.statusOpen}: {openCount}</p>
+                  <p>{t.statusInProgress}: {progressCount}</p>
+                  <p>{t.statusStopped}: {stoppedCount}</p>
+                  <p>{t.statusCompleted}: {completedCount}</p>
                   <p className="font-bold mt-3">{t.totalProgress}: {progressPercent}%</p>
                   <div className="w-full bg-gray-300 rounded h-4 mt-1">
                     <div className="bg-green-600 h-4 rounded" style={{ width: `${progressPercent}%` }} />
@@ -1861,8 +1877,8 @@ export default function Home() {
                       const progressPercent = totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0;
                       return (
                         <div className="border rounded p-3 bg-gray-100">
-                          <p>⬜ Offen: {openCount}</p><p>🟡 In Arbeit: {progressCount}</p>
-                          <p>⛔ Gestoppt: {stoppedCount}</p><p>✅ Erledigt: {completedCount}</p>
+                          <p>{t.statusOpen}: {openCount}</p><p>{t.statusInProgress}: {progressCount}</p>
+                          <p>{t.statusStopped}: {stoppedCount}</p><p>{t.statusCompleted}: {completedCount}</p>
                           <p className="font-bold mt-2">{t.progress}: {progressPercent}%</p>
                           <div className="w-full bg-gray-300 rounded h-4 mt-1">
                             <div className="bg-green-600 h-4 rounded" style={{ width: `${progressPercent}%` }} />
@@ -1883,7 +1899,7 @@ export default function Home() {
                           <ul className="list-disc pl-6 space-y-1">
                             {instruction.work_instruction_tasks.map((task: any) => (
                               <li key={task.id}>
-                                {task.status === "completed" ? "✅ Erledigt" : task.status === "in_progress" ? "🟡 In Arbeit" : task.status === "stopped" ? "⛔ Gestoppt" : "⬜ Offen"}{" "}{task.task_text}
+                                {task.status === "completed" ? t.statusCompleted : task.status === "in_progress" ? t.statusInProgress : task.status === "stopped" ? t.statusStopped : t.statusOpen}{" "}{task.task_text}
                                 {task.note && <div className="text-sm text-gray-600 ml-2">{t.feedbackLabel}: {task.note}</div>}
                               </li>
                             ))}
@@ -2007,10 +2023,10 @@ export default function Home() {
                       <li key={task.id} className="space-y-2 border rounded p-2 list-none">
                         <div className="flex items-center gap-2">
                           <select className="border rounded p-2 font-medium text-black bg-white" value={task.status || "open"} onChange={(e) => updateTaskStatus(task.id, e.target.value)}>
-                            <option value="open">⬜ Offen</option>
-                            <option value="in_progress">🟡 In Arbeit</option>
-                            <option value="stopped">⛔ Gestoppt</option>
-                            <option value="completed">✅ Erledigt</option>
+                            <option value="open">{t.statusOpen}</option>
+                            <option value="in_progress">{t.statusInProgress}</option>
+                            <option value="stopped">{t.statusStopped}</option>
+                            <option value="completed">{t.statusCompleted}</option>
                           </select>
                           <div>
                             <div className="font-medium">{task.task_text}</div>
