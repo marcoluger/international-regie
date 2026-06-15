@@ -117,6 +117,70 @@ const texts = {
     update: "Aktualisieren",
     downloadPdf: "PDF herunterladen",
     sendPdf: "PDF per E-Mail senden",
+    // Dashboard
+    dashboard: "Dashboard",
+    projects: "Projekte",
+    workInstructions: "Arbeitsanweisungen",
+    dueToday: "Heute fällig",
+    totalProgress: "Gesamtfortschritt",
+    stoppedSteps: "Gestoppte Arbeitsschritte",
+    stepsInProgress: "Arbeitsschritte in Arbeit",
+    noProject: "Kein Projekt",
+    // Projekte
+    projectsTab: "Projekte",
+    projectName: "Projektname",
+    projectCustomer: "Kunde",
+    projectSite: "Baustelle",
+    projectManager: "Projektleiter",
+    saveProject: "Projekt speichern",
+    deleteProject: "Projekt löschen",
+    openProject: "Projekt öffnen",
+    closeProject: "Schließen",
+    progress: "Fortschritt",
+    noInstructions: "Noch keine Arbeitsanweisungen für dieses Projekt.",
+    noReports: "Noch keine Regieberichte für dieses Projekt.",
+    reportsTab: "Regieberichte",
+    // Arbeitsanweisungen
+    newInstruction: "Neue Arbeitsanweisung",
+    instructionTitle: "Titel",
+    selectProject: "Projekt auswählen",
+    problems: "Probleme / Hinweise",
+    workSteps: "Arbeitsschritte",
+    addStep: "+ Arbeitsschritt",
+    saveInstruction: "Arbeitsanweisung speichern",
+    savedInstructions: "Gespeicherte Arbeitsanweisungen",
+    noInstructionsSaved: "Noch keine Arbeitsanweisungen vorhanden.",
+    date: "Datum",
+    project: "Projekt",
+    translateTo: "Übersetzen nach",
+    translating2: "Übersetze...",
+    translated: "Übersetzt",
+    feedback: "Rückmeldung",
+    saveFeedback: "Rückmeldung speichern",
+    toReport: "In Regiebericht übernehmen",
+    deleteInstruction: "Arbeitsanweisung löschen",
+    autoReportLocked: "Automatische Regieberichte sind in deinem Paket nicht aktiviert.",
+    // Mitarbeiter
+    employeeManagement: "Mitarbeiterverwaltung",
+    name: "Name",
+    role: "Rolle",
+    addEmployee: "Mitarbeiter hinzufügen",
+    currentEmployees: "Aktuelle Mitarbeiter",
+    resetPassword: "Passwort zurücksetzen",
+    // Firmendaten
+    companyData: "Firmendaten",
+    uploadLogo: "Firmenlogo hochladen",
+    companyName: "Firmenname",
+    street: "Straße",
+    zip: "PLZ",
+    city: "Ort",
+    phone: "Telefon",
+    website: "Webseite",
+    taxNumber: "UID / Steuernummer",
+    saveCompany: "Firmendaten speichern",
+    // Berichte
+    reportNameLabel: "Berichtsname",
+    firma: "Firma",
   },
   Kroatisch: {
     title: "Tjedni režijski izvještaj",
@@ -157,6 +221,64 @@ const texts = {
     update: "Ažuriraj",
     downloadPdf: "Preuzmi PDF",
     sendPdf: "Pošalji PDF e-poštom",
+    dashboard: "Nadzorna ploča",
+    projects: "Projekti",
+    workInstructions: "Radne upute",
+    dueToday: "Danas dospijeva",
+    totalProgress: "Ukupni napredak",
+    stoppedSteps: "Zaustavljeni koraci",
+    stepsInProgress: "Koraci u tijeku",
+    noProject: "Nema projekta",
+    projectsTab: "Projekti",
+    projectName: "Naziv projekta",
+    projectCustomer: "Kupac",
+    projectSite: "Gradilište",
+    projectManager: "Voditelj projekta",
+    saveProject: "Spremi projekt",
+    deleteProject: "Obriši projekt",
+    openProject: "Otvori projekt",
+    closeProject: "Zatvori",
+    progress: "Napredak",
+    noInstructions: "Još nema radnih uputa za ovaj projekt.",
+    noReports: "Još nema izvještaja za ovaj projekt.",
+    reportsTab: "Режijski izvještaji",
+    newInstruction: "Nova radna uputa",
+    instructionTitle: "Naslov",
+    selectProject: "Odaberi projekt",
+    problems: "Problemi / napomene",
+    workSteps: "Radni koraci",
+    addStep: "+ Korak",
+    saveInstruction: "Spremi radnu uputu",
+    savedInstructions: "Spremljene radne upute",
+    noInstructionsSaved: "Još nema radnih uputa.",
+    date: "Datum",
+    project: "Projekt",
+    translateTo: "Prevedi na",
+    translating2: "Prevođenje...",
+    translated: "Prevedeno",
+    feedback: "Povratna informacija",
+    saveFeedback: "Spremi povratnu informaciju",
+    toReport: "Prenesi u izvještaj",
+    deleteInstruction: "Obriši radnu uputu",
+    autoReportLocked: "Automatski izvještaji nisu aktivni u vašem paketu.",
+    employeeManagement: "Upravljanje radnicima",
+    name: "Ime",
+    role: "Uloga",
+    addEmployee: "Dodaj radnika",
+    currentEmployees: "Trenutni radnici",
+    resetPassword: "Resetiraj lozinku",
+    companyData: "Podaci o tvrtki",
+    uploadLogo: "Učitaj logotip",
+    companyName: "Naziv tvrtke",
+    street: "Ulica",
+    zip: "Poštanski broj",
+    city: "Grad",
+    phone: "Telefon",
+    website: "Web stranica",
+    taxNumber: "OIB / Porezni broj",
+    saveCompany: "Spremi podatke tvrtke",
+    reportNameLabel: "Naziv izvještaja",
+    firma: "Tvrtka",
   },
   Slowenisch: {
     title: "Tedensko poročilo",
@@ -197,6 +319,64 @@ const texts = {
     update: "Posodobi",
     downloadPdf: "Prenesi PDF",
     sendPdf: "Pošlji PDF po e-pošti",
+    dashboard: "Nadzorna plošča",
+    projects: "Projekti",
+    workInstructions: "Delovne navodila",
+    dueToday: "Danes dospeva",
+    totalProgress: "Skupni napredek",
+    stoppedSteps: "Ustavljeni koraki",
+    stepsInProgress: "Koraki v teku",
+    noProject: "Ni projekta",
+    projectsTab: "Projekti",
+    projectName: "Ime projekta",
+    projectCustomer: "Stranka",
+    projectSite: "Gradbišče",
+    projectManager: "Vodja projekta",
+    saveProject: "Shrani projekt",
+    deleteProject: "Izbriši projekt",
+    openProject: "Odpri projekt",
+    closeProject: "Zapri",
+    progress: "Napredek",
+    noInstructions: "Še ni delovnih navodil za ta projekt.",
+    noReports: "Še ni poročil za ta projekt.",
+    reportsTab: "Режijska poročila",
+    newInstruction: "Novo delovno navodilo",
+    instructionTitle: "Naslov",
+    selectProject: "Izberi projekt",
+    problems: "Težave / opombe",
+    workSteps: "Delovni koraki",
+    addStep: "+ Korak",
+    saveInstruction: "Shrani delovno navodilo",
+    savedInstructions: "Shranjena delovna navodila",
+    noInstructionsSaved: "Še ni delovnih navodil.",
+    date: "Datum",
+    project: "Projekt",
+    translateTo: "Prevedi v",
+    translating2: "Prevajam...",
+    translated: "Prevedeno",
+    feedback: "Povratna informacija",
+    saveFeedback: "Shrani povratno informacijo",
+    toReport: "Prenesi v poročilo",
+    deleteInstruction: "Izbriši delovno navodilo",
+    autoReportLocked: "Samodejno poročanje ni aktivno v vašem paketu.",
+    employeeManagement: "Upravljanje zaposlenih",
+    name: "Ime",
+    role: "Vloga",
+    addEmployee: "Dodaj zaposlenega",
+    currentEmployees: "Trenutni zaposleni",
+    resetPassword: "Ponastavi geslo",
+    companyData: "Podatki o podjetju",
+    uploadLogo: "Naloži logotip",
+    companyName: "Ime podjetja",
+    street: "Ulica",
+    zip: "Poštna številka",
+    city: "Mesto",
+    phone: "Telefon",
+    website: "Spletna stran",
+    taxNumber: "DDV / Davčna številka",
+    saveCompany: "Shrani podatke podjetja",
+    reportNameLabel: "Ime poročila",
+    firma: "Podjetje",
   },
   Polnisch: {
     title: "Tygodniowy raport roboczy",
@@ -237,6 +417,71 @@ const texts = {
     update: "Aktualizuj",
     downloadPdf: "Pobierz PDF",
     sendPdf: "Wyślij PDF e-mailem",
+    // Dashboard
+    dashboard: "Panel główny",
+    projects: "Projekty",
+    workInstructions: "Instrukcje pracy",
+    dueToday: "Należne dzisiaj",
+    totalProgress: "Ogólny postęp",
+    stoppedSteps: "Zatrzymane kroki",
+    stepsInProgress: "Kroki w toku",
+    noProject: "Brak projektu",
+    // Projekte
+    projectsTab: "Projekty",
+    projectName: "Nazwa projektu",
+    projectCustomer: "Klient",
+    projectSite: "Budowa",
+    projectManager: "Kierownik projektu",
+    saveProject: "Zapisz projekt",
+    deleteProject: "Usuń projekt",
+    openProject: "Otwórz projekt",
+    closeProject: "Zamknij",
+    progress: "Postęp",
+    noInstructions: "Brak instrukcji dla tego projektu.",
+    noReports: "Brak raportów dla tego projektu.",
+    reportsTab: "Raporty robocze",
+    // Arbeitsanweisungen
+    newInstruction: "Nowa instrukcja pracy",
+    instructionTitle: "Tytuł",
+    selectProject: "Wybierz projekt",
+    problems: "Problemy / Uwagi",
+    workSteps: "Kroki pracy",
+    addStep: "+ Krok",
+    saveInstruction: "Zapisz instrukcję",
+    savedInstructions: "Zapisane instrukcje",
+    noInstructionsSaved: "Brak zapisanych instrukcji.",
+    date: "Data",
+    project: "Projekt",
+    translateInstruction: "Przetłumacz na",
+    translating2: "Tłumaczenie...",
+    translated: "Przetłumaczono",
+    translateTo: "Przetłumacz na",
+    feedback: "Informacja zwrotna",
+    saveFeedback: "Zapisz informację",
+    toReport: "Przenieś do raportu",
+    deleteInstruction: "Usuń instrukcję",
+    autoReportLocked: "Automatyczne raporty nie są aktywne w Twoim pakiecie.",
+    // Mitarbeiter
+    employeeManagement: "Zarządzanie pracownikami",
+    name: "Imię",
+    role: "Rola",
+    addEmployee: "Dodaj pracownika",
+    currentEmployees: "Aktualni pracownicy",
+    resetPassword: "Resetuj hasło",
+    // Firmendaten
+    companyData: "Dane firmy",
+    uploadLogo: "Prześlij logo",
+    companyName: "Nazwa firmy",
+    street: "Ulica",
+    zip: "Kod pocztowy",
+    city: "Miasto",
+    phone: "Telefon",
+    website: "Strona internetowa",
+    taxNumber: "NIP",
+    saveCompany: "Zapisz dane firmy",
+    // Berichte
+    reportNameLabel: "Nazwa raportu",
+    firma: "Firma",
   },
 };
 
@@ -538,12 +783,16 @@ export default function Home() {
     if (featureError) { setMessage("Fehler beim Laden der Module: " + featureError.message); return; }
 
     setCompanyFeatures(features as CompanyFeatures);
-  // Übersetzungssprache auf erste freigeschaltete Zielsprache setzen
+  // NUR Übersetzungs-Zielsprache anpassen, NICHT die App-Sprache
   const allowed = Array.isArray(features.allowed_languages)
     ? features.allowed_languages
     : (typeof features.allowed_languages === "string" ? JSON.parse(features.allowed_languages) : []);
   const firstTarget = allowed.filter((l: string) => l !== "Deutsch")[0];
-  if (firstTarget) setInstructionToLanguage(firstTarget);
+  if (firstTarget) {
+    setInstructionToLanguage(firstTarget);
+    setToLanguage(firstTarget); // Regiebericht-Zielsprache
+  }
+  // App-Sprache bleibt immer Deutsch (oder was der User gewählt hat)
 
     // Alle Ladefunktionen erhalten jetzt die companyId direkt
     await loadCompanyUsers(companyUser.company_id);
@@ -1191,7 +1440,7 @@ export default function Home() {
         <p className="text-gray-700">{t.loggedInAs}: <strong>{user.email}</strong></p>
         {currentCompany && (
           <p className="text-gray-700">
-            Firma: <strong>{currentCompany.companies.name}</strong> | Rolle: <strong>{currentCompany.role}</strong>
+            {t.firma}: <strong>{currentCompany.companies.name}</strong> | Rolle: <strong>{currentCompany.role}</strong>
           </p>
         )}
         <div className="flex items-center gap-3 mt-2">
@@ -1203,10 +1452,7 @@ export default function Home() {
             value={uiLanguage}
             onChange={(e) => setUiLanguage(e.target.value as Language)}
           >
-            {(getAllowedLanguages(companyFeatures).length > 0
-              ? getAllowedLanguages(companyFeatures).filter(l => languages.includes(l as Language))
-              : languages
-            ).map((lang) => (
+            {languages.map((lang) => (
               <option key={lang} value={lang}>🌐 {lang}</option>
             ))}
           </select>
@@ -1227,13 +1473,13 @@ export default function Home() {
 
       {/* FIX 3: Alle Bereiche als eigene Tabs, sauber strukturiert */}
       <nav className="flex flex-wrap gap-2">
-        <TabButton label="Dashboard"            tabName="dashboard"           activeTab={activeTab} onClick={() => setActiveTab("dashboard")} />
+        <TabButton label={t.dashboard}            tabName="dashboard"           activeTab={activeTab} onClick={() => setActiveTab("dashboard")} />
         <TabButton label="Regiebericht"         tabName="regiebericht"        activeTab={activeTab} onClick={() => setActiveTab("regiebericht")} />
-        <TabButton label="Berichte"             tabName="berichte"            activeTab={activeTab} onClick={() => setActiveTab("berichte")} />
-        <TabButton label="Projekte"             tabName="projekte"            activeTab={activeTab} onClick={() => { setActiveTab("projekte"); loadProjects(); }} />
-        <TabButton label="Arbeitsanweisungen"   tabName="arbeitsanweisungen"  activeTab={activeTab} onClick={() => setActiveTab("arbeitsanweisungen")} />
-        <TabButton label="Mitarbeiter"          tabName="mitarbeiter"         activeTab={activeTab} onClick={() => setActiveTab("mitarbeiter")} />
-        <TabButton label="Firmendaten"          tabName="firmendaten"         activeTab={activeTab} onClick={() => setActiveTab("firmendaten")} />
+        <TabButton label={t.saveLoad}             tabName="berichte"            activeTab={activeTab} onClick={() => setActiveTab("berichte")} />
+        <TabButton label={t.projectsTab}             tabName="projekte"            activeTab={activeTab} onClick={() => { setActiveTab("projekte"); loadProjects(); }} />
+        <TabButton label={t.workInstructions}   tabName="arbeitsanweisungen"  activeTab={activeTab} onClick={() => setActiveTab("arbeitsanweisungen")} />
+        <TabButton label={t.employeeManagement}          tabName="mitarbeiter"         activeTab={activeTab} onClick={() => setActiveTab("mitarbeiter")} />
+        <TabButton label={t.companyData}          tabName="firmendaten"         activeTab={activeTab} onClick={() => setActiveTab("firmendaten")} />
       </nav>
 
       {/* Globale Statusmeldung */}
@@ -1244,7 +1490,7 @@ export default function Home() {
       {/* ── TAB: Dashboard ── */}
       {activeTab === "dashboard" && (
         <section className="border rounded p-4 space-y-4 bg-white text-black">
-          <h2 className="text-xl font-bold">Dashboard</h2>
+          <h2 className="text-xl font-bold">{t.dashboard}</h2>
           {(() => {
             const allTasks = workInstructions.flatMap((i) => i.work_instruction_tasks || []);
             const openCount      = allTasks.filter((t: any) => (t.status || "open") === "open").length;
@@ -1258,9 +1504,9 @@ export default function Home() {
 
             return (
               <div className="space-y-3">
-                <p>Projekte: <strong>{projects.length}</strong></p>
-                <p>Arbeitsanweisungen: <strong>{workInstructions.length}</strong></p>
-                <p>Heute fällig: <strong>{todayInstructions.length}</strong></p>
+                <p>{t.projects}: <strong>{projects.length}</strong></p>
+                <p>{t.workInstructions}: <strong>{workInstructions.length}</strong></p>
+                <p>{t.dueToday}: <strong>{todayInstructions.length}</strong></p>
 
                 <div className="border rounded p-3 bg-gray-100">
                   <p>⬜ Offen: {openCount}</p>
@@ -1275,10 +1521,10 @@ export default function Home() {
 
                 {stoppedCount > 0 && (
                   <div className="border rounded p-3 bg-red-50">
-                    <h3 className="font-bold mb-2">Gestoppte Arbeitsschritte</h3>
+                    <h3 className="font-bold mb-2">{t.stoppedSteps}</h3>
                     {allTasks.filter((t: any) => t.status === "stopped").map((task: any) => (
                       <p key={task.id}>
-                        <strong>{workInstructions.find((i) => (i.work_instruction_tasks || []).some((t: any) => t.id === task.id))?.project || "Kein Projekt"}</strong>
+                        <strong>{workInstructions.find((i) => (i.work_instruction_tasks || []).some((t: any) => t.id === task.id))?.project || t.noProject}</strong>
                         {" — "}⛔ {task.task_text}{task.note ? ` — ${task.note}` : ""}
                       </p>
                     ))}
@@ -1287,10 +1533,10 @@ export default function Home() {
 
                 {progressCount > 0 && (
                   <div className="border rounded p-3 bg-yellow-50">
-                    <h3 className="font-bold mb-2">Arbeitsschritte in Arbeit</h3>
+                    <h3 className="font-bold mb-2">{t.stepsInProgress}</h3>
                     {allTasks.filter((t: any) => t.status === "in_progress").map((task: any) => (
                       <p key={task.id}>
-                        <strong>{workInstructions.find((i) => (i.work_instruction_tasks || []).some((t: any) => t.id === task.id))?.project || "Kein Projekt"}</strong>
+                        <strong>{workInstructions.find((i) => (i.work_instruction_tasks || []).some((t: any) => t.id === task.id))?.project || t.noProject}</strong>
                         {" — "}🟡 {task.task_text}{task.note ? ` — ${task.note}` : ""}
                       </p>
                     ))}
@@ -1424,27 +1670,27 @@ export default function Home() {
       {/* ── TAB: Projekte ── */}
       {activeTab === "projekte" && (
         <section className="border rounded p-4 space-y-4 bg-white text-black">
-          <h2 className="text-xl font-bold">Projekte</h2>
+          <h2 className="text-xl font-bold">{t.projectsTab}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <input className="border p-3 w-full" placeholder="Projektname" value={projectName} onChange={(e) => setProjectName(e.target.value)} />
-            <input className="border p-3 w-full" placeholder="Kunde" value={projectCustomer} onChange={(e) => setProjectCustomer(e.target.value)} />
-            <input className="border p-3 w-full" placeholder="Baustelle" value={projectSite} onChange={(e) => setProjectSite(e.target.value)} />
-            <input className="border p-3 w-full" placeholder="Projektleiter" value={projectManager} onChange={(e) => setProjectManager(e.target.value)} />
+            <input className="border p-3 w-full" placeholder={t.projectName} value={projectName} onChange={(e) => setProjectName(e.target.value)} />
+            <input className="border p-3 w-full" placeholder={t.customer} value={projectCustomer} onChange={(e) => setProjectCustomer(e.target.value)} />
+            <input className="border p-3 w-full" placeholder={t.site} value={projectSite} onChange={(e) => setProjectSite(e.target.value)} />
+            <input className="border p-3 w-full" placeholder={t.projectManager} value={projectManager} onChange={(e) => setProjectManager(e.target.value)} />
           </div>
-          <button type="button" onClick={saveProject} className="bg-blue-700 text-white px-4 py-3 rounded">Projekt speichern</button>
+          <button type="button" onClick={saveProject} className="bg-blue-700 text-white px-4 py-3 rounded">{t.saveProject}</button>
 
           <div className="space-y-3 mt-4">
             {projects.map((project) => (
               <div key={project.id} className="border rounded p-3 space-y-2">
                 <strong>{project.name}</strong>
-                <p>Kunde: {project.customer || "-"}</p>
-                <p>Baustelle: {project.site || "-"}</p>
-                <p>Projektleiter: {project.project_manager || "-"}</p>
+                <p>{t.customer}: {project.customer || "-"}</p>
+                <p>{t.site}: {project.site || "-"}</p>
+                <p>{t.projectManager}: {project.project_manager || "-"}</p>
                 <div className="flex gap-2">
                   <button type="button" onClick={() => setSelectedProjectDetailId(project.id === selectedProjectDetailId ? "" : project.id)} className="bg-gray-700 text-white px-3 py-2 rounded">
-                    {project.id === selectedProjectDetailId ? "Schließen" : "Projekt öffnen"}
+                    {project.id === selectedProjectDetailId ? t.closeProject : t.openProject}
                   </button>
-                  <button type="button" onClick={() => deleteProject(project.id)} className="bg-red-600 text-white px-3 py-2 rounded">Projekt löschen</button>
+                  <button type="button" onClick={() => deleteProject(project.id)} className="bg-red-600 text-white px-3 py-2 rounded">{t.deleteProject}</button>
                 </div>
 
                 {selectedProjectDetailId === project.id && (
@@ -1461,7 +1707,7 @@ export default function Home() {
                         <div className="border rounded p-3 bg-gray-100">
                           <p>⬜ Offen: {openCount}</p><p>🟡 In Arbeit: {progressCount}</p>
                           <p>⛔ Gestoppt: {stoppedCount}</p><p>✅ Erledigt: {completedCount}</p>
-                          <p className="font-bold mt-2">Fortschritt: {progressPercent}%</p>
+                          <p className="font-bold mt-2">{t.progress}: {progressPercent}%</p>
                           <div className="w-full bg-gray-300 rounded h-4 mt-1">
                             <div className="bg-green-600 h-4 rounded" style={{ width: `${progressPercent}%` }} />
                           </div>
@@ -1469,14 +1715,14 @@ export default function Home() {
                       );
                     })()}
 
-                    <h4 className="font-bold">Arbeitsanweisungen</h4>
+                    <h4 className="font-bold">{t.workInstructions}</h4>
                     {workInstructions.filter((i) => i.project_id === project.id).map((instruction) => (
                       <div key={instruction.id} className="border rounded p-3 bg-white space-y-2">
                         <strong>{instruction.title}</strong>
-                        <p><strong>Datum:</strong> {instruction.work_date || "-"}</p>
-                        <p><strong>Kunde:</strong> {instruction.customer || "-"}</p>
-                        <p><strong>Baustelle:</strong> {instruction.site || "-"}</p>
-                        {instruction.problems_text && <p><strong>Probleme:</strong> {instruction.problems_text}</p>}
+                        <p><strong>{t.date}:</strong> {instruction.work_date || "-"}</p>
+                        <p><strong>{t.customer}:</strong> {instruction.customer || "-"}</p>
+                        <p><strong>{t.site}:</strong> {instruction.site || "-"}</p>
+                        {instruction.problems_text && <p><strong>{t.problems}:</strong> {instruction.problems_text}</p>}
                         {(instruction.work_instruction_tasks || []).length > 0 && (
                           <ul className="list-disc pl-6 space-y-1">
                             {instruction.work_instruction_tasks.map((task: any) => (
@@ -1488,7 +1734,7 @@ export default function Home() {
                           </ul>
                         )}
                         {companyFeatures?.module_auto_reports ? (
-                          <button type="button" onClick={() => createReportFromInstruction(instruction)} className="bg-green-700 text-white px-3 py-2 rounded">Regiebericht erzeugen</button>
+                          <button type="button" onClick={() => createReportFromInstruction(instruction)} className="bg-green-700 text-white px-3 py-2 rounded">{t.toReport}</button>
                         ) : (
                           <p className="text-sm text-gray-500">Automatische Regieberichte sind in deinem Paket nicht aktiviert.</p>
                         )}
@@ -1498,11 +1744,11 @@ export default function Home() {
                       <p className="text-gray-600">Noch keine Arbeitsanweisungen für dieses Projekt.</p>
                     )}
 
-                    <h4 className="font-bold mt-2">Regieberichte</h4>
+                    <h4 className="font-bold mt-2">{t.reportsTab}</h4>
                     {savedReports.filter((r: any) => r.project_id === project.id).map((report: any) => (
                       <div key={report.id} className="border rounded p-3 bg-white">
                         <strong>{report.report_name}</strong>
-                        <p>Mitarbeiter: {report.employee || "-"}</p>
+                        <p>{t.employee}: {report.employee || "-"}</p>
                       </div>
                     ))}
                     {savedReports.filter((r: any) => r.project_id === project.id).length === 0 && (
@@ -1521,9 +1767,9 @@ export default function Home() {
       {activeTab === "arbeitsanweisungen" && (
         <div className="space-y-4">
           <section className="border rounded p-4 space-y-4 bg-white text-black">
-            <h2 className="text-xl font-bold">Neue Arbeitsanweisung</h2>
+            <h2 className="text-xl font-bold">{t.newInstruction}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <input className="border p-3 text-black bg-white" placeholder="Titel" value={instructionTitle} onChange={(e) => setInstructionTitle(e.target.value)} />
+              <input className="border p-3 text-black bg-white" placeholder={t.instructionTitle} value={instructionTitle} onChange={(e) => setInstructionTitle(e.target.value)} />
               <select className="border p-3 text-black bg-white" value={selectedProjectId} onChange={(e) => {
                 const projectId = e.target.value;
                 setSelectedProjectId(projectId);
@@ -1534,31 +1780,31 @@ export default function Home() {
                   setInstructionSite(selectedProject.site || "");
                 }
               }}>
-                <option value="">Projekt auswählen</option>
+                <option value="">{t.selectProject}</option>
                 {projects.map((project) => <option key={project.id} value={project.id}>{project.name}</option>)}
               </select>
-              <input className="border p-3 text-black bg-white" placeholder="Kunde" value={instructionCustomer} onChange={(e) => setInstructionCustomer(e.target.value)} />
-              <input className="border p-3 text-black bg-white" placeholder="Baustelle" value={instructionSite} onChange={(e) => setInstructionSite(e.target.value)} />
+              <input className="border p-3 text-black bg-white" placeholder={t.customer} value={instructionCustomer} onChange={(e) => setInstructionCustomer(e.target.value)} />
+              <input className="border p-3 text-black bg-white" placeholder={t.site} value={instructionSite} onChange={(e) => setInstructionSite(e.target.value)} />
               <input type="date" className="border p-3 text-black bg-white" value={instructionDate} onChange={(e) => setInstructionDate(e.target.value)} />
             </div>
-            <input className="border p-3 w-full text-black bg-white" placeholder="Probleme / Hinweise" value={instructionProblems} onChange={(e) => setInstructionProblems(e.target.value)} />
-            <h3 className="font-bold">Arbeitsschritte</h3>
+            <input className="border p-3 w-full text-black bg-white" placeholder={t.problems} value={instructionProblems} onChange={(e) => setInstructionProblems(e.target.value)} />
+            <h3 className="font-bold">{t.workSteps}</h3>
             {instructionTasks.map((task, index) => (
               <input key={index} className="border p-3 w-full text-black bg-white" placeholder={`Arbeitsschritt ${index + 1}`} value={task}
                 onChange={(e) => { const copy = [...instructionTasks]; copy[index] = e.target.value; setInstructionTasks(copy); }} />
             ))}
             <div className="flex gap-3">
-              <button type="button" onClick={() => setInstructionTasks([...instructionTasks, ""])} className="bg-gray-700 text-white px-4 py-3 rounded">+ Arbeitsschritt</button>
-              <button type="button" onClick={saveWorkInstruction} className="bg-blue-700 text-white px-4 py-3 rounded">Arbeitsanweisung speichern</button>
+              <button type="button" onClick={() => setInstructionTasks([...instructionTasks, ""])} className="bg-gray-700 text-white px-4 py-3 rounded">{t.addStep}</button>
+              <button type="button" onClick={saveWorkInstruction} className="bg-blue-700 text-white px-4 py-3 rounded">{t.saveInstruction}</button>
             </div>
           </section>
 
           <section className="border rounded p-4 space-y-4 bg-white text-black">
-            <h2 className="text-xl font-bold">Gespeicherte Arbeitsanweisungen</h2>
+            <h2 className="text-xl font-bold">{t.savedInstructions}</h2>
             {workInstructions.length === 0 && <p className="text-gray-600">Noch keine Arbeitsanweisungen vorhanden.</p>}
             {/* Zielsprache für Übersetzung — nur freigeschaltete Sprachen */}
             <div className="flex items-center gap-3 bg-gray-50 border rounded p-3">
-              <label className="text-sm font-medium text-gray-700">🌐 Übersetzen nach:</label>
+              <label className="text-sm font-medium text-gray-700">🌐 {t.translateTo}:</label>
               <select
                 className="border p-2 rounded text-black bg-white"
                 value={instructionToLanguage}
@@ -1585,10 +1831,10 @@ export default function Home() {
                 {translation?.title && (
                   <p className="text-blue-700 italic text-sm">🌐 {translation.title}</p>
                 )}
-                <p><strong>Datum:</strong> {instruction.work_date || "-"}</p>
-                <p><strong>Projekt:</strong> {instruction.project || "-"}</p>
-                <p><strong>Kunde:</strong> {instruction.customer || "-"}</p>
-                <p><strong>Baustelle:</strong> {instruction.site || "-"}</p>
+                <p><strong>{t.date}:</strong> {instruction.work_date || "-"}</p>
+                <p><strong>{t.project}:</strong> {instruction.project || "-"}</p>
+                <p><strong>{t.customer}:</strong> {instruction.customer || "-"}</p>
+                <p><strong>{t.site}:</strong> {instruction.site || "-"}</p>
                 {instruction.problems_text && (
                   <div className="bg-yellow-50 border rounded p-3">
                     <strong>Probleme / Hinweise:</strong>
@@ -1617,14 +1863,14 @@ export default function Home() {
                             )}
                           </div>
                         </div>
-                        <input className="border p-2 w-full text-black bg-white" placeholder="Rückmeldung" defaultValue={task.note || ""} id={`task-note-${task.id}`} />
+                        <input className="border p-2 w-full text-black bg-white" placeholder={t.feedback} defaultValue={task.note || ""} id={`task-note-${task.id}`} />
                         {translation?.tasks?.[`note_${task.id}`] && (
                           <p className="text-blue-700 italic text-sm">🌐 {translation.tasks[`note_${task.id}`]}</p>
                         )}
                         <button type="button" onClick={() => {
                           const field = document.getElementById(`task-note-${task.id}`) as HTMLInputElement;
                           updateTaskNote(task.id, field.value);
-                        }} className="bg-gray-700 text-white px-3 py-2 rounded">Rückmeldung speichern</button>
+                        }} className="bg-gray-700 text-white px-3 py-2 rounded">{t.saveFeedback}</button>
                       </li>
                     ))}
                 </ul>
@@ -1638,11 +1884,11 @@ export default function Home() {
                       disabled={isTranslating}
                       className="bg-black text-white px-4 py-2 rounded font-medium disabled:opacity-50"
                     >
-                      {isTranslating ? "⏳ Übersetze..." : `🌐 In ${instructionToLanguage} übersetzen`}
+                      {isTranslating ? "⏳ " + t.translating2 : `🌐 ${t.translateTo}: ${instructionToLanguage}`}
                     </button>
                     {translation && (
                       <span className="ml-3 text-sm text-green-600 font-medium">
-                        ✅ Übersetzt ({translation.language})
+                        {t.translated} ({translation.language})
                       </span>
                     )}
                   </div>
@@ -1656,17 +1902,17 @@ export default function Home() {
                       onClick={() => createReportFromInstruction(instruction)}
                       className="bg-green-700 text-white px-4 py-2 rounded font-medium"
                     >
-                      📋 In Regiebericht übernehmen
+                      {t.toReport}
                     </button>
                   ) : (
                     <div className="bg-gray-50 border rounded p-3 text-sm text-gray-500">
-                      🔒 Automatische Regieberichte sind in deinem Paket nicht aktiviert.
+                      {t.autoReportLocked}
                     </div>
                   )}
                 </div>
 
                 {(currentCompany?.role === "owner" || currentCompany?.role === "project_manager" || currentCompany?.role === "admin") && (
-                  <button type="button" onClick={() => deleteWorkInstruction(instruction.id)} className="bg-red-600 text-white px-3 py-2 rounded">Arbeitsanweisung löschen</button>
+                  <button type="button" onClick={() => deleteWorkInstruction(instruction.id)} className="bg-red-600 text-white px-3 py-2 rounded">{t.deleteInstruction}</button>
                 )}
               </div>
               );
@@ -1678,26 +1924,26 @@ export default function Home() {
       {/* ── TAB: Mitarbeiter ── */}
       {activeTab === "mitarbeiter" && (
         <section className="border rounded p-4 space-y-4 bg-white text-black">
-          <h2 className="text-xl font-bold">Mitarbeiterverwaltung</h2>
+          <h2 className="text-xl font-bold">{t.employeeManagement}</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <input className="border p-3 text-black bg-white" placeholder="Name" value={newUserName} onChange={(e) => setNewUserName(e.target.value)} />
-            <input className="border p-3 text-black bg-white" placeholder="E-Mail" value={newUserEmail} onChange={(e) => setNewUserEmail(e.target.value)} />
+            <input className="border p-3 text-black bg-white" placeholder={t.name} value={newUserName} onChange={(e) => setNewUserName(e.target.value)} />
+            <input className="border p-3 text-black bg-white" placeholder={t.email} value={newUserEmail} onChange={(e) => setNewUserEmail(e.target.value)} />
             <select className="border p-3 text-black bg-white" value={newUserRole} onChange={(e) => setNewUserRole(e.target.value)}>
               <option value="employee">Mitarbeiter</option>
               <option value="project_manager">Projektleiter</option>
               <option value="admin">Admin</option>
             </select>
           </div>
-          <button type="button" onClick={addCompanyUser} className="bg-blue-700 text-white px-4 py-3 rounded">Mitarbeiter hinzufügen</button>
-          <p>Aktuelle Mitarbeiter: <strong>{companyUsers.length}</strong></p>
+          <button type="button" onClick={addCompanyUser} className="bg-blue-700 text-white px-4 py-3 rounded">{t.addEmployee}</button>
+          <p>{t.currentEmployees}: <strong>{companyUsers.length}</strong></p>
           <div className="space-y-3">
             {companyUsers.map((member) => (
               <div key={member.id} className="border rounded p-3 space-y-2">
                 <strong>{member.full_name || "-"}</strong>
                 <p>{member.email || "-"}</p>
-                <p>Rolle: {member.role}</p>
+                <p>{t.role}: {member.role}</p>
                 {member.email && (
-                  <button type="button" onClick={() => resetCompanyUserPassword(member.email)} className="bg-gray-700 text-white px-3 py-2 rounded">Passwort zurücksetzen</button>
+                  <button type="button" onClick={() => resetCompanyUserPassword(member.email)} className="bg-gray-700 text-white px-3 py-2 rounded">{t.resetPassword}</button>
                 )}
               </div>
             ))}
@@ -1708,25 +1954,25 @@ export default function Home() {
       {/* ── TAB: Firmendaten ── */}
       {activeTab === "firmendaten" && (
         <section className="border rounded p-4 space-y-4 bg-white text-black">
-          <h2 className="text-xl font-bold">Firmendaten</h2>
+          <h2 className="text-xl font-bold">{t.companyData}</h2>
           {companySettings?.company_logo && (
             <img src={companySettings.company_logo} alt="Firmenlogo" className="h-20 object-contain" />
           )}
           <div>
-            <label className="block text-sm font-medium mb-1">Firmenlogo hochladen</label>
+            <label className="block text-sm font-medium mb-1">{t.uploadLogo}</label>
             <input type="file" accept="image/*" className="border p-3 w-full text-black bg-white" onChange={(e) => uploadCompanyLogo(e.target.files)} />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <input className="border p-3 text-black bg-white" placeholder="Firmenname"        value={companySettings?.company_name || ""} onChange={(e) => updateCompanyField("company_name", e.target.value)} />
-            <input className="border p-3 text-black bg-white" placeholder="Straße"            value={companySettings?.street || ""}        onChange={(e) => updateCompanyField("street", e.target.value)} />
-            <input className="border p-3 text-black bg-white" placeholder="PLZ"               value={companySettings?.zip_code || ""}      onChange={(e) => updateCompanyField("zip_code", e.target.value)} />
-            <input className="border p-3 text-black bg-white" placeholder="Ort"               value={companySettings?.city || ""}          onChange={(e) => updateCompanyField("city", e.target.value)} />
-            <input className="border p-3 text-black bg-white" placeholder="Telefon"           value={companySettings?.phone || ""}         onChange={(e) => updateCompanyField("phone", e.target.value)} />
-            <input className="border p-3 text-black bg-white" placeholder="E-Mail"            value={companySettings?.email || ""}         onChange={(e) => updateCompanyField("email", e.target.value)} />
-            <input className="border p-3 text-black bg-white" placeholder="Webseite"          value={companySettings?.website || ""}       onChange={(e) => updateCompanyField("website", e.target.value)} />
-            <input className="border p-3 text-black bg-white" placeholder="UID / Steuernummer" value={companySettings?.tax_number || ""}   onChange={(e) => updateCompanyField("tax_number", e.target.value)} />
+            <input className="border p-3 text-black bg-white" placeholder={t.companyName}        value={companySettings?.company_name || ""} onChange={(e) => updateCompanyField("company_name", e.target.value)} />
+            <input className="border p-3 text-black bg-white" placeholder={t.street}            value={companySettings?.street || ""}        onChange={(e) => updateCompanyField("street", e.target.value)} />
+            <input className="border p-3 text-black bg-white" placeholder={t.zip}               value={companySettings?.zip_code || ""}      onChange={(e) => updateCompanyField("zip_code", e.target.value)} />
+            <input className="border p-3 text-black bg-white" placeholder={t.city}               value={companySettings?.city || ""}          onChange={(e) => updateCompanyField("city", e.target.value)} />
+            <input className="border p-3 text-black bg-white" placeholder={t.phone}           value={companySettings?.phone || ""}         onChange={(e) => updateCompanyField("phone", e.target.value)} />
+            <input className="border p-3 text-black bg-white" placeholder={t.email}            value={companySettings?.email || ""}         onChange={(e) => updateCompanyField("email", e.target.value)} />
+            <input className="border p-3 text-black bg-white" placeholder={t.website}          value={companySettings?.website || ""}       onChange={(e) => updateCompanyField("website", e.target.value)} />
+            <input className="border p-3 text-black bg-white" placeholder={t.taxNumber} value={companySettings?.tax_number || ""}   onChange={(e) => updateCompanyField("tax_number", e.target.value)} />
           </div>
-          <button type="button" onClick={saveCompanySettings} className="bg-blue-700 text-white px-4 py-3 rounded">Firmendaten speichern</button>
+          <button type="button" onClick={saveCompanySettings} className="bg-blue-700 text-white px-4 py-3 rounded">{t.saveCompany}</button>
         </section>
       )}
 
