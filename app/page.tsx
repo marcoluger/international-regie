@@ -1465,6 +1465,7 @@ export default function Home() {
       projectNumber: instruction.project || "",
       site: instruction.site || "",
       description,
+      photos: [], // Fotos der Arbeitsanweisung NICHT übernehmen
     };
 
     setDays(copy);
