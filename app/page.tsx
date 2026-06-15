@@ -1188,9 +1188,20 @@ export default function Home() {
             Firma: <strong>{currentCompany.companies.name}</strong> | Rolle: <strong>{currentCompany.role}</strong>
           </p>
         )}
-        <button type="button" onClick={signOut} className="mt-2 bg-gray-800 text-white px-4 py-2 rounded">
-          {t.logout}
-        </button>
+        <div className="flex items-center gap-3 mt-2">
+          <button type="button" onClick={signOut} className="bg-gray-800 text-white px-4 py-2 rounded">
+            {t.logout}
+          </button>
+          <select
+            className="border p-2 rounded text-black bg-white text-sm"
+            value={uiLanguage}
+            onChange={(e) => setUiLanguage(e.target.value as Language)}
+          >
+            {languages.map((lang) => (
+              <option key={lang} value={lang}>🌐 {lang}</option>
+            ))}
+          </select>
+        </div>
       </header>
 
       {/* FIX 3: Alle Bereiche als eigene Tabs, sauber strukturiert */}
@@ -1277,9 +1288,7 @@ export default function Home() {
           <section className="border rounded p-4 space-y-4 bg-white text-black">
             <h2 className="text-xl font-bold">{t.general}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <select className="border p-3 text-black bg-white" value={uiLanguage} onChange={(e) => setUiLanguage(e.target.value as Language)}>
-                {languages.map((lang) => <option key={lang} value={lang}>{t.appLanguage}: {lang}</option>)}
-              </select>
+
               <select className="border p-3 text-black bg-white" value={pdfLanguage} onChange={(e) => setPdfLanguage(e.target.value)}>
                 {pdfLanguages.map((lang) => <option key={lang} value={lang}>{t.pdfLanguage}: {lang}</option>)}
               </select>
