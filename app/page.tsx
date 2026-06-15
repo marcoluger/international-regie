@@ -538,6 +538,12 @@ export default function Home() {
     if (featureError) { setMessage("Fehler beim Laden der Module: " + featureError.message); return; }
 
     setCompanyFeatures(features as CompanyFeatures);
+  // Übersetzungssprache auf erste freigeschaltete Zielsprache setzen
+  const allowed = Array.isArray(features.allowed_languages)
+    ? features.allowed_languages
+    : (typeof features.allowed_languages === "string" ? JSON.parse(features.allowed_languages) : []);
+  const firstTarget = allowed.filter((l: string) => l !== "Deutsch")[0];
+  if (firstTarget) setInstructionToLanguage(firstTarget);
 
     // Alle Ladefunktionen erhalten jetzt die companyId direkt
     await loadCompanyUsers(companyUser.company_id);
