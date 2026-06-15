@@ -181,6 +181,13 @@ const texts = {
     // Berichte
     reportNameLabel: "Berichtsname",
     firma: "Firma",
+    feedbackLabel: "Rückmeldung",
+    noProjectsYet: "Noch keine Projekte vorhanden.",
+    noInstructionsYet: "Noch keine Arbeitsanweisungen vorhanden.",
+    problemsHints: "Probleme / Hinweise",
+    roleEmployee: "Mitarbeiter",
+    roleProjectManager: "Projektleiter",
+    roleAdmin: "Admin",
   },
   Kroatisch: {
     title: "Tjedni režijski izvještaj",
@@ -279,6 +286,13 @@ const texts = {
     saveCompany: "Spremi podatke tvrtke",
     reportNameLabel: "Naziv izvještaja",
     firma: "Tvrtka",
+    feedbackLabel: "Povratna informacija",
+    noProjectsYet: "Još nema projekata.",
+    noInstructionsYet: "Još nema radnih uputa.",
+    problemsHints: "Problemi / napomene",
+    roleEmployee: "Radnik",
+    roleProjectManager: "Voditelj projekta",
+    roleAdmin: "Administrator",
   },
   Slowenisch: {
     title: "Tedensko poročilo",
@@ -377,6 +391,13 @@ const texts = {
     saveCompany: "Shrani podatke podjetja",
     reportNameLabel: "Ime poročila",
     firma: "Podjetje",
+    feedbackLabel: "Povratna informacija",
+    noProjectsYet: "Še ni projektov.",
+    noInstructionsYet: "Še ni delovnih navodil.",
+    problemsHints: "Težave / opombe",
+    roleEmployee: "Zaposleni",
+    roleProjectManager: "Vodja projekta",
+    roleAdmin: "Administrator",
   },
   Polnisch: {
     title: "Tygodniowy raport roboczy",
@@ -482,6 +503,13 @@ const texts = {
     // Berichte
     reportNameLabel: "Nazwa raportu",
     firma: "Firma",
+    feedbackLabel: "Informacja zwrotna",
+    noProjectsYet: "Brak projektów.",
+    noInstructionsYet: "Brak instrukcji pracy.",
+    problemsHints: "Problemy / uwagi",
+    roleEmployee: "Pracownik",
+    roleProjectManager: "Kierownik projektu",
+    roleAdmin: "Administrator",
   },
 };
 
@@ -1440,7 +1468,7 @@ export default function Home() {
         <p className="text-gray-700">{t.loggedInAs}: <strong>{user.email}</strong></p>
         {currentCompany && (
           <p className="text-gray-700">
-            {t.firma}: <strong>{currentCompany.companies.name}</strong> | Rolle: <strong>{currentCompany.role}</strong>
+            {t.firma}: <strong>{currentCompany.companies.name}</strong> | {t.role}: <strong>{currentCompany.role}</strong>
           </p>
         )}
         <div className="flex items-center gap-3 mt-2">
@@ -1513,7 +1541,7 @@ export default function Home() {
                   <p>🟡 In Arbeit: {progressCount}</p>
                   <p>⛔ Gestoppt: {stoppedCount}</p>
                   <p>✅ Erledigt: {completedCount}</p>
-                  <p className="font-bold mt-3">Gesamtfortschritt: {progressPercent}%</p>
+                  <p className="font-bold mt-3">{t.totalProgress}: {progressPercent}%</p>
                   <div className="w-full bg-gray-300 rounded h-4 mt-1">
                     <div className="bg-green-600 h-4 rounded" style={{ width: `${progressPercent}%` }} />
                   </div>
@@ -1728,7 +1756,7 @@ export default function Home() {
                             {instruction.work_instruction_tasks.map((task: any) => (
                               <li key={task.id}>
                                 {task.status === "completed" ? "✅ Erledigt" : task.status === "in_progress" ? "🟡 In Arbeit" : task.status === "stopped" ? "⛔ Gestoppt" : "⬜ Offen"}{" "}{task.task_text}
-                                {task.note && <div className="text-sm text-gray-600 ml-2">Rückmeldung: {task.note}</div>}
+                                {task.note && <div className="text-sm text-gray-600 ml-2">{t.feedbackLabel}: {task.note}</div>}
                               </li>
                             ))}
                           </ul>
@@ -1736,12 +1764,12 @@ export default function Home() {
                         {companyFeatures?.module_auto_reports ? (
                           <button type="button" onClick={() => createReportFromInstruction(instruction)} className="bg-green-700 text-white px-3 py-2 rounded">{t.toReport}</button>
                         ) : (
-                          <p className="text-sm text-gray-500">Automatische Regieberichte sind in deinem Paket nicht aktiviert.</p>
+                          <p className="text-sm text-gray-500">{t.autoReportLocked}</p>
                         )}
                       </div>
                     ))}
                     {workInstructions.filter((i) => i.project_id === project.id).length === 0 && (
-                      <p className="text-gray-600">Noch keine Arbeitsanweisungen für dieses Projekt.</p>
+                      <p className="text-gray-600">{t.noInstructions}</p>
                     )}
 
                     <h4 className="font-bold mt-2">{t.reportsTab}</h4>
@@ -1752,13 +1780,13 @@ export default function Home() {
                       </div>
                     ))}
                     {savedReports.filter((r: any) => r.project_id === project.id).length === 0 && (
-                      <p className="text-gray-600">Noch keine Regieberichte für dieses Projekt.</p>
+                      <p className="text-gray-600">{t.noReports}</p>
                     )}
                   </div>
                 )}
               </div>
             ))}
-            {projects.length === 0 && <p className="text-gray-600">Noch keine Projekte vorhanden.</p>}
+            {projects.length === 0 && <p className="text-gray-600">{t.noProjectsYet}</p>}
           </div>
         </section>
       )}
@@ -1801,7 +1829,7 @@ export default function Home() {
 
           <section className="border rounded p-4 space-y-4 bg-white text-black">
             <h2 className="text-xl font-bold">{t.savedInstructions}</h2>
-            {workInstructions.length === 0 && <p className="text-gray-600">Noch keine Arbeitsanweisungen vorhanden.</p>}
+            {workInstructions.length === 0 && <p className="text-gray-600">{t.noInstructionsYet}</p>}
             {/* Zielsprache für Übersetzung — nur freigeschaltete Sprachen */}
             <div className="flex items-center gap-3 bg-gray-50 border rounded p-3">
               <label className="text-sm font-medium text-gray-700">🌐 {t.translateTo}:</label>
@@ -1837,7 +1865,7 @@ export default function Home() {
                 <p><strong>{t.site}:</strong> {instruction.site || "-"}</p>
                 {instruction.problems_text && (
                   <div className="bg-yellow-50 border rounded p-3">
-                    <strong>Probleme / Hinweise:</strong>
+                    <strong>{t.problemsHints}:</strong>
                     <p>{instruction.problems_text}</p>
                     {translation?.problems_text && (
                       <p className="text-blue-700 italic text-sm mt-1">🌐 {translation.problems_text}</p>
@@ -1929,9 +1957,9 @@ export default function Home() {
             <input className="border p-3 text-black bg-white" placeholder={t.name} value={newUserName} onChange={(e) => setNewUserName(e.target.value)} />
             <input className="border p-3 text-black bg-white" placeholder={t.email} value={newUserEmail} onChange={(e) => setNewUserEmail(e.target.value)} />
             <select className="border p-3 text-black bg-white" value={newUserRole} onChange={(e) => setNewUserRole(e.target.value)}>
-              <option value="employee">Mitarbeiter</option>
-              <option value="project_manager">Projektleiter</option>
-              <option value="admin">Admin</option>
+              <option value="employee">{t.roleEmployee}</option>
+              <option value="project_manager">{t.roleProjectManager}</option>
+              <option value="admin">{t.roleAdmin}</option>
             </select>
           </div>
           <button type="button" onClick={addCompanyUser} className="bg-blue-700 text-white px-4 py-3 rounded">{t.addEmployee}</button>
