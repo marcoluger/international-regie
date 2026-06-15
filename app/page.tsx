@@ -430,6 +430,9 @@ export default function Home() {
   const [instructionDescription, setInstructionDescription] = useState("");
   const [instructionTasks, setInstructionTasks] = useState<string[]>([""]);
   const [workInstructions, setWorkInstructions] = useState<any[]>([]);
+  const [instructionTranslations, setInstructionTranslations] = useState<Record<string, any>>({});
+  const [translatingInstructionId, setTranslatingInstructionId] = useState<string | null>(null);
+  const [instructionToLanguage, setInstructionToLanguage] = useState("Polnisch");
 
   // FIX 1: "dashboard" als Standard-Tab, alle Tabs klar definiert
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -843,6 +846,83 @@ export default function Home() {
       setMessage("Fehler beim Übersetzen: " + String(error));
     }
     setLoading(false);
+  }
+
+  async function translateInstruction(instruction: any) {
+    setTranslatingInstructionId(instruction.id);
+    setMessage("");
+
+    try {
+      const textsToTranslate = [
+        { key: "title", text: instruction.title || "" },
+        { key: "problems_text", text: instruction.problems_text || "" },
+        { key: "description", text: instruction.description || "" },
+      ];
+
+      const translatedFields: Record<string, string> = {};
+
+      for (const item of textsToTranslate) {
+        if (!item.text.trim()) continue;
+        const res = await fetch("/api/translate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            description: item.text,
+            fromLanguage: "Deutsch",
+            toLanguage: instructionToLanguage,
+          }),
+        });
+        const data = await res.json();
+        translatedFields[item.key] = data.error ? item.text : data.translation;
+      }
+
+      // Arbeitsschritte übersetzen
+      const translatedTasks: Record<string, string> = {};
+      for (const task of instruction.work_instruction_tasks || []) {
+        if (!task.task_text?.trim()) continue;
+        const res = await fetch("/api/translate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            description: task.task_text,
+            fromLanguage: "Deutsch",
+            toLanguage: instructionToLanguage,
+          }),
+        });
+        const data = await res.json();
+        translatedTasks[task.id] = data.error ? task.task_text : data.translation;
+
+        // Rückmeldung übersetzen falls vorhanden
+        if (task.note?.trim()) {
+          const resNote = await fetch("/api/translate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              description: task.note,
+              fromLanguage: "Deutsch",
+              toLanguage: instructionToLanguage,
+            }),
+          });
+          const dataNote = await resNote.json();
+          translatedTasks[`note_${task.id}`] = dataNote.error ? task.note : dataNote.translation;
+        }
+      }
+
+      setInstructionTranslations((prev) => ({
+        ...prev,
+        [instruction.id]: {
+          ...translatedFields,
+          tasks: translatedTasks,
+          language: instructionToLanguage,
+        },
+      }));
+
+      setMessage("Arbeitsanweisung wurde übersetzt.");
+    } catch (err) {
+      setMessage("Fehler beim Übersetzen: " + String(err));
+    }
+
+    setTranslatingInstructionId(null);
   }
 
   function createReportFromInstruction(instruction: any) {
@@ -1435,9 +1515,30 @@ export default function Home() {
           <section className="border rounded p-4 space-y-4 bg-white text-black">
             <h2 className="text-xl font-bold">Gespeicherte Arbeitsanweisungen</h2>
             {workInstructions.length === 0 && <p className="text-gray-600">Noch keine Arbeitsanweisungen vorhanden.</p>}
-            {workInstructions.map((instruction) => (
+            {/* Zielsprache für Übersetzung */}
+            <div className="flex items-center gap-3 bg-gray-50 border rounded p-3">
+              <label className="text-sm font-medium text-gray-700">🌐 Übersetzen nach:</label>
+              <select
+                className="border p-2 rounded text-black bg-white"
+                value={instructionToLanguage}
+                onChange={(e) => setInstructionToLanguage(e.target.value)}
+              >
+                {["Kroatisch", "Slowenisch", "Polnisch", "Englisch", "Deutsch"].map((lang) => (
+                  <option key={lang} value={lang}>{lang}</option>
+                ))}
+              </select>
+            </div>
+
+            {workInstructions.map((instruction) => {
+              const translation = instructionTranslations[instruction.id];
+              const isTranslating = translatingInstructionId === instruction.id;
+
+              return (
               <div key={instruction.id} className="border rounded p-4 space-y-2">
                 <h3 className="font-bold text-lg">{instruction.title}</h3>
+                {translation?.title && (
+                  <p className="text-blue-700 italic text-sm">🌐 {translation.title}</p>
+                )}
                 <p><strong>Datum:</strong> {instruction.work_date || "-"}</p>
                 <p><strong>Projekt:</strong> {instruction.project || "-"}</p>
                 <p><strong>Kunde:</strong> {instruction.customer || "-"}</p>
@@ -1446,6 +1547,9 @@ export default function Home() {
                   <div className="bg-yellow-50 border rounded p-3">
                     <strong>Probleme / Hinweise:</strong>
                     <p>{instruction.problems_text}</p>
+                    {translation?.problems_text && (
+                      <p className="text-blue-700 italic text-sm mt-1">🌐 {translation.problems_text}</p>
+                    )}
                   </div>
                 )}
                 <ul className="list-disc pl-6 mt-2 space-y-2">
@@ -1460,9 +1564,17 @@ export default function Home() {
                             <option value="stopped">⛔ Gestoppt</option>
                             <option value="completed">✅ Erledigt</option>
                           </select>
-                          <div className="font-medium">{task.task_text}</div>
+                          <div>
+                            <div className="font-medium">{task.task_text}</div>
+                            {translation?.tasks?.[task.id] && (
+                              <div className="text-blue-700 italic text-sm">🌐 {translation.tasks[task.id]}</div>
+                            )}
+                          </div>
                         </div>
                         <input className="border p-2 w-full text-black bg-white" placeholder="Rückmeldung" defaultValue={task.note || ""} id={`task-note-${task.id}`} />
+                        {translation?.tasks?.[`note_${task.id}`] && (
+                          <p className="text-blue-700 italic text-sm">🌐 {translation.tasks[`note_${task.id}`]}</p>
+                        )}
                         <button type="button" onClick={() => {
                           const field = document.getElementById(`task-note-${task.id}`) as HTMLInputElement;
                           updateTaskNote(task.id, field.value);
@@ -1470,6 +1582,26 @@ export default function Home() {
                       </li>
                     ))}
                 </ul>
+
+                {/* Übersetzungs-Button */}
+                {companyFeatures?.ai_enabled && (
+                  <div className="border-t pt-3 mt-2">
+                    <button
+                      type="button"
+                      onClick={() => translateInstruction(instruction)}
+                      disabled={isTranslating}
+                      className="bg-black text-white px-4 py-2 rounded font-medium disabled:opacity-50"
+                    >
+                      {isTranslating ? "⏳ Übersetze..." : `🌐 In ${instructionToLanguage} übersetzen`}
+                    </button>
+                    {translation && (
+                      <span className="ml-3 text-sm text-green-600 font-medium">
+                        ✅ Übersetzt ({translation.language})
+                      </span>
+                    )}
+                  </div>
+                )}
+
                 {/* Button: Arbeitsanweisung → Regiebericht */}
                 <div className="border-t pt-3 mt-2">
                   {companyFeatures?.module_auto_reports ? (
@@ -1491,7 +1623,8 @@ export default function Home() {
                   <button type="button" onClick={() => deleteWorkInstruction(instruction.id)} className="bg-red-600 text-white px-3 py-2 rounded">Arbeitsanweisung löschen</button>
                 )}
               </div>
-            ))}
+              );
+            })}
           </section>
         </div>
       )}
