@@ -1438,6 +1438,7 @@ export default function Home() {
             {workInstructions.map((instruction) => (
               <div key={instruction.id} className="border rounded p-4 space-y-2">
                 <h3 className="font-bold text-lg">{instruction.title}</h3>
+                <p><strong>Datum:</strong> {instruction.work_date || "-"}</p>
                 <p><strong>Projekt:</strong> {instruction.project || "-"}</p>
                 <p><strong>Kunde:</strong> {instruction.customer || "-"}</p>
                 <p><strong>Baustelle:</strong> {instruction.site || "-"}</p>
