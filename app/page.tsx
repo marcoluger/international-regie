@@ -220,6 +220,11 @@ const texts = {
     photos: "Fotos",
     deletePhoto2: "Foto löschen",
     tabDay: "Tagesansicht",
+    tabWeek: "Wochenansicht",
+    weekView: "Wochenansicht",
+    noInstructionsDay: "Keine Arbeitsanweisungen für diesen Tag.",
+    noInstructionsWeek: "Keine Arbeitsanweisungen für diese Woche.",
+    noInstructionsMonth: "Keine Arbeitsanweisungen für diesen Monat.",
     tabMonth: "Monatsansicht",
     dayView: "Tagesansicht",
     monthView: "Monatsansicht",
@@ -375,6 +380,11 @@ const texts = {
     photos: "Fotografije",
     deletePhoto2: "Obriši fotografiju",
     tabDay: "Dnevni pregled",
+    tabWeek: "Tedenski pregled",
+    weekView: "Tedenski pregled",
+    noInstructionsDay: "Ni delovnih navodil za ta dan.",
+    noInstructionsWeek: "Ni delovnih navodil za ta teden.",
+    noInstructionsMonth: "Ni delovnih navodil za ta mesec.",
     tabMonth: "Mjesečni pregled",
     dayView: "Dnevni pregled",
     monthView: "Mjesečni pregled",
@@ -530,6 +540,11 @@ const texts = {
     photos: "Fotografije",
     deletePhoto2: "Izbriši fotografijo",
     tabDay: "Dnevni pregled",
+    tabWeek: "Tjedni pregled",
+    weekView: "Tjedni pregled",
+    noInstructionsDay: "Nema radnih uputa za ovaj dan.",
+    noInstructionsWeek: "Nema radnih uputa za ovaj tjedan.",
+    noInstructionsMonth: "Nema radnih uputa za ovaj mjesec.",
     tabMonth: "Mesečni pregled",
     dayView: "Dnevni pregled",
     monthView: "Mesečni pregled",
@@ -692,6 +707,11 @@ const texts = {
     photos: "Zdjęcia",
     deletePhoto2: "Usuń zdjęcie",
     tabDay: "Widok dzienny",
+    tabWeek: "Widok tygodniowy",
+    weekView: "Widok tygodniowy",
+    noInstructionsDay: "Brak instrukcji na ten dzień.",
+    noInstructionsWeek: "Brak instrukcji na ten tydzień.",
+    noInstructionsMonth: "Brak instrukcji na ten miesiąc.",
     tabMonth: "Widok miesięczny",
     dayView: "Widok dzienny",
     monthView: "Widok miesięczny",
@@ -933,6 +953,7 @@ export default function Home() {
   const [instructionDate, setInstructionDate] = useState("");
   const [selectedDayDate, setSelectedDayDate] = useState(new Date().toISOString().split("T")[0]);
   const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
+  const [selectedWeek, setSelectedWeek] = useState(new Date().toISOString().split("T")[0]);
 
   useEffect(() => {
     async function loadUser() {
@@ -1761,6 +1782,7 @@ export default function Home() {
         <TabButton label={t.employeeManagement}          tabName="mitarbeiter"         activeTab={activeTab} onClick={() => setActiveTab("mitarbeiter")} />
         <TabButton label={t.companyData}          tabName="firmendaten"         activeTab={activeTab} onClick={() => setActiveTab("firmendaten")} />
         <TabButton label={t.tabDay}               tabName="tag"                 activeTab={activeTab} onClick={() => setActiveTab("tag")} />
+        <TabButton label={t.tabWeek}              tabName="woche"               activeTab={activeTab} onClick={() => setActiveTab("woche")} />
         <TabButton label={t.tabMonth}             tabName="monat"               activeTab={activeTab} onClick={() => setActiveTab("monat")} />
       </nav>
 
@@ -2127,141 +2149,8 @@ export default function Home() {
             </div>
           </section>
 
-          <section className="border rounded p-4 space-y-4 bg-white text-black">
-            <h2 className="text-xl font-bold">{t.savedInstructions}</h2>
-            {workInstructions.length === 0 && <p className="text-gray-600">{t.noInstructionsYet}</p>}
-            {/* Zielsprache für Übersetzung — nur freigeschaltete Sprachen */}
-            <div className="flex items-center gap-3 bg-gray-50 border rounded p-3">
-              <label className="text-sm font-medium text-gray-700">🌐 {t.translateTo}:</label>
-              <select
-                className="border p-2 rounded text-black bg-white"
-                value={instructionToLanguage}
-                onChange={(e) => setInstructionToLanguage(e.target.value)}
-              >
-                {getAllowedLanguages(companyFeatures)
-                  .filter((lang) => lang !== "Deutsch")
-                  .map((lang) => (
-                    <option key={lang} value={lang}>{lang}</option>
-                  ))}
-              </select>
-              {getAllowedLanguages(companyFeatures).filter((l) => l !== "Deutsch").length === 0 && (
-                <span className="text-sm text-gray-400">🔒 Keine Zielsprachen freigeschaltet</span>
-              )}
-            </div>
-
-            {workInstructions.map((instruction) => {
-              const translation = instructionTranslations[instruction.id];
-              const isTranslating = translatingInstructionId === instruction.id;
-
-              return (
-              <div key={instruction.id} className="border rounded p-4 space-y-2">
-                <h3 className="font-bold text-lg">{instruction.title}</h3>
-                {translation?.title && (
-                  <p className="text-blue-700 italic text-sm">🌐 {translation.title}</p>
-                )}
-                <p><strong>{t.date}:</strong> {instruction.work_date || "-"}</p>
-                <p><strong>{t.project}:</strong> {instruction.project || "-"}</p>
-                <p><strong>{t.customer}:</strong> {instruction.customer || "-"}</p>
-                <p><strong>{t.site}:</strong> {instruction.site || "-"}</p>
-                {instruction.problems_text && (
-                  <div className="bg-yellow-50 border rounded p-3">
-                    <strong>{t.problemsHints}:</strong>
-                    <p>{instruction.problems_text}</p>
-                    {translation?.problems_text && (
-                      <p className="text-blue-700 italic text-sm mt-1">🌐 {translation.problems_text}</p>
-                    )}
-                  </div>
-                )}
-                {companyFeatures?.photos_enabled && (instruction.photos || []).length > 0 && (
-                  <div>
-                    <strong>{t.photos}:</strong>
-                    <div className="grid grid-cols-3 gap-2 mt-2">
-                      {(instruction.photos || []).map((photo: string, i: number) => (
-                        <img key={i} src={photo} alt="Foto" className="w-full h-24 object-cover rounded border" />
-                      ))}
-                    </div>
-                  </div>
-                )}
-                <ul className="list-disc pl-6 mt-2 space-y-2">
-                  {(instruction.work_instruction_tasks || [])
-                    .sort((a: any, b: any) => a.sort_order - b.sort_order)
-                    .map((task: any) => (
-                      <li key={task.id} className="space-y-2 border rounded p-2 list-none">
-                        <div className="flex items-center gap-2">
-                          <select className="border rounded p-2 font-medium text-black bg-white" value={task.status || "open"} onChange={(e) => updateTaskStatus(task.id, e.target.value)}>
-                            <option value="open">{t.statusOpen}</option>
-                            <option value="in_progress">{t.statusInProgress}</option>
-                            <option value="stopped">{t.statusStopped}</option>
-                            <option value="completed">{t.statusCompleted}</option>
-                          </select>
-                          <div>
-                            <div className="font-medium">{task.task_text}</div>
-                            {translation?.tasks?.[task.id] && (
-                              <div className="text-blue-700 italic text-sm">🌐 {translation.tasks[task.id]}</div>
-                            )}
-                          </div>
-                        </div>
-                        {companyFeatures?.photos_enabled && (task.photos || []).length > 0 && (
-                          <div className="grid grid-cols-3 gap-2 mt-1">
-                            {(task.photos || []).map((photo: string, pi: number) => (
-                              <img key={pi} src={photo} alt="Foto" className="w-full h-20 object-cover rounded border" />
-                            ))}
-                          </div>
-                        )}
-                        <input className="border p-2 w-full text-black bg-white" placeholder={t.feedback} defaultValue={task.note || ""} id={`task-note-${task.id}`} />
-                        {translation?.tasks?.[`note_${task.id}`] && (
-                          <p className="text-blue-700 italic text-sm">🌐 {translation.tasks[`note_${task.id}`]}</p>
-                        )}
-                        <button type="button" onClick={() => {
-                          const field = document.getElementById(`task-note-${task.id}`) as HTMLInputElement;
-                          updateTaskNote(task.id, field.value);
-                        }} className="bg-gray-700 text-white px-3 py-2 rounded">{t.saveFeedback}</button>
-                      </li>
-                    ))}
-                </ul>
-
-                {/* Übersetzungs-Button */}
-                {companyFeatures?.ai_enabled && (
-                  <div className="border-t pt-3 mt-2">
-                    <button
-                      type="button"
-                      onClick={() => translateInstruction(instruction)}
-                      disabled={isTranslating}
-                      className="bg-black text-white px-4 py-2 rounded font-medium disabled:opacity-50"
-                    >
-                      {isTranslating ? "⏳ " + t.translating2 : `🌐 ${t.translateTo}: ${instructionToLanguage}`}
-                    </button>
-                    {translation && (
-                      <span className="ml-3 text-sm text-green-600 font-medium">
-                        {t.translated} ({translation.language})
-                      </span>
-                    )}
-                  </div>
-                )}
-
-                {/* Button: Arbeitsanweisung → Regiebericht */}
-                <div className="border-t pt-3 mt-2">
-                  {companyFeatures?.module_auto_reports ? (
-                    <button
-                      type="button"
-                      onClick={() => createReportFromInstruction(instruction)}
-                      className="bg-green-700 text-white px-4 py-2 rounded font-medium"
-                    >
-                      {t.toReport}
-                    </button>
-                  ) : (
-                    <div className="bg-gray-50 border rounded p-3 text-sm text-gray-500">
-                      {t.autoReportLocked}
-                    </div>
-                  )}
-                </div>
-
-                {(currentCompany?.role === "owner" || currentCompany?.role === "project_manager" || currentCompany?.role === "admin") && (
-                  <button type="button" onClick={() => deleteWorkInstruction(instruction.id)} className="bg-red-600 text-white px-3 py-2 rounded">{t.deleteInstruction}</button>
-                )}
-              </div>
-              );
-            })}
+          <section className="border rounded p-4 bg-blue-50 text-black">
+            <p className="text-blue-700 text-sm">💡 {t.savedInstructions} → {t.tabDay} / {t.tabWeek} / {t.tabMonth}</p>
           </section>
         </div>
       )}
@@ -2269,86 +2158,169 @@ export default function Home() {
       {/* ── TAB: Tagesansicht ── */}
       {activeTab === "tag" && (
         <div className="space-y-4">
-          {/* Datum wählen */}
           <section className="border rounded p-4 bg-white text-black space-y-3">
             <h2 className="text-xl font-bold">{t.dayView}</h2>
-            <input
-              type="date"
-              className="border p-3 rounded text-black bg-white"
-              value={selectedDayDate}
-              onChange={(e) => setSelectedDayDate(e.target.value)}
-            />
+            <input type="date" className="border p-3 rounded text-black bg-white"
+              value={selectedDayDate} onChange={(e) => setSelectedDayDate(e.target.value)} />
           </section>
 
-          {/* Tageseinträge aus gespeicherten Berichten */}
           {(() => {
-            const dayEntries = savedReports.flatMap((report) =>
-              (report.days || [])
-                .filter((day) => day.date === selectedDayDate && (day.description || day.hours))
-                .map((day) => ({ ...day, reportName: report.report_name, employee: report.employee }))
+            const dayInstructions = workInstructions.filter((i) => i.work_date === selectedDayDate);
+            if (dayInstructions.length === 0) return (
+              <section className="border rounded p-4 bg-white text-black">
+                <p className="text-gray-500">{t.noInstructionsDay}</p>
+              </section>
+            );
+            return dayInstructions.map((instruction) => (
+              <section key={instruction.id} className="border rounded p-4 bg-white text-black space-y-2">
+                <div className="flex justify-between items-start">
+                  <h3 className="font-bold text-lg">{instruction.title}</h3>
+                  <span className="text-sm text-gray-500">{instruction.work_date}</span>
+                </div>
+                <p><strong>{t.project}:</strong> {instruction.project || "-"}</p>
+                <p><strong>{t.customer}:</strong> {instruction.customer || "-"}</p>
+                <p><strong>{t.site}:</strong> {instruction.site || "-"}</p>
+                {instruction.problems_text && (
+                  <div className="bg-yellow-50 border rounded p-2">
+                    <strong>{t.problemsHints}:</strong> {instruction.problems_text}
+                  </div>
+                )}
+                {(instruction.photos || []).length > 0 && companyFeatures?.photos_enabled && (
+                  <div className="grid grid-cols-3 gap-2">
+                    {(instruction.photos || []).map((photo: string, i: number) => (
+                      <img key={i} src={photo} alt="Foto" className="w-full h-24 object-cover rounded border" />
+                    ))}
+                  </div>
+                )}
+                <ul className="space-y-2 mt-2">
+                  {(instruction.work_instruction_tasks || [])
+                    .sort((a: any, b: any) => a.sort_order - b.sort_order)
+                    .map((task: any) => (
+                      <li key={task.id} className="border rounded p-2 space-y-1">
+                        <div className="flex items-center gap-2">
+                          <select className="border rounded p-1 text-sm text-black bg-white"
+                            value={task.status || "open"}
+                            onChange={(e) => updateTaskStatus(task.id, e.target.value)}>
+                            <option value="open">{t.statusOpen}</option>
+                            <option value="in_progress">{t.statusInProgress}</option>
+                            <option value="stopped">{t.statusStopped}</option>
+                            <option value="completed">{t.statusCompleted}</option>
+                          </select>
+                          <span className="font-medium">{task.task_text}</span>
+                        </div>
+                        {task.note && <p className="text-sm text-gray-600 ml-2">{t.feedbackLabel}: {task.note}</p>}
+                        {(task.photos || []).length > 0 && companyFeatures?.photos_enabled && (
+                          <div className="grid grid-cols-3 gap-1">
+                            {(task.photos || []).map((photo: string, pi: number) => (
+                              <img key={pi} src={photo} alt="Foto" className="w-full h-16 object-cover rounded" />
+                            ))}
+                          </div>
+                        )}
+                      </li>
+                    ))}
+                </ul>
+                <div className="flex gap-2 pt-2 border-t">
+                  {companyFeatures?.module_auto_reports && (
+                    <button type="button" onClick={() => createReportFromInstruction(instruction)}
+                      className="bg-green-700 text-white px-3 py-2 rounded text-sm">📋 {t.toReport}</button>
+                  )}
+                  {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
+                    <button type="button" onClick={() => deleteWorkInstruction(instruction.id)}
+                      className="bg-red-600 text-white px-3 py-2 rounded text-sm">{t.deleteInstruction}</button>
+                  )}
+                </div>
+              </section>
+            ));
+          })()}
+        </div>
+      )}
+
+      {/* ── TAB: Wochenansicht ── */}
+      {activeTab === "woche" && (
+        <div className="space-y-4">
+          <section className="border rounded p-4 bg-white text-black space-y-3">
+            <h2 className="text-xl font-bold">{t.weekView}</h2>
+            <div className="flex items-center gap-3">
+              <label className="text-sm font-medium">{t.selectDate}:</label>
+              <input type="date" className="border p-3 rounded text-black bg-white"
+                value={selectedWeek} onChange={(e) => setSelectedWeek(e.target.value)} />
+            </div>
+            <p className="text-sm text-gray-500">{t.week}: {getCalendarWeek(selectedWeek)}</p>
+          </section>
+
+          {(() => {
+            if (!selectedWeek) return null;
+            const [y, m, d] = selectedWeek.split("-").map(Number);
+            const date = new Date(Date.UTC(y, m - 1, d));
+            const dayNum = date.getUTCDay() || 7;
+            const monday = new Date(date);
+            monday.setUTCDate(date.getUTCDate() - dayNum + 1);
+
+            const weekDates = Array.from({ length: 7 }, (_, i) => {
+              const nd = new Date(monday);
+              nd.setUTCDate(monday.getUTCDate() + i);
+              return nd.toISOString().split("T")[0];
+            });
+
+            const weekInstructions = workInstructions.filter((i) => weekDates.includes(i.work_date));
+
+            if (weekInstructions.length === 0) return (
+              <section className="border rounded p-4 bg-white text-black">
+                <p className="text-gray-500">{t.noInstructionsWeek}</p>
+              </section>
             );
 
-            if (dayEntries.length === 0) {
+            return weekDates.map((dateStr, di) => {
+              const dayInstructions = weekInstructions.filter((i) => i.work_date === dateStr);
+              if (dayInstructions.length === 0) return null;
               return (
-                <section className="border rounded p-4 bg-white text-black">
-                  <p className="text-gray-500">{t.noEntries}</p>
-                </section>
-              );
-            }
-
-            const totalHoursDay = dayEntries.reduce((sum, d) => sum + (Number(d.hours?.replace(",", ".")) || 0), 0);
-
-            return (
-              <>
-                {/* Stundenübersicht Tag */}
-                <section className="border rounded p-4 bg-white text-black space-y-2">
-                  <h3 className="font-bold">{t.hoursOverview}</h3>
-                  <p><strong>{t.total}:</strong> {totalHoursDay.toString().replace(".", ",")} {t.hours}</p>
-                  {Object.entries(
-                    dayEntries.reduce<Record<string, number>>((acc, d) => {
-                      if (!d.projectNumber) return acc;
-                      acc[d.projectNumber] = (acc[d.projectNumber] || 0) + (Number(d.hours?.replace(",", ".")) || 0);
-                      return acc;
-                    }, {})
-                  ).map(([proj, h]) => (
-                    <p key={proj}><strong>{t.projectNumber} {proj}:</strong> {h.toString().replace(".", ",")} {t.hours}</p>
+                <section key={dateStr} className="border rounded p-4 bg-white text-black space-y-3">
+                  <div className="flex justify-between items-center bg-gray-100 rounded p-2">
+                    <h3 className="font-bold">{t.weekdays[di]} — {dateStr}</h3>
+                    <button type="button" onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }}
+                      className="text-blue-600 text-sm hover:underline">→ {t.dayView}</button>
+                  </div>
+                  {dayInstructions.map((instruction) => (
+                    <div key={instruction.id} className="border rounded p-3 space-y-2">
+                      <div className="flex justify-between">
+                        <strong>{instruction.title}</strong>
+                        <span className="text-sm text-gray-500">{instruction.project || "-"}</span>
+                      </div>
+                      <p className="text-sm"><strong>{t.customer}:</strong> {instruction.customer || "-"} | <strong>{t.site}:</strong> {instruction.site || "-"}</p>
+                      {instruction.problems_text && (
+                        <div className="bg-yellow-50 border rounded p-2 text-sm">
+                          <strong>{t.problemsHints}:</strong> {instruction.problems_text}
+                        </div>
+                      )}
+                      <ul className="space-y-1">
+                        {(instruction.work_instruction_tasks || [])
+                          .sort((a: any, b: any) => a.sort_order - b.sort_order)
+                          .map((task: any) => (
+                            <li key={task.id} className="flex items-center gap-2 text-sm">
+                              <select className="border rounded p-1 text-xs text-black bg-white"
+                                value={task.status || "open"}
+                                onChange={(e) => updateTaskStatus(task.id, e.target.value)}>
+                                <option value="open">{t.statusOpen}</option>
+                                <option value="in_progress">{t.statusInProgress}</option>
+                                <option value="stopped">{t.statusStopped}</option>
+                                <option value="completed">{t.statusCompleted}</option>
+                              </select>
+                              <span>{task.task_text}</span>
+                              {task.note && <span className="text-gray-500">— {task.note}</span>}
+                            </li>
+                          ))}
+                      </ul>
+                      <div className="flex gap-2">
+                        {companyFeatures?.module_auto_reports && (
+                          <button type="button" onClick={() => createReportFromInstruction(instruction)}
+                            className="bg-green-700 text-white px-3 py-1 rounded text-sm">📋 {t.toReport}</button>
+                        )}
+                      </div>
+                    </div>
                   ))}
                 </section>
-
-                {/* Einträge Liste */}
-                {dayEntries.map((entry, i) => (
-                  <section key={i} className="border rounded p-4 bg-white text-black space-y-2">
-                    <div className="flex justify-between items-start">
-                      <h3 className="font-bold">{entry.employee || "-"}</h3>
-                      <span className="text-sm text-gray-500">{entry.reportName}</span>
-                    </div>
-                    <p><strong>{t.customer}:</strong> {entry.customer || "-"}</p>
-                    <p><strong>{t.projectNumber}:</strong> {entry.projectNumber || "-"}</p>
-                    <p><strong>{t.site}:</strong> {entry.site || "-"}</p>
-                    <p><strong>{t.hours}:</strong> {entry.hours || "-"}</p>
-                    {entry.description && (
-                      <div>
-                        <strong>{t.description}:</strong>
-                        <p className="mt-1 text-gray-700 whitespace-pre-line">{entry.description}</p>
-                      </div>
-                    )}
-                    {entry.translation && (
-                      <div className="bg-gray-50 border rounded p-2">
-                        <strong>{t.translation}:</strong>
-                        <p className="mt-1 text-gray-700 whitespace-pre-line">{entry.translation}</p>
-                      </div>
-                    )}
-                    {(entry.photos || []).length > 0 && (
-                      <div className="grid grid-cols-3 gap-2">
-                        {entry.photos.map((photo: string, pi: number) => (
-                          <img key={pi} src={photo} alt="Foto" className="w-full h-24 object-cover rounded border" />
-                        ))}
-                      </div>
-                    )}
-                  </section>
-                ))}
-              </>
-            );
+              );
+            });
           })()}
         </div>
       )}
@@ -2356,165 +2328,77 @@ export default function Home() {
       {/* ── TAB: Monatsansicht ── */}
       {activeTab === "monat" && (
         <div className="space-y-4">
-          {/* Monat wählen */}
           <section className="border rounded p-4 bg-white text-black space-y-3">
             <h2 className="text-xl font-bold">{t.monthView}</h2>
-            <input
-              type="month"
-              className="border p-3 rounded text-black bg-white"
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-            />
+            <input type="month" className="border p-3 rounded text-black bg-white"
+              value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} />
           </section>
 
           {(() => {
-            const monthEntries = savedReports.flatMap((report) =>
-              (report.days || [])
-                .filter((day) => day.date?.startsWith(selectedMonth) && (day.description || day.hours))
-                .map((day) => ({ ...day, reportName: report.report_name, employee: report.employee }))
-            );
+            const monthInstructions = workInstructions.filter((i) => i.work_date?.startsWith(selectedMonth));
 
-            const totalHoursMonth = monthEntries.reduce((sum, d) => sum + (Number(d.hours?.replace(",", ".")) || 0), 0);
-
-            const projectTotalsMonth = monthEntries.reduce<Record<string, number>>((acc, d) => {
-              if (!d.projectNumber) return acc;
-              acc[d.projectNumber] = (acc[d.projectNumber] || 0) + (Number(d.hours?.replace(",", ".")) || 0);
-              return acc;
-            }, {});
-
-            const employeeTotals = monthEntries.reduce<Record<string, number>>((acc, d) => {
-              const emp = d.employee || "-";
-              acc[emp] = (acc[emp] || 0) + (Number(d.hours?.replace(",", ".")) || 0);
-              return acc;
-            }, {});
-
-            // Group by week
-            const byWeek = monthEntries.reduce<Record<string, typeof monthEntries>>((acc, d) => {
-              const kw = getCalendarWeek(d.date);
-              if (!acc[kw]) acc[kw] = [];
-              acc[kw].push(d);
-              return acc;
-            }, {});
+            // Kalender
+            const [year, month] = selectedMonth.split("-").map(Number);
+            const daysInMonth = new Date(year, month, 0).getDate();
+            const firstDay = (new Date(year, month - 1, 1).getDay() + 6) % 7;
+            const cells: (number | null)[] = [];
+            for (let i = 0; i < firstDay; i++) cells.push(null);
+            for (let d = 1; d <= daysInMonth; d++) cells.push(d);
 
             return (
               <>
-                {/* Monats-Zusammenfassung */}
-                <section className="border rounded p-4 bg-white text-black space-y-3">
-                  <h3 className="font-bold text-lg">{t.totalHoursMonth}</h3>
-                  <p className="text-2xl font-bold text-blue-700">{totalHoursMonth.toString().replace(".", ",")} {t.hours}</p>
-
-                  {Object.keys(projectTotalsMonth).length > 0 && (
-                    <div>
-                      <h4 className="font-bold mb-2">{t.hoursPerProject}</h4>
-                      {Object.entries(projectTotalsMonth).map(([proj, h]) => (
-                        <div key={proj} className="flex justify-between border-b py-1">
-                          <span>{t.projectNumber} {proj}</span>
-                          <span className="font-medium">{h.toString().replace(".", ",")} {t.hours}</span>
+                {/* Kalender */}
+                <section className="border rounded p-4 bg-white text-black">
+                  <h3 className="font-bold mb-3">{selectedMonth}</h3>
+                  <div className="grid grid-cols-7 gap-1 mb-1">
+                    {t.weekdays.map((label) => (
+                      <div key={label} className="text-center text-xs font-bold text-gray-500 py-1">
+                        {label.slice(0, 2)}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="grid grid-cols-7 gap-1">
+                    {cells.map((day, i) => {
+                      if (!day) return <div key={`e-${i}`} />;
+                      const dateStr = `${selectedMonth}-${String(day).padStart(2, "0")}`;
+                      const entries = monthInstructions.filter((inst) => inst.work_date === dateStr);
+                      const isToday = dateStr === new Date().toISOString().split("T")[0];
+                      return (
+                        <div key={day} onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }}
+                          className={`border rounded p-1 min-h-14 cursor-pointer hover:border-blue-400 transition-colors ${
+                            isToday ? "border-blue-500 bg-blue-50" : entries.length > 0 ? "bg-green-50 border-green-300" : "bg-white"
+                          }`}>
+                          <div className={`text-xs font-bold ${isToday ? "text-blue-600" : "text-gray-700"}`}>{day}</div>
+                          {entries.length > 0 && (
+                            <div className="text-xs text-green-700 font-medium">{entries.length} ✓</div>
+                          )}
+                          {entries[0] && (
+                            <div className="text-xs text-gray-500 truncate">{entries[0].title}</div>
+                          )}
                         </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {Object.keys(employeeTotals).length > 0 && (
-                    <div>
-                      <h4 className="font-bold mb-2">{t.employee}</h4>
-                      {Object.entries(employeeTotals).map(([emp, h]) => (
-                        <div key={emp} className="flex justify-between border-b py-1">
-                          <span>{emp}</span>
-                          <span className="font-medium">{h.toString().replace(".", ",")} {t.hours}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                      );
+                    })}
+                  </div>
                 </section>
 
-                {/* Kalender-Ansicht */}
-                <section className="border rounded p-4 bg-white text-black space-y-3">
-                  <h3 className="font-bold text-lg">Kalender {selectedMonth}</h3>
-                  {(() => {
-                    const [year, month] = selectedMonth.split("-").map(Number);
-                    const daysInMonth = new Date(year, month, 0).getDate();
-                    const firstDay = (new Date(year, month - 1, 1).getDay() + 6) % 7; // Mo=0
-
-                    const cells = [];
-                    for (let i = 0; i < firstDay; i++) cells.push(null);
-                    for (let d = 1; d <= daysInMonth; d++) cells.push(d);
-
-                    const dayLabels = t.weekdays.slice(0, 7);
-
-                    return (
-                      <div>
-                        <div className="grid grid-cols-7 gap-1 mb-1">
-                          {dayLabels.map((label) => (
-                            <div key={label} className="text-center text-xs font-bold text-gray-500 py-1">
-                              {label.slice(0, 2)}
-                            </div>
-                          ))}
+                {/* Monats-Liste */}
+                <section className="border rounded p-4 bg-white text-black space-y-2">
+                  <h3 className="font-bold">{t.workInstructions} ({monthInstructions.length})</h3>
+                  {monthInstructions.length === 0 && <p className="text-gray-500">{t.noInstructionsMonth}</p>}
+                  {monthInstructions
+                    .sort((a, b) => (a.work_date || "").localeCompare(b.work_date || ""))
+                    .map((instruction) => (
+                      <div key={instruction.id}
+                        onClick={() => { setSelectedDayDate(instruction.work_date); setActiveTab("tag"); }}
+                        className="border rounded p-3 bg-gray-50 cursor-pointer hover:bg-gray-100 flex justify-between items-center">
+                        <div>
+                          <span className="font-medium">{instruction.title}</span>
+                          <span className="text-gray-500 text-sm ml-2">{instruction.customer || "-"}</span>
                         </div>
-                        <div className="grid grid-cols-7 gap-1">
-                          {cells.map((day, i) => {
-                            if (!day) return <div key={`empty-${i}`} />;
-                            const dateStr = `${selectedMonth}-${String(day).padStart(2, "0")}`;
-                            const entries = monthEntries.filter((e) => e.date === dateStr);
-                            const dayHours = entries.reduce((sum, e) => sum + (Number(e.hours?.replace(",", ".")) || 0), 0);
-                            const isToday = dateStr === new Date().toISOString().split("T")[0];
-
-                            return (
-                              <div
-                                key={day}
-                                onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }}
-                                className={`border rounded p-1 min-h-14 cursor-pointer hover:border-blue-400 transition-colors ${
-                                  isToday ? "border-blue-500 bg-blue-50" : entries.length > 0 ? "bg-green-50 border-green-300" : "bg-white"
-                                }`}
-                              >
-                                <div className={`text-xs font-bold ${isToday ? "text-blue-600" : "text-gray-700"}`}>{day}</div>
-                                {dayHours > 0 && (
-                                  <div className="text-xs text-green-700 font-medium">{dayHours.toString().replace(".", ",")}h</div>
-                                )}
-                                {entries.length > 0 && (
-                                  <div className="text-xs text-gray-500 truncate">{entries[0].employee || ""}</div>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
+                        <span className="text-sm text-gray-500">{instruction.work_date}</span>
                       </div>
-                    );
-                  })()}
+                    ))}
                 </section>
-
-                {/* Wochenweise Liste */}
-                {Object.entries(byWeek).map(([kw, entries]) => {
-                  const kwHours = entries.reduce((sum, e) => sum + (Number(e.hours?.replace(",", ".")) || 0), 0);
-                  return (
-                    <section key={kw} className="border rounded p-4 bg-white text-black space-y-2">
-                      <div className="flex justify-between items-center">
-                        <h3 className="font-bold">{t.week} {kw}</h3>
-                        <span className="text-blue-700 font-bold">{kwHours.toString().replace(".", ",")} {t.hours}</span>
-                      </div>
-                      {entries.map((entry, i) => (
-                        <div
-                          key={i}
-                          onClick={() => { setSelectedDayDate(entry.date); setActiveTab("tag"); }}
-                          className="border rounded p-3 bg-gray-50 cursor-pointer hover:bg-gray-100 flex justify-between items-center"
-                        >
-                          <div>
-                            <span className="font-medium">{entry.date}</span>
-                            <span className="text-gray-500 text-sm ml-2">{entry.employee || "-"}</span>
-                            <span className="text-gray-500 text-sm ml-2">{entry.customer || "-"}</span>
-                          </div>
-                          <span className="font-bold text-green-700">{entry.hours} {t.hours}</span>
-                        </div>
-                      ))}
-                    </section>
-                  );
-                })}
-
-                {monthEntries.length === 0 && (
-                  <section className="border rounded p-4 bg-white text-black">
-                    <p className="text-gray-500">{t.noEntries}</p>
-                  </section>
-                )}
               </>
             );
           })()}
