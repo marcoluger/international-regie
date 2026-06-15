@@ -183,6 +183,7 @@ const texts = {
     firma: "Firma",
     feedbackLabel: "Rückmeldung",
     noProjectsYet: "Noch keine Projekte vorhanden.",
+    weekdays: ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"],
     noInstructionsYet: "Noch keine Arbeitsanweisungen vorhanden.",
     problemsHints: "Probleme / Hinweise",
     roleEmployee: "Mitarbeiter",
@@ -288,6 +289,7 @@ const texts = {
     firma: "Tvrtka",
     feedbackLabel: "Povratna informacija",
     noProjectsYet: "Još nema projekata.",
+    weekdays: ["Ponedjeljak", "Utorak", "Srijeda", "Četvrtak", "Petak", "Subota", "Nedjelja"],
     noInstructionsYet: "Još nema radnih uputa.",
     problemsHints: "Problemi / napomene",
     roleEmployee: "Radnik",
@@ -393,6 +395,7 @@ const texts = {
     firma: "Podjetje",
     feedbackLabel: "Povratna informacija",
     noProjectsYet: "Še ni projektov.",
+    weekdays: ["Ponedeljek", "Torek", "Sreda", "Četrtek", "Petek", "Sobota", "Nedelja"],
     noInstructionsYet: "Še ni delovnih navodil.",
     problemsHints: "Težave / opombe",
     roleEmployee: "Zaposleni",
@@ -505,6 +508,7 @@ const texts = {
     firma: "Firma",
     feedbackLabel: "Informacja zwrotna",
     noProjectsYet: "Brak projektów.",
+    weekdays: ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota", "Niedziela"],
     noInstructionsYet: "Brak instrukcji pracy.",
     problemsHints: "Problemy / uwagi",
     roleEmployee: "Pracownik",
@@ -1602,7 +1606,7 @@ export default function Home() {
           {/* Tageseinträge */}
           {days.map((day, index) => (
             <section key={day.weekday} className="border rounded p-4 space-y-3 bg-white text-black">
-              <h2 className="text-xl font-bold">{day.weekday}</h2>
+              <h2 className="text-xl font-bold">{t.weekdays[index] || day.weekday}</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <input
                   type="date" className="border p-3 text-black bg-white" value={day.date}
