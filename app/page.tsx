@@ -185,6 +185,37 @@ const texts = {
     noProjectsYet: "Noch keine Projekte vorhanden.",
     weekdays: ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"],
     noInstructionsYet: "Noch keine Arbeitsanweisungen vorhanden.",
+    msgLoginOk: "Login erfolgreich.",
+    msgLogout: "Du wurdest abgemeldet.",
+    msgRegisterOk: "Registrierung erfolgreich.",
+    msgRegisterFail: "Registrierung fehlgeschlagen: ",
+    msgLoginFail: "Login fehlgeschlagen: ",
+    msgSaved: "Neuer Bericht wurde gespeichert.",
+    msgUpdated: "Bericht wurde aktualisiert.",
+    msgLoaded: "Bericht wurde geladen.",
+    msgDeleted: "Bericht wurde gelöscht.",
+    msgTranslated: "Woche wurde übersetzt.",
+    msgTranslateErr: "Fehler beim Übersetzen: ",
+    msgPhotoUploading: "Fotos werden hochgeladen...",
+    msgPhotoOk: "Fotos wurden hochgeladen.",
+    msgPhotoErr: "Fehler beim Foto-Upload: ",
+    msgSaving: "Speichere Arbeitsanweisung...",
+    msgNoFirm: "Keine Firma geladen.",
+    msgNoTitle: "Bitte Titel der Arbeitsanweisung eintragen.",
+    msgInstructionSaved: "Arbeitsanweisung gespeichert.",
+    msgInstructionDeleted: "Arbeitsanweisung gelöscht.",
+    msgFeedbackSaved: "Rückmeldung gespeichert.",
+    msgEmployeeAdded: "Mitarbeiter wurde angelegt.",
+    msgPasswordReset: "Passwort-Reset-E-Mail wurde gesendet.",
+    msgCompanySaved: "Firmendaten wurden gespeichert.",
+    msgProjectSaved: "Projekt gespeichert.",
+    msgProjectDeleted: "Projekt gelöscht.",
+    msgInstructionTranslated: "Arbeitsanweisung wurde übersetzt.",
+    msgNewReport: "Neuer Bericht gestartet.",
+    msgNoEmployee: "Bitte Mitarbeiter eintragen.",
+    msgEmailRequired: "Bitte Empfänger-E-Mail eintragen.",
+    msgEmailSending: "PDF wird per E-Mail gesendet...",
+    msgEmailSent: "PDF wurde per E-Mail gesendet.",
     problemsHints: "Probleme / Hinweise",
     roleEmployee: "Mitarbeiter",
     roleProjectManager: "Projektleiter",
@@ -291,6 +322,37 @@ const texts = {
     noProjectsYet: "Još nema projekata.",
     weekdays: ["Ponedjeljak", "Utorak", "Srijeda", "Četvrtak", "Petak", "Subota", "Nedjelja"],
     noInstructionsYet: "Još nema radnih uputa.",
+    msgLoginOk: "Prijava uspješna.",
+    msgLogout: "Odjavljeni ste.",
+    msgRegisterOk: "Registracija uspješna.",
+    msgRegisterFail: "Registracija neuspješna: ",
+    msgLoginFail: "Prijava neuspješna: ",
+    msgSaved: "Novi izvještaj je spremljen.",
+    msgUpdated: "Izvještaj je ažuriran.",
+    msgLoaded: "Izvještaj je učitan.",
+    msgDeleted: "Izvještaj je obrisan.",
+    msgTranslated: "Tjedan je preveden.",
+    msgTranslateErr: "Pogreška pri prevođenju: ",
+    msgPhotoUploading: "Učitavanje fotografija...",
+    msgPhotoOk: "Fotografije su učitane.",
+    msgPhotoErr: "Pogreška pri učitavanju fotografije: ",
+    msgSaving: "Sprema se radna uputa...",
+    msgNoFirm: "Tvrtka nije učitana.",
+    msgNoTitle: "Unesite naslov radne upute.",
+    msgInstructionSaved: "Radna uputa je spremljena.",
+    msgInstructionDeleted: "Radna uputa je obrisana.",
+    msgFeedbackSaved: "Povratna informacija je spremljena.",
+    msgEmployeeAdded: "Radnik je dodan.",
+    msgPasswordReset: "E-mail za resetiranje lozinke je poslan.",
+    msgCompanySaved: "Podaci o tvrtki su spremljeni.",
+    msgProjectSaved: "Projekt je spremljen.",
+    msgProjectDeleted: "Projekt je obrisan.",
+    msgInstructionTranslated: "Radna uputa je prevedena.",
+    msgNewReport: "Novi izvještaj je pokrenut.",
+    msgNoEmployee: "Unesite ime radnika.",
+    msgEmailRequired: "Unesite e-mail primatelja.",
+    msgEmailSending: "PDF se šalje e-poštom...",
+    msgEmailSent: "PDF je poslan e-poštom.",
     problemsHints: "Problemi / napomene",
     roleEmployee: "Radnik",
     roleProjectManager: "Voditelj projekta",
@@ -397,6 +459,37 @@ const texts = {
     noProjectsYet: "Še ni projektov.",
     weekdays: ["Ponedeljek", "Torek", "Sreda", "Četrtek", "Petek", "Sobota", "Nedelja"],
     noInstructionsYet: "Še ni delovnih navodil.",
+    msgLoginOk: "Prijava uspešna.",
+    msgLogout: "Odjavljeni ste.",
+    msgRegisterOk: "Registracija uspešna.",
+    msgRegisterFail: "Registracija neuspešna: ",
+    msgLoginFail: "Prijava neuspešna: ",
+    msgSaved: "Novo poročilo je shranjeno.",
+    msgUpdated: "Poročilo je posodobljeno.",
+    msgLoaded: "Poročilo je naloženo.",
+    msgDeleted: "Poročilo je izbrisano.",
+    msgTranslated: "Teden je preveden.",
+    msgTranslateErr: "Napaka pri prevajanju: ",
+    msgPhotoUploading: "Nalaganje fotografij...",
+    msgPhotoOk: "Fotografije so naložene.",
+    msgPhotoErr: "Napaka pri nalaganju fotografije: ",
+    msgSaving: "Shranjevanje delovnega navodila...",
+    msgNoFirm: "Podjetje ni naloženo.",
+    msgNoTitle: "Vnesite naslov delovnega navodila.",
+    msgInstructionSaved: "Delovno navodilo je shranjeno.",
+    msgInstructionDeleted: "Delovno navodilo je izbrisano.",
+    msgFeedbackSaved: "Povratna informacija je shranjena.",
+    msgEmployeeAdded: "Zaposleni je dodan.",
+    msgPasswordReset: "E-pošta za ponastavitev gesla je poslana.",
+    msgCompanySaved: "Podatki podjetja so shranjeni.",
+    msgProjectSaved: "Projekt je shranjen.",
+    msgProjectDeleted: "Projekt je izbrisan.",
+    msgInstructionTranslated: "Delovno navodilo je prevedeno.",
+    msgNewReport: "Novo poročilo je začeto.",
+    msgNoEmployee: "Vnesite ime zaposlenega.",
+    msgEmailRequired: "Vnesite e-pošto prejemnika.",
+    msgEmailSending: "PDF se pošilja po e-pošti...",
+    msgEmailSent: "PDF je poslan po e-pošti.",
     problemsHints: "Težave / opombe",
     roleEmployee: "Zaposleni",
     roleProjectManager: "Vodja projekta",
@@ -510,6 +603,37 @@ const texts = {
     noProjectsYet: "Brak projektów.",
     weekdays: ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota", "Niedziela"],
     noInstructionsYet: "Brak instrukcji pracy.",
+    msgLoginOk: "Logowanie zakończone sukcesem.",
+    msgLogout: "Zostałeś wylogowany.",
+    msgRegisterOk: "Rejestracja zakończona sukcesem.",
+    msgRegisterFail: "Rejestracja nieudana: ",
+    msgLoginFail: "Logowanie nieudane: ",
+    msgSaved: "Nowy raport został zapisany.",
+    msgUpdated: "Raport został zaktualizowany.",
+    msgLoaded: "Raport został wczytany.",
+    msgDeleted: "Raport został usunięty.",
+    msgTranslated: "Tydzień został przetłumaczony.",
+    msgTranslateErr: "Błąd tłumaczenia: ",
+    msgPhotoUploading: "Przesyłanie zdjęć...",
+    msgPhotoOk: "Zdjęcia zostały przesłane.",
+    msgPhotoErr: "Błąd przesyłania zdjęcia: ",
+    msgSaving: "Zapisywanie instrukcji pracy...",
+    msgNoFirm: "Firma nie jest załadowana.",
+    msgNoTitle: "Wprowadź tytuł instrukcji pracy.",
+    msgInstructionSaved: "Instrukcja pracy została zapisana.",
+    msgInstructionDeleted: "Instrukcja pracy została usunięta.",
+    msgFeedbackSaved: "Informacja zwrotna została zapisana.",
+    msgEmployeeAdded: "Pracownik został dodany.",
+    msgPasswordReset: "E-mail do resetowania hasła został wysłany.",
+    msgCompanySaved: "Dane firmy zostały zapisane.",
+    msgProjectSaved: "Projekt został zapisany.",
+    msgProjectDeleted: "Projekt został usunięty.",
+    msgInstructionTranslated: "Instrukcja pracy została przetłumaczona.",
+    msgNewReport: "Nowy raport został rozpoczęty.",
+    msgNoEmployee: "Wprowadź imię pracownika.",
+    msgEmailRequired: "Wprowadź e-mail odbiorcy.",
+    msgEmailSending: "PDF jest wysyłany e-mailem...",
+    msgEmailSent: "PDF został wysłany e-mailem.",
     problemsHints: "Problemy / uwagi",
     roleEmployee: "Pracownik",
     roleProjectManager: "Kierownik projektu",
@@ -764,15 +888,15 @@ export default function Home() {
   async function signUp() {
     setMessage("");
     const { error } = await supabase.auth.signUp({ email, password });
-    if (error) { setMessage("Registrierung fehlgeschlagen: " + error.message); return; }
-    setMessage("Registrierung erfolgreich.");
+    if (error) { setMessage(t.msgRegisterFail + error.message); return; }
+    setMessage(t.msgRegisterOk);
   }
 
   async function signIn() {
     setMessage("");
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) { setMessage("Login fehlgeschlagen: " + error.message); return; }
-    setMessage("Login erfolgreich.");
+    if (error) { setMessage(t.msgLoginFail + error.message); return; }
+    setMessage(t.msgLoginOk);
   }
 
   async function signOut() {
@@ -780,7 +904,7 @@ export default function Home() {
     setUser(null);
     newReport();
     setSavedReports([]);
-    setMessage("Du wurdest abgemeldet.");
+    setMessage(t.msgLogout);
   }
 
   // FIX 2: loadProjects bekommt companyId als Parameter, damit es nicht auf
@@ -847,7 +971,7 @@ export default function Home() {
     const { error } = await supabase.from("work_instruction_tasks").update({ note }).eq("id", taskId);
     if (error) { setMessage("Fehler beim Speichern der Rückmeldung: " + error.message); return; }
     if (currentCompany) await loadWorkInstructions(currentCompany.company_id);
-    setMessage("Rückmeldung gespeichert.");
+    setMessage(t.msgFeedbackSaved);
   }
 
   async function loadCompanyUsers(companyId: string) {
@@ -872,7 +996,7 @@ export default function Home() {
     if (error) { setMessage("Fehler beim Hinzufügen: " + error.message); return; }
     setNewUserName(""); setNewUserEmail(""); setNewUserRole("employee");
     await loadCompanyUsers(currentCompany.company_id);
-    setMessage("Mitarbeiter wurde angelegt.");
+    setMessage(t.msgEmployeeAdded);
   }
 
   async function resetCompanyUserPassword(memberEmail: string) {
@@ -881,7 +1005,7 @@ export default function Home() {
       redirectTo: "https://international-regie.vercel.app",
     });
     if (error) { setMessage("Fehler beim Passwort-Reset: " + error.message); return; }
-    setMessage("Passwort-Reset-E-Mail wurde gesendet.");
+    setMessage(t.msgPasswordReset);
   }
 
   async function loadReportsFromDatabase() {
@@ -897,9 +1021,9 @@ export default function Home() {
   }
 
   async function saveWorkInstruction() {
-    setMessage("Speichere Arbeitsanweisung...");
-    if (!currentCompany) { setMessage("Keine Firma geladen."); return; }
-    if (!instructionTitle.trim()) { setMessage("Bitte Titel der Arbeitsanweisung eintragen."); return; }
+    setMessage(t.msgSaving);
+    if (!currentCompany) { setMessage(t.msgNoFirm); return; }
+    if (!instructionTitle.trim()) { setMessage(t.msgNoTitle); return; }
 
     const { data: instruction, error } = await supabase
       .from("work_instructions")
@@ -933,7 +1057,7 @@ export default function Home() {
     setInstructionSite(""); setInstructionDescription(""); setInstructionTasks([""]); setInstructionProblems("");
 
     await loadWorkInstructions(currentCompany.company_id);
-    setMessage("Arbeitsanweisung gespeichert.");
+    setMessage(t.msgInstructionSaved);
   }
 
   async function deleteWorkInstruction(id: string) {
@@ -941,7 +1065,7 @@ export default function Home() {
     const { error } = await supabase.from("work_instructions").delete().eq("id", id);
     if (error) { setMessage("Fehler beim Löschen: " + error.message); return; }
     await loadWorkInstructions(currentCompany.company_id);
-    setMessage("Arbeitsanweisung gelöscht.");
+    setMessage(t.msgInstructionDeleted);
   }
 
   function updateFullWeekFromMonday(selectedValue: string) {
@@ -976,19 +1100,19 @@ export default function Home() {
 
   async function handlePhotos(index: number, files: FileList | null) {
     if (!files || !user) return;
-    setMessage("Fotos werden hochgeladen...");
+    setMessage(t.msgPhotoUploading);
     for (const file of Array.from(files)) {
       const fileExt = file.name.split(".").pop() || "jpg";
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `${user.id}/${calendarWeek || "ohne-kw"}/${fileName}`;
       const { error } = await supabase.storage.from("report-photos").upload(filePath, file);
-      if (error) { setMessage("Fehler beim Foto-Upload: " + error.message); return; }
+      if (error) { setMessage(t.msgPhotoErr + error.message); return; }
       const { data } = supabase.storage.from("report-photos").getPublicUrl(filePath);
       const copy = [...days];
       copy[index] = { ...copy[index], photos: [...copy[index].photos, data.publicUrl] };
       setDays(copy);
     }
-    setMessage("Fotos wurden hochgeladen.");
+    setMessage(t.msgPhotoOk);
   }
 
   function deletePhoto(dayIndex: number, photoIndex: number) {
@@ -1010,7 +1134,7 @@ export default function Home() {
     if (!user || !companySettings) return;
     const { error } = await supabase.from("company_settings").upsert({ ...companySettings, user_id: user.id }, { onConflict: "user_id" });
     if (error) { setMessage("Fehler beim Speichern der Firmendaten: " + error.message); return; }
-    setMessage("Firmendaten wurden gespeichert.");
+    setMessage(t.msgCompanySaved);
   }
 
   function updateCompanyField(field: keyof CompanySettings, value: string) {
@@ -1054,7 +1178,7 @@ export default function Home() {
     }
     if (error) { setMessage("Fehler beim Speichern: " + error.message); return; }
     setReportName(name);
-    setMessage(currentReportId ? "Bericht wurde aktualisiert." : "Neuer Bericht wurde gespeichert.");
+    setMessage(currentReportId ? t.msgUpdated : t.msgSaved);
     await loadReportsFromDatabase();
   }
 
@@ -1066,7 +1190,7 @@ export default function Home() {
     setToLanguage(report.to_language || "Polnisch");
     setPdfLanguage(report.pdf_language || "Deutsch");
     setDays(report.days || createEmptyDays());
-    setMessage("Bericht wurde geladen.");
+    setMessage(t.msgLoaded);
     setActiveTab("regiebericht"); // Nach Laden direkt zum Bericht springen
   }
 
@@ -1074,7 +1198,7 @@ export default function Home() {
     const { error } = await supabase.from("reports").delete().eq("id", id);
     if (error) { setMessage("Fehler beim Löschen: " + error.message); return; }
     if (currentReportId === id) newReport();
-    setMessage("Bericht wurde gelöscht.");
+    setMessage(t.msgDeleted);
     await loadReportsFromDatabase();
   }
 
@@ -1103,7 +1227,7 @@ export default function Home() {
     if (error) { setMessage("Fehler beim Speichern: " + error.message); return; }
     setProjectName(""); setProjectCustomer(""); setProjectSite(""); setProjectManager("");
     await loadProjects();
-    setMessage("Projekt gespeichert.");
+    setMessage(t.msgProjectSaved);
   }
 
   async function deleteProject(id: string) {
@@ -1112,7 +1236,7 @@ export default function Home() {
     if (error) { setMessage("Fehler beim Löschen des Projekts: " + error.message); return; }
     if (selectedProjectDetailId === id) setSelectedProjectDetailId("");
     await loadProjects();
-    setMessage("Projekt gelöscht.");
+    setMessage(t.msgProjectDeleted);
   }
 
   async function updateTaskStatus(taskId: string, status: string) {
@@ -1123,7 +1247,7 @@ export default function Home() {
 
   async function translateAll() {
     setMessage("");
-    if (!employee.trim()) { setMessage("Bitte Mitarbeiter eintragen."); return; }
+    if (!employee.trim()) { setMessage(t.msgNoEmployee); return; }
     setLoading(true);
     const translatedDays = [...days];
     try {
@@ -1139,9 +1263,9 @@ export default function Home() {
         translatedDays[i].translation = data.error ? data.error : data.translation;
       }
       setDays(translatedDays);
-      setMessage("Woche wurde übersetzt.");
+      setMessage(t.msgTranslated);
     } catch (error) {
-      setMessage("Fehler beim Übersetzen: " + String(error));
+      setMessage(t.msgTranslateErr + String(error));
     }
     setLoading(false);
   }
@@ -1215,9 +1339,9 @@ export default function Home() {
         },
       }));
 
-      setMessage("Arbeitsanweisung wurde übersetzt.");
+      setMessage(t.msgInstructionTranslated);
     } catch (err) {
-      setMessage("Fehler beim Übersetzen: " + String(err));
+      setMessage(t.msgTranslateErr + String(err));
     }
 
     setTranslatingInstructionId(null);
@@ -1419,8 +1543,8 @@ export default function Home() {
     const filename = `Regiebericht_${calendarWeek || "Woche"}_${employee || "Mitarbeiter"}.pdf`;
 
     if (sendByEmail) {
-      if (!emailTo.trim()) { setMessage("Bitte Empfänger-E-Mail eintragen."); return; }
-      setMessage("PDF wird per E-Mail gesendet...");
+      if (!emailTo.trim()) { setMessage(t.msgEmailRequired); return; }
+      setMessage(t.msgEmailSending);
       const pdfBase64 = doc.output("datauristring").split(",")[1];
       const res = await fetch("/api/send-report", {
         method: "POST",
@@ -1429,7 +1553,7 @@ export default function Home() {
       });
       const data = await res.json();
       if (data.error) { setMessage("Fehler beim E-Mail-Versand: " + data.error); return; }
-      setMessage("PDF wurde per E-Mail gesendet.");
+      setMessage(t.msgEmailSent);
       return;
     }
 
@@ -1674,7 +1798,7 @@ export default function Home() {
             <button type="button" onClick={saveReport} className="bg-orange-600 text-white px-4 py-3 rounded">
               {currentReportId ? t.updateReport : t.saveReport}
             </button>
-            <button type="button" onClick={() => { newReport(); setMessage("Neuer Bericht gestartet."); }} className="bg-gray-700 text-white px-4 py-3 rounded">
+            <button type="button" onClick={() => { newReport(); setMessage(t.msgNewReport); }} className="bg-gray-700 text-white px-4 py-3 rounded">
               {t.newReport}
             </button>
           </div>
