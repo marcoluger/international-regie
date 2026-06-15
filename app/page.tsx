@@ -1819,7 +1819,11 @@ export default function Home() {
                 <input className="border p-3 text-black bg-white" placeholder={t.hours} value={day.hours} onChange={(e) => updateDay(index, "hours", e.target.value)} />
               </div>
               <textarea className="border p-3 w-full h-28 text-black bg-white" placeholder={t.description} value={day.description} onChange={(e) => updateDay(index, "description", e.target.value)} />
-              <input type="file" accept="image/*" multiple className="border p-3 w-full text-black bg-white" onChange={(e) => handlePhotos(index, e.target.files)} />
+              {companyFeatures?.photos_enabled ? (
+                <input type="file" accept="image/*" multiple className="border p-3 w-full text-black bg-white" onChange={(e) => handlePhotos(index, e.target.files)} />
+              ) : (
+                <div className="border rounded p-3 bg-gray-50 text-sm text-gray-400">🔒 Foto-Upload ist in deinem Paket nicht aktiviert.</div>
+              )}
               {day.photos.length > 0 && (
                 <div className="grid grid-cols-2 gap-3">
                   {day.photos.map((photo, photoIndex) => (
@@ -2022,43 +2026,49 @@ export default function Home() {
             </div>
             <input className="border p-3 w-full text-black bg-white" placeholder={t.problems} value={instructionProblems} onChange={(e) => setInstructionProblems(e.target.value)} />
 
-            {/* Fotos zur Arbeitsanweisung */}
-            <div>
-              <h3 className="font-bold mb-2">{t.photos}</h3>
-              <input type="file" accept="image/*" multiple className="border p-3 w-full text-black bg-white"
-                onChange={(e) => handleInstructionPhotos(e.target.files)} />
-              {instructionPhotos.length > 0 && (
-                <div className="grid grid-cols-3 gap-2 mt-2">
-                  {instructionPhotos.map((photo, i) => (
-                    <div key={i} className="relative">
-                      <img src={photo} alt="Foto" className="w-full h-24 object-cover rounded" />
-                      <button type="button" onClick={() => setInstructionPhotos((prev) => prev.filter((_, idx) => idx !== i))}
-                        className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 text-xs">✕</button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            {/* Fotos zur Arbeitsanweisung — nur wenn Modul aktiv */}
+            {companyFeatures?.photos_enabled && (
+              <div>
+                <h3 className="font-bold mb-2">{t.photos}</h3>
+                <input type="file" accept="image/*" multiple className="border p-3 w-full text-black bg-white"
+                  onChange={(e) => handleInstructionPhotos(e.target.files)} />
+                {instructionPhotos.length > 0 && (
+                  <div className="grid grid-cols-3 gap-2 mt-2">
+                    {instructionPhotos.map((photo, i) => (
+                      <div key={i} className="relative">
+                        <img src={photo} alt="Foto" className="w-full h-24 object-cover rounded" />
+                        <button type="button" onClick={() => setInstructionPhotos((prev) => prev.filter((_, idx) => idx !== i))}
+                          className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 text-xs">✕</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
             <h3 className="font-bold">{t.workSteps}</h3>
             {instructionTasks.map((task, index) => (
               <div key={index} className="border rounded p-3 space-y-2 bg-gray-50">
                 <input className="border p-3 w-full text-black bg-white" placeholder={`${t.workSteps} ${index + 1}`} value={task}
                   onChange={(e) => { const copy = [...instructionTasks]; copy[index] = e.target.value; setInstructionTasks(copy); }} />
-                <input type="file" accept="image/*" multiple className="border p-2 w-full text-black bg-white text-sm"
-                  onChange={(e) => handleInstructionTaskPhotos(index, e.target.files)} />
-                {(instructionTaskPhotos[index] || []).length > 0 && (
-                  <div className="grid grid-cols-3 gap-2">
-                    {(instructionTaskPhotos[index] || []).map((photo, pi) => (
-                      <div key={pi} className="relative">
-                        <img src={photo} alt="Foto" className="w-full h-20 object-cover rounded" />
-                        <button type="button" onClick={() => setInstructionTaskPhotos((prev) => ({
-                          ...prev,
-                          [index]: (prev[index] || []).filter((_, idx) => idx !== pi)
-                        }))} className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 text-xs">✕</button>
+                {companyFeatures?.photos_enabled && (
+                  <>
+                    <input type="file" accept="image/*" multiple className="border p-2 w-full text-black bg-white text-sm"
+                      onChange={(e) => handleInstructionTaskPhotos(index, e.target.files)} />
+                    {(instructionTaskPhotos[index] || []).length > 0 && (
+                      <div className="grid grid-cols-3 gap-2">
+                        {(instructionTaskPhotos[index] || []).map((photo, pi) => (
+                          <div key={pi} className="relative">
+                            <img src={photo} alt="Foto" className="w-full h-20 object-cover rounded" />
+                            <button type="button" onClick={() => setInstructionTaskPhotos((prev) => ({
+                              ...prev,
+                              [index]: (prev[index] || []).filter((_, idx) => idx !== pi)
+                            }))} className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 text-xs">✕</button>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    )}
+                  </>
                 )}
               </div>
             ))}
@@ -2113,7 +2123,7 @@ export default function Home() {
                     )}
                   </div>
                 )}
-                {(instruction.photos || []).length > 0 && (
+                {companyFeatures?.photos_enabled && (instruction.photos || []).length > 0 && (
                   <div>
                     <strong>{t.photos}:</strong>
                     <div className="grid grid-cols-3 gap-2 mt-2">
@@ -2142,7 +2152,7 @@ export default function Home() {
                             )}
                           </div>
                         </div>
-                        {(task.photos || []).length > 0 && (
+                        {companyFeatures?.photos_enabled && (task.photos || []).length > 0 && (
                           <div className="grid grid-cols-3 gap-2 mt-1">
                             {(task.photos || []).map((photo: string, pi: number) => (
                               <img key={pi} src={photo} alt="Foto" className="w-full h-20 object-cover rounded border" />
