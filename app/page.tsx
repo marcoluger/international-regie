@@ -216,6 +216,7 @@ const texts = {
     msgEmailRequired: "Bitte Empfänger-E-Mail eintragen.",
     msgEmailSending: "PDF wird per E-Mail gesendet...",
     msgEmailSent: "PDF wurde per E-Mail gesendet.",
+    tabReport: "Regiebericht",
     statusOpen: "⬜ Offen",
     statusInProgress: "🟡 In Arbeit",
     statusStopped: "⛔ Gestoppt",
@@ -357,6 +358,7 @@ const texts = {
     msgEmailRequired: "Unesite e-mail primatelja.",
     msgEmailSending: "PDF se šalje e-poštom...",
     msgEmailSent: "PDF je poslan e-poštom.",
+    tabReport: "Режijski izvještaj",
     statusOpen: "⬜ Otvoreno",
     statusInProgress: "🟡 U tijeku",
     statusStopped: "⛔ Zaustavljeno",
@@ -498,6 +500,7 @@ const texts = {
     msgEmailRequired: "Vnesite e-pošto prejemnika.",
     msgEmailSending: "PDF se pošilja po e-pošti...",
     msgEmailSent: "PDF je poslan po e-pošti.",
+    tabReport: "Режijsko poročilo",
     statusOpen: "⬜ Odprto",
     statusInProgress: "🟡 V teku",
     statusStopped: "⛔ Ustavljeno",
@@ -646,6 +649,7 @@ const texts = {
     msgEmailRequired: "Wprowadź e-mail odbiorcy.",
     msgEmailSending: "PDF jest wysyłany e-mailem...",
     msgEmailSent: "PDF został wysłany e-mailem.",
+    tabReport: "Raport roboczy",
     statusOpen: "⬜ Otwarte",
     statusInProgress: "🟡 W toku",
     statusStopped: "⛔ Zatrzymane",
@@ -1624,7 +1628,10 @@ export default function Home() {
             value={uiLanguage}
             onChange={(e) => setUiLanguage(e.target.value as Language)}
           >
-            {languages.map((lang) => (
+            {(getAllowedLanguages(companyFeatures).length > 0
+              ? ["Deutsch", ...getAllowedLanguages(companyFeatures).filter(l => l !== "Deutsch" && languages.includes(l as Language))]
+              : languages
+            ).map((lang) => (
               <option key={lang} value={lang}>🌐 {lang}</option>
             ))}
           </select>
@@ -1646,7 +1653,7 @@ export default function Home() {
       {/* FIX 3: Alle Bereiche als eigene Tabs, sauber strukturiert */}
       <nav className="flex flex-wrap gap-2">
         <TabButton label={t.dashboard}            tabName="dashboard"           activeTab={activeTab} onClick={() => setActiveTab("dashboard")} />
-        <TabButton label="Regiebericht"         tabName="regiebericht"        activeTab={activeTab} onClick={() => setActiveTab("regiebericht")} />
+        <TabButton label={t.tabReport}         tabName="regiebericht"        activeTab={activeTab} onClick={() => setActiveTab("regiebericht")} />
         <TabButton label={t.saveLoad}             tabName="berichte"            activeTab={activeTab} onClick={() => setActiveTab("berichte")} />
         <TabButton label={t.projectsTab}             tabName="projekte"            activeTab={activeTab} onClick={() => { setActiveTab("projekte"); loadProjects(); }} />
         <TabButton label={t.workInstructions}   tabName="arbeitsanweisungen"  activeTab={activeTab} onClick={() => setActiveTab("arbeitsanweisungen")} />
