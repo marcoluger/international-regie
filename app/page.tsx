@@ -1624,7 +1624,10 @@ export default function Home() {
             value={uiLanguage}
             onChange={(e) => setUiLanguage(e.target.value as Language)}
           >
-            {languages.map((lang) => (
+            {(getAllowedLanguages(companyFeatures).length > 0
+              ? ["Deutsch", ...getAllowedLanguages(companyFeatures).filter(l => l !== "Deutsch" && languages.includes(l as Language))]
+              : languages
+            ).map((lang) => (
               <option key={lang} value={lang}>🌐 {lang}</option>
             ))}
           </select>
