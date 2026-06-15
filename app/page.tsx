@@ -217,6 +217,8 @@ const texts = {
     msgEmailSending: "PDF wird per E-Mail gesendet...",
     msgEmailSent: "PDF wurde per E-Mail gesendet.",
     tabReport: "Regiebericht",
+    photos: "Fotos",
+    deletePhoto2: "Foto löschen",
     statusOpen: "⬜ Offen",
     statusInProgress: "🟡 In Arbeit",
     statusStopped: "⛔ Gestoppt",
@@ -359,6 +361,8 @@ const texts = {
     msgEmailSending: "PDF se šalje e-poštom...",
     msgEmailSent: "PDF je poslan e-poštom.",
     tabReport: "Режijski izvještaj",
+    photos: "Fotografije",
+    deletePhoto2: "Obriši fotografiju",
     statusOpen: "⬜ Otvoreno",
     statusInProgress: "🟡 U tijeku",
     statusStopped: "⛔ Zaustavljeno",
@@ -501,6 +505,8 @@ const texts = {
     msgEmailSending: "PDF se pošilja po e-pošti...",
     msgEmailSent: "PDF je poslan po e-pošti.",
     tabReport: "Режijsko poročilo",
+    photos: "Fotografije",
+    deletePhoto2: "Izbriši fotografijo",
     statusOpen: "⬜ Odprto",
     statusInProgress: "🟡 V teku",
     statusStopped: "⛔ Ustavljeno",
@@ -650,6 +656,8 @@ const texts = {
     msgEmailSending: "PDF jest wysyłany e-mailem...",
     msgEmailSent: "PDF został wysłany e-mailem.",
     tabReport: "Raport roboczy",
+    photos: "Zdjęcia",
+    deletePhoto2: "Usuń zdjęcie",
     statusOpen: "⬜ Otwarte",
     statusInProgress: "🟡 W toku",
     statusStopped: "⛔ Zatrzymane",
@@ -859,6 +867,8 @@ export default function Home() {
   const [instructionSite, setInstructionSite] = useState("");
   const [instructionDescription, setInstructionDescription] = useState("");
   const [instructionTasks, setInstructionTasks] = useState<string[]>([""]);
+  const [instructionPhotos, setInstructionPhotos] = useState<string[]>([]);
+  const [instructionTaskPhotos, setInstructionTaskPhotos] = useState<Record<number, string[]>>({});
   const [workInstructions, setWorkInstructions] = useState<any[]>([]);
   const [instructionTranslations, setInstructionTranslations] = useState<Record<string, any>>({});
   const [translatingInstructionId, setTranslatingInstructionId] = useState<string | null>(null);
@@ -1040,6 +1050,43 @@ export default function Home() {
     setDays(copy);
   }
 
+  async function handleInstructionPhotos(files: FileList | null) {
+    if (!files || !user) return;
+    setMessage(t.msgPhotoUploading);
+    const uploaded: string[] = [];
+    for (const file of Array.from(files)) {
+      const fileExt = file.name.split(".").pop() || "jpg";
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `${user.id}/instructions/${fileName}`;
+      const { error } = await supabase.storage.from("report-photos").upload(filePath, file);
+      if (error) { setMessage(t.msgPhotoErr + error.message); return; }
+      const { data } = supabase.storage.from("report-photos").getPublicUrl(filePath);
+      uploaded.push(data.publicUrl);
+    }
+    setInstructionPhotos((prev) => [...prev, ...uploaded]);
+    setMessage(t.msgPhotoOk);
+  }
+
+  async function handleInstructionTaskPhotos(taskIndex: number, files: FileList | null) {
+    if (!files || !user) return;
+    setMessage(t.msgPhotoUploading);
+    const uploaded: string[] = [];
+    for (const file of Array.from(files)) {
+      const fileExt = file.name.split(".").pop() || "jpg";
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `${user.id}/instructions/tasks/${fileName}`;
+      const { error } = await supabase.storage.from("report-photos").upload(filePath, file);
+      if (error) { setMessage(t.msgPhotoErr + error.message); return; }
+      const { data } = supabase.storage.from("report-photos").getPublicUrl(filePath);
+      uploaded.push(data.publicUrl);
+    }
+    setInstructionTaskPhotos((prev) => ({
+      ...prev,
+      [taskIndex]: [...(prev[taskIndex] || []), ...uploaded],
+    }));
+    setMessage(t.msgPhotoOk);
+  }
+
   async function saveWorkInstruction() {
     setMessage(t.msgSaving);
     if (!currentCompany) { setMessage(t.msgNoFirm); return; }
@@ -1058,6 +1105,7 @@ export default function Home() {
         site: instructionSite,
         description: instructionDescription,
         problems_text: instructionProblems,
+        photos: instructionPhotos,
       })
       .select()
       .single();
@@ -1066,7 +1114,12 @@ export default function Home() {
 
     const taskRows = instructionTasks
       .filter((task) => task.trim() !== "")
-      .map((task, index) => ({ work_instruction_id: instruction.id, task_text: task, sort_order: index }));
+      .map((task, index) => ({
+        work_instruction_id: instruction.id,
+        task_text: task,
+        sort_order: index,
+        photos: instructionTaskPhotos[index] || [],
+      }));
 
     if (taskRows.length > 0) {
       const { error: taskError } = await supabase.from("work_instruction_tasks").insert(taskRows);
@@ -1075,6 +1128,7 @@ export default function Home() {
 
     setInstructionTitle(""); setInstructionProject(""); setInstructionCustomer("");
     setInstructionSite(""); setInstructionDescription(""); setInstructionTasks([""]); setInstructionProblems("");
+    setInstructionPhotos([]); setInstructionTaskPhotos({});
 
     await loadWorkInstructions(currentCompany.company_id);
     setMessage(t.msgInstructionSaved);
@@ -1967,10 +2021,46 @@ export default function Home() {
               <input type="date" className="border p-3 text-black bg-white" value={instructionDate} onChange={(e) => setInstructionDate(e.target.value)} />
             </div>
             <input className="border p-3 w-full text-black bg-white" placeholder={t.problems} value={instructionProblems} onChange={(e) => setInstructionProblems(e.target.value)} />
+
+            {/* Fotos zur Arbeitsanweisung */}
+            <div>
+              <h3 className="font-bold mb-2">{t.photos}</h3>
+              <input type="file" accept="image/*" multiple className="border p-3 w-full text-black bg-white"
+                onChange={(e) => handleInstructionPhotos(e.target.files)} />
+              {instructionPhotos.length > 0 && (
+                <div className="grid grid-cols-3 gap-2 mt-2">
+                  {instructionPhotos.map((photo, i) => (
+                    <div key={i} className="relative">
+                      <img src={photo} alt="Foto" className="w-full h-24 object-cover rounded" />
+                      <button type="button" onClick={() => setInstructionPhotos((prev) => prev.filter((_, idx) => idx !== i))}
+                        className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 text-xs">✕</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             <h3 className="font-bold">{t.workSteps}</h3>
             {instructionTasks.map((task, index) => (
-              <input key={index} className="border p-3 w-full text-black bg-white" placeholder={`Arbeitsschritt ${index + 1}`} value={task}
-                onChange={(e) => { const copy = [...instructionTasks]; copy[index] = e.target.value; setInstructionTasks(copy); }} />
+              <div key={index} className="border rounded p-3 space-y-2 bg-gray-50">
+                <input className="border p-3 w-full text-black bg-white" placeholder={`${t.workSteps} ${index + 1}`} value={task}
+                  onChange={(e) => { const copy = [...instructionTasks]; copy[index] = e.target.value; setInstructionTasks(copy); }} />
+                <input type="file" accept="image/*" multiple className="border p-2 w-full text-black bg-white text-sm"
+                  onChange={(e) => handleInstructionTaskPhotos(index, e.target.files)} />
+                {(instructionTaskPhotos[index] || []).length > 0 && (
+                  <div className="grid grid-cols-3 gap-2">
+                    {(instructionTaskPhotos[index] || []).map((photo, pi) => (
+                      <div key={pi} className="relative">
+                        <img src={photo} alt="Foto" className="w-full h-20 object-cover rounded" />
+                        <button type="button" onClick={() => setInstructionTaskPhotos((prev) => ({
+                          ...prev,
+                          [index]: (prev[index] || []).filter((_, idx) => idx !== pi)
+                        }))} className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 text-xs">✕</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             ))}
             <div className="flex gap-3">
               <button type="button" onClick={() => setInstructionTasks([...instructionTasks, ""])} className="bg-gray-700 text-white px-4 py-3 rounded">{t.addStep}</button>
@@ -2023,6 +2113,16 @@ export default function Home() {
                     )}
                   </div>
                 )}
+                {(instruction.photos || []).length > 0 && (
+                  <div>
+                    <strong>{t.photos}:</strong>
+                    <div className="grid grid-cols-3 gap-2 mt-2">
+                      {(instruction.photos || []).map((photo: string, i: number) => (
+                        <img key={i} src={photo} alt="Foto" className="w-full h-24 object-cover rounded border" />
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <ul className="list-disc pl-6 mt-2 space-y-2">
                   {(instruction.work_instruction_tasks || [])
                     .sort((a: any, b: any) => a.sort_order - b.sort_order)
@@ -2042,6 +2142,13 @@ export default function Home() {
                             )}
                           </div>
                         </div>
+                        {(task.photos || []).length > 0 && (
+                          <div className="grid grid-cols-3 gap-2 mt-1">
+                            {(task.photos || []).map((photo: string, pi: number) => (
+                              <img key={pi} src={photo} alt="Foto" className="w-full h-20 object-cover rounded border" />
+                            ))}
+                          </div>
+                        )}
                         <input className="border p-2 w-full text-black bg-white" placeholder={t.feedback} defaultValue={task.note || ""} id={`task-note-${task.id}`} />
                         {translation?.tasks?.[`note_${task.id}`] && (
                           <p className="text-blue-700 italic text-sm">🌐 {translation.tasks[`note_${task.id}`]}</p>
