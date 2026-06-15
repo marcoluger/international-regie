@@ -1201,6 +1201,15 @@ export default function Home() {
               <option key={lang} value={lang}>🌐 {lang}</option>
             ))}
           </select>
+          <select
+            className="border p-2 rounded text-black bg-white text-sm"
+            value={pdfLanguage}
+            onChange={(e) => setPdfLanguage(e.target.value)}
+          >
+            {pdfLanguages.map((lang) => (
+              <option key={lang} value={lang}>📄 {lang}</option>
+            ))}
+          </select>
         </div>
       </header>
 
@@ -1289,9 +1298,7 @@ export default function Home() {
             <h2 className="text-xl font-bold">{t.general}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 
-              <select className="border p-3 text-black bg-white" value={pdfLanguage} onChange={(e) => setPdfLanguage(e.target.value)}>
-                {pdfLanguages.map((lang) => <option key={lang} value={lang}>{t.pdfLanguage}: {lang}</option>)}
-              </select>
+
               <input className="border p-3 text-black bg-white" placeholder={t.employee} value={employee} onChange={(e) => setEmployee(e.target.value)} />
               <input className="border p-3 bg-gray-200 text-black" value={calendarWeek} readOnly placeholder={t.calendarWeek} />
               <select className="border p-3 text-black bg-white" value={fromLanguage} onChange={(e) => setFromLanguage(e.target.value)}>
