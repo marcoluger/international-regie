@@ -900,6 +900,9 @@ function getAllowedLanguages(companyFeatures: any): string[] {
 export default function Home() {
   const [uiLanguage, setUiLanguage] = useState<Language>("Deutsch");
   const t = texts[uiLanguage];
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [onboardingStep, setOnboardingStep] = useState(1);
+  const [onboardingDone, setOnboardingDone] = useState(false);
 
   const [user, setUser] = useState<User | null>(null);
   const [email, setEmail] = useState("");
@@ -1265,10 +1268,17 @@ export default function Home() {
   async function loadCompanySettings(userId: string) {
     const { data, error } = await supabase.from("company_settings").select("*").eq("user_id", userId).single();
     if (error && error.code !== "PGRST116") { setMessage("Fehler beim Laden der Firmendaten: " + error.message); return; }
-    setCompanySettings(data || {
-      user_id: userId, company_name: "Elektrotechnik Luger", company_logo: "",
+    
+    const settings = data || {
+      user_id: userId, company_name: "", company_logo: "",
       street: "", zip_code: "", city: "", phone: "", email: "", website: "", tax_number: "",
-    });
+    };
+    setCompanySettings(settings);
+    
+    // Onboarding zeigen wenn Firmenname noch leer ist
+    if (!data || !data.company_name) {
+      setShowOnboarding(true);
+    }
   }
 
   async function saveCompanySettings() {
@@ -1540,6 +1550,18 @@ export default function Home() {
     setMessage("Regiebericht wurde aus Arbeitsanweisung vorbereitet.");
   }
 
+  async function saveOnboarding() {
+    if (!user || !companySettings) return;
+    const { error } = await supabase.from("company_settings").upsert(
+      { ...companySettings, user_id: user.id },
+      { onConflict: "user_id" }
+    );
+    if (error) { setMessage("Fehler beim Speichern: " + error.message); return; }
+    setShowOnboarding(false);
+    setOnboardingDone(true);
+    setMessage("Willkommen! Ihre Firmendaten wurden gespeichert.");
+  }
+
   async function createPDF(sendByEmail = false) {
     const p = pdfTexts[pdfLanguage as keyof typeof pdfTexts];
     const doc = new jsPDF("p", "mm", "a4");
@@ -1723,6 +1745,102 @@ export default function Home() {
             <button type="button" onClick={signUp} className="bg-green-600 text-white px-4 py-3 rounded">{t.register}</button>
           </div>
         </section>
+      </main>
+    );
+  }
+
+  // ─── Onboarding ───────────────────────────────────────────────────────────────
+  if (user && showOnboarding) {
+    return (
+      <main className="max-w-xl mx-auto p-4 md:p-8 min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="bg-white border rounded-xl p-6 space-y-6 w-full shadow-lg">
+          
+          {/* Progress */}
+          <div className="flex items-center gap-2 mb-2">
+            {[1, 2, 3].map((step) => (
+              <div key={step} className={`flex-1 h-2 rounded-full ${onboardingStep >= step ? "bg-blue-600" : "bg-gray-200"}`} />
+            ))}
+          </div>
+
+          {onboardingStep === 1 && (
+            <div className="space-y-4">
+              <h2 className="text-2xl font-bold">👋 Willkommen!</h2>
+              <p className="text-gray-600">Bitte hinterlegen Sie zuerst Ihre Firmendaten.</p>
+              <div className="space-y-3">
+                <input className="border p-3 w-full rounded text-black" placeholder="Firmenname *"
+                  value={companySettings?.company_name || ""}
+                  onChange={(e) => updateCompanyField("company_name", e.target.value)} />
+                <input className="border p-3 w-full rounded text-black" placeholder="Straße"
+                  value={companySettings?.street || ""}
+                  onChange={(e) => updateCompanyField("street", e.target.value)} />
+                <div className="grid grid-cols-2 gap-3">
+                  <input className="border p-3 rounded text-black" placeholder="PLZ"
+                    value={companySettings?.zip_code || ""}
+                    onChange={(e) => updateCompanyField("zip_code", e.target.value)} />
+                  <input className="border p-3 rounded text-black" placeholder="Ort"
+                    value={companySettings?.city || ""}
+                    onChange={(e) => updateCompanyField("city", e.target.value)} />
+                </div>
+              </div>
+              <button type="button"
+                onClick={() => {
+                  if (!companySettings?.company_name?.trim()) { setMessage("Bitte Firmenname eingeben."); return; }
+                  setOnboardingStep(2);
+                }}
+                className="w-full bg-blue-700 text-white py-3 rounded font-bold">
+                Weiter →
+              </button>
+            </div>
+          )}
+
+          {onboardingStep === 2 && (
+            <div className="space-y-4">
+              <h2 className="text-2xl font-bold">📞 Kontaktdaten</h2>
+              <div className="space-y-3">
+                <input className="border p-3 w-full rounded text-black" placeholder="Telefon"
+                  value={companySettings?.phone || ""}
+                  onChange={(e) => updateCompanyField("phone", e.target.value)} />
+                <input className="border p-3 w-full rounded text-black" placeholder="E-Mail"
+                  value={companySettings?.email || ""}
+                  onChange={(e) => updateCompanyField("email", e.target.value)} />
+                <input className="border p-3 w-full rounded text-black" placeholder="Webseite"
+                  value={companySettings?.website || ""}
+                  onChange={(e) => updateCompanyField("website", e.target.value)} />
+                <input className="border p-3 w-full rounded text-black" placeholder="UID / Steuernummer"
+                  value={companySettings?.tax_number || ""}
+                  onChange={(e) => updateCompanyField("tax_number", e.target.value)} />
+              </div>
+              <div className="flex gap-3">
+                <button type="button" onClick={() => setOnboardingStep(1)}
+                  className="flex-1 bg-gray-200 text-gray-800 py-3 rounded font-medium">← Zurück</button>
+                <button type="button" onClick={() => setOnboardingStep(3)}
+                  className="flex-1 bg-blue-700 text-white py-3 rounded font-bold">Weiter →</button>
+              </div>
+            </div>
+          )}
+
+          {onboardingStep === 3 && (
+            <div className="space-y-4">
+              <h2 className="text-2xl font-bold">🖼️ Firmenlogo</h2>
+              <p className="text-gray-600">Optional — kann später hinzugefügt werden.</p>
+              {companySettings?.company_logo && (
+                <img src={companySettings.company_logo} alt="Logo" className="h-20 object-contain border rounded p-2" />
+              )}
+              <input type="file" accept="image/*" className="border p-3 w-full rounded text-black bg-white"
+                onChange={(e) => uploadCompanyLogo(e.target.files)} />
+              {message && <div className="bg-yellow-50 border rounded p-3 text-sm">{message}</div>}
+              <div className="flex gap-3">
+                <button type="button" onClick={() => setOnboardingStep(2)}
+                  className="flex-1 bg-gray-200 text-gray-800 py-3 rounded font-medium">← Zurück</button>
+                <button type="button" onClick={saveOnboarding}
+                  className="flex-1 bg-green-700 text-white py-3 rounded font-bold">✅ Speichern & Starten</button>
+              </div>
+              <button type="button" onClick={() => setShowOnboarding(false)}
+                className="w-full text-gray-400 text-sm underline">Überspringen</button>
+            </div>
+          )}
+
+        </div>
       </main>
     );
   }
