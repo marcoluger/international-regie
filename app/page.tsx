@@ -919,6 +919,31 @@ export default function Home() {
     setMessage(`✅ Mitarbeiter angelegt. Login: ${data.email}`);
   }
 
+  async function deleteCompanyUser(memberId: string, memberUserId: string) {
+    if (!currentCompany) return;
+    if (!window.confirm("Mitarbeiter wirklich löschen?")) return;
+    // Aus company_users entfernen
+    const { error } = await supabase.from("company_users").delete().eq("id", memberId);
+    if (error) { setMessage("Fehler beim Löschen: " + error.message); return; }
+    // Auth-User löschen per API
+    const res = await fetch("/api/delete-employee", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: memberUserId }),
+    });
+    const data = await res.json();
+    if (data.error) { setMessage("Fehler beim Löschen des Auth-Users: " + data.error); return; }
+    await loadCompanyUsers(currentCompany.company_id);
+    setMessage("Mitarbeiter wurde gelöscht.");
+  }
+
+  function canDelete(myRole: string, memberRole: string): boolean {
+    if (myRole === "owner") return memberRole !== "owner";
+    if (myRole === "admin") return memberRole === "employee" || memberRole === "project_manager";
+    if (myRole === "project_manager") return memberRole === "employee";
+    return false;
+  }
+
   async function resetCompanyUserPassword(memberEmail: string) {
     if (!memberEmail) { setMessage("Keine E-Mail-Adresse vorhanden."); return; }
     const { error } = await supabase.auth.resetPasswordForEmail(memberEmail, { redirectTo: "https://international-regie.vercel.app" });
@@ -1811,8 +1836,13 @@ export default function Home() {
               <div key={member.id} className="border rounded p-3 space-y-2">
                 <strong>{member.full_name || "-"}</strong>
                 <p>{member.email || "-"}</p>
-                <p>{t.role}: {member.role}</p>
-                {member.email && (<button type="button" onClick={() => resetCompanyUserPassword(member.email)} className="bg-gray-700 text-white px-3 py-2 rounded">{t.resetPassword}</button>)}
+                <p>{t.role}: {member.role === "owner" ? "Owner" : member.role === "admin" ? t.roleAdmin : member.role === "project_manager" ? t.roleProjectManager : t.roleEmployee}</p>
+                <div className="flex gap-2 flex-wrap">
+                  {member.email && (<button type="button" onClick={() => resetCompanyUserPassword(member.email)} className="bg-gray-700 text-white px-3 py-2 rounded">{t.resetPassword}</button>)}
+                  {currentCompany && canDelete(currentCompany.role, member.role) && member.user_id !== user?.id && (
+                    <button type="button" onClick={() => deleteCompanyUser(member.id, member.user_id)} className="bg-red-600 text-white px-3 py-2 rounded">🗑️ Löschen</button>
+                  )}
+                </div>
               </div>
             ))}
           </div>
