@@ -1631,18 +1631,13 @@ export default function Home() {
       return; 
     }
 
+    setChangingPassword(false);
     setMustChangePassword(false);
     setNewPassword("");
     setNewPasswordConfirm("");
-    setChangingPassword(false);
 
-    // Jetzt alles laden
-    if (user) {
-      await loadCompanyContext(user.id);
-      await loadReportsFromDatabase();
-      await loadCompanySettings(user.id);
-    }
-    setMessage("Passwort wurde erfolgreich geändert. Willkommen!");
+    // Seite neu laden damit alles sauber startet
+    window.location.reload();
   }
 
   async function saveOnboarding() {
