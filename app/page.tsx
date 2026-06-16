@@ -818,7 +818,7 @@ export default function Home() {
   const [selectedProjectId, setSelectedProjectId] = useState("");
   const [selectedProjectDetailId, setSelectedProjectDetailId] = useState("");
   const [instructionDate, setInstructionDate] = useState("");
-  const [assignedUserId, setAssignedUserId] = useState("");
+  const [assignedUserIds, setAssignedUserIds] = useState<string[]>([]);
   const [selectedDayDate, setSelectedDayDate] = useState(new Date().toISOString().split("T")[0]);
   const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
   const [selectedWeek, setSelectedWeek] = useState(new Date().toISOString().split("T")[0]);
@@ -1000,14 +1000,14 @@ export default function Home() {
     setMessage(t.msgSaving);
     if (!currentCompany) { setMessage(t.msgNoFirm); return; }
     if (!instructionTitle.trim()) { setMessage(t.msgNoTitle); return; }
-    const { data: instruction, error } = await supabase.from("work_instructions").insert({ company_id: currentCompany.company_id, project_id: selectedProjectId || null, work_date: instructionDate || null, created_by: user?.id, assigned_user_id: assignedUserId || null, title: instructionTitle, project: instructionProject, customer: instructionCustomer, site: instructionSite, description: instructionDescription, problems_text: instructionProblems, photos: instructionPhotos }).select().single();
+    const { data: instruction, error } = await supabase.from("work_instructions").insert({ company_id: currentCompany.company_id, project_id: selectedProjectId || null, work_date: instructionDate || null, created_by: user?.id, assigned_user_ids: assignedUserIds, title: instructionTitle, project: instructionProject, customer: instructionCustomer, site: instructionSite, description: instructionDescription, problems_text: instructionProblems, photos: instructionPhotos }).select().single();
     if (error) { setMessage("Fehler: " + error.message); return; }
     const taskRows = instructionTasks.filter((task) => task.trim() !== "").map((task, index) => ({ work_instruction_id: instruction.id, task_text: task, sort_order: index, photos: instructionTaskPhotos[index] || [] }));
     if (taskRows.length > 0) {
       const { error: taskError } = await supabase.from("work_instruction_tasks").insert(taskRows);
       if (taskError) { setMessage("Arbeitsanweisung gespeichert, aber Schritte nicht: " + taskError.message); return; }
     }
-    setInstructionTitle(""); setInstructionProject(""); setInstructionCustomer(""); setInstructionSite(""); setInstructionDescription(""); setInstructionTasks([""]); setInstructionProblems(""); setInstructionPhotos([]); setInstructionTaskPhotos({}); setAssignedUserId("");
+    setInstructionTitle(""); setInstructionProject(""); setInstructionCustomer(""); setInstructionSite(""); setInstructionDescription(""); setInstructionTasks([""]); setInstructionProblems(""); setInstructionPhotos([]); setInstructionTaskPhotos({}); setAssignedUserIds([]);
     await loadWorkInstructions(currentCompany.company_id);
     setMessage(t.msgInstructionSaved);
   }
@@ -1652,13 +1652,30 @@ export default function Home() {
               <input className="border p-3 text-black bg-white" placeholder={t.customer} value={instructionCustomer} onChange={(e) => setInstructionCustomer(e.target.value)} />
               <input className="border p-3 text-black bg-white" placeholder={t.site} value={instructionSite} onChange={(e) => setInstructionSite(e.target.value)} />
               <input type="date" className="border p-3 text-black bg-white" value={instructionDate} onChange={(e) => setInstructionDate(e.target.value)} />
-              <select className="border p-3 text-black bg-white" value={assignedUserId} onChange={(e) => setAssignedUserId(e.target.value)}>
-                <option value="">👤 Mitarbeiter zuweisen (optional)</option>
-                {companyUsers.filter(m => m.role === "employee").map((m) => (
-                  <option key={m.user_id} value={m.user_id}>{m.full_name || m.email}</option>
-                ))}
-              </select>
             </div>
+            {/* Mitarbeiter zuweisen – Mehrfachauswahl */}
+            {companyUsers.filter(m => m.role === "employee").length > 0 && (
+              <div className="border rounded p-3 bg-gray-50 space-y-2">
+                <h3 className="font-bold text-sm">👤 Mitarbeiter zuweisen</h3>
+                {companyUsers.filter(m => m.role === "employee").map((m) => (
+                  <label key={m.user_id} className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={assignedUserIds.includes(m.user_id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setAssignedUserIds(prev => [...prev, m.user_id]);
+                        } else {
+                          setAssignedUserIds(prev => prev.filter(id => id !== m.user_id));
+                        }
+                      }}
+                      className="w-4 h-4"
+                    />
+                    <span>{m.full_name || m.email}</span>
+                  </label>
+                ))}
+              </div>
+            )}
             <input className="border p-3 w-full text-black bg-white" placeholder={t.problems} value={instructionProblems} onChange={(e) => setInstructionProblems(e.target.value)} />
             {companyFeatures?.photos_enabled && (
               <div>
@@ -1693,7 +1710,13 @@ export default function Home() {
             <input type="date" className="border p-3 rounded text-black bg-white" value={selectedDayDate} onChange={(e) => setSelectedDayDate(e.target.value)} />
           </section>
           {(() => {
-            const dayInstructions = workInstructions.filter((i) => i.work_date === selectedDayDate);
+            const dayInstructions = workInstructions.filter((i) => {
+              if (i.work_date !== selectedDayDate) return false;
+              if (currentCompany?.role === "employee") {
+                return (i.assigned_user_ids || []).includes(user?.id);
+              }
+              return true;
+            });
             if (dayInstructions.length === 0) return (<section className="border rounded p-4 bg-white text-black"><p className="text-gray-500">{t.noInstructionsDay}</p></section>);
             return dayInstructions.map((instruction) => (
               <section key={instruction.id} className="border rounded p-4 bg-white text-black space-y-2">
@@ -1741,7 +1764,13 @@ export default function Home() {
             const dayNum = date.getUTCDay() || 7;
             const monday = new Date(date); monday.setUTCDate(date.getUTCDate() - dayNum + 1);
             const weekDates = Array.from({ length: 7 }, (_, i) => { const nd = new Date(monday); nd.setUTCDate(monday.getUTCDate() + i); return nd.toISOString().split("T")[0]; });
-            const weekInstructions = workInstructions.filter((i) => weekDates.includes(i.work_date));
+            const weekInstructions = workInstructions.filter((i) => {
+              if (!weekDates.includes(i.work_date)) return false;
+              if (currentCompany?.role === "employee") {
+                return (i.assigned_user_ids || []).includes(user?.id);
+              }
+              return true;
+            });
             if (weekInstructions.length === 0) return (<section className="border rounded p-4 bg-white text-black"><p className="text-gray-500">{t.noInstructionsWeek}</p></section>);
             return weekDates.map((dateStr, di) => {
               const dayInstructions = weekInstructions.filter((i) => i.work_date === dateStr);
@@ -1784,7 +1813,13 @@ export default function Home() {
             <input type="month" className="border p-3 rounded text-black bg-white" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} />
           </section>
           {(() => {
-            const monthInstructions = workInstructions.filter((i) => i.work_date?.startsWith(selectedMonth));
+            const monthInstructions = workInstructions.filter((i) => {
+              if (!i.work_date?.startsWith(selectedMonth)) return false;
+              if (currentCompany?.role === "employee") {
+                return (i.assigned_user_ids || []).includes(user?.id);
+              }
+              return true;
+            });
             const [year, month] = selectedMonth.split("-").map(Number);
             const daysInMonth = new Date(year, month, 0).getDate();
             const firstDay = (new Date(year, month - 1, 1).getDay() + 6) % 7;
