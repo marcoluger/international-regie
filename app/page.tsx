@@ -117,7 +117,6 @@ const texts = {
     update: "Aktualisieren",
     downloadPdf: "PDF herunterladen",
     sendPdf: "PDF per E-Mail senden",
-    // Dashboard
     dashboard: "Dashboard",
     projects: "Projekte",
     workInstructions: "Arbeitsanweisungen",
@@ -126,7 +125,6 @@ const texts = {
     stoppedSteps: "Gestoppte Arbeitsschritte",
     stepsInProgress: "Arbeitsschritte in Arbeit",
     noProject: "Kein Projekt",
-    // Projekte
     projectsTab: "Projekte",
     projectName: "Projektname",
     projectCustomer: "Kunde",
@@ -140,7 +138,6 @@ const texts = {
     noInstructions: "Noch keine Arbeitsanweisungen für dieses Projekt.",
     noReports: "Noch keine Regieberichte für dieses Projekt.",
     reportsTab: "Regieberichte",
-    // Arbeitsanweisungen
     newInstruction: "Neue Arbeitsanweisung",
     instructionTitle: "Titel",
     selectProject: "Projekt auswählen",
@@ -160,14 +157,12 @@ const texts = {
     toReport: "In Regiebericht übernehmen",
     deleteInstruction: "Arbeitsanweisung löschen",
     autoReportLocked: "Automatische Regieberichte sind in deinem Paket nicht aktiviert.",
-    // Mitarbeiter
     employeeManagement: "Mitarbeiterverwaltung",
     name: "Name",
     role: "Rolle",
     addEmployee: "Mitarbeiter hinzufügen",
     currentEmployees: "Aktuelle Mitarbeiter",
     resetPassword: "Passwort zurücksetzen",
-    // Firmendaten
     companyData: "Firmendaten",
     uploadLogo: "Firmenlogo hochladen",
     companyName: "Firmenname",
@@ -178,7 +173,6 @@ const texts = {
     website: "Webseite",
     taxNumber: "UID / Steuernummer",
     saveCompany: "Firmendaten speichern",
-    // Berichte
     reportNameLabel: "Berichtsname",
     firma: "Firma",
     feedbackLabel: "Rückmeldung",
@@ -303,7 +297,7 @@ const texts = {
     progress: "Napredak",
     noInstructions: "Još nema radnih uputa za ovaj projekt.",
     noReports: "Još nema izvještaja za ovaj projekt.",
-    reportsTab: "Режijski izvještaji",
+    reportsTab: "Režijski izvještaji",
     newInstruction: "Nova radna uputa",
     instructionTitle: "Naslov",
     selectProject: "Odaberi projekt",
@@ -376,7 +370,7 @@ const texts = {
     msgEmailRequired: "Unesite e-mail primatelja.",
     msgEmailSending: "PDF se šalje e-poštom...",
     msgEmailSent: "PDF je poslan e-poštom.",
-    tabReport: "Режijski izvještaj",
+    tabReport: "Režijski izvještaj",
     photos: "Fotografije",
     deletePhoto2: "Obriši fotografiju",
     tabDay: "Dnevni pregled",
@@ -463,7 +457,7 @@ const texts = {
     progress: "Napredek",
     noInstructions: "Še ni delovnih navodil za ta projekt.",
     noReports: "Še ni poročil za ta projekt.",
-    reportsTab: "Режijska poročila",
+    reportsTab: "Režijska poročila",
     newInstruction: "Novo delovno navodilo",
     instructionTitle: "Naslov",
     selectProject: "Izberi projekt",
@@ -536,7 +530,7 @@ const texts = {
     msgEmailRequired: "Vnesite e-pošto prejemnika.",
     msgEmailSending: "PDF se pošilja po e-pošti...",
     msgEmailSent: "PDF je poslan po e-pošti.",
-    tabReport: "Режijsko poročilo",
+    tabReport: "Režijsko poročilo",
     photos: "Fotografije",
     deletePhoto2: "Izbriši fotografijo",
     tabDay: "Dnevni pregled",
@@ -603,7 +597,6 @@ const texts = {
     update: "Aktualizuj",
     downloadPdf: "Pobierz PDF",
     sendPdf: "Wyślij PDF e-mailem",
-    // Dashboard
     dashboard: "Panel główny",
     projects: "Projekty",
     workInstructions: "Instrukcje pracy",
@@ -612,7 +605,6 @@ const texts = {
     stoppedSteps: "Zatrzymane kroki",
     stepsInProgress: "Kroki w toku",
     noProject: "Brak projektu",
-    // Projekte
     projectsTab: "Projekty",
     projectName: "Nazwa projektu",
     projectCustomer: "Klient",
@@ -626,7 +618,6 @@ const texts = {
     noInstructions: "Brak instrukcji dla tego projektu.",
     noReports: "Brak raportów dla tego projektu.",
     reportsTab: "Raporty robocze",
-    // Arbeitsanweisungen
     newInstruction: "Nowa instrukcja pracy",
     instructionTitle: "Tytuł",
     selectProject: "Wybierz projekt",
@@ -638,23 +629,20 @@ const texts = {
     noInstructionsSaved: "Brak zapisanych instrukcji.",
     date: "Data",
     project: "Projekt",
-    translateInstruction: "Przetłumacz na",
+    translateTo: "Przetłumacz na",
     translating2: "Tłumaczenie...",
     translated: "Przetłumaczono",
-    translateTo: "Przetłumacz na",
     feedback: "Informacja zwrotna",
     saveFeedback: "Zapisz informację",
     toReport: "Przenieś do raportu",
     deleteInstruction: "Usuń instrukcję",
     autoReportLocked: "Automatyczne raporty nie są aktywne w Twoim pakiecie.",
-    // Mitarbeiter
     employeeManagement: "Zarządzanie pracownikami",
     name: "Imię",
     role: "Rola",
     addEmployee: "Dodaj pracownika",
     currentEmployees: "Aktualni pracownicy",
     resetPassword: "Resetuj hasło",
-    // Firmendaten
     companyData: "Dane firmy",
     uploadLogo: "Prześlij logo",
     companyName: "Nazwa firmy",
@@ -665,7 +653,6 @@ const texts = {
     website: "Strona internetowa",
     taxNumber: "NIP",
     saveCompany: "Zapisz dane firmy",
-    // Berichte
     reportNameLabel: "Nazwa raportu",
     firma: "Firma",
     feedbackLabel: "Informacja zwrotna",
@@ -861,7 +848,6 @@ function getCalendarWeek(dateString: string) {
   return `KW ${weekNumber}`;
 }
 
-// ─── Tab-Button Hilfkomponente ────────────────────────────────────────────────
 function TabButton({
   label,
   tabName,
@@ -888,12 +874,10 @@ function TabButton({
   );
 }
 
-// Hilfsfunktion: allowed_languages sicher als Array holen
 function getAllowedLanguages(companyFeatures: any): string[] {
   const raw = companyFeatures?.allowed_languages;
   if (!raw) return [];
   if (Array.isArray(raw)) return raw;
-  // Falls jsonb als String kommt: '["Deutsch","Kroatisch"]'
   try { return JSON.parse(raw); } catch { return []; }
 }
 
@@ -907,7 +891,6 @@ export default function Home() {
   const [newPassword, setNewPassword] = useState("");
   const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
   const [changingPassword, setChangingPassword] = useState(false);
-
   const [user, setUser] = useState<User | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -949,12 +932,7 @@ export default function Home() {
   const [instructionTranslations, setInstructionTranslations] = useState<Record<string, any>>({});
   const [translatingInstructionId, setTranslatingInstructionId] = useState<string | null>(null);
   const [instructionToLanguage, setInstructionToLanguage] = useState("Polnisch");
-
-  // FIX 1: "dashboard" als Standard-Tab, alle Tabs klar definiert
   const [activeTab, setActiveTab] = useState("dashboard");
-
-
-
   const [projects, setProjects] = useState<any[]>([]);
   const [projectName, setProjectName] = useState("");
   const [projectCustomer, setProjectCustomer] = useState("");
@@ -972,50 +950,39 @@ export default function Home() {
       const { data } = await supabase.auth.getUser();
       setUser(data.user);
       if (data.user) {
-        // ZUERST: Passwort-Änderung prüfen
         const { data: pwCheck } = await supabase
           .from("company_users")
           .select("must_change_password")
           .eq("user_id", data.user.id)
           .maybeSingle();
-
         if (pwCheck?.must_change_password === true) {
           setMustChangePassword(true);
-          return; // Nichts anderes laden!
+          return;
         }
-
         await loadCompanyContext(data.user.id);
         await loadReportsFromDatabase();
         await loadCompanySettings(data.user.id);
       }
     }
-
     loadUser();
-
     const { data: authListener } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user || null);
       if (session?.user) {
-        // ZUERST: Passwort-Änderung prüfen
         const { data: pwCheck } = await supabase
           .from("company_users")
           .select("must_change_password")
           .eq("user_id", session.user.id)
           .maybeSingle();
-
         if (pwCheck?.must_change_password === true) {
           setMustChangePassword(true);
           return;
         }
-
         loadCompanyContext(session.user.id);
         loadReportsFromDatabase();
         loadCompanySettings(session.user.id);
       }
     });
-
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
+    return () => { authListener.subscription.unsubscribe(); };
   }, []);
 
   async function signUp() {
@@ -1027,7 +994,6 @@ export default function Home() {
 
   async function signIn() {
     setMessage("");
-    // Benutzername → Fake-E-Mail konvertieren
     const loginEmail = isUsernameLogin
       ? `${username.toLowerCase().replace(/\s+/g, ".")}@regie-internal.app`
       : email;
@@ -1044,59 +1010,41 @@ export default function Home() {
     setMessage(t.msgLogout);
   }
 
-  // FIX 2: loadProjects bekommt companyId als Parameter, damit es nicht auf
-  // den noch nicht gesetzten currentCompany-State angewiesen ist
   async function loadCompanyContext(userId: string) {
-    // Schritt 1: company_user laden (ohne Join)
     const { data: companyUser, error } = await supabase
       .from("company_users")
       .select("company_id, role")
       .eq("user_id", userId)
       .maybeSingle();
-
-    // Kein Eintrag gefunden → Onboarding zeigen
     if (error) { setMessage("Fehler beim Laden der Firma: " + error.message); return; }
     if (!companyUser) { setShowOnboarding(true); return; }
-
-    // Schritt 2: company separat laden
     const { data: companyData, error: companyError } = await supabase
       .from("companies")
       .select("id, name")
       .eq("id", companyUser.company_id)
       .single();
-
     if (companyError) { setMessage("Fehler beim Laden der Firmendaten: " + companyError.message); return; }
-
     const company: CurrentCompany = {
       company_id: companyUser.company_id,
       role: companyUser.role,
       companies: { id: companyData.id, name: companyData.name },
     };
-
     setCurrentCompany(company);
-
     const { data: features, error: featureError } = await supabase
       .from("company_features")
       .select("*")
       .eq("company_id", companyUser.company_id)
       .single();
-
     if (featureError) { setMessage("Fehler beim Laden der Module: " + featureError.message); return; }
-
     setCompanyFeatures(features as CompanyFeatures);
-
-  // NUR Übersetzungs-Zielsprache anpassen, NICHT die App-Sprache
-  const allowed = Array.isArray(features.allowed_languages)
-    ? features.allowed_languages
-    : (typeof features.allowed_languages === "string" ? JSON.parse(features.allowed_languages) : []);
-  const firstTarget = allowed.filter((l: string) => l !== "Deutsch")[0];
-  if (firstTarget) {
-    setInstructionToLanguage(firstTarget);
-    setToLanguage(firstTarget); // Regiebericht-Zielsprache
-  }
-  // App-Sprache bleibt immer Deutsch (oder was der User gewählt hat)
-
-    // Alle Ladefunktionen erhalten jetzt die companyId direkt
+    const allowed = Array.isArray(features.allowed_languages)
+      ? features.allowed_languages
+      : (typeof features.allowed_languages === "string" ? JSON.parse(features.allowed_languages) : []);
+    const firstTarget = allowed.filter((l: string) => l !== "Deutsch")[0];
+    if (firstTarget) {
+      setInstructionToLanguage(firstTarget);
+      setToLanguage(firstTarget);
+    }
     await loadCompanyUsers(companyUser.company_id);
     await loadWorkInstructions(companyUser.company_id);
     await loadProjects(companyUser.company_id);
@@ -1108,7 +1056,6 @@ export default function Home() {
       .select(`*, work_instruction_tasks (*)`)
       .eq("company_id", companyId)
       .order("created_at", { ascending: false });
-
     if (error) { setMessage("Fehler beim Laden der Arbeitsanweisungen: " + error.message); return; }
     setWorkInstructions(data || []);
   }
@@ -1126,7 +1073,6 @@ export default function Home() {
       .select("*")
       .eq("company_id", companyId)
       .order("created_at", { ascending: true });
-
     if (error) { setMessage("Fehler beim Laden der Mitarbeiter: " + error.message); return; }
     setCompanyUsers(data || []);
   }
@@ -1219,7 +1165,6 @@ export default function Home() {
     setMessage(t.msgSaving);
     if (!currentCompany) { setMessage(t.msgNoFirm); return; }
     if (!instructionTitle.trim()) { setMessage(t.msgNoTitle); return; }
-
     const { data: instruction, error } = await supabase
       .from("work_instructions")
       .insert({
@@ -1237,9 +1182,7 @@ export default function Home() {
       })
       .select()
       .single();
-
     if (error) { setMessage("Fehler: " + error.message); return; }
-
     const taskRows = instructionTasks
       .filter((task) => task.trim() !== "")
       .map((task, index) => ({
@@ -1248,16 +1191,13 @@ export default function Home() {
         sort_order: index,
         photos: instructionTaskPhotos[index] || [],
       }));
-
     if (taskRows.length > 0) {
       const { error: taskError } = await supabase.from("work_instruction_tasks").insert(taskRows);
       if (taskError) { setMessage("Arbeitsanweisung gespeichert, aber Schritte nicht: " + taskError.message); return; }
     }
-
     setInstructionTitle(""); setInstructionProject(""); setInstructionCustomer("");
     setInstructionSite(""); setInstructionDescription(""); setInstructionTasks([""]); setInstructionProblems("");
     setInstructionPhotos([]); setInstructionTaskPhotos({});
-
     await loadWorkInstructions(currentCompany.company_id);
     setMessage(t.msgInstructionSaved);
   }
@@ -1326,14 +1266,11 @@ export default function Home() {
   async function loadCompanySettings(userId: string) {
     const { data, error } = await supabase.from("company_settings").select("*").eq("user_id", userId).single();
     if (error && error.code !== "PGRST116") { setMessage("Fehler beim Laden der Firmendaten: " + error.message); return; }
-    
     const settings = data || {
       user_id: userId, company_name: "", company_logo: "",
       street: "", zip_code: "", city: "", phone: "", email: "", website: "", tax_number: "",
     };
     setCompanySettings(settings);
-    
-    // Onboarding zeigen wenn Firmenname noch leer ist
     if (!data || !data.company_name) {
       setShowOnboarding(true);
     }
@@ -1400,7 +1337,7 @@ export default function Home() {
     setPdfLanguage(report.pdf_language || "Deutsch");
     setDays(report.days || createEmptyDays());
     setMessage(t.msgLoaded);
-    setActiveTab("regiebericht"); // Nach Laden direkt zum Bericht springen
+    setActiveTab("regiebericht");
   }
 
   async function deleteReport(id: string) {
@@ -1417,7 +1354,6 @@ export default function Home() {
     setDays(createEmptyDays());
   }
 
-  // FIX 2: companyId als Parameter
   async function loadProjects(companyId?: string) {
     const id = companyId ?? currentCompany?.company_id;
     if (!id) return;
@@ -1482,77 +1418,51 @@ export default function Home() {
   async function translateInstruction(instruction: any) {
     setTranslatingInstructionId(instruction.id);
     setMessage("");
-
     try {
       const textsToTranslate = [
         { key: "title", text: instruction.title || "" },
         { key: "problems_text", text: instruction.problems_text || "" },
         { key: "description", text: instruction.description || "" },
       ];
-
       const translatedFields: Record<string, string> = {};
-
       for (const item of textsToTranslate) {
         if (!item.text.trim()) continue;
         const res = await fetch("/api/translate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            description: item.text,
-            fromLanguage: "Deutsch",
-            toLanguage: instructionToLanguage,
-          }),
+          body: JSON.stringify({ description: item.text, fromLanguage: "Deutsch", toLanguage: instructionToLanguage }),
         });
         const data = await res.json();
         translatedFields[item.key] = data.error ? item.text : data.translation;
       }
-
-      // Arbeitsschritte übersetzen
       const translatedTasks: Record<string, string> = {};
       for (const task of instruction.work_instruction_tasks || []) {
         if (!task.task_text?.trim()) continue;
         const res = await fetch("/api/translate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            description: task.task_text,
-            fromLanguage: "Deutsch",
-            toLanguage: instructionToLanguage,
-          }),
+          body: JSON.stringify({ description: task.task_text, fromLanguage: "Deutsch", toLanguage: instructionToLanguage }),
         });
         const data = await res.json();
         translatedTasks[task.id] = data.error ? task.task_text : data.translation;
-
-        // Rückmeldung übersetzen falls vorhanden
         if (task.note?.trim()) {
           const resNote = await fetch("/api/translate", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              description: task.note,
-              fromLanguage: "Deutsch",
-              toLanguage: instructionToLanguage,
-            }),
+            body: JSON.stringify({ description: task.note, fromLanguage: "Deutsch", toLanguage: instructionToLanguage }),
           });
           const dataNote = await resNote.json();
           translatedTasks[`note_${task.id}`] = dataNote.error ? task.note : dataNote.translation;
         }
       }
-
       setInstructionTranslations((prev) => ({
         ...prev,
-        [instruction.id]: {
-          ...translatedFields,
-          tasks: translatedTasks,
-          language: instructionToLanguage,
-        },
+        [instruction.id]: { ...translatedFields, tasks: translatedTasks, language: instructionToLanguage },
       }));
-
       setMessage(t.msgInstructionTranslated);
     } catch (err) {
       setMessage(t.msgTranslateErr + String(err));
     }
-
     setTranslatingInstructionId(null);
   }
 
@@ -1563,21 +1473,15 @@ export default function Home() {
         : task.status === "in_progress" ? "🟡 In Arbeit"
         : task.status === "stopped" ? "⛔ Gestoppt"
         : "⬜ Offen";
-      return [
-        `${statusText}: ${task.task_text}`,
-        task.note ? `Rückmeldung: ${task.note}` : "",
-      ].filter(Boolean).join("\n");
+      return [`${statusText}: ${task.task_text}`, task.note ? `Rückmeldung: ${task.note}` : ""].filter(Boolean).join("\n");
     });
-
     const description = [
       ...completedTasks,
       instruction.problems_text ? "Probleme / Hinweise: " + instruction.problems_text : "",
       instruction.employee_note ? "Rückmeldung Mitarbeiter: " + instruction.employee_note : "",
     ].filter(Boolean).join("\n");
-
     const copy = [...days];
     const targetDate = instruction.work_date || "";
-
     if (targetDate) {
       const [year, month, day] = targetDate.split("-").map(Number);
       const selectedDate = new Date(Date.UTC(year, month - 1, day));
@@ -1590,24 +1494,22 @@ export default function Home() {
         copy[i] = { ...copy[i], date: nextDate.toISOString().split("T")[0] };
       }
     }
-
     const targetIndex = targetDate ? copy.findIndex((day) => day.date === targetDate) : 0;
     const indexToUse = targetIndex >= 0 ? targetIndex : 0;
-
     copy[indexToUse] = {
       ...copy[indexToUse],
       customer: instruction.customer || "",
       projectNumber: instruction.project || "",
       site: instruction.site || "",
       description,
-      photos: [], // Fotos der Arbeitsanweisung NICHT übernehmen
+      photos: [],
     };
-
     setDays(copy);
-    setActiveTab("regiebericht"); // FIX 3: korrekter Tab-Name
+    setActiveTab("regiebericht");
     setMessage("Regiebericht wurde aus Arbeitsanweisung vorbereitet.");
   }
 
+  // ── FIXED: kein window.location.reload() ──
   async function changePassword() {
     if (!newPassword.trim() || newPassword.length < 6) {
       setMessage("Passwort muss mindestens 6 Zeichen haben.");
@@ -1619,39 +1521,44 @@ export default function Home() {
     }
     setChangingPassword(true);
     setMessage("Speichere...");
-
     try {
-      // Schritt 1: must_change_password auf false
-      const { error: dbError } = await supabase.from("company_users")
-        .update({ must_change_password: false })
-        .eq("user_id", user?.id);
-      
-      if (dbError) {
-        setMessage("DB Fehler: " + dbError.message);
-        setChangingPassword(false);
-        return;
-      }
-      setMessage("Schritt 1 OK...");
-
-      // Schritt 2: Passwort ändern per API Route
+      // Schritt 1: Passwort per API ändern
       const res = await fetch("/api/change-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          userId: user?.id,
-          newPassword 
-        }),
+        body: JSON.stringify({ userId: user?.id, newPassword }),
       });
       const data = await res.json();
-      
       if (data.error) {
         setMessage("Fehler: " + data.error);
         setChangingPassword(false);
         return;
       }
-
-      setMessage("Passwort geändert! Weiterleitung...");
-      setTimeout(() => window.location.reload(), 1000);
+      // Schritt 2: Flag in DB zurücksetzen
+      const { error: dbError } = await supabase
+        .from("company_users")
+        .update({ must_change_password: false })
+        .eq("user_id", user?.id);
+      if (dbError) {
+        setMessage("DB Fehler: " + dbError.message);
+        setChangingPassword(false);
+        return;
+      }
+      // Schritt 3: Neu einloggen damit Session aktiv bleibt
+      if (user?.email) {
+        await supabase.auth.signInWithPassword({ email: user.email, password: newPassword });
+      }
+      // Schritt 4: State direkt setzen – kein reload nötig
+      setMustChangePassword(false);
+      setNewPassword("");
+      setNewPasswordConfirm("");
+      setMessage("✅ Passwort geändert!");
+      // Schritt 5: App-Daten nachladen
+      if (user?.id) {
+        await loadCompanyContext(user.id);
+        await loadReportsFromDatabase();
+        await loadCompanySettings(user.id);
+      }
     } catch (err) {
       setMessage("Unbekannter Fehler: " + String(err));
       setChangingPassword(false);
@@ -1660,65 +1567,36 @@ export default function Home() {
 
   async function saveOnboarding() {
     if (!user || !companySettings) return;
-
-    // Prüfen ob User schon eine Firma hat
     const { data: existingUser } = await supabase
       .from("company_users")
       .select("company_id")
       .eq("user_id", user.id)
       .maybeSingle();
-
     let companyId = existingUser?.company_id;
-
     if (!companyId) {
-      // Neue Firma anlegen
       const { data: newCompany, error: companyError } = await supabase
         .from("companies")
-        .insert({
-          name: companySettings.company_name || "Meine Firma",
-          owner_user_id: user.id,
-          status: "active",
-        })
+        .insert({ name: companySettings.company_name || "Meine Firma", owner_user_id: user.id, status: "active" })
         .select()
         .single();
-
       if (companyError) { setMessage("Fehler beim Anlegen der Firma: " + companyError.message); return; }
       companyId = newCompany.id;
-
-      // User als owner eintragen
       const { error: userError } = await supabase.from("company_users").insert({
-        company_id: companyId,
-        user_id: user.id,
-        email: user.email,
-        full_name: companySettings.company_name,
-        role: "owner",
+        company_id: companyId, user_id: user.id, email: user.email,
+        full_name: companySettings.company_name, role: "owner",
       });
       if (userError) { setMessage("Fehler beim Anlegen des Benutzers: " + userError.message); return; }
-
-      // Standard company_features anlegen
       await supabase.from("company_features").insert({
-        company_id: companyId,
-        package_name: "starter",
-        max_employees: 5,
-        module_reports: true,
-        module_work_orders: false,
-        module_auto_reports: false,
-        photos_enabled: false,
-        email_enabled: false,
-        signature_enabled: false,
-        ai_enabled: false,
-        allowed_languages: ["Deutsch"],
+        company_id: companyId, package_name: "starter", max_employees: 5,
+        module_reports: true, module_work_orders: false, module_auto_reports: false,
+        photos_enabled: false, email_enabled: false, signature_enabled: false,
+        ai_enabled: false, allowed_languages: ["Deutsch"],
       });
     }
-
-    // Firmendaten speichern
     const { error } = await supabase.from("company_settings").upsert(
-      { ...companySettings, user_id: user.id },
-      { onConflict: "user_id" }
+      { ...companySettings, user_id: user.id }, { onConflict: "user_id" }
     );
     if (error) { setMessage("Fehler beim Speichern: " + error.message); return; }
-
-    // Kontext neu laden
     await loadCompanyContext(user.id);
     setShowOnboarding(false);
     setOnboardingDone(true);
@@ -1734,21 +1612,17 @@ export default function Home() {
     const marginRight = 15;
     const contentWidth = pageWidth - marginLeft - marginRight;
     let y = 15;
-
     const addFooter = () => {
       doc.setFontSize(8); doc.setTextColor(120);
       doc.text(p.company, marginLeft, pageHeight - 10);
       doc.text(`${p.createdAt}: ${new Date().toLocaleDateString("de-DE")}`, pageWidth - marginRight, pageHeight - 10, { align: "right" });
       doc.setTextColor(0);
     };
-
     const addNewPageIfNeeded = (neededHeight: number) => {
       if (y + neededHeight > pageHeight - 25) { addFooter(); doc.addPage(); y = 15; }
     };
-
     const qrText = `${p.title} ${calendarWeek || ""} - ${employee}`;
     const qrImage = await QRCode.toDataURL(qrText);
-
     let logoBase64 = "";
     if (companySettings?.company_logo) {
       try {
@@ -1760,18 +1634,14 @@ export default function Home() {
           reader.onerror = reject;
           reader.readAsDataURL(blob);
         });
-      } catch (error) {
-        console.error("Logo konnte nicht geladen werden:", error);
-      }
+      } catch (error) { console.error("Logo konnte nicht geladen werden:", error); }
     }
-
     doc.setFillColor(240, 240, 240);
     doc.rect(0, 0, pageWidth, 70, "F");
     doc.setFontSize(20); doc.setFont("helvetica", "bold");
     doc.text(p.title, marginLeft, y);
     doc.setFontSize(11); doc.setFont("helvetica", "normal");
     y += 8;
-
     doc.text(companySettings?.company_name || "Elektrotechnik Luger", marginLeft, y); y += 6;
     if (companySettings?.street) { doc.text(companySettings.street, marginLeft, y); y += 5; }
     if (companySettings?.zip_code || companySettings?.city) {
@@ -1781,49 +1651,39 @@ export default function Home() {
     if (companySettings?.email) { doc.text(`E-Mail: ${companySettings.email}`, marginLeft, y); y += 5; }
     if (companySettings?.website) { doc.text(`Web: ${companySettings.website}`, marginLeft, y); y += 5; }
     if (companySettings?.tax_number) { doc.text(`UID: ${companySettings.tax_number}`, marginLeft, y); y += 5; }
-
     y += 7;
     doc.text(`${p.report}: ${reportName || "-"}`, marginLeft, y); y += 6;
     doc.text(`${p.calendarWeek}: ${calendarWeek || "-"}`, marginLeft, y); y += 6;
     doc.text(`${p.employee}: ${employee || "-"}`, marginLeft, y);
-
     if (logoBase64) {
       doc.addImage(logoBase64, "PNG", pageWidth - 45, 8, 30, 30);
     } else {
       doc.addImage(qrImage, "PNG", pageWidth - 42, 8, 28, 28);
     }
-
     y += 10;
     if (y < 75) y = 75;
-
     doc.setFontSize(12); doc.setFont("helvetica", "bold");
     doc.text(p.dailyReports, marginLeft, y); y += 8;
-
     for (const day of days) {
       const hasContent = day.description || day.hours || day.customer || day.projectNumber || day.site || day.photos.length > 0;
-      if (!hasContent) continue; // FIX: war "return", jetzt "continue" damit alle Tage verarbeitet werden
-
+      if (!hasContent) continue;
       const descriptionText = day.translation || day.description || "-";
       const splitDescription = doc.splitTextToSize(descriptionText, contentWidth - 8);
       const estimatedHeight = 45 + splitDescription.length * 5 + day.photos.length * 10;
       addNewPageIfNeeded(estimatedHeight);
-
       doc.setFillColor(230, 230, 230);
       doc.rect(marginLeft, y, contentWidth, 9, "F");
       doc.setFontSize(11); doc.setFont("helvetica", "bold");
       doc.text(`${day.weekday} - ${day.date || "-"}`, marginLeft + 3, y + 6);
       y += 13;
-
       doc.setFont("helvetica", "normal"); doc.setFontSize(9);
       doc.text(`${p.customer}: ${day.customer || "-"}`, marginLeft + 3, y);
       doc.text(`${p.project}: ${day.projectNumber || "-"}`, marginLeft + 80, y); y += 6;
       doc.text(`${p.site}: ${day.site || "-"}`, marginLeft + 3, y);
       doc.text(`${p.hours}: ${day.hours || "-"}`, marginLeft + 80, y); y += 8;
-
       doc.setFont("helvetica", "bold"); doc.text(`${p.description}:`, marginLeft + 3, y); y += 6;
       doc.setFont("helvetica", "normal"); doc.text(splitDescription, marginLeft + 3, y);
       y += splitDescription.length * 5 + 5;
-
       if (day.photos.length > 0) {
         doc.setFont("helvetica", "bold"); doc.text(`${p.photos}:`, marginLeft + 3, y); y += 6;
         doc.setFont("helvetica", "normal"); doc.setFontSize(8);
@@ -1847,10 +1707,8 @@ export default function Home() {
         }
         y += 2;
       }
-
       doc.setDrawColor(200); doc.line(marginLeft, y, pageWidth - marginRight, y); y += 10; doc.setDrawColor(0);
     }
-
     addNewPageIfNeeded(65);
     doc.setFontSize(12); doc.setFont("helvetica", "bold"); doc.text(p.summary, marginLeft, y); y += 8;
     doc.setFontSize(10); doc.setFont("helvetica", "normal");
@@ -1858,7 +1716,6 @@ export default function Home() {
     Object.entries(projectTotals).forEach(([project, total]) => {
       doc.text(`${p.project} ${project}: ${total.toString().replace(".", ",")} ${p.hours}`, marginLeft, y); y += 6;
     });
-
     y += 18;
     doc.line(marginLeft, y, marginLeft + 70, y);
     doc.line(pageWidth - marginRight - 70, y, pageWidth - marginRight, y);
@@ -1866,9 +1723,7 @@ export default function Home() {
     doc.text(p.signatureEmployee, marginLeft, y);
     doc.text(p.signatureCustomer, pageWidth - marginRight - 70, y);
     addFooter();
-
     const filename = `Regiebericht_${calendarWeek || "Woche"}_${employee || "Mitarbeiter"}.pdf`;
-
     if (sendByEmail) {
       if (!emailTo.trim()) { setMessage(t.msgEmailRequired); return; }
       setMessage(t.msgEmailSending);
@@ -1883,49 +1738,29 @@ export default function Home() {
       setMessage(t.msgEmailSent);
       return;
     }
-
     doc.save(filename);
   }
 
-  // ─── Login-Screen ──────────────────────────────────────────────────────────
   if (!user) {
     return (
       <main className="max-w-xl mx-auto p-4 md:p-8 space-y-6 bg-gray-100 min-h-screen text-black">
         <section className="border rounded p-4 space-y-4 bg-white">
           <h1 className="text-3xl font-bold">{t.loginTitle}</h1>
-          <select
-            className="border p-3 w-full text-black bg-white"
-            value={uiLanguage}
-            onChange={(e) => setUiLanguage(e.target.value as Language)}
-          >
+          <select className="border p-3 w-full text-black bg-white" value={uiLanguage} onChange={(e) => setUiLanguage(e.target.value as Language)}>
             {languages.map((lang) => <option key={lang} value={lang}>{lang}</option>)}
           </select>
           {message && <div className="border rounded p-3 bg-yellow-100 text-black">{message}</div>}
-          
-          {/* Login-Typ wählen */}
           <div className="flex gap-2">
-            <button type="button"
-              onClick={() => setIsUsernameLogin(false)}
-              className={`flex-1 py-2 rounded font-medium ${!isUsernameLogin ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-700"}`}>
-              📧 E-Mail
-            </button>
-            <button type="button"
-              onClick={() => setIsUsernameLogin(true)}
-              className={`flex-1 py-2 rounded font-medium ${isUsernameLogin ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-700"}`}>
-              👤 Benutzername
-            </button>
+            <button type="button" onClick={() => setIsUsernameLogin(false)} className={`flex-1 py-2 rounded font-medium ${!isUsernameLogin ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-700"}`}>📧 E-Mail</button>
+            <button type="button" onClick={() => setIsUsernameLogin(true)} className={`flex-1 py-2 rounded font-medium ${isUsernameLogin ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-700"}`}>👤 Benutzername</button>
           </div>
-
-          {isUsernameLogin ? (
-            <input className="border p-3 w-full text-black bg-white" placeholder="Benutzername" value={username} onChange={(e) => setUsername(e.target.value)} />
-          ) : (
-            <input className="border p-3 w-full text-black bg-white" placeholder={t.email} value={email} onChange={(e) => setEmail(e.target.value)} />
-          )}
+          {isUsernameLogin
+            ? <input className="border p-3 w-full text-black bg-white" placeholder="Benutzername" value={username} onChange={(e) => setUsername(e.target.value)} />
+            : <input className="border p-3 w-full text-black bg-white" placeholder={t.email} value={email} onChange={(e) => setEmail(e.target.value)} />
+          }
           <input className="border p-3 w-full text-black bg-white" placeholder={t.password} type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-          <div className="flex flex-wrap gap-3">
-            <button type="button" onClick={signIn} className="bg-blue-600 text-white px-4 py-3 rounded w-full">{t.login}</button>
-          </div>
-          <p className="text-center text-sm text-gray-500">Noch kein Konto? 
+          <button type="button" onClick={signIn} className="bg-blue-600 text-white px-4 py-3 rounded w-full">{t.login}</button>
+          <p className="text-center text-sm text-gray-500">Noch kein Konto?
             <button type="button" onClick={signUp} className="text-blue-600 underline ml-1">{t.register}</button>
           </p>
         </section>
@@ -1933,7 +1768,6 @@ export default function Home() {
     );
   }
 
-  // ─── Passwort ändern (Pflicht beim ersten Login) ─────────────────────────────
   if (user && mustChangePassword) {
     return (
       <main className="max-w-md mx-auto p-4 md:p-8 min-h-screen bg-gray-100 flex items-center justify-center">
@@ -1944,22 +1778,9 @@ export default function Home() {
             <p className="text-gray-500 text-sm mt-1">Bitte ändern Sie Ihr temporäres Passwort.</p>
           </div>
           {message && <div className="bg-yellow-50 border rounded p-3 text-sm">{message}</div>}
-          <input
-            className="border p-3 w-full rounded text-black"
-            placeholder="Neues Passwort (min. 6 Zeichen)"
-            type="password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-          />
-          <input
-            className="border p-3 w-full rounded text-black"
-            placeholder="Passwort bestätigen"
-            type="password"
-            value={newPasswordConfirm}
-            onChange={(e) => setNewPasswordConfirm(e.target.value)}
-          />
-          <button type="button" onClick={changePassword} disabled={changingPassword}
-            className="w-full bg-blue-700 text-white py-3 rounded font-bold disabled:opacity-50">
+          <input className="border p-3 w-full rounded text-black" placeholder="Neues Passwort (min. 6 Zeichen)" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+          <input className="border p-3 w-full rounded text-black" placeholder="Passwort bestätigen" type="password" value={newPasswordConfirm} onChange={(e) => setNewPasswordConfirm(e.target.value)} />
+          <button type="button" onClick={changePassword} disabled={changingPassword} className="w-full bg-blue-700 text-white py-3 rounded font-bold disabled:opacity-50">
             {changingPassword ? "Wird gespeichert..." : "Passwort speichern & weiter"}
           </button>
         </div>
@@ -1967,167 +1788,105 @@ export default function Home() {
     );
   }
 
-  // ─── Onboarding ───────────────────────────────────────────────────────────────
   if (user && showOnboarding) {
     return (
       <main className="max-w-xl mx-auto p-4 md:p-8 min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="bg-white border rounded-xl p-6 space-y-6 w-full shadow-lg">
-          
-          {/* Progress */}
           <div className="flex items-center gap-2 mb-2">
             {[1, 2, 3].map((step) => (
               <div key={step} className={`flex-1 h-2 rounded-full ${onboardingStep >= step ? "bg-blue-600" : "bg-gray-200"}`} />
             ))}
           </div>
-
           {onboardingStep === 1 && (
             <div className="space-y-4">
               <h2 className="text-2xl font-bold">👋 Willkommen!</h2>
               <p className="text-gray-600">Bitte hinterlegen Sie zuerst Ihre Firmendaten.</p>
               <div className="space-y-3">
-                <input className="border p-3 w-full rounded text-black" placeholder="Firmenname *"
-                  value={companySettings?.company_name || ""}
-                  onChange={(e) => updateCompanyField("company_name", e.target.value)} />
-                <input className="border p-3 w-full rounded text-black" placeholder="Straße"
-                  value={companySettings?.street || ""}
-                  onChange={(e) => updateCompanyField("street", e.target.value)} />
+                <input className="border p-3 w-full rounded text-black" placeholder="Firmenname *" value={companySettings?.company_name || ""} onChange={(e) => updateCompanyField("company_name", e.target.value)} />
+                <input className="border p-3 w-full rounded text-black" placeholder="Straße" value={companySettings?.street || ""} onChange={(e) => updateCompanyField("street", e.target.value)} />
                 <div className="grid grid-cols-2 gap-3">
-                  <input className="border p-3 rounded text-black" placeholder="PLZ"
-                    value={companySettings?.zip_code || ""}
-                    onChange={(e) => updateCompanyField("zip_code", e.target.value)} />
-                  <input className="border p-3 rounded text-black" placeholder="Ort"
-                    value={companySettings?.city || ""}
-                    onChange={(e) => updateCompanyField("city", e.target.value)} />
+                  <input className="border p-3 rounded text-black" placeholder="PLZ" value={companySettings?.zip_code || ""} onChange={(e) => updateCompanyField("zip_code", e.target.value)} />
+                  <input className="border p-3 rounded text-black" placeholder="Ort" value={companySettings?.city || ""} onChange={(e) => updateCompanyField("city", e.target.value)} />
                 </div>
               </div>
-              <button type="button"
-                onClick={() => {
-                  if (!companySettings?.company_name?.trim()) { setMessage("Bitte Firmenname eingeben."); return; }
-                  setOnboardingStep(2);
-                }}
-                className="w-full bg-blue-700 text-white py-3 rounded font-bold">
-                Weiter →
-              </button>
+              <button type="button" onClick={() => { if (!companySettings?.company_name?.trim()) { setMessage("Bitte Firmenname eingeben."); return; } setOnboardingStep(2); }} className="w-full bg-blue-700 text-white py-3 rounded font-bold">Weiter →</button>
             </div>
           )}
-
           {onboardingStep === 2 && (
             <div className="space-y-4">
               <h2 className="text-2xl font-bold">📞 Kontaktdaten</h2>
               <div className="space-y-3">
-                <input className="border p-3 w-full rounded text-black" placeholder="Telefon"
-                  value={companySettings?.phone || ""}
-                  onChange={(e) => updateCompanyField("phone", e.target.value)} />
-                <input className="border p-3 w-full rounded text-black" placeholder="E-Mail"
-                  value={companySettings?.email || ""}
-                  onChange={(e) => updateCompanyField("email", e.target.value)} />
-                <input className="border p-3 w-full rounded text-black" placeholder="Webseite"
-                  value={companySettings?.website || ""}
-                  onChange={(e) => updateCompanyField("website", e.target.value)} />
-                <input className="border p-3 w-full rounded text-black" placeholder="UID / Steuernummer"
-                  value={companySettings?.tax_number || ""}
-                  onChange={(e) => updateCompanyField("tax_number", e.target.value)} />
+                <input className="border p-3 w-full rounded text-black" placeholder="Telefon" value={companySettings?.phone || ""} onChange={(e) => updateCompanyField("phone", e.target.value)} />
+                <input className="border p-3 w-full rounded text-black" placeholder="E-Mail" value={companySettings?.email || ""} onChange={(e) => updateCompanyField("email", e.target.value)} />
+                <input className="border p-3 w-full rounded text-black" placeholder="Webseite" value={companySettings?.website || ""} onChange={(e) => updateCompanyField("website", e.target.value)} />
+                <input className="border p-3 w-full rounded text-black" placeholder="UID / Steuernummer" value={companySettings?.tax_number || ""} onChange={(e) => updateCompanyField("tax_number", e.target.value)} />
               </div>
               <div className="flex gap-3">
-                <button type="button" onClick={() => setOnboardingStep(1)}
-                  className="flex-1 bg-gray-200 text-gray-800 py-3 rounded font-medium">← Zurück</button>
-                <button type="button" onClick={() => setOnboardingStep(3)}
-                  className="flex-1 bg-blue-700 text-white py-3 rounded font-bold">Weiter →</button>
+                <button type="button" onClick={() => setOnboardingStep(1)} className="flex-1 bg-gray-200 text-gray-800 py-3 rounded font-medium">← Zurück</button>
+                <button type="button" onClick={() => setOnboardingStep(3)} className="flex-1 bg-blue-700 text-white py-3 rounded font-bold">Weiter →</button>
               </div>
             </div>
           )}
-
           {onboardingStep === 3 && (
             <div className="space-y-4">
               <h2 className="text-2xl font-bold">🖼️ Firmenlogo</h2>
               <p className="text-gray-600">Optional — kann später hinzugefügt werden.</p>
-              {companySettings?.company_logo && (
-                <img src={companySettings.company_logo} alt="Logo" className="h-20 object-contain border rounded p-2" />
-              )}
-              <input type="file" accept="image/*" className="border p-3 w-full rounded text-black bg-white"
-                onChange={(e) => uploadCompanyLogo(e.target.files)} />
+              {companySettings?.company_logo && (<img src={companySettings.company_logo} alt="Logo" className="h-20 object-contain border rounded p-2" />)}
+              <input type="file" accept="image/*" className="border p-3 w-full rounded text-black bg-white" onChange={(e) => uploadCompanyLogo(e.target.files)} />
               {message && <div className="bg-yellow-50 border rounded p-3 text-sm">{message}</div>}
               <div className="flex gap-3">
-                <button type="button" onClick={() => setOnboardingStep(2)}
-                  className="flex-1 bg-gray-200 text-gray-800 py-3 rounded font-medium">← Zurück</button>
-                <button type="button" onClick={saveOnboarding}
-                  className="flex-1 bg-green-700 text-white py-3 rounded font-bold">✅ Speichern & Starten</button>
+                <button type="button" onClick={() => setOnboardingStep(2)} className="flex-1 bg-gray-200 text-gray-800 py-3 rounded font-medium">← Zurück</button>
+                <button type="button" onClick={saveOnboarding} className="flex-1 bg-green-700 text-white py-3 rounded font-bold">✅ Speichern & Starten</button>
               </div>
-              <button type="button" onClick={() => setShowOnboarding(false)}
-                className="w-full text-gray-400 text-sm underline">Überspringen</button>
+              <button type="button" onClick={() => setShowOnboarding(false)} className="w-full text-gray-400 text-sm underline">Überspringen</button>
             </div>
           )}
-
         </div>
       </main>
     );
   }
 
-  // ─── Haupt-App ─────────────────────────────────────────────────────────────
   return (
     <main className="max-w-5xl mx-auto p-4 md:p-8 space-y-6 bg-gray-100 min-h-screen text-black">
-
-      {/* Header */}
       <header className="bg-white border rounded p-4 space-y-1">
         <h1 className="text-3xl font-bold">{t.title}</h1>
         <p className="text-gray-600">{t.subtitle}</p>
         <p className="text-gray-700">{t.loggedInAs}: <strong>{user.email}</strong></p>
         {currentCompany && (
-          <p className="text-gray-700">
-            {t.firma}: <strong>{currentCompany.companies.name}</strong> | {t.role}: <strong>{currentCompany.role}</strong>
-          </p>
+          <p className="text-gray-700">{t.firma}: <strong>{currentCompany.companies.name}</strong> | {t.role}: <strong>{currentCompany.role}</strong></p>
         )}
         <div className="flex items-center gap-3 mt-2">
-          <button type="button" onClick={signOut} className="bg-gray-800 text-white px-4 py-2 rounded">
-            {t.logout}
-          </button>
-          <select
-            className="border p-2 rounded text-black bg-white text-sm"
-            value={uiLanguage}
-            onChange={(e) => setUiLanguage(e.target.value as Language)}
-          >
+          <button type="button" onClick={signOut} className="bg-gray-800 text-white px-4 py-2 rounded">{t.logout}</button>
+          <select className="border p-2 rounded text-black bg-white text-sm" value={uiLanguage} onChange={(e) => setUiLanguage(e.target.value as Language)}>
             {(getAllowedLanguages(companyFeatures).length > 0
               ? ["Deutsch", ...getAllowedLanguages(companyFeatures).filter(l => l !== "Deutsch" && languages.includes(l as Language))]
               : languages
-            ).map((lang) => (
-              <option key={lang} value={lang}>🌐 {lang}</option>
-            ))}
+            ).map((lang) => (<option key={lang} value={lang}>🌐 {lang}</option>))}
           </select>
-          <select
-            className="border p-2 rounded text-black bg-white text-sm"
-            value={pdfLanguage}
-            onChange={(e) => setPdfLanguage(e.target.value)}
-          >
+          <select className="border p-2 rounded text-black bg-white text-sm" value={pdfLanguage} onChange={(e) => setPdfLanguage(e.target.value)}>
             {(getAllowedLanguages(companyFeatures).length > 0
               ? getAllowedLanguages(companyFeatures).filter(l => pdfLanguages.includes(l))
               : pdfLanguages
-            ).map((lang) => (
-              <option key={lang} value={lang}>📄 {lang}</option>
-            ))}
+            ).map((lang) => (<option key={lang} value={lang}>📄 {lang}</option>))}
           </select>
         </div>
       </header>
 
-      {/* FIX 3: Alle Bereiche als eigene Tabs, sauber strukturiert */}
       <nav className="flex flex-wrap gap-2">
         <TabButton label={t.dashboard}            tabName="dashboard"           activeTab={activeTab} onClick={() => setActiveTab("dashboard")} />
-        <TabButton label={t.tabReport}         tabName="regiebericht"        activeTab={activeTab} onClick={() => setActiveTab("regiebericht")} />
+        <TabButton label={t.tabReport}            tabName="regiebericht"        activeTab={activeTab} onClick={() => setActiveTab("regiebericht")} />
         <TabButton label={t.saveLoad}             tabName="berichte"            activeTab={activeTab} onClick={() => setActiveTab("berichte")} />
-        <TabButton label={t.projectsTab}             tabName="projekte"            activeTab={activeTab} onClick={() => { setActiveTab("projekte"); loadProjects(); }} />
-        <TabButton label={t.workInstructions}   tabName="arbeitsanweisungen"  activeTab={activeTab} onClick={() => setActiveTab("arbeitsanweisungen")} />
-        <TabButton label={t.employeeManagement}          tabName="mitarbeiter"         activeTab={activeTab} onClick={() => setActiveTab("mitarbeiter")} />
+        <TabButton label={t.projectsTab}          tabName="projekte"            activeTab={activeTab} onClick={() => { setActiveTab("projekte"); loadProjects(); }} />
+        <TabButton label={t.workInstructions}     tabName="arbeitsanweisungen"  activeTab={activeTab} onClick={() => setActiveTab("arbeitsanweisungen")} />
+        <TabButton label={t.employeeManagement}   tabName="mitarbeiter"         activeTab={activeTab} onClick={() => setActiveTab("mitarbeiter")} />
         <TabButton label={t.companyData}          tabName="firmendaten"         activeTab={activeTab} onClick={() => setActiveTab("firmendaten")} />
         <TabButton label={t.tabDay}               tabName="tag"                 activeTab={activeTab} onClick={() => setActiveTab("tag")} />
         <TabButton label={t.tabWeek}              tabName="woche"               activeTab={activeTab} onClick={() => setActiveTab("woche")} />
         <TabButton label={t.tabMonth}             tabName="monat"               activeTab={activeTab} onClick={() => setActiveTab("monat")} />
       </nav>
 
-      {/* Globale Statusmeldung */}
-      {message && (
-        <div className="border rounded p-3 bg-yellow-100 text-black">{message}</div>
-      )}
+      {message && <div className="border rounded p-3 bg-yellow-100 text-black">{message}</div>}
 
-      {/* ── TAB: Dashboard ── */}
       {activeTab === "dashboard" && (
         <section className="border rounded p-4 space-y-4 bg-white text-black">
           <h2 className="text-xl font-bold">{t.dashboard}</h2>
@@ -2141,13 +1900,11 @@ export default function Home() {
             const progressPercent = totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0;
             const today = new Date().toISOString().split("T")[0];
             const todayInstructions = workInstructions.filter((i: any) => i.work_date === today);
-
             return (
               <div className="space-y-3">
                 <p>{t.projects}: <strong>{projects.length}</strong></p>
                 <p>{t.workInstructions}: <strong>{workInstructions.length}</strong></p>
                 <p>{t.dueToday}: <strong>{todayInstructions.length}</strong></p>
-
                 <div className="border rounded p-3 bg-gray-100">
                   <p>{t.statusOpen}: {openCount}</p>
                   <p>{t.statusInProgress}: {progressCount}</p>
@@ -2158,27 +1915,19 @@ export default function Home() {
                     <div className="bg-green-600 h-4 rounded" style={{ width: `${progressPercent}%` }} />
                   </div>
                 </div>
-
                 {stoppedCount > 0 && (
                   <div className="border rounded p-3 bg-red-50">
                     <h3 className="font-bold mb-2">{t.stoppedSteps}</h3>
                     {allTasks.filter((t: any) => t.status === "stopped").map((task: any) => (
-                      <p key={task.id}>
-                        <strong>{workInstructions.find((i) => (i.work_instruction_tasks || []).some((t: any) => t.id === task.id))?.project || t.noProject}</strong>
-                        {" — "}⛔ {task.task_text}{task.note ? ` — ${task.note}` : ""}
-                      </p>
+                      <p key={task.id}><strong>{workInstructions.find((i) => (i.work_instruction_tasks || []).some((t: any) => t.id === task.id))?.project || t.noProject}</strong>{" — "}⛔ {task.task_text}{task.note ? ` — ${task.note}` : ""}</p>
                     ))}
                   </div>
                 )}
-
                 {progressCount > 0 && (
                   <div className="border rounded p-3 bg-yellow-50">
                     <h3 className="font-bold mb-2">{t.stepsInProgress}</h3>
                     {allTasks.filter((t: any) => t.status === "in_progress").map((task: any) => (
-                      <p key={task.id}>
-                        <strong>{workInstructions.find((i) => (i.work_instruction_tasks || []).some((t: any) => t.id === task.id))?.project || t.noProject}</strong>
-                        {" — "}🟡 {task.task_text}{task.note ? ` — ${task.note}` : ""}
-                      </p>
+                      <p key={task.id}><strong>{workInstructions.find((i) => (i.work_instruction_tasks || []).some((t: any) => t.id === task.id))?.project || t.noProject}</strong>{" — "}🟡 {task.task_text}{task.note ? ` — ${task.note}` : ""}</p>
                     ))}
                   </div>
                 )}
@@ -2188,49 +1937,37 @@ export default function Home() {
         </section>
       )}
 
-      {/* ── TAB: Regiebericht (Eingabe) ── */}
       {activeTab === "regiebericht" && (
         <div className="space-y-4">
-          {/* Allgemeine Angaben */}
           <section className="border rounded p-4 space-y-4 bg-white text-black">
             <h2 className="text-xl font-bold">{t.general}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-
-
               <input className="border p-3 text-black bg-white" placeholder={t.employee} value={employee} onChange={(e) => setEmployee(e.target.value)} />
               <input className="border p-3 bg-gray-200 text-black" value={calendarWeek} readOnly placeholder={t.calendarWeek} />
               <select className="border p-3 text-black bg-white" value={fromLanguage} onChange={(e) => setFromLanguage(e.target.value)}>
                 {(getAllowedLanguages(companyFeatures).length > 0 ? getAllowedLanguages(companyFeatures) : languages).map((lang) => <option key={lang} value={lang}>{lang}</option>)}
               </select>
               <select className="border p-3 text-black bg-white" value={toLanguage} onChange={(e) => setToLanguage(e.target.value)}>
-                {(getAllowedLanguages(companyFeatures).length > 0 ? getAllowedLanguages(companyFeatures) : languages)
-                  .filter((lang) => lang !== "Deutsch")
-                  .map((lang) => <option key={lang} value={lang}>{lang}</option>)}
+                {(getAllowedLanguages(companyFeatures).length > 0 ? getAllowedLanguages(companyFeatures) : languages).filter((lang) => lang !== "Deutsch").map((lang) => <option key={lang} value={lang}>{lang}</option>)}
               </select>
               <input className="border p-3 text-black bg-white md:col-span-2" placeholder={t.recipientEmail} value={emailTo} onChange={(e) => setEmailTo(e.target.value)} />
             </div>
           </section>
-
-          {/* Tageseinträge */}
           {days.map((day, index) => (
             <section key={day.weekday} className="border rounded p-4 space-y-3 bg-white text-black">
               <h2 className="text-xl font-bold">{t.weekdays[index] || day.weekday}</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <input
-                  type="date" className="border p-3 text-black bg-white" value={day.date}
-                  onChange={(e) => { if (index === 0) updateFullWeekFromMonday(e.target.value); else updateDay(index, "date", e.target.value); }}
-                />
+                <input type="date" className="border p-3 text-black bg-white" value={day.date} onChange={(e) => { if (index === 0) updateFullWeekFromMonday(e.target.value); else updateDay(index, "date", e.target.value); }} />
                 <input className="border p-3 text-black bg-white" placeholder={t.customer} value={day.customer} onChange={(e) => updateDay(index, "customer", e.target.value)} />
                 <input className="border p-3 text-black bg-white" placeholder={t.projectNumber} value={day.projectNumber} onChange={(e) => updateDay(index, "projectNumber", e.target.value)} />
                 <input className="border p-3 text-black bg-white" placeholder={t.site} value={day.site} onChange={(e) => updateDay(index, "site", e.target.value)} />
                 <input className="border p-3 text-black bg-white" placeholder={t.hours} value={day.hours} onChange={(e) => updateDay(index, "hours", e.target.value)} />
               </div>
               <textarea className="border p-3 w-full h-28 text-black bg-white" placeholder={t.description} value={day.description} onChange={(e) => updateDay(index, "description", e.target.value)} />
-              {companyFeatures?.photos_enabled ? (
-                <input type="file" accept="image/*" multiple className="border p-3 w-full text-black bg-white" onChange={(e) => handlePhotos(index, e.target.files)} />
-              ) : (
-                <div className="border rounded p-3 bg-gray-50 text-sm text-gray-400">🔒 Foto-Upload ist in deinem Paket nicht aktiviert.</div>
-              )}
+              {companyFeatures?.photos_enabled
+                ? <input type="file" accept="image/*" multiple className="border p-3 w-full text-black bg-white" onChange={(e) => handlePhotos(index, e.target.files)} />
+                : <div className="border rounded p-3 bg-gray-50 text-sm text-gray-400">🔒 Foto-Upload ist in deinem Paket nicht aktiviert.</div>
+              }
               {day.photos.length > 0 && (
                 <div className="grid grid-cols-2 gap-3">
                   {day.photos.map((photo, photoIndex) => (
@@ -2249,8 +1986,6 @@ export default function Home() {
               )}
             </section>
           ))}
-
-          {/* Stundenübersicht */}
           <section className="border rounded p-4 space-y-2 bg-white text-black">
             <h2 className="text-xl font-bold">{t.hoursOverview}</h2>
             <p><strong>{t.total}:</strong> {totalHours.toString().replace(".", ",")} {t.hours}</p>
@@ -2258,48 +1993,30 @@ export default function Home() {
               <p key={project}><strong>{t.projectNumber} {project}:</strong> {total.toString().replace(".", ",")} {t.hours}</p>
             ))}
           </section>
-
-          {/* Aktions-Buttons */}
           <div className="flex flex-wrap gap-4">
-            <button type="button" onClick={translateAll} className="bg-black text-white px-4 py-3 rounded">
-              {loading ? t.translating : t.translateWeek}
-            </button>
-            <button type="button" onClick={saveReport} className="bg-orange-600 text-white px-4 py-3 rounded">
-              {currentReportId ? t.update : t.save}
-            </button>
-            <button type="button" onClick={() => createPDF(false)} className="bg-green-600 text-white px-4 py-3 rounded">
-              {t.downloadPdf}
-            </button>
-            <button type="button" onClick={() => createPDF(true)} className="bg-purple-600 text-white px-4 py-3 rounded">
-              {t.sendPdf}
-            </button>
+            <button type="button" onClick={translateAll} className="bg-black text-white px-4 py-3 rounded">{loading ? t.translating : t.translateWeek}</button>
+            <button type="button" onClick={saveReport} className="bg-orange-600 text-white px-4 py-3 rounded">{currentReportId ? t.update : t.save}</button>
+            <button type="button" onClick={() => createPDF(false)} className="bg-green-600 text-white px-4 py-3 rounded">{t.downloadPdf}</button>
+            <button type="button" onClick={() => createPDF(true)} className="bg-purple-600 text-white px-4 py-3 rounded">{t.sendPdf}</button>
           </div>
         </div>
       )}
 
-      {/* ── TAB: Berichte (Speichern / Laden) ── */}
       {activeTab === "berichte" && (
         <section className="border rounded p-4 space-y-4 bg-white text-black">
           <h2 className="text-xl font-bold">{t.saveLoad}</h2>
           <input className="border p-3 w-full text-black bg-white" placeholder={t.reportName} value={reportName} onChange={(e) => setReportName(e.target.value)} />
           <div className="flex flex-wrap gap-3">
-            <button type="button" onClick={saveReport} className="bg-orange-600 text-white px-4 py-3 rounded">
-              {currentReportId ? t.updateReport : t.saveReport}
-            </button>
-            <button type="button" onClick={() => { newReport(); setMessage(t.msgNewReport); }} className="bg-gray-700 text-white px-4 py-3 rounded">
-              {t.newReport}
-            </button>
+            <button type="button" onClick={saveReport} className="bg-orange-600 text-white px-4 py-3 rounded">{currentReportId ? t.updateReport : t.saveReport}</button>
+            <button type="button" onClick={() => { newReport(); setMessage(t.msgNewReport); }} className="bg-gray-700 text-white px-4 py-3 rounded">{t.newReport}</button>
           </div>
-
           {savedReports.length > 0 && (
             <div className="space-y-2">
               <h3 className="font-bold">{t.savedReports}</h3>
               {savedReports.map((report) => (
                 <div key={report.id} className="border rounded p-3 space-y-2">
                   <strong>{report.report_name}</strong>
-                  <p className="text-sm text-gray-700">
-                    {t.employee}: {report.employee || "-"} | {new Date(report.created_at).toLocaleString("de-DE")}
-                  </p>
+                  <p className="text-sm text-gray-700">{t.employee}: {report.employee || "-"} | {new Date(report.created_at).toLocaleString("de-DE")}</p>
                   <div className="flex gap-2">
                     <button type="button" onClick={() => loadReport(report)} className="bg-blue-600 text-white px-3 py-2 rounded">{t.loadEdit}</button>
                     <button type="button" onClick={() => deleteReport(report.id)} className="bg-red-600 text-white px-3 py-2 rounded">{t.delete}</button>
@@ -2311,7 +2028,6 @@ export default function Home() {
         </section>
       )}
 
-      {/* ── TAB: Projekte ── */}
       {activeTab === "projekte" && (
         <section className="border rounded p-4 space-y-4 bg-white text-black">
           <h2 className="text-xl font-bold">{t.projectsTab}</h2>
@@ -2322,7 +2038,6 @@ export default function Home() {
             <input className="border p-3 w-full" placeholder={t.projectManager} value={projectManager} onChange={(e) => setProjectManager(e.target.value)} />
           </div>
           <button type="button" onClick={saveProject} className="bg-blue-700 text-white px-4 py-3 rounded">{t.saveProject}</button>
-
           <div className="space-y-3 mt-4">
             {projects.map((project) => (
               <div key={project.id} className="border rounded p-3 space-y-2">
@@ -2331,34 +2046,26 @@ export default function Home() {
                 <p>{t.site}: {project.site || "-"}</p>
                 <p>{t.projectManager}: {project.project_manager || "-"}</p>
                 <div className="flex gap-2">
-                  <button type="button" onClick={() => setSelectedProjectDetailId(project.id === selectedProjectDetailId ? "" : project.id)} className="bg-gray-700 text-white px-3 py-2 rounded">
-                    {project.id === selectedProjectDetailId ? t.closeProject : t.openProject}
-                  </button>
+                  <button type="button" onClick={() => setSelectedProjectDetailId(project.id === selectedProjectDetailId ? "" : project.id)} className="bg-gray-700 text-white px-3 py-2 rounded">{project.id === selectedProjectDetailId ? t.closeProject : t.openProject}</button>
                   <button type="button" onClick={() => deleteProject(project.id)} className="bg-red-600 text-white px-3 py-2 rounded">{t.deleteProject}</button>
                 </div>
-
                 {selectedProjectDetailId === project.id && (
                   <div className="border rounded p-3 bg-gray-50 space-y-3 mt-2">
                     {(() => {
                       const tasks = workInstructions.filter((i) => i.project_id === project.id).flatMap((i) => i.work_instruction_tasks || []);
-                      const openCount      = tasks.filter((t: any) => (t.status || "open") === "open").length;
-                      const progressCount  = tasks.filter((t: any) => t.status === "in_progress").length;
-                      const stoppedCount   = tasks.filter((t: any) => t.status === "stopped").length;
                       const completedCount = tasks.filter((t: any) => t.status === "completed").length;
-                      const totalTasks     = tasks.length;
-                      const progressPercent = totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0;
+                      const progressPercent = tasks.length > 0 ? Math.round((completedCount / tasks.length) * 100) : 0;
                       return (
                         <div className="border rounded p-3 bg-gray-100">
-                          <p>{t.statusOpen}: {openCount}</p><p>{t.statusInProgress}: {progressCount}</p>
-                          <p>{t.statusStopped}: {stoppedCount}</p><p>{t.statusCompleted}: {completedCount}</p>
+                          <p>{t.statusOpen}: {tasks.filter((t: any) => (t.status || "open") === "open").length}</p>
+                          <p>{t.statusInProgress}: {tasks.filter((t: any) => t.status === "in_progress").length}</p>
+                          <p>{t.statusStopped}: {tasks.filter((t: any) => t.status === "stopped").length}</p>
+                          <p>{t.statusCompleted}: {completedCount}</p>
                           <p className="font-bold mt-2">{t.progress}: {progressPercent}%</p>
-                          <div className="w-full bg-gray-300 rounded h-4 mt-1">
-                            <div className="bg-green-600 h-4 rounded" style={{ width: `${progressPercent}%` }} />
-                          </div>
+                          <div className="w-full bg-gray-300 rounded h-4 mt-1"><div className="bg-green-600 h-4 rounded" style={{ width: `${progressPercent}%` }} /></div>
                         </div>
                       );
                     })()}
-
                     <h4 className="font-bold">{t.workInstructions}</h4>
                     {workInstructions.filter((i) => i.project_id === project.id).map((instruction) => (
                       <div key={instruction.id} className="border rounded p-3 bg-white space-y-2">
@@ -2370,34 +2077,17 @@ export default function Home() {
                         {(instruction.work_instruction_tasks || []).length > 0 && (
                           <ul className="list-disc pl-6 space-y-1">
                             {instruction.work_instruction_tasks.map((task: any) => (
-                              <li key={task.id}>
-                                {task.status === "completed" ? t.statusCompleted : task.status === "in_progress" ? t.statusInProgress : task.status === "stopped" ? t.statusStopped : t.statusOpen}{" "}{task.task_text}
-                                {task.note && <div className="text-sm text-gray-600 ml-2">{t.feedbackLabel}: {task.note}</div>}
-                              </li>
+                              <li key={task.id}>{task.status === "completed" ? t.statusCompleted : task.status === "in_progress" ? t.statusInProgress : task.status === "stopped" ? t.statusStopped : t.statusOpen}{" "}{task.task_text}{task.note && <div className="text-sm text-gray-600 ml-2">{t.feedbackLabel}: {task.note}</div>}</li>
                             ))}
                           </ul>
                         )}
-                        {companyFeatures?.module_auto_reports ? (
-                          <button type="button" onClick={() => createReportFromInstruction(instruction)} className="bg-green-700 text-white px-3 py-2 rounded">{t.toReport}</button>
-                        ) : (
-                          <p className="text-sm text-gray-500">{t.autoReportLocked}</p>
-                        )}
+                        {companyFeatures?.module_auto_reports ? (<button type="button" onClick={() => createReportFromInstruction(instruction)} className="bg-green-700 text-white px-3 py-2 rounded">{t.toReport}</button>) : (<p className="text-sm text-gray-500">{t.autoReportLocked}</p>)}
                       </div>
                     ))}
-                    {workInstructions.filter((i) => i.project_id === project.id).length === 0 && (
-                      <p className="text-gray-600">{t.noInstructions}</p>
-                    )}
-
+                    {workInstructions.filter((i) => i.project_id === project.id).length === 0 && <p className="text-gray-600">{t.noInstructions}</p>}
                     <h4 className="font-bold mt-2">{t.reportsTab}</h4>
-                    {savedReports.filter((r: any) => r.project_id === project.id).map((report: any) => (
-                      <div key={report.id} className="border rounded p-3 bg-white">
-                        <strong>{report.report_name}</strong>
-                        <p>{t.employee}: {report.employee || "-"}</p>
-                      </div>
-                    ))}
-                    {savedReports.filter((r: any) => r.project_id === project.id).length === 0 && (
-                      <p className="text-gray-600">{t.noReports}</p>
-                    )}
+                    {savedReports.filter((r: any) => r.project_id === project.id).map((report: any) => (<div key={report.id} className="border rounded p-3 bg-white"><strong>{report.report_name}</strong><p>{t.employee}: {report.employee || "-"}</p></div>))}
+                    {savedReports.filter((r: any) => r.project_id === project.id).length === 0 && <p className="text-gray-600">{t.noReports}</p>}
                   </div>
                 )}
               </div>
@@ -2407,7 +2097,6 @@ export default function Home() {
         </section>
       )}
 
-      {/* ── TAB: Arbeitsanweisungen ── */}
       {activeTab === "arbeitsanweisungen" && (
         <div className="space-y-4">
           <section className="border rounded p-4 space-y-4 bg-white text-black">
@@ -2418,11 +2107,7 @@ export default function Home() {
                 const projectId = e.target.value;
                 setSelectedProjectId(projectId);
                 const selectedProject = projects.find((p) => p.id === projectId);
-                if (selectedProject) {
-                  setInstructionProject(selectedProject.name || "");
-                  setInstructionCustomer(selectedProject.customer || "");
-                  setInstructionSite(selectedProject.site || "");
-                }
+                if (selectedProject) { setInstructionProject(selectedProject.name || ""); setInstructionCustomer(selectedProject.customer || ""); setInstructionSite(selectedProject.site || ""); }
               }}>
                 <option value="">{t.selectProject}</option>
                 {projects.map((project) => <option key={project.id} value={project.id}>{project.name}</option>)}
@@ -2432,45 +2117,35 @@ export default function Home() {
               <input type="date" className="border p-3 text-black bg-white" value={instructionDate} onChange={(e) => setInstructionDate(e.target.value)} />
             </div>
             <input className="border p-3 w-full text-black bg-white" placeholder={t.problems} value={instructionProblems} onChange={(e) => setInstructionProblems(e.target.value)} />
-
-            {/* Fotos zur Arbeitsanweisung — nur wenn Modul aktiv */}
             {companyFeatures?.photos_enabled && (
               <div>
                 <h3 className="font-bold mb-2">{t.photos}</h3>
-                <input type="file" accept="image/*" multiple className="border p-3 w-full text-black bg-white"
-                  onChange={(e) => handleInstructionPhotos(e.target.files)} />
+                <input type="file" accept="image/*" multiple className="border p-3 w-full text-black bg-white" onChange={(e) => handleInstructionPhotos(e.target.files)} />
                 {instructionPhotos.length > 0 && (
                   <div className="grid grid-cols-3 gap-2 mt-2">
                     {instructionPhotos.map((photo, i) => (
                       <div key={i} className="relative">
                         <img src={photo} alt="Foto" className="w-full h-24 object-cover rounded" />
-                        <button type="button" onClick={() => setInstructionPhotos((prev) => prev.filter((_, idx) => idx !== i))}
-                          className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 text-xs">✕</button>
+                        <button type="button" onClick={() => setInstructionPhotos((prev) => prev.filter((_, idx) => idx !== i))} className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 text-xs">✕</button>
                       </div>
                     ))}
                   </div>
                 )}
               </div>
             )}
-
             <h3 className="font-bold">{t.workSteps}</h3>
             {instructionTasks.map((task, index) => (
               <div key={index} className="border rounded p-3 space-y-2 bg-gray-50">
-                <input className="border p-3 w-full text-black bg-white" placeholder={`${t.workSteps} ${index + 1}`} value={task}
-                  onChange={(e) => { const copy = [...instructionTasks]; copy[index] = e.target.value; setInstructionTasks(copy); }} />
+                <input className="border p-3 w-full text-black bg-white" placeholder={`${t.workSteps} ${index + 1}`} value={task} onChange={(e) => { const copy = [...instructionTasks]; copy[index] = e.target.value; setInstructionTasks(copy); }} />
                 {companyFeatures?.photos_enabled && (
                   <>
-                    <input type="file" accept="image/*" multiple className="border p-2 w-full text-black bg-white text-sm"
-                      onChange={(e) => handleInstructionTaskPhotos(index, e.target.files)} />
+                    <input type="file" accept="image/*" multiple className="border p-2 w-full text-black bg-white text-sm" onChange={(e) => handleInstructionTaskPhotos(index, e.target.files)} />
                     {(instructionTaskPhotos[index] || []).length > 0 && (
                       <div className="grid grid-cols-3 gap-2">
                         {(instructionTaskPhotos[index] || []).map((photo, pi) => (
                           <div key={pi} className="relative">
                             <img src={photo} alt="Foto" className="w-full h-20 object-cover rounded" />
-                            <button type="button" onClick={() => setInstructionTaskPhotos((prev) => ({
-                              ...prev,
-                              [index]: (prev[index] || []).filter((_, idx) => idx !== pi)
-                            }))} className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 text-xs">✕</button>
+                            <button type="button" onClick={() => setInstructionTaskPhotos((prev) => ({ ...prev, [index]: (prev[index] || []).filter((_, idx) => idx !== pi) }))} className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 text-xs">✕</button>
                           </div>
                         ))}
                       </div>
@@ -2484,29 +2159,21 @@ export default function Home() {
               <button type="button" onClick={saveWorkInstruction} className="bg-blue-700 text-white px-4 py-3 rounded">{t.saveInstruction}</button>
             </div>
           </section>
-
           <section className="border rounded p-4 bg-blue-50 text-black">
             <p className="text-blue-700 text-sm">💡 {t.savedInstructions} → {t.tabDay} / {t.tabWeek} / {t.tabMonth}</p>
           </section>
         </div>
       )}
 
-      {/* ── TAB: Tagesansicht ── */}
       {activeTab === "tag" && (
         <div className="space-y-4">
           <section className="border rounded p-4 bg-white text-black space-y-3">
             <h2 className="text-xl font-bold">{t.dayView}</h2>
-            <input type="date" className="border p-3 rounded text-black bg-white"
-              value={selectedDayDate} onChange={(e) => setSelectedDayDate(e.target.value)} />
+            <input type="date" className="border p-3 rounded text-black bg-white" value={selectedDayDate} onChange={(e) => setSelectedDayDate(e.target.value)} />
           </section>
-
           {(() => {
             const dayInstructions = workInstructions.filter((i) => i.work_date === selectedDayDate);
-            if (dayInstructions.length === 0) return (
-              <section className="border rounded p-4 bg-white text-black">
-                <p className="text-gray-500">{t.noInstructionsDay}</p>
-              </section>
-            );
+            if (dayInstructions.length === 0) return (<section className="border rounded p-4 bg-white text-black"><p className="text-gray-500">{t.noInstructionsDay}</p></section>);
             return dayInstructions.map((instruction) => (
               <section key={instruction.id} className="border rounded p-4 bg-white text-black space-y-2">
                 <div className="flex justify-between items-start">
@@ -2516,53 +2183,33 @@ export default function Home() {
                 <p><strong>{t.project}:</strong> {instruction.project || "-"}</p>
                 <p><strong>{t.customer}:</strong> {instruction.customer || "-"}</p>
                 <p><strong>{t.site}:</strong> {instruction.site || "-"}</p>
-                {instruction.problems_text && (
-                  <div className="bg-yellow-50 border rounded p-2">
-                    <strong>{t.problemsHints}:</strong> {instruction.problems_text}
-                  </div>
-                )}
+                {instruction.problems_text && (<div className="bg-yellow-50 border rounded p-2"><strong>{t.problemsHints}:</strong> {instruction.problems_text}</div>)}
                 {(instruction.photos || []).length > 0 && companyFeatures?.photos_enabled && (
-                  <div className="grid grid-cols-3 gap-2">
-                    {(instruction.photos || []).map((photo: string, i: number) => (
-                      <img key={i} src={photo} alt="Foto" className="w-full h-24 object-cover rounded border" />
-                    ))}
-                  </div>
+                  <div className="grid grid-cols-3 gap-2">{(instruction.photos || []).map((photo: string, i: number) => (<img key={i} src={photo} alt="Foto" className="w-full h-24 object-cover rounded border" />))}</div>
                 )}
                 <ul className="space-y-2 mt-2">
-                  {(instruction.work_instruction_tasks || [])
-                    .sort((a: any, b: any) => a.sort_order - b.sort_order)
-                    .map((task: any) => (
-                      <li key={task.id} className="border rounded p-2 space-y-1">
-                        <div className="flex items-center gap-2">
-                          <select className="border rounded p-1 text-sm text-black bg-white"
-                            value={task.status || "open"}
-                            onChange={(e) => updateTaskStatus(task.id, e.target.value)}>
-                            <option value="open">{t.statusOpen}</option>
-                            <option value="in_progress">{t.statusInProgress}</option>
-                            <option value="stopped">{t.statusStopped}</option>
-                            <option value="completed">{t.statusCompleted}</option>
-                          </select>
-                          <span className="font-medium">{task.task_text}</span>
-                        </div>
-                        {task.note && <p className="text-sm text-gray-600 ml-2">{t.feedbackLabel}: {task.note}</p>}
-                        {(task.photos || []).length > 0 && companyFeatures?.photos_enabled && (
-                          <div className="grid grid-cols-3 gap-1">
-                            {(task.photos || []).map((photo: string, pi: number) => (
-                              <img key={pi} src={photo} alt="Foto" className="w-full h-16 object-cover rounded" />
-                            ))}
-                          </div>
-                        )}
-                      </li>
-                    ))}
+                  {(instruction.work_instruction_tasks || []).sort((a: any, b: any) => a.sort_order - b.sort_order).map((task: any) => (
+                    <li key={task.id} className="border rounded p-2 space-y-1">
+                      <div className="flex items-center gap-2">
+                        <select className="border rounded p-1 text-sm text-black bg-white" value={task.status || "open"} onChange={(e) => updateTaskStatus(task.id, e.target.value)}>
+                          <option value="open">{t.statusOpen}</option>
+                          <option value="in_progress">{t.statusInProgress}</option>
+                          <option value="stopped">{t.statusStopped}</option>
+                          <option value="completed">{t.statusCompleted}</option>
+                        </select>
+                        <span className="font-medium">{task.task_text}</span>
+                      </div>
+                      {task.note && <p className="text-sm text-gray-600 ml-2">{t.feedbackLabel}: {task.note}</p>}
+                      {(task.photos || []).length > 0 && companyFeatures?.photos_enabled && (
+                        <div className="grid grid-cols-3 gap-1">{(task.photos || []).map((photo: string, pi: number) => (<img key={pi} src={photo} alt="Foto" className="w-full h-16 object-cover rounded" />))}</div>
+                      )}
+                    </li>
+                  ))}
                 </ul>
                 <div className="flex gap-2 pt-2 border-t">
-                  {companyFeatures?.module_auto_reports && (
-                    <button type="button" onClick={() => createReportFromInstruction(instruction)}
-                      className="bg-green-700 text-white px-3 py-2 rounded text-sm">📋 {t.toReport}</button>
-                  )}
+                  {companyFeatures?.module_auto_reports && (<button type="button" onClick={() => createReportFromInstruction(instruction)} className="bg-green-700 text-white px-3 py-2 rounded text-sm">📋 {t.toReport}</button>)}
                   {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
-                    <button type="button" onClick={() => deleteWorkInstruction(instruction.id)}
-                      className="bg-red-600 text-white px-3 py-2 rounded text-sm">{t.deleteInstruction}</button>
+                    <button type="button" onClick={() => deleteWorkInstruction(instruction.id)} className="bg-red-600 text-white px-3 py-2 rounded text-sm">{t.deleteInstruction}</button>
                   )}
                 </div>
               </section>
@@ -2571,19 +2218,16 @@ export default function Home() {
         </div>
       )}
 
-      {/* ── TAB: Wochenansicht ── */}
       {activeTab === "woche" && (
         <div className="space-y-4">
           <section className="border rounded p-4 bg-white text-black space-y-3">
             <h2 className="text-xl font-bold">{t.weekView}</h2>
             <div className="flex items-center gap-3">
               <label className="text-sm font-medium">{t.selectDate}:</label>
-              <input type="date" className="border p-3 rounded text-black bg-white"
-                value={selectedWeek} onChange={(e) => setSelectedWeek(e.target.value)} />
+              <input type="date" className="border p-3 rounded text-black bg-white" value={selectedWeek} onChange={(e) => setSelectedWeek(e.target.value)} />
             </div>
             <p className="text-sm text-gray-500">{t.week}: {getCalendarWeek(selectedWeek)}</p>
           </section>
-
           {(() => {
             if (!selectedWeek) return null;
             const [y, m, d] = selectedWeek.split("-").map(Number);
@@ -2591,21 +2235,11 @@ export default function Home() {
             const dayNum = date.getUTCDay() || 7;
             const monday = new Date(date);
             monday.setUTCDate(date.getUTCDate() - dayNum + 1);
-
             const weekDates = Array.from({ length: 7 }, (_, i) => {
-              const nd = new Date(monday);
-              nd.setUTCDate(monday.getUTCDate() + i);
-              return nd.toISOString().split("T")[0];
+              const nd = new Date(monday); nd.setUTCDate(monday.getUTCDate() + i); return nd.toISOString().split("T")[0];
             });
-
             const weekInstructions = workInstructions.filter((i) => weekDates.includes(i.work_date));
-
-            if (weekInstructions.length === 0) return (
-              <section className="border rounded p-4 bg-white text-black">
-                <p className="text-gray-500">{t.noInstructionsWeek}</p>
-              </section>
-            );
-
+            if (weekInstructions.length === 0) return (<section className="border rounded p-4 bg-white text-black"><p className="text-gray-500">{t.noInstructionsWeek}</p></section>);
             return weekDates.map((dateStr, di) => {
               const dayInstructions = weekInstructions.filter((i) => i.work_date === dateStr);
               if (dayInstructions.length === 0) return null;
@@ -2613,45 +2247,27 @@ export default function Home() {
                 <section key={dateStr} className="border rounded p-4 bg-white text-black space-y-3">
                   <div className="flex justify-between items-center bg-gray-100 rounded p-2">
                     <h3 className="font-bold">{t.weekdays[di]} — {dateStr}</h3>
-                    <button type="button" onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }}
-                      className="text-blue-600 text-sm hover:underline">→ {t.dayView}</button>
+                    <button type="button" onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }} className="text-blue-600 text-sm hover:underline">→ {t.dayView}</button>
                   </div>
                   {dayInstructions.map((instruction) => (
                     <div key={instruction.id} className="border rounded p-3 space-y-2">
-                      <div className="flex justify-between">
-                        <strong>{instruction.title}</strong>
-                        <span className="text-sm text-gray-500">{instruction.project || "-"}</span>
-                      </div>
+                      <div className="flex justify-between"><strong>{instruction.title}</strong><span className="text-sm text-gray-500">{instruction.project || "-"}</span></div>
                       <p className="text-sm"><strong>{t.customer}:</strong> {instruction.customer || "-"} | <strong>{t.site}:</strong> {instruction.site || "-"}</p>
-                      {instruction.problems_text && (
-                        <div className="bg-yellow-50 border rounded p-2 text-sm">
-                          <strong>{t.problemsHints}:</strong> {instruction.problems_text}
-                        </div>
-                      )}
+                      {instruction.problems_text && (<div className="bg-yellow-50 border rounded p-2 text-sm"><strong>{t.problemsHints}:</strong> {instruction.problems_text}</div>)}
                       <ul className="space-y-1">
-                        {(instruction.work_instruction_tasks || [])
-                          .sort((a: any, b: any) => a.sort_order - b.sort_order)
-                          .map((task: any) => (
-                            <li key={task.id} className="flex items-center gap-2 text-sm">
-                              <select className="border rounded p-1 text-xs text-black bg-white"
-                                value={task.status || "open"}
-                                onChange={(e) => updateTaskStatus(task.id, e.target.value)}>
-                                <option value="open">{t.statusOpen}</option>
-                                <option value="in_progress">{t.statusInProgress}</option>
-                                <option value="stopped">{t.statusStopped}</option>
-                                <option value="completed">{t.statusCompleted}</option>
-                              </select>
-                              <span>{task.task_text}</span>
-                              {task.note && <span className="text-gray-500">— {task.note}</span>}
-                            </li>
-                          ))}
+                        {(instruction.work_instruction_tasks || []).sort((a: any, b: any) => a.sort_order - b.sort_order).map((task: any) => (
+                          <li key={task.id} className="flex items-center gap-2 text-sm">
+                            <select className="border rounded p-1 text-xs text-black bg-white" value={task.status || "open"} onChange={(e) => updateTaskStatus(task.id, e.target.value)}>
+                              <option value="open">{t.statusOpen}</option>
+                              <option value="in_progress">{t.statusInProgress}</option>
+                              <option value="stopped">{t.statusStopped}</option>
+                              <option value="completed">{t.statusCompleted}</option>
+                            </select>
+                            <span>{task.task_text}</span>{task.note && <span className="text-gray-500">— {task.note}</span>}
+                          </li>
+                        ))}
                       </ul>
-                      <div className="flex gap-2">
-                        {companyFeatures?.module_auto_reports && (
-                          <button type="button" onClick={() => createReportFromInstruction(instruction)}
-                            className="bg-green-700 text-white px-3 py-1 rounded text-sm">📋 {t.toReport}</button>
-                        )}
-                      </div>
+                      {companyFeatures?.module_auto_reports && (<button type="button" onClick={() => createReportFromInstruction(instruction)} className="bg-green-700 text-white px-3 py-1 rounded text-sm">📋 {t.toReport}</button>)}
                     </div>
                   ))}
                 </section>
@@ -2661,37 +2277,26 @@ export default function Home() {
         </div>
       )}
 
-      {/* ── TAB: Monatsansicht ── */}
       {activeTab === "monat" && (
         <div className="space-y-4">
           <section className="border rounded p-4 bg-white text-black space-y-3">
             <h2 className="text-xl font-bold">{t.monthView}</h2>
-            <input type="month" className="border p-3 rounded text-black bg-white"
-              value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} />
+            <input type="month" className="border p-3 rounded text-black bg-white" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} />
           </section>
-
           {(() => {
             const monthInstructions = workInstructions.filter((i) => i.work_date?.startsWith(selectedMonth));
-
-            // Kalender
             const [year, month] = selectedMonth.split("-").map(Number);
             const daysInMonth = new Date(year, month, 0).getDate();
             const firstDay = (new Date(year, month - 1, 1).getDay() + 6) % 7;
             const cells: (number | null)[] = [];
             for (let i = 0; i < firstDay; i++) cells.push(null);
             for (let d = 1; d <= daysInMonth; d++) cells.push(d);
-
             return (
               <>
-                {/* Kalender */}
                 <section className="border rounded p-4 bg-white text-black">
                   <h3 className="font-bold mb-3">{selectedMonth}</h3>
                   <div className="grid grid-cols-7 gap-1 mb-1">
-                    {t.weekdays.map((label) => (
-                      <div key={label} className="text-center text-xs font-bold text-gray-500 py-1">
-                        {label.slice(0, 2)}
-                      </div>
-                    ))}
+                    {t.weekdays.map((label) => (<div key={label} className="text-center text-xs font-bold text-gray-500 py-1">{label.slice(0, 2)}</div>))}
                   </div>
                   <div className="grid grid-cols-7 gap-1">
                     {cells.map((day, i) => {
@@ -2701,39 +2306,25 @@ export default function Home() {
                       const isToday = dateStr === new Date().toISOString().split("T")[0];
                       return (
                         <div key={day} onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }}
-                          className={`border rounded p-1 min-h-14 cursor-pointer hover:border-blue-400 transition-colors ${
-                            isToday ? "border-blue-500 bg-blue-50" : entries.length > 0 ? "bg-green-50 border-green-300" : "bg-white"
-                          }`}>
+                          className={`border rounded p-1 min-h-14 cursor-pointer hover:border-blue-400 transition-colors ${isToday ? "border-blue-500 bg-blue-50" : entries.length > 0 ? "bg-green-50 border-green-300" : "bg-white"}`}>
                           <div className={`text-xs font-bold ${isToday ? "text-blue-600" : "text-gray-700"}`}>{day}</div>
-                          {entries.length > 0 && (
-                            <div className="text-xs text-green-700 font-medium">{entries.length} ✓</div>
-                          )}
-                          {entries[0] && (
-                            <div className="text-xs text-gray-500 truncate">{entries[0].title}</div>
-                          )}
+                          {entries.length > 0 && <div className="text-xs text-green-700 font-medium">{entries.length} ✓</div>}
+                          {entries[0] && <div className="text-xs text-gray-500 truncate">{entries[0].title}</div>}
                         </div>
                       );
                     })}
                   </div>
                 </section>
-
-                {/* Monats-Liste */}
                 <section className="border rounded p-4 bg-white text-black space-y-2">
                   <h3 className="font-bold">{t.workInstructions} ({monthInstructions.length})</h3>
                   {monthInstructions.length === 0 && <p className="text-gray-500">{t.noInstructionsMonth}</p>}
-                  {monthInstructions
-                    .sort((a, b) => (a.work_date || "").localeCompare(b.work_date || ""))
-                    .map((instruction) => (
-                      <div key={instruction.id}
-                        onClick={() => { setSelectedDayDate(instruction.work_date); setActiveTab("tag"); }}
-                        className="border rounded p-3 bg-gray-50 cursor-pointer hover:bg-gray-100 flex justify-between items-center">
-                        <div>
-                          <span className="font-medium">{instruction.title}</span>
-                          <span className="text-gray-500 text-sm ml-2">{instruction.customer || "-"}</span>
-                        </div>
-                        <span className="text-sm text-gray-500">{instruction.work_date}</span>
-                      </div>
-                    ))}
+                  {monthInstructions.sort((a, b) => (a.work_date || "").localeCompare(b.work_date || "")).map((instruction) => (
+                    <div key={instruction.id} onClick={() => { setSelectedDayDate(instruction.work_date); setActiveTab("tag"); }}
+                      className="border rounded p-3 bg-gray-50 cursor-pointer hover:bg-gray-100 flex justify-between items-center">
+                      <div><span className="font-medium">{instruction.title}</span><span className="text-gray-500 text-sm ml-2">{instruction.customer || "-"}</span></div>
+                      <span className="text-sm text-gray-500">{instruction.work_date}</span>
+                    </div>
+                  ))}
                 </section>
               </>
             );
@@ -2741,7 +2332,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* ── TAB: Mitarbeiter ── */}
       {activeTab === "mitarbeiter" && (
         <section className="border rounded p-4 space-y-4 bg-white text-black">
           <h2 className="text-xl font-bold">{t.employeeManagement}</h2>
@@ -2758,9 +2348,7 @@ export default function Home() {
                   {currentCompany?.role === "owner" && <option value="admin">{t.roleAdmin}</option>}
                 </select>
               </div>
-              <button type="button" onClick={addCompanyUser} disabled={creatingEmployee} className="bg-blue-700 text-white px-4 py-3 rounded disabled:opacity-50">
-                {creatingEmployee ? "Wird angelegt..." : t.addEmployee}
-              </button>
+              <button type="button" onClick={addCompanyUser} disabled={creatingEmployee} className="bg-blue-700 text-white px-4 py-3 rounded disabled:opacity-50">{creatingEmployee ? "Wird angelegt..." : t.addEmployee}</button>
               <p className="text-xs text-gray-400">Der Mitarbeiter meldet sich mit seinem Benutzernamen und Passwort an.</p>
             </div>
           )}
@@ -2771,35 +2359,30 @@ export default function Home() {
                 <strong>{member.full_name || "-"}</strong>
                 <p>{member.email || "-"}</p>
                 <p>{t.role}: {member.role}</p>
-                {member.email && (
-                  <button type="button" onClick={() => resetCompanyUserPassword(member.email)} className="bg-gray-700 text-white px-3 py-2 rounded">{t.resetPassword}</button>
-                )}
+                {member.email && (<button type="button" onClick={() => resetCompanyUserPassword(member.email)} className="bg-gray-700 text-white px-3 py-2 rounded">{t.resetPassword}</button>)}
               </div>
             ))}
           </div>
         </section>
       )}
 
-      {/* ── TAB: Firmendaten ── */}
       {activeTab === "firmendaten" && (
         <section className="border rounded p-4 space-y-4 bg-white text-black">
           <h2 className="text-xl font-bold">{t.companyData}</h2>
-          {companySettings?.company_logo && (
-            <img src={companySettings.company_logo} alt="Firmenlogo" className="h-20 object-contain" />
-          )}
+          {companySettings?.company_logo && (<img src={companySettings.company_logo} alt="Firmenlogo" className="h-20 object-contain" />)}
           <div>
             <label className="block text-sm font-medium mb-1">{t.uploadLogo}</label>
             <input type="file" accept="image/*" className="border p-3 w-full text-black bg-white" onChange={(e) => uploadCompanyLogo(e.target.files)} />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <input className="border p-3 text-black bg-white" placeholder={t.companyName}        value={companySettings?.company_name || ""} onChange={(e) => updateCompanyField("company_name", e.target.value)} />
-            <input className="border p-3 text-black bg-white" placeholder={t.street}            value={companySettings?.street || ""}        onChange={(e) => updateCompanyField("street", e.target.value)} />
-            <input className="border p-3 text-black bg-white" placeholder={t.zip}               value={companySettings?.zip_code || ""}      onChange={(e) => updateCompanyField("zip_code", e.target.value)} />
-            <input className="border p-3 text-black bg-white" placeholder={t.city}               value={companySettings?.city || ""}          onChange={(e) => updateCompanyField("city", e.target.value)} />
-            <input className="border p-3 text-black bg-white" placeholder={t.phone}           value={companySettings?.phone || ""}         onChange={(e) => updateCompanyField("phone", e.target.value)} />
-            <input className="border p-3 text-black bg-white" placeholder={t.email}            value={companySettings?.email || ""}         onChange={(e) => updateCompanyField("email", e.target.value)} />
-            <input className="border p-3 text-black bg-white" placeholder={t.website}          value={companySettings?.website || ""}       onChange={(e) => updateCompanyField("website", e.target.value)} />
-            <input className="border p-3 text-black bg-white" placeholder={t.taxNumber} value={companySettings?.tax_number || ""}   onChange={(e) => updateCompanyField("tax_number", e.target.value)} />
+            <input className="border p-3 text-black bg-white" placeholder={t.companyName} value={companySettings?.company_name || ""} onChange={(e) => updateCompanyField("company_name", e.target.value)} />
+            <input className="border p-3 text-black bg-white" placeholder={t.street} value={companySettings?.street || ""} onChange={(e) => updateCompanyField("street", e.target.value)} />
+            <input className="border p-3 text-black bg-white" placeholder={t.zip} value={companySettings?.zip_code || ""} onChange={(e) => updateCompanyField("zip_code", e.target.value)} />
+            <input className="border p-3 text-black bg-white" placeholder={t.city} value={companySettings?.city || ""} onChange={(e) => updateCompanyField("city", e.target.value)} />
+            <input className="border p-3 text-black bg-white" placeholder={t.phone} value={companySettings?.phone || ""} onChange={(e) => updateCompanyField("phone", e.target.value)} />
+            <input className="border p-3 text-black bg-white" placeholder={t.email} value={companySettings?.email || ""} onChange={(e) => updateCompanyField("email", e.target.value)} />
+            <input className="border p-3 text-black bg-white" placeholder={t.website} value={companySettings?.website || ""} onChange={(e) => updateCompanyField("website", e.target.value)} />
+            <input className="border p-3 text-black bg-white" placeholder={t.taxNumber} value={companySettings?.tax_number || ""} onChange={(e) => updateCompanyField("tax_number", e.target.value)} />
           </div>
           <button type="button" onClick={saveCompanySettings} className="bg-blue-700 text-white px-4 py-3 rounded">{t.saveCompany}</button>
         </section>
