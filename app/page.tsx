@@ -1010,17 +1010,23 @@ export default function Home() {
   // FIX 2: loadProjects bekommt companyId als Parameter, damit es nicht auf
   // den noch nicht gesetzten currentCompany-State angewiesen ist
   async function loadCompanyContext(userId: string) {
+    // Schritt 1: company_user laden (ohne Join)
     const { data: companyUser, error } = await supabase
       .from("company_users")
-      .select("company_id, role, companies(id, name)")
+      .select("company_id, role")
       .eq("user_id", userId)
       .single();
 
     if (error) { setMessage("Fehler beim Laden der Firma: " + error.message); return; }
 
-    const companyData = Array.isArray(companyUser.companies)
-      ? companyUser.companies[0]
-      : companyUser.companies;
+    // Schritt 2: company separat laden
+    const { data: companyData, error: companyError } = await supabase
+      .from("companies")
+      .select("id, name")
+      .eq("id", companyUser.company_id)
+      .single();
+
+    if (companyError) { setMessage("Fehler beim Laden der Firmendaten: " + companyError.message); return; }
 
     const company: CurrentCompany = {
       company_id: companyUser.company_id,
