@@ -177,6 +177,12 @@ export default function AdminPage() {
 
   // Neue Firma anlegen
   const [newCompanyName, setNewCompanyName] = useState("");
+  const [newOwnerUsername, setNewOwnerUsername] = useState("");
+  const [newOwnerFullName, setNewOwnerFullName] = useState("");
+  const [newOwnerPassword, setNewOwnerPassword] = useState("");
+  const [newOwnerPackage, setNewOwnerPackage] = useState("starter");
+  const [creatingCompany, setCreatingCompany] = useState(false);
+  const [lastCreatedCredentials, setLastCreatedCredentials] = useState<{username: string, password: string, company: string} | null>(null);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -302,20 +308,60 @@ export default function AdminPage() {
 
   async function createCompany() {
     if (!newCompanyName.trim()) { setMessage("Bitte Firmenname eingeben."); return; }
+    if (!newOwnerUsername.trim()) { setMessage("Bitte Benutzername eingeben."); return; }
+    if (!newOwnerPassword.trim() || newOwnerPassword.length < 6) { setMessage("Passwort muss mindestens 6 Zeichen haben."); return; }
 
-    const { data, error } = await supabase
+    setCreatingCompany(true);
+
+    // 1. Firma anlegen
+    const { data: company, error: companyError } = await supabase
       .from("companies")
       .insert({ name: newCompanyName.trim() })
       .select()
       .single();
 
-    if (error) { setMessage("Fehler: " + error.message); return; }
+    if (companyError) { setMessage("Fehler: " + companyError.message); setCreatingCompany(false); return; }
 
-    // Standard-Features anlegen
-    await supabase.from("company_features").insert(EMPTY_FEATURES(data.id));
+    // 2. Owner per API anlegen
+    const ownerEmail = `${newOwnerUsername.toLowerCase().replace(/\s+/g, ".")}@regie-internal.app`;
+    const res = await fetch("/api/create-employee", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: newOwnerUsername,
+        password: newOwnerPassword,
+        fullName: newOwnerFullName || newOwnerUsername,
+        role: "owner",
+        companyId: company.id,
+        mustChangePassword: true,
+      }),
+    });
+    const ownerData = await res.json();
+    if (ownerData.error) { setMessage("Fehler beim Owner anlegen: " + ownerData.error); setCreatingCompany(false); return; }
+
+    // 3. Features anlegen mit gewähltem Paket
+    const pkg = PACKAGES[newOwnerPackage] || PACKAGES.starter;
+    await supabase.from("company_features").insert({
+      ...EMPTY_FEATURES(company.id),
+      ...pkg.defaults,
+      company_id: company.id,
+      package_name: newOwnerPackage,
+    });
+
+    // Zugangsdaten merken für Anzeige
+    setLastCreatedCredentials({
+      username: newOwnerUsername,
+      password: newOwnerPassword,
+      company: newCompanyName.trim(),
+    });
 
     setNewCompanyName("");
-    setMessage(`✅ Firma "${data.name}" wurde angelegt.`);
+    setNewOwnerUsername("");
+    setNewOwnerFullName("");
+    setNewOwnerPassword("");
+    setNewOwnerPackage("starter");
+    setCreatingCompany(false);
+    setMessage(`✅ Firma "${company.name}" mit Owner wurde angelegt.`);
     await loadCompanies();
   }
 
@@ -389,24 +435,46 @@ export default function AdminPage() {
       )}
 
       {/* Neue Firma anlegen */}
-      <section className="bg-white border rounded-xl p-4 space-y-3">
+      <section className="bg-white border rounded-xl p-4 space-y-4">
         <h2 className="text-lg font-bold">➕ Neue Firma anlegen</h2>
-        <div className="flex gap-3">
-          <input
-            className="border p-3 rounded flex-1"
-            placeholder="Firmenname"
-            value={newCompanyName}
-            onChange={(e) => setNewCompanyName(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter") createCompany(); }}
-          />
-          <button
-            type="button"
-            onClick={createCompany}
-            className="bg-blue-700 text-white px-6 py-3 rounded font-medium"
-          >
-            Anlegen
-          </button>
+        
+        {lastCreatedCredentials && (
+          <div className="bg-green-50 border-2 border-green-500 rounded-xl p-4 space-y-2">
+            <h3 className="font-bold text-green-700">✅ Zugangsdaten für den Kunden:</h3>
+            <p><strong>Firma:</strong> {lastCreatedCredentials.company}</p>
+            <p><strong>Benutzername:</strong> {lastCreatedCredentials.username}</p>
+            <p><strong>Passwort:</strong> {lastCreatedCredentials.password}</p>
+            <p className="text-sm text-orange-600">⚠️ Bitte jetzt notieren — wird nicht mehr angezeigt!</p>
+            <button type="button" onClick={() => setLastCreatedCredentials(null)}
+              className="bg-gray-200 text-gray-700 px-4 py-2 rounded text-sm">Schließen</button>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <input className="border p-3 rounded" placeholder="Firmenname *"
+            value={newCompanyName} onChange={(e) => setNewCompanyName(e.target.value)} />
+          <input className="border p-3 rounded" placeholder="Owner Vollständiger Name"
+            value={newOwnerFullName} onChange={(e) => setNewOwnerFullName(e.target.value)} />
+          <input className="border p-3 rounded" placeholder="Owner Benutzername * (für Login)"
+            value={newOwnerUsername} onChange={(e) => setNewOwnerUsername(e.target.value)} />
+          <input className="border p-3 rounded" placeholder="Owner Temporäres Passwort *" type="password"
+            value={newOwnerPassword} onChange={(e) => setNewOwnerPassword(e.target.value)} />
+          <div className="md:col-span-2">
+            <label className="text-sm font-medium text-gray-600 block mb-1">Paket</label>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              {Object.entries(PACKAGES).map(([key, pkg]) => (
+                <button key={key} type="button" onClick={() => setNewOwnerPackage(key)}
+                  className={`border-2 rounded-lg p-2 text-sm font-medium ${newOwnerPackage === key ? "border-blue-600 bg-blue-50 text-blue-700" : "border-gray-200"}`}>
+                  {pkg.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
+        <button type="button" onClick={createCompany} disabled={creatingCompany}
+          className="bg-blue-700 text-white px-6 py-3 rounded font-medium w-full disabled:opacity-50">
+          {creatingCompany ? "Wird angelegt..." : "➕ Firma + Owner anlegen"}
+        </button>
       </section>
 
       {/* Firmen-Übersicht */}

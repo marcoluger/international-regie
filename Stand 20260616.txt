@@ -903,10 +903,6 @@ export default function Home() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingStep, setOnboardingStep] = useState(1);
   const [onboardingDone, setOnboardingDone] = useState(false);
-  const [mustChangePassword, setMustChangePassword] = useState(false);
-  const [newPassword, setNewPassword] = useState("");
-  const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
-  const [changingPassword, setChangingPassword] = useState(false);
 
   const [user, setUser] = useState<User | null>(null);
   const [email, setEmail] = useState("");
@@ -1060,17 +1056,6 @@ export default function Home() {
     if (featureError) { setMessage("Fehler beim Laden der Module: " + featureError.message); return; }
 
     setCompanyFeatures(features as CompanyFeatures);
-
-    // Passwort-Änderung prüfen
-    const { data: companyUserData } = await supabase
-      .from("company_users")
-      .select("must_change_password")
-      .eq("user_id", userId)
-      .single();
-    if (companyUserData?.must_change_password) {
-      setMustChangePassword(true);
-    }
-
   // NUR Übersetzungs-Zielsprache anpassen, NICHT die App-Sprache
   const allowed = Array.isArray(features.allowed_languages)
     ? features.allowed_languages
@@ -1594,31 +1579,6 @@ export default function Home() {
     setMessage("Regiebericht wurde aus Arbeitsanweisung vorbereitet.");
   }
 
-  async function changePassword() {
-    if (!newPassword.trim() || newPassword.length < 6) {
-      setMessage("Passwort muss mindestens 6 Zeichen haben.");
-      return;
-    }
-    if (newPassword !== newPasswordConfirm) {
-      setMessage("Passwörter stimmen nicht überein.");
-      return;
-    }
-    setChangingPassword(true);
-    const { error } = await supabase.auth.updateUser({ password: newPassword });
-    if (error) { setMessage("Fehler: " + error.message); setChangingPassword(false); return; }
-
-    // must_change_password auf false setzen
-    await supabase.from("company_users")
-      .update({ must_change_password: false })
-      .eq("user_id", user?.id);
-
-    setMustChangePassword(false);
-    setNewPassword("");
-    setNewPasswordConfirm("");
-    setChangingPassword(false);
-    setMessage("Passwort wurde erfolgreich geändert. Willkommen!");
-  }
-
   async function saveOnboarding() {
     if (!user || !companySettings) return;
 
@@ -1890,40 +1850,6 @@ export default function Home() {
             <button type="button" onClick={signUp} className="text-blue-600 underline ml-1">{t.register}</button>
           </p>
         </section>
-      </main>
-    );
-  }
-
-  // ─── Passwort ändern (Pflicht beim ersten Login) ─────────────────────────────
-  if (user && mustChangePassword) {
-    return (
-      <main className="max-w-md mx-auto p-4 md:p-8 min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="bg-white border rounded-xl p-6 space-y-5 w-full shadow-lg">
-          <div className="text-center">
-            <div className="text-5xl mb-3">🔐</div>
-            <h2 className="text-2xl font-bold">Passwort ändern</h2>
-            <p className="text-gray-500 text-sm mt-1">Bitte ändern Sie Ihr temporäres Passwort.</p>
-          </div>
-          {message && <div className="bg-yellow-50 border rounded p-3 text-sm">{message}</div>}
-          <input
-            className="border p-3 w-full rounded text-black"
-            placeholder="Neues Passwort (min. 6 Zeichen)"
-            type="password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-          />
-          <input
-            className="border p-3 w-full rounded text-black"
-            placeholder="Passwort bestätigen"
-            type="password"
-            value={newPasswordConfirm}
-            onChange={(e) => setNewPasswordConfirm(e.target.value)}
-          />
-          <button type="button" onClick={changePassword} disabled={changingPassword}
-            className="w-full bg-blue-700 text-white py-3 rounded font-bold disabled:opacity-50">
-            {changingPassword ? "Wird gespeichert..." : "Passwort speichern & weiter"}
-          </button>
-        </div>
       </main>
     );
   }
