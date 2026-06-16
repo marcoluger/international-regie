@@ -1039,15 +1039,18 @@ export default function Home() {
     const copy = [...days]; copy[dayIndex] = { ...copy[dayIndex], photos: copy[dayIndex].photos.filter((_, index) => index !== photoIndex) }; setDays(copy);
   }
 
-  // ── FIXED: Onboarding nur für Owner ──
+  // ── FIXED: Onboarding nur für Owner, Settings über owner in company_users ──
   async function loadCompanySettings(userId: string) {
     const { data: companyUser } = await supabase.from("company_users").select("company_id, role").eq("user_id", userId).maybeSingle();
     if (!companyUser) return;
-    const { data: company } = await supabase.from("companies").select("owner_user_id").eq("id", companyUser.company_id).single();
-    if (!company) return;
-    const { data, error } = await supabase.from("company_settings").select("*").eq("user_id", company.owner_user_id).single();
+
+    // Owner der Firma finden
+    const { data: ownerUser } = await supabase.from("company_users").select("user_id").eq("company_id", companyUser.company_id).eq("role", "owner").maybeSingle();
+    const ownerUserId = ownerUser?.user_id || userId;
+
+    const { data, error } = await supabase.from("company_settings").select("*").eq("user_id", ownerUserId).single();
     if (error && error.code !== "PGRST116") { setMessage("Fehler beim Laden der Firmendaten: " + error.message); return; }
-    const settings = data || { user_id: company.owner_user_id, company_name: "", company_logo: "", street: "", zip_code: "", city: "", phone: "", email: "", website: "", tax_number: "" };
+    const settings = data || { user_id: ownerUserId, company_name: "", company_logo: "", street: "", zip_code: "", city: "", phone: "", email: "", website: "", tax_number: "" };
     setCompanySettings(settings);
     // Onboarding NUR für Owner anzeigen wenn Firmendaten fehlen
     if ((!data || !data.company_name) && companyUser.role === "owner") {
