@@ -721,120 +721,15 @@ const texts = {
 };
 
 const pdfTexts = {
-  Deutsch: {
-    title: "Wochen-Regiebericht",
-    company: "Elektrotechnik Luger",
-    report: "Bericht",
-    calendarWeek: "Kalenderwoche",
-    employee: "Mitarbeiter",
-    dailyReports: "Tagesberichte",
-    customer: "Kunde",
-    project: "Projekt",
-    site: "Baustelle",
-    hours: "Stunden",
-    description: "Arbeitsbeschreibung",
-    photos: "Fotos",
-    photo: "Foto",
-    summary: "Zusammenfassung",
-    totalHours: "Gesamtstunden",
-    signatureEmployee: "Unterschrift Mitarbeiter",
-    signatureCustomer: "Unterschrift Kunde / Bauleitung",
-    createdAt: "Erstellt am",
-  },
-  Kroatisch: {
-    title: "Tjedni režijski izvještaj",
-    company: "Elektrotechnik Luger",
-    report: "Izvještaj",
-    calendarWeek: "Kalendarski tjedan",
-    employee: "Radnik",
-    dailyReports: "Dnevni izvještaji",
-    customer: "Kupac",
-    project: "Projekt",
-    site: "Gradilište",
-    hours: "Sati",
-    description: "Opis rada",
-    photos: "Fotografije",
-    photo: "Fotografija",
-    summary: "Sažetak",
-    totalHours: "Ukupno sati",
-    signatureEmployee: "Potpis radnika",
-    signatureCustomer: "Potpis kupca / voditelja gradilišta",
-    createdAt: "Izrađeno dana",
-  },
-  Slowenisch: {
-    title: "Tedensko poročilo",
-    company: "Elektrotechnik Luger",
-    report: "Poročilo",
-    calendarWeek: "Koledarski teden",
-    employee: "Zaposleni",
-    dailyReports: "Dnevna poročila",
-    customer: "Stranka",
-    project: "Projekt",
-    site: "Gradbišče",
-    hours: "Ure",
-    description: "Opis dela",
-    photos: "Fotografije",
-    photo: "Fotografija",
-    summary: "Povzetek",
-    totalHours: "Skupno število ur",
-    signatureEmployee: "Podpis zaposlenega",
-    signatureCustomer: "Podpis stranke / vodje gradbišča",
-    createdAt: "Ustvarjeno dne",
-  },
-  Polnisch: {
-    title: "Tygodniowy raport roboczy",
-    company: "Elektrotechnik Luger",
-    report: "Raport",
-    calendarWeek: "Tydzień kalendarzowy",
-    employee: "Pracownik",
-    dailyReports: "Raporty dzienne",
-    customer: "Klient",
-    project: "Projekt",
-    site: "Budowa",
-    hours: "Godziny",
-    description: "Opis pracy",
-    photos: "Zdjęcia",
-    photo: "Zdjęcie",
-    summary: "Podsumowanie",
-    totalHours: "Łączna liczba godzin",
-    signatureEmployee: "Podpis pracownika",
-    signatureCustomer: "Podpis klienta / kierownika budowy",
-    createdAt: "Utworzono dnia",
-  },
-  Englisch: {
-    title: "Weekly Work Report",
-    company: "Elektrotechnik Luger",
-    report: "Report",
-    calendarWeek: "Calendar week",
-    employee: "Employee",
-    dailyReports: "Daily reports",
-    customer: "Customer",
-    project: "Project",
-    site: "Site",
-    hours: "Hours",
-    description: "Work description",
-    photos: "Photos",
-    photo: "Photo",
-    summary: "Summary",
-    totalHours: "Total hours",
-    signatureEmployee: "Employee signature",
-    signatureCustomer: "Customer / Site manager signature",
-    createdAt: "Created on",
-  },
+  Deutsch: { title: "Wochen-Regiebericht", company: "Elektrotechnik Luger", report: "Bericht", calendarWeek: "Kalenderwoche", employee: "Mitarbeiter", dailyReports: "Tagesberichte", customer: "Kunde", project: "Projekt", site: "Baustelle", hours: "Stunden", description: "Arbeitsbeschreibung", photos: "Fotos", photo: "Foto", summary: "Zusammenfassung", totalHours: "Gesamtstunden", signatureEmployee: "Unterschrift Mitarbeiter", signatureCustomer: "Unterschrift Kunde / Bauleitung", createdAt: "Erstellt am" },
+  Kroatisch: { title: "Tjedni režijski izvještaj", company: "Elektrotechnik Luger", report: "Izvještaj", calendarWeek: "Kalendarski tjedan", employee: "Radnik", dailyReports: "Dnevni izvještaji", customer: "Kupac", project: "Projekt", site: "Gradilište", hours: "Sati", description: "Opis rada", photos: "Fotografije", photo: "Fotografija", summary: "Sažetak", totalHours: "Ukupno sati", signatureEmployee: "Potpis radnika", signatureCustomer: "Potpis kupca / voditelja gradilišta", createdAt: "Izrađeno dana" },
+  Slowenisch: { title: "Tedensko poročilo", company: "Elektrotechnik Luger", report: "Poročilo", calendarWeek: "Koledarski teden", employee: "Zaposleni", dailyReports: "Dnevna poročila", customer: "Stranka", project: "Projekt", site: "Gradbišče", hours: "Ure", description: "Opis dela", photos: "Fotografije", photo: "Fotografija", summary: "Povzetek", totalHours: "Skupno število ur", signatureEmployee: "Podpis zaposlenega", signatureCustomer: "Podpis stranke / vodje gradbišča", createdAt: "Ustvarjeno dne" },
+  Polnisch: { title: "Tygodniowy raport roboczy", company: "Elektrotechnik Luger", report: "Raport", calendarWeek: "Tydzień kalendarzowy", employee: "Pracownik", dailyReports: "Raporty dzienne", customer: "Klient", project: "Projekt", site: "Budowa", hours: "Godziny", description: "Opis pracy", photos: "Zdjęcia", photo: "Zdjęcie", summary: "Podsumowanie", totalHours: "Łączna liczba godzin", signatureEmployee: "Podpis pracownika", signatureCustomer: "Podpis klienta / kierownika budowy", createdAt: "Utworzono dnia" },
+  Englisch: { title: "Weekly Work Report", company: "Elektrotechnik Luger", report: "Report", calendarWeek: "Calendar week", employee: "Employee", dailyReports: "Daily reports", customer: "Customer", project: "Project", site: "Site", hours: "Hours", description: "Work description", photos: "Photos", photo: "Photo", summary: "Summary", totalHours: "Total hours", signatureEmployee: "Employee signature", signatureCustomer: "Customer / Site manager signature", createdAt: "Created on" },
 };
 
 function createEmptyDays(): DayEntry[] {
-  return weekdays.map((day) => ({
-    weekday: day,
-    date: "",
-    customer: "",
-    projectNumber: "",
-    site: "",
-    hours: "",
-    description: "",
-    translation: "",
-    photos: [],
-  }));
+  return weekdays.map((day) => ({ weekday: day, date: "", customer: "", projectNumber: "", site: "", hours: "", description: "", translation: "", photos: [] }));
 }
 
 function getCalendarWeek(dateString: string) {
@@ -848,27 +743,9 @@ function getCalendarWeek(dateString: string) {
   return `KW ${weekNumber}`;
 }
 
-function TabButton({
-  label,
-  tabName,
-  activeTab,
-  onClick,
-}: {
-  label: string;
-  tabName: string;
-  activeTab: string;
-  onClick: () => void;
-}) {
+function TabButton({ label, tabName, activeTab, onClick }: { label: string; tabName: string; activeTab: string; onClick: () => void }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`px-4 py-2 rounded font-medium transition-colors ${
-        activeTab === tabName
-          ? "bg-blue-700 text-white"
-          : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-      }`}
-    >
+    <button type="button" onClick={onClick} className={`px-4 py-2 rounded font-medium transition-colors ${activeTab === tabName ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-800 hover:bg-gray-300"}`}>
       {label}
     </button>
   );
@@ -950,15 +827,8 @@ export default function Home() {
       const { data } = await supabase.auth.getUser();
       setUser(data.user);
       if (data.user) {
-        const { data: pwCheck } = await supabase
-          .from("company_users")
-          .select("must_change_password")
-          .eq("user_id", data.user.id)
-          .maybeSingle();
-        if (pwCheck?.must_change_password === true) {
-          setMustChangePassword(true);
-          return;
-        }
+        const { data: pwCheck } = await supabase.from("company_users").select("must_change_password").eq("user_id", data.user.id).maybeSingle();
+        if (pwCheck?.must_change_password === true) { setMustChangePassword(true); return; }
         await loadCompanyContext(data.user.id);
         await loadReportsFromDatabase();
         await loadCompanySettings(data.user.id);
@@ -968,15 +838,8 @@ export default function Home() {
     const { data: authListener } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user || null);
       if (session?.user) {
-        const { data: pwCheck } = await supabase
-          .from("company_users")
-          .select("must_change_password")
-          .eq("user_id", session.user.id)
-          .maybeSingle();
-        if (pwCheck?.must_change_password === true) {
-          setMustChangePassword(true);
-          return;
-        }
+        const { data: pwCheck } = await supabase.from("company_users").select("must_change_password").eq("user_id", session.user.id).maybeSingle();
+        if (pwCheck?.must_change_password === true) { setMustChangePassword(true); return; }
         loadCompanyContext(session.user.id);
         loadReportsFromDatabase();
         loadCompanySettings(session.user.id);
@@ -994,9 +857,7 @@ export default function Home() {
 
   async function signIn() {
     setMessage("");
-    const loginEmail = isUsernameLogin
-      ? `${username.toLowerCase().replace(/\s+/g, ".")}@regie-internal.app`
-      : email;
+    const loginEmail = isUsernameLogin ? `${username.toLowerCase().replace(/\s+/g, ".")}@regie-internal.app` : email;
     const { error } = await supabase.auth.signInWithPassword({ email: loginEmail, password });
     if (error) { setMessage(t.msgLoginFail + error.message); return; }
     setMessage(t.msgLoginOk);
@@ -1004,58 +865,30 @@ export default function Home() {
 
   async function signOut() {
     await supabase.auth.signOut();
-    setUser(null);
-    newReport();
-    setSavedReports([]);
-    setMessage(t.msgLogout);
+    setUser(null); newReport(); setSavedReports([]); setMessage(t.msgLogout);
   }
 
   async function loadCompanyContext(userId: string) {
-    const { data: companyUser, error } = await supabase
-      .from("company_users")
-      .select("company_id, role")
-      .eq("user_id", userId)
-      .maybeSingle();
+    const { data: companyUser, error } = await supabase.from("company_users").select("company_id, role").eq("user_id", userId).maybeSingle();
     if (error) { setMessage("Fehler beim Laden der Firma: " + error.message); return; }
     if (!companyUser) { setShowOnboarding(true); return; }
-    const { data: companyData, error: companyError } = await supabase
-      .from("companies")
-      .select("id, name")
-      .eq("id", companyUser.company_id)
-      .single();
+    const { data: companyData, error: companyError } = await supabase.from("companies").select("id, name").eq("id", companyUser.company_id).single();
     if (companyError) { setMessage("Fehler beim Laden der Firmendaten: " + companyError.message); return; }
-    const company: CurrentCompany = {
-      company_id: companyUser.company_id,
-      role: companyUser.role,
-      companies: { id: companyData.id, name: companyData.name },
-    };
+    const company: CurrentCompany = { company_id: companyUser.company_id, role: companyUser.role, companies: { id: companyData.id, name: companyData.name } };
     setCurrentCompany(company);
-    const { data: features, error: featureError } = await supabase
-      .from("company_features")
-      .select("*")
-      .eq("company_id", companyUser.company_id)
-      .single();
+    const { data: features, error: featureError } = await supabase.from("company_features").select("*").eq("company_id", companyUser.company_id).single();
     if (featureError) { setMessage("Fehler beim Laden der Module: " + featureError.message); return; }
     setCompanyFeatures(features as CompanyFeatures);
-    const allowed = Array.isArray(features.allowed_languages)
-      ? features.allowed_languages
-      : (typeof features.allowed_languages === "string" ? JSON.parse(features.allowed_languages) : []);
+    const allowed = Array.isArray(features.allowed_languages) ? features.allowed_languages : (typeof features.allowed_languages === "string" ? JSON.parse(features.allowed_languages) : []);
     const firstTarget = allowed.filter((l: string) => l !== "Deutsch")[0];
-    if (firstTarget) {
-      setInstructionToLanguage(firstTarget);
-      setToLanguage(firstTarget);
-    }
+    if (firstTarget) { setInstructionToLanguage(firstTarget); setToLanguage(firstTarget); }
     await loadCompanyUsers(companyUser.company_id);
     await loadWorkInstructions(companyUser.company_id);
     await loadProjects(companyUser.company_id);
   }
 
   async function loadWorkInstructions(companyId: string) {
-    const { data, error } = await supabase
-      .from("work_instructions")
-      .select(`*, work_instruction_tasks (*)`)
-      .eq("company_id", companyId)
-      .order("created_at", { ascending: false });
+    const { data, error } = await supabase.from("work_instructions").select(`*, work_instruction_tasks (*)`).eq("company_id", companyId).order("created_at", { ascending: false });
     if (error) { setMessage("Fehler beim Laden der Arbeitsanweisungen: " + error.message); return; }
     setWorkInstructions(data || []);
   }
@@ -1068,33 +901,16 @@ export default function Home() {
   }
 
   async function loadCompanyUsers(companyId: string) {
-    const { data, error } = await supabase
-      .from("company_users")
-      .select("*")
-      .eq("company_id", companyId)
-      .order("created_at", { ascending: true });
+    const { data, error } = await supabase.from("company_users").select("*").eq("company_id", companyId).order("created_at", { ascending: true });
     if (error) { setMessage("Fehler beim Laden der Mitarbeiter: " + error.message); return; }
     setCompanyUsers(data || []);
   }
 
   async function addCompanyUser() {
     if (!currentCompany) return;
-    if (!newUserName.trim() || !newUserUsername.trim() || !newUserPassword.trim()) {
-      setMessage("Bitte alle Pflichtfelder ausfüllen.");
-      return;
-    }
+    if (!newUserName.trim() || !newUserUsername.trim() || !newUserPassword.trim()) { setMessage("Bitte alle Pflichtfelder ausfüllen."); return; }
     setCreatingEmployee(true);
-    const res = await fetch("/api/create-employee", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        username: newUserUsername,
-        password: newUserPassword,
-        fullName: newUserName,
-        role: newUserRole,
-        companyId: currentCompany.company_id,
-      }),
-    });
+    const res = await fetch("/api/create-employee", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: newUserUsername, password: newUserPassword, fullName: newUserName, role: newUserRole, companyId: currentCompany.company_id }) });
     const data = await res.json();
     setCreatingEmployee(false);
     if (data.error) { setMessage("Fehler: " + data.error); return; }
@@ -1105,9 +921,7 @@ export default function Home() {
 
   async function resetCompanyUserPassword(memberEmail: string) {
     if (!memberEmail) { setMessage("Keine E-Mail-Adresse vorhanden."); return; }
-    const { error } = await supabase.auth.resetPasswordForEmail(memberEmail, {
-      redirectTo: "https://international-regie.vercel.app",
-    });
+    const { error } = await supabase.auth.resetPasswordForEmail(memberEmail, { redirectTo: "https://international-regie.vercel.app" });
     if (error) { setMessage("Fehler beim Passwort-Reset: " + error.message); return; }
     setMessage(t.msgPasswordReset);
   }
@@ -1119,9 +933,7 @@ export default function Home() {
   }
 
   function updateDay(index: number, field: keyof DayEntry, value: string) {
-    const copy = [...days];
-    copy[index] = { ...copy[index], [field]: value };
-    setDays(copy);
+    const copy = [...days]; copy[index] = { ...copy[index], [field]: value }; setDays(copy);
   }
 
   async function handleInstructionPhotos(files: FileList | null) {
@@ -1154,10 +966,7 @@ export default function Home() {
       const { data } = supabase.storage.from("report-photos").getPublicUrl(filePath);
       uploaded.push(data.publicUrl);
     }
-    setInstructionTaskPhotos((prev) => ({
-      ...prev,
-      [taskIndex]: [...(prev[taskIndex] || []), ...uploaded],
-    }));
+    setInstructionTaskPhotos((prev) => ({ ...prev, [taskIndex]: [...(prev[taskIndex] || []), ...uploaded] }));
     setMessage(t.msgPhotoOk);
   }
 
@@ -1165,39 +974,14 @@ export default function Home() {
     setMessage(t.msgSaving);
     if (!currentCompany) { setMessage(t.msgNoFirm); return; }
     if (!instructionTitle.trim()) { setMessage(t.msgNoTitle); return; }
-    const { data: instruction, error } = await supabase
-      .from("work_instructions")
-      .insert({
-        company_id: currentCompany.company_id,
-        project_id: selectedProjectId || null,
-        work_date: instructionDate || null,
-        created_by: user?.id,
-        title: instructionTitle,
-        project: instructionProject,
-        customer: instructionCustomer,
-        site: instructionSite,
-        description: instructionDescription,
-        problems_text: instructionProblems,
-        photos: instructionPhotos,
-      })
-      .select()
-      .single();
+    const { data: instruction, error } = await supabase.from("work_instructions").insert({ company_id: currentCompany.company_id, project_id: selectedProjectId || null, work_date: instructionDate || null, created_by: user?.id, title: instructionTitle, project: instructionProject, customer: instructionCustomer, site: instructionSite, description: instructionDescription, problems_text: instructionProblems, photos: instructionPhotos }).select().single();
     if (error) { setMessage("Fehler: " + error.message); return; }
-    const taskRows = instructionTasks
-      .filter((task) => task.trim() !== "")
-      .map((task, index) => ({
-        work_instruction_id: instruction.id,
-        task_text: task,
-        sort_order: index,
-        photos: instructionTaskPhotos[index] || [],
-      }));
+    const taskRows = instructionTasks.filter((task) => task.trim() !== "").map((task, index) => ({ work_instruction_id: instruction.id, task_text: task, sort_order: index, photos: instructionTaskPhotos[index] || [] }));
     if (taskRows.length > 0) {
       const { error: taskError } = await supabase.from("work_instruction_tasks").insert(taskRows);
       if (taskError) { setMessage("Arbeitsanweisung gespeichert, aber Schritte nicht: " + taskError.message); return; }
     }
-    setInstructionTitle(""); setInstructionProject(""); setInstructionCustomer("");
-    setInstructionSite(""); setInstructionDescription(""); setInstructionTasks([""]); setInstructionProblems("");
-    setInstructionPhotos([]); setInstructionTaskPhotos({});
+    setInstructionTitle(""); setInstructionProject(""); setInstructionCustomer(""); setInstructionSite(""); setInstructionDescription(""); setInstructionTasks([""]); setInstructionProblems(""); setInstructionPhotos([]); setInstructionTaskPhotos({});
     await loadWorkInstructions(currentCompany.company_id);
     setMessage(t.msgInstructionSaved);
   }
@@ -1228,12 +1012,8 @@ export default function Home() {
     setMessage("Notiz wurde gespeichert.");
   }
 
-  function parseHours(value: string) {
-    return Number(value.replace(",", ".")) || 0;
-  }
-
+  function parseHours(value: string) { return Number(value.replace(",", ".")) || 0; }
   const totalHours = days.reduce((sum, day) => sum + parseHours(day.hours), 0);
-
   const projectTotals = days.reduce<Record<string, number>>((acc, day) => {
     if (!day.projectNumber) return acc;
     acc[day.projectNumber] = (acc[day.projectNumber] || 0) + parseHours(day.hours);
@@ -1250,28 +1030,27 @@ export default function Home() {
       const { error } = await supabase.storage.from("report-photos").upload(filePath, file);
       if (error) { setMessage(t.msgPhotoErr + error.message); return; }
       const { data } = supabase.storage.from("report-photos").getPublicUrl(filePath);
-      const copy = [...days];
-      copy[index] = { ...copy[index], photos: [...copy[index].photos, data.publicUrl] };
-      setDays(copy);
+      const copy = [...days]; copy[index] = { ...copy[index], photos: [...copy[index].photos, data.publicUrl] }; setDays(copy);
     }
     setMessage(t.msgPhotoOk);
   }
 
   function deletePhoto(dayIndex: number, photoIndex: number) {
-    const copy = [...days];
-    copy[dayIndex] = { ...copy[dayIndex], photos: copy[dayIndex].photos.filter((_, index) => index !== photoIndex) };
-    setDays(copy);
+    const copy = [...days]; copy[dayIndex] = { ...copy[dayIndex], photos: copy[dayIndex].photos.filter((_, index) => index !== photoIndex) }; setDays(copy);
   }
 
+  // ── FIXED: Onboarding nur für Owner ──
   async function loadCompanySettings(userId: string) {
-    const { data, error } = await supabase.from("company_settings").select("*").eq("user_id", userId).single();
+    const { data: companyUser } = await supabase.from("company_users").select("company_id, role").eq("user_id", userId).maybeSingle();
+    if (!companyUser) return;
+    const { data: company } = await supabase.from("companies").select("owner_user_id").eq("id", companyUser.company_id).single();
+    if (!company) return;
+    const { data, error } = await supabase.from("company_settings").select("*").eq("user_id", company.owner_user_id).single();
     if (error && error.code !== "PGRST116") { setMessage("Fehler beim Laden der Firmendaten: " + error.message); return; }
-    const settings = data || {
-      user_id: userId, company_name: "", company_logo: "",
-      street: "", zip_code: "", city: "", phone: "", email: "", website: "", tax_number: "",
-    };
+    const settings = data || { user_id: company.owner_user_id, company_name: "", company_logo: "", street: "", zip_code: "", city: "", phone: "", email: "", website: "", tax_number: "" };
     setCompanySettings(settings);
-    if (!data || !data.company_name) {
+    // Onboarding NUR für Owner anzeigen wenn Firmendaten fehlen
+    if ((!data || !data.company_name) && companyUser.role === "owner") {
       setShowOnboarding(true);
     }
   }
@@ -1285,12 +1064,7 @@ export default function Home() {
 
   function updateCompanyField(field: keyof CompanySettings, value: string) {
     if (!user) return;
-    setCompanySettings((current) => ({
-      user_id: user.id,
-      company_name: current?.company_name || "Elektrotechnik Luger",
-      ...current,
-      [field]: value,
-    }));
+    setCompanySettings((current) => ({ user_id: user.id, company_name: current?.company_name || "", ...current, [field]: value }));
   }
 
   async function uploadCompanyLogo(files: FileList | null) {
@@ -1310,10 +1084,7 @@ export default function Home() {
     setMessage("");
     if (!user) { setMessage("Bitte zuerst anmelden."); return; }
     const name = reportName.trim() || `${calendarWeek || "Woche"} - ${employee || "Bericht"}`;
-    const reportData = {
-      report_name: name, employee, from_language: fromLanguage, to_language: toLanguage,
-      pdf_language: pdfLanguage, days, user_id: user.id, project_id: selectedProjectId || null,
-    };
+    const reportData = { report_name: name, employee, from_language: fromLanguage, to_language: toLanguage, pdf_language: pdfLanguage, days, user_id: user.id, project_id: selectedProjectId || null };
     let error;
     if (currentReportId) {
       ({ error } = await supabase.from("reports").update(reportData).eq("id", currentReportId));
@@ -1329,50 +1100,38 @@ export default function Home() {
   }
 
   function loadReport(report: SavedReport) {
-    setCurrentReportId(report.id);
-    setReportName(report.report_name);
-    setEmployee(report.employee || "");
-    setFromLanguage(report.from_language || "Deutsch");
-    setToLanguage(report.to_language || "Polnisch");
-    setPdfLanguage(report.pdf_language || "Deutsch");
-    setDays(report.days || createEmptyDays());
-    setMessage(t.msgLoaded);
-    setActiveTab("regiebericht");
+    setCurrentReportId(report.id); setReportName(report.report_name); setEmployee(report.employee || "");
+    setFromLanguage(report.from_language || "Deutsch"); setToLanguage(report.to_language || "Polnisch");
+    setPdfLanguage(report.pdf_language || "Deutsch"); setDays(report.days || createEmptyDays());
+    setMessage(t.msgLoaded); setActiveTab("regiebericht");
   }
 
   async function deleteReport(id: string) {
     const { error } = await supabase.from("reports").delete().eq("id", id);
     if (error) { setMessage("Fehler beim Löschen: " + error.message); return; }
     if (currentReportId === id) newReport();
-    setMessage(t.msgDeleted);
-    await loadReportsFromDatabase();
+    setMessage(t.msgDeleted); await loadReportsFromDatabase();
   }
 
   function newReport() {
     setCurrentReportId(null); setReportName(""); setEmployee(""); setEmailTo("");
-    setFromLanguage("Deutsch"); setToLanguage("Polnisch"); setPdfLanguage("Deutsch");
-    setDays(createEmptyDays());
+    setFromLanguage("Deutsch"); setToLanguage("Polnisch"); setPdfLanguage("Deutsch"); setDays(createEmptyDays());
   }
 
   async function loadProjects(companyId?: string) {
     const id = companyId ?? currentCompany?.company_id;
     if (!id) return;
-    const { data, error } = await supabase
-      .from("projects").select("*").eq("company_id", id).order("created_at", { ascending: false });
+    const { data, error } = await supabase.from("projects").select("*").eq("company_id", id).order("created_at", { ascending: false });
     if (error) { setMessage("Fehler beim Laden der Projekte: " + error.message); return; }
     setProjects(data || []);
   }
 
   async function saveProject() {
     if (!currentCompany) return;
-    const { error } = await supabase.from("projects").insert({
-      company_id: currentCompany.company_id,
-      name: projectName, customer: projectCustomer, site: projectSite, project_manager: projectManager,
-    });
+    const { error } = await supabase.from("projects").insert({ company_id: currentCompany.company_id, name: projectName, customer: projectCustomer, site: projectSite, project_manager: projectManager });
     if (error) { setMessage("Fehler beim Speichern: " + error.message); return; }
     setProjectName(""); setProjectCustomer(""); setProjectSite(""); setProjectManager("");
-    await loadProjects();
-    setMessage(t.msgProjectSaved);
+    await loadProjects(); setMessage(t.msgProjectSaved);
   }
 
   async function deleteProject(id: string) {
@@ -1380,8 +1139,7 @@ export default function Home() {
     const { error } = await supabase.from("projects").delete().eq("id", id);
     if (error) { setMessage("Fehler beim Löschen des Projekts: " + error.message); return; }
     if (selectedProjectDetailId === id) setSelectedProjectDetailId("");
-    await loadProjects();
-    setMessage(t.msgProjectDeleted);
+    await loadProjects(); setMessage(t.msgProjectDeleted);
   }
 
   async function updateTaskStatus(taskId: string, status: string) {
@@ -1399,87 +1157,50 @@ export default function Home() {
       for (let i = 0; i < translatedDays.length; i++) {
         const day = translatedDays[i];
         if (!day.description.trim()) continue;
-        const res = await fetch("/api/translate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ hours: day.hours, description: day.description, fromLanguage, toLanguage }),
-        });
+        const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ hours: day.hours, description: day.description, fromLanguage, toLanguage }) });
         const data = await res.json();
         translatedDays[i].translation = data.error ? data.error : data.translation;
       }
-      setDays(translatedDays);
-      setMessage(t.msgTranslated);
-    } catch (error) {
-      setMessage(t.msgTranslateErr + String(error));
-    }
+      setDays(translatedDays); setMessage(t.msgTranslated);
+    } catch (error) { setMessage(t.msgTranslateErr + String(error)); }
     setLoading(false);
   }
 
   async function translateInstruction(instruction: any) {
-    setTranslatingInstructionId(instruction.id);
-    setMessage("");
+    setTranslatingInstructionId(instruction.id); setMessage("");
     try {
-      const textsToTranslate = [
-        { key: "title", text: instruction.title || "" },
-        { key: "problems_text", text: instruction.problems_text || "" },
-        { key: "description", text: instruction.description || "" },
-      ];
+      const textsToTranslate = [{ key: "title", text: instruction.title || "" }, { key: "problems_text", text: instruction.problems_text || "" }, { key: "description", text: instruction.description || "" }];
       const translatedFields: Record<string, string> = {};
       for (const item of textsToTranslate) {
         if (!item.text.trim()) continue;
-        const res = await fetch("/api/translate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ description: item.text, fromLanguage: "Deutsch", toLanguage: instructionToLanguage }),
-        });
+        const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: item.text, fromLanguage: "Deutsch", toLanguage: instructionToLanguage }) });
         const data = await res.json();
         translatedFields[item.key] = data.error ? item.text : data.translation;
       }
       const translatedTasks: Record<string, string> = {};
       for (const task of instruction.work_instruction_tasks || []) {
         if (!task.task_text?.trim()) continue;
-        const res = await fetch("/api/translate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ description: task.task_text, fromLanguage: "Deutsch", toLanguage: instructionToLanguage }),
-        });
+        const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: task.task_text, fromLanguage: "Deutsch", toLanguage: instructionToLanguage }) });
         const data = await res.json();
         translatedTasks[task.id] = data.error ? task.task_text : data.translation;
         if (task.note?.trim()) {
-          const resNote = await fetch("/api/translate", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ description: task.note, fromLanguage: "Deutsch", toLanguage: instructionToLanguage }),
-          });
+          const resNote = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: task.note, fromLanguage: "Deutsch", toLanguage: instructionToLanguage }) });
           const dataNote = await resNote.json();
           translatedTasks[`note_${task.id}`] = dataNote.error ? task.note : dataNote.translation;
         }
       }
-      setInstructionTranslations((prev) => ({
-        ...prev,
-        [instruction.id]: { ...translatedFields, tasks: translatedTasks, language: instructionToLanguage },
-      }));
+      setInstructionTranslations((prev) => ({ ...prev, [instruction.id]: { ...translatedFields, tasks: translatedTasks, language: instructionToLanguage } }));
       setMessage(t.msgInstructionTranslated);
-    } catch (err) {
-      setMessage(t.msgTranslateErr + String(err));
-    }
+    } catch (err) { setMessage(t.msgTranslateErr + String(err)); }
     setTranslatingInstructionId(null);
   }
 
   function createReportFromInstruction(instruction: any) {
     const completedTasks = (instruction.work_instruction_tasks || []).map((task: any) => {
-      const statusText =
-        task.status === "completed" ? "✅ Erledigt"
-        : task.status === "in_progress" ? "🟡 In Arbeit"
-        : task.status === "stopped" ? "⛔ Gestoppt"
-        : "⬜ Offen";
+      const statusText = task.status === "completed" ? "✅ Erledigt" : task.status === "in_progress" ? "🟡 In Arbeit" : task.status === "stopped" ? "⛔ Gestoppt" : "⬜ Offen";
       return [`${statusText}: ${task.task_text}`, task.note ? `Rückmeldung: ${task.note}` : ""].filter(Boolean).join("\n");
     });
-    const description = [
-      ...completedTasks,
-      instruction.problems_text ? "Probleme / Hinweise: " + instruction.problems_text : "",
-      instruction.employee_note ? "Rückmeldung Mitarbeiter: " + instruction.employee_note : "",
-    ].filter(Boolean).join("\n");
+    const description = [...completedTasks, instruction.problems_text ? "Probleme / Hinweise: " + instruction.problems_text : "", instruction.employee_note ? "Rückmeldung Mitarbeiter: " + instruction.employee_note : ""].filter(Boolean).join("\n");
     const copy = [...days];
     const targetDate = instruction.work_date || "";
     if (targetDate) {
@@ -1488,119 +1209,47 @@ export default function Home() {
       const dayNumber = selectedDate.getUTCDay() || 7;
       const monday = new Date(selectedDate);
       monday.setUTCDate(selectedDate.getUTCDate() - dayNumber + 1);
-      for (let i = 0; i < 7; i++) {
-        const nextDate = new Date(monday);
-        nextDate.setUTCDate(monday.getUTCDate() + i);
-        copy[i] = { ...copy[i], date: nextDate.toISOString().split("T")[0] };
-      }
+      for (let i = 0; i < 7; i++) { const nextDate = new Date(monday); nextDate.setUTCDate(monday.getUTCDate() + i); copy[i] = { ...copy[i], date: nextDate.toISOString().split("T")[0] }; }
     }
     const targetIndex = targetDate ? copy.findIndex((day) => day.date === targetDate) : 0;
     const indexToUse = targetIndex >= 0 ? targetIndex : 0;
-    copy[indexToUse] = {
-      ...copy[indexToUse],
-      customer: instruction.customer || "",
-      projectNumber: instruction.project || "",
-      site: instruction.site || "",
-      description,
-      photos: [],
-    };
-    setDays(copy);
-    setActiveTab("regiebericht");
-    setMessage("Regiebericht wurde aus Arbeitsanweisung vorbereitet.");
+    copy[indexToUse] = { ...copy[indexToUse], customer: instruction.customer || "", projectNumber: instruction.project || "", site: instruction.site || "", description, photos: [] };
+    setDays(copy); setActiveTab("regiebericht"); setMessage("Regiebericht wurde aus Arbeitsanweisung vorbereitet.");
   }
 
   // ── FIXED: kein window.location.reload() ──
   async function changePassword() {
-    if (!newPassword.trim() || newPassword.length < 6) {
-      setMessage("Passwort muss mindestens 6 Zeichen haben.");
-      return;
-    }
-    if (newPassword !== newPasswordConfirm) {
-      setMessage("Passwörter stimmen nicht überein.");
-      return;
-    }
-    setChangingPassword(true);
-    setMessage("Speichere...");
+    if (!newPassword.trim() || newPassword.length < 6) { setMessage("Passwort muss mindestens 6 Zeichen haben."); return; }
+    if (newPassword !== newPasswordConfirm) { setMessage("Passwörter stimmen nicht überein."); return; }
+    setChangingPassword(true); setMessage("Speichere...");
     try {
-      // Schritt 1: Passwort per API ändern
-      const res = await fetch("/api/change-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user?.id, newPassword }),
-      });
+      const res = await fetch("/api/change-password", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId: user?.id, newPassword }) });
       const data = await res.json();
-      if (data.error) {
-        setMessage("Fehler: " + data.error);
-        setChangingPassword(false);
-        return;
-      }
-      // Schritt 2: Flag in DB zurücksetzen
-      const { error: dbError } = await supabase
-        .from("company_users")
-        .update({ must_change_password: false })
-        .eq("user_id", user?.id);
-      if (dbError) {
-        setMessage("DB Fehler: " + dbError.message);
-        setChangingPassword(false);
-        return;
-      }
-      // Schritt 3: Neu einloggen damit Session aktiv bleibt
-      if (user?.email) {
-        await supabase.auth.signInWithPassword({ email: user.email, password: newPassword });
-      }
-      // Schritt 4: State direkt setzen – kein reload nötig
-      setMustChangePassword(false);
-      setNewPassword("");
-      setNewPasswordConfirm("");
-      setMessage("✅ Passwort geändert!");
-      // Schritt 5: App-Daten nachladen
-      if (user?.id) {
-        await loadCompanyContext(user.id);
-        await loadReportsFromDatabase();
-        await loadCompanySettings(user.id);
-      }
-    } catch (err) {
-      setMessage("Unbekannter Fehler: " + String(err));
-      setChangingPassword(false);
-    }
+      if (data.error) { setMessage("Fehler: " + data.error); setChangingPassword(false); return; }
+      const { error: dbError } = await supabase.from("company_users").update({ must_change_password: false }).eq("user_id", user?.id);
+      if (dbError) { setMessage("DB Fehler: " + dbError.message); setChangingPassword(false); return; }
+      if (user?.email) { await supabase.auth.signInWithPassword({ email: user.email, password: newPassword }); }
+      setMustChangePassword(false); setNewPassword(""); setNewPasswordConfirm(""); setMessage("✅ Passwort geändert!");
+      if (user?.id) { await loadCompanyContext(user.id); await loadReportsFromDatabase(); await loadCompanySettings(user.id); }
+    } catch (err) { setMessage("Unbekannter Fehler: " + String(err)); setChangingPassword(false); }
   }
 
   async function saveOnboarding() {
     if (!user || !companySettings) return;
-    const { data: existingUser } = await supabase
-      .from("company_users")
-      .select("company_id")
-      .eq("user_id", user.id)
-      .maybeSingle();
+    const { data: existingUser } = await supabase.from("company_users").select("company_id").eq("user_id", user.id).maybeSingle();
     let companyId = existingUser?.company_id;
     if (!companyId) {
-      const { data: newCompany, error: companyError } = await supabase
-        .from("companies")
-        .insert({ name: companySettings.company_name || "Meine Firma", owner_user_id: user.id, status: "active" })
-        .select()
-        .single();
+      const { data: newCompany, error: companyError } = await supabase.from("companies").insert({ name: companySettings.company_name || "Meine Firma", owner_user_id: user.id, status: "active" }).select().single();
       if (companyError) { setMessage("Fehler beim Anlegen der Firma: " + companyError.message); return; }
       companyId = newCompany.id;
-      const { error: userError } = await supabase.from("company_users").insert({
-        company_id: companyId, user_id: user.id, email: user.email,
-        full_name: companySettings.company_name, role: "owner",
-      });
+      const { error: userError } = await supabase.from("company_users").insert({ company_id: companyId, user_id: user.id, email: user.email, full_name: companySettings.company_name, role: "owner" });
       if (userError) { setMessage("Fehler beim Anlegen des Benutzers: " + userError.message); return; }
-      await supabase.from("company_features").insert({
-        company_id: companyId, package_name: "starter", max_employees: 5,
-        module_reports: true, module_work_orders: false, module_auto_reports: false,
-        photos_enabled: false, email_enabled: false, signature_enabled: false,
-        ai_enabled: false, allowed_languages: ["Deutsch"],
-      });
+      await supabase.from("company_features").insert({ company_id: companyId, package_name: "starter", max_employees: 5, module_reports: true, module_work_orders: false, module_auto_reports: false, photos_enabled: false, email_enabled: false, signature_enabled: false, ai_enabled: false, allowed_languages: ["Deutsch"] });
     }
-    const { error } = await supabase.from("company_settings").upsert(
-      { ...companySettings, user_id: user.id }, { onConflict: "user_id" }
-    );
+    const { error } = await supabase.from("company_settings").upsert({ ...companySettings, user_id: user.id }, { onConflict: "user_id" });
     if (error) { setMessage("Fehler beim Speichern: " + error.message); return; }
     await loadCompanyContext(user.id);
-    setShowOnboarding(false);
-    setOnboardingDone(true);
-    setMessage("Willkommen! Ihre Firmendaten wurden gespeichert.");
+    setShowOnboarding(false); setOnboardingDone(true); setMessage("Willkommen! Ihre Firmendaten wurden gespeichert.");
   }
 
   async function createPDF(sendByEmail = false) {
@@ -1608,19 +1257,11 @@ export default function Home() {
     const doc = new jsPDF("p", "mm", "a4");
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
-    const marginLeft = 15;
-    const marginRight = 15;
+    const marginLeft = 15; const marginRight = 15;
     const contentWidth = pageWidth - marginLeft - marginRight;
     let y = 15;
-    const addFooter = () => {
-      doc.setFontSize(8); doc.setTextColor(120);
-      doc.text(p.company, marginLeft, pageHeight - 10);
-      doc.text(`${p.createdAt}: ${new Date().toLocaleDateString("de-DE")}`, pageWidth - marginRight, pageHeight - 10, { align: "right" });
-      doc.setTextColor(0);
-    };
-    const addNewPageIfNeeded = (neededHeight: number) => {
-      if (y + neededHeight > pageHeight - 25) { addFooter(); doc.addPage(); y = 15; }
-    };
+    const addFooter = () => { doc.setFontSize(8); doc.setTextColor(120); doc.text(p.company, marginLeft, pageHeight - 10); doc.text(`${p.createdAt}: ${new Date().toLocaleDateString("de-DE")}`, pageWidth - marginRight, pageHeight - 10, { align: "right" }); doc.setTextColor(0); };
+    const addNewPageIfNeeded = (neededHeight: number) => { if (y + neededHeight > pageHeight - 25) { addFooter(); doc.addPage(); y = 15; } };
     const qrText = `${p.title} ${calendarWeek || ""} - ${employee}`;
     const qrImage = await QRCode.toDataURL(qrText);
     let logoBase64 = "";
@@ -1628,25 +1269,15 @@ export default function Home() {
       try {
         const response = await fetch(companySettings.company_logo);
         const blob = await response.blob();
-        logoBase64 = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result as string);
-          reader.onerror = reject;
-          reader.readAsDataURL(blob);
-        });
+        logoBase64 = await new Promise<string>((resolve, reject) => { const reader = new FileReader(); reader.onloadend = () => resolve(reader.result as string); reader.onerror = reject; reader.readAsDataURL(blob); });
       } catch (error) { console.error("Logo konnte nicht geladen werden:", error); }
     }
-    doc.setFillColor(240, 240, 240);
-    doc.rect(0, 0, pageWidth, 70, "F");
-    doc.setFontSize(20); doc.setFont("helvetica", "bold");
-    doc.text(p.title, marginLeft, y);
-    doc.setFontSize(11); doc.setFont("helvetica", "normal");
-    y += 8;
+    doc.setFillColor(240, 240, 240); doc.rect(0, 0, pageWidth, 70, "F");
+    doc.setFontSize(20); doc.setFont("helvetica", "bold"); doc.text(p.title, marginLeft, y);
+    doc.setFontSize(11); doc.setFont("helvetica", "normal"); y += 8;
     doc.text(companySettings?.company_name || "Elektrotechnik Luger", marginLeft, y); y += 6;
     if (companySettings?.street) { doc.text(companySettings.street, marginLeft, y); y += 5; }
-    if (companySettings?.zip_code || companySettings?.city) {
-      doc.text(`${companySettings?.zip_code || ""} ${companySettings?.city || ""}`, marginLeft, y); y += 5;
-    }
+    if (companySettings?.zip_code || companySettings?.city) { doc.text(`${companySettings?.zip_code || ""} ${companySettings?.city || ""}`, marginLeft, y); y += 5; }
     if (companySettings?.phone) { doc.text(`Tel: ${companySettings.phone}`, marginLeft, y); y += 5; }
     if (companySettings?.email) { doc.text(`E-Mail: ${companySettings.email}`, marginLeft, y); y += 5; }
     if (companySettings?.website) { doc.text(`Web: ${companySettings.website}`, marginLeft, y); y += 5; }
@@ -1655,15 +1286,9 @@ export default function Home() {
     doc.text(`${p.report}: ${reportName || "-"}`, marginLeft, y); y += 6;
     doc.text(`${p.calendarWeek}: ${calendarWeek || "-"}`, marginLeft, y); y += 6;
     doc.text(`${p.employee}: ${employee || "-"}`, marginLeft, y);
-    if (logoBase64) {
-      doc.addImage(logoBase64, "PNG", pageWidth - 45, 8, 30, 30);
-    } else {
-      doc.addImage(qrImage, "PNG", pageWidth - 42, 8, 28, 28);
-    }
-    y += 10;
-    if (y < 75) y = 75;
-    doc.setFontSize(12); doc.setFont("helvetica", "bold");
-    doc.text(p.dailyReports, marginLeft, y); y += 8;
+    if (logoBase64) { doc.addImage(logoBase64, "PNG", pageWidth - 45, 8, 30, 30); } else { doc.addImage(qrImage, "PNG", pageWidth - 42, 8, 28, 28); }
+    y += 10; if (y < 75) y = 75;
+    doc.setFontSize(12); doc.setFont("helvetica", "bold"); doc.text(p.dailyReports, marginLeft, y); y += 8;
     for (const day of days) {
       const hasContent = day.description || day.hours || day.customer || day.projectNumber || day.site || day.photos.length > 0;
       if (!hasContent) continue;
@@ -1671,39 +1296,25 @@ export default function Home() {
       const splitDescription = doc.splitTextToSize(descriptionText, contentWidth - 8);
       const estimatedHeight = 45 + splitDescription.length * 5 + day.photos.length * 10;
       addNewPageIfNeeded(estimatedHeight);
-      doc.setFillColor(230, 230, 230);
-      doc.rect(marginLeft, y, contentWidth, 9, "F");
-      doc.setFontSize(11); doc.setFont("helvetica", "bold");
-      doc.text(`${day.weekday} - ${day.date || "-"}`, marginLeft + 3, y + 6);
-      y += 13;
+      doc.setFillColor(230, 230, 230); doc.rect(marginLeft, y, contentWidth, 9, "F");
+      doc.setFontSize(11); doc.setFont("helvetica", "bold"); doc.text(`${day.weekday} - ${day.date || "-"}`, marginLeft + 3, y + 6); y += 13;
       doc.setFont("helvetica", "normal"); doc.setFontSize(9);
-      doc.text(`${p.customer}: ${day.customer || "-"}`, marginLeft + 3, y);
-      doc.text(`${p.project}: ${day.projectNumber || "-"}`, marginLeft + 80, y); y += 6;
-      doc.text(`${p.site}: ${day.site || "-"}`, marginLeft + 3, y);
-      doc.text(`${p.hours}: ${day.hours || "-"}`, marginLeft + 80, y); y += 8;
+      doc.text(`${p.customer}: ${day.customer || "-"}`, marginLeft + 3, y); doc.text(`${p.project}: ${day.projectNumber || "-"}`, marginLeft + 80, y); y += 6;
+      doc.text(`${p.site}: ${day.site || "-"}`, marginLeft + 3, y); doc.text(`${p.hours}: ${day.hours || "-"}`, marginLeft + 80, y); y += 8;
       doc.setFont("helvetica", "bold"); doc.text(`${p.description}:`, marginLeft + 3, y); y += 6;
-      doc.setFont("helvetica", "normal"); doc.text(splitDescription, marginLeft + 3, y);
-      y += splitDescription.length * 5 + 5;
+      doc.setFont("helvetica", "normal"); doc.text(splitDescription, marginLeft + 3, y); y += splitDescription.length * 5 + 5;
       if (day.photos.length > 0) {
         doc.setFont("helvetica", "bold"); doc.text(`${p.photos}:`, marginLeft + 3, y); y += 6;
         doc.setFont("helvetica", "normal"); doc.setFontSize(8);
         for (let photoIndex = 0; photoIndex < day.photos.length; photoIndex++) {
-          const photo = day.photos[photoIndex];
           try {
-            const response = await fetch(photo);
+            const response = await fetch(day.photos[photoIndex]);
             const blob = await response.blob();
-            const photoBase64 = await new Promise<string>((resolve, reject) => {
-              const reader = new FileReader();
-              reader.onloadend = () => resolve(reader.result as string);
-              reader.onerror = reject;
-              reader.readAsDataURL(blob);
-            });
+            const photoBase64 = await new Promise<string>((resolve, reject) => { const reader = new FileReader(); reader.onloadend = () => resolve(reader.result as string); reader.onerror = reject; reader.readAsDataURL(blob); });
             addNewPageIfNeeded(65);
             doc.text(`${p.photo} ${photoIndex + 1}:`, marginLeft + 3, y); y += 5;
             doc.addImage(photoBase64, "JPEG", marginLeft + 3, y, 70, 50); y += 56;
-          } catch (error) {
-            doc.text(`${p.photo} ${photoIndex + 1}: konnte nicht geladen werden`, marginLeft + 3, y); y += 6;
-          }
+          } catch (error) { doc.text(`${p.photo} ${photoIndex + 1}: konnte nicht geladen werden`, marginLeft + 3, y); y += 6; }
         }
         y += 2;
       }
@@ -1713,30 +1324,20 @@ export default function Home() {
     doc.setFontSize(12); doc.setFont("helvetica", "bold"); doc.text(p.summary, marginLeft, y); y += 8;
     doc.setFontSize(10); doc.setFont("helvetica", "normal");
     doc.text(`${p.totalHours}: ${totalHours.toString().replace(".", ",")} ${p.hours}`, marginLeft, y); y += 8;
-    Object.entries(projectTotals).forEach(([project, total]) => {
-      doc.text(`${p.project} ${project}: ${total.toString().replace(".", ",")} ${p.hours}`, marginLeft, y); y += 6;
-    });
+    Object.entries(projectTotals).forEach(([project, total]) => { doc.text(`${p.project} ${project}: ${total.toString().replace(".", ",")} ${p.hours}`, marginLeft, y); y += 6; });
     y += 18;
-    doc.line(marginLeft, y, marginLeft + 70, y);
-    doc.line(pageWidth - marginRight - 70, y, pageWidth - marginRight, y);
-    y += 6; doc.setFontSize(9);
-    doc.text(p.signatureEmployee, marginLeft, y);
-    doc.text(p.signatureCustomer, pageWidth - marginRight - 70, y);
+    doc.line(marginLeft, y, marginLeft + 70, y); doc.line(pageWidth - marginRight - 70, y, pageWidth - marginRight, y);
+    y += 6; doc.setFontSize(9); doc.text(p.signatureEmployee, marginLeft, y); doc.text(p.signatureCustomer, pageWidth - marginRight - 70, y);
     addFooter();
     const filename = `Regiebericht_${calendarWeek || "Woche"}_${employee || "Mitarbeiter"}.pdf`;
     if (sendByEmail) {
       if (!emailTo.trim()) { setMessage(t.msgEmailRequired); return; }
       setMessage(t.msgEmailSending);
       const pdfBase64 = doc.output("datauristring").split(",")[1];
-      const res = await fetch("/api/send-report", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ to: emailTo, subject: `${p.title} ${calendarWeek || ""}`, pdfBase64, filename }),
-      });
+      const res = await fetch("/api/send-report", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ to: emailTo, subject: `${p.title} ${calendarWeek || ""}`, pdfBase64, filename }) });
       const data = await res.json();
       if (data.error) { setMessage("Fehler beim E-Mail-Versand: " + data.error); return; }
-      setMessage(t.msgEmailSent);
-      return;
+      setMessage(t.msgEmailSent); return;
     }
     doc.save(filename);
   }
@@ -1754,15 +1355,10 @@ export default function Home() {
             <button type="button" onClick={() => setIsUsernameLogin(false)} className={`flex-1 py-2 rounded font-medium ${!isUsernameLogin ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-700"}`}>📧 E-Mail</button>
             <button type="button" onClick={() => setIsUsernameLogin(true)} className={`flex-1 py-2 rounded font-medium ${isUsernameLogin ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-700"}`}>👤 Benutzername</button>
           </div>
-          {isUsernameLogin
-            ? <input className="border p-3 w-full text-black bg-white" placeholder="Benutzername" value={username} onChange={(e) => setUsername(e.target.value)} />
-            : <input className="border p-3 w-full text-black bg-white" placeholder={t.email} value={email} onChange={(e) => setEmail(e.target.value)} />
-          }
+          {isUsernameLogin ? <input className="border p-3 w-full text-black bg-white" placeholder="Benutzername" value={username} onChange={(e) => setUsername(e.target.value)} /> : <input className="border p-3 w-full text-black bg-white" placeholder={t.email} value={email} onChange={(e) => setEmail(e.target.value)} />}
           <input className="border p-3 w-full text-black bg-white" placeholder={t.password} type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
           <button type="button" onClick={signIn} className="bg-blue-600 text-white px-4 py-3 rounded w-full">{t.login}</button>
-          <p className="text-center text-sm text-gray-500">Noch kein Konto?
-            <button type="button" onClick={signUp} className="text-blue-600 underline ml-1">{t.register}</button>
-          </p>
+          <p className="text-center text-sm text-gray-500">Noch kein Konto? <button type="button" onClick={signUp} className="text-blue-600 underline ml-1">{t.register}</button></p>
         </section>
       </main>
     );
@@ -1772,17 +1368,11 @@ export default function Home() {
     return (
       <main className="max-w-md mx-auto p-4 md:p-8 min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="bg-white border rounded-xl p-6 space-y-5 w-full shadow-lg">
-          <div className="text-center">
-            <div className="text-5xl mb-3">🔐</div>
-            <h2 className="text-2xl font-bold">Passwort ändern</h2>
-            <p className="text-gray-500 text-sm mt-1">Bitte ändern Sie Ihr temporäres Passwort.</p>
-          </div>
+          <div className="text-center"><div className="text-5xl mb-3">🔐</div><h2 className="text-2xl font-bold">Passwort ändern</h2><p className="text-gray-500 text-sm mt-1">Bitte ändern Sie Ihr temporäres Passwort.</p></div>
           {message && <div className="bg-yellow-50 border rounded p-3 text-sm">{message}</div>}
           <input className="border p-3 w-full rounded text-black" placeholder="Neues Passwort (min. 6 Zeichen)" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
           <input className="border p-3 w-full rounded text-black" placeholder="Passwort bestätigen" type="password" value={newPasswordConfirm} onChange={(e) => setNewPasswordConfirm(e.target.value)} />
-          <button type="button" onClick={changePassword} disabled={changingPassword} className="w-full bg-blue-700 text-white py-3 rounded font-bold disabled:opacity-50">
-            {changingPassword ? "Wird gespeichert..." : "Passwort speichern & weiter"}
-          </button>
+          <button type="button" onClick={changePassword} disabled={changingPassword} className="w-full bg-blue-700 text-white py-3 rounded font-bold disabled:opacity-50">{changingPassword ? "Wird gespeichert..." : "Passwort speichern & weiter"}</button>
         </div>
       </main>
     );
@@ -1792,11 +1382,7 @@ export default function Home() {
     return (
       <main className="max-w-xl mx-auto p-4 md:p-8 min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="bg-white border rounded-xl p-6 space-y-6 w-full shadow-lg">
-          <div className="flex items-center gap-2 mb-2">
-            {[1, 2, 3].map((step) => (
-              <div key={step} className={`flex-1 h-2 rounded-full ${onboardingStep >= step ? "bg-blue-600" : "bg-gray-200"}`} />
-            ))}
-          </div>
+          <div className="flex items-center gap-2 mb-2">{[1, 2, 3].map((step) => (<div key={step} className={`flex-1 h-2 rounded-full ${onboardingStep >= step ? "bg-blue-600" : "bg-gray-200"}`} />))}</div>
           {onboardingStep === 1 && (
             <div className="space-y-4">
               <h2 className="text-2xl font-bold">👋 Willkommen!</h2>
@@ -1852,37 +1438,29 @@ export default function Home() {
         <h1 className="text-3xl font-bold">{t.title}</h1>
         <p className="text-gray-600">{t.subtitle}</p>
         <p className="text-gray-700">{t.loggedInAs}: <strong>{user.email}</strong></p>
-        {currentCompany && (
-          <p className="text-gray-700">{t.firma}: <strong>{currentCompany.companies.name}</strong> | {t.role}: <strong>{currentCompany.role}</strong></p>
-        )}
+        {currentCompany && (<p className="text-gray-700">{t.firma}: <strong>{currentCompany.companies.name}</strong> | {t.role}: <strong>{currentCompany.role}</strong></p>)}
         <div className="flex items-center gap-3 mt-2">
           <button type="button" onClick={signOut} className="bg-gray-800 text-white px-4 py-2 rounded">{t.logout}</button>
           <select className="border p-2 rounded text-black bg-white text-sm" value={uiLanguage} onChange={(e) => setUiLanguage(e.target.value as Language)}>
-            {(getAllowedLanguages(companyFeatures).length > 0
-              ? ["Deutsch", ...getAllowedLanguages(companyFeatures).filter(l => l !== "Deutsch" && languages.includes(l as Language))]
-              : languages
-            ).map((lang) => (<option key={lang} value={lang}>🌐 {lang}</option>))}
+            {(getAllowedLanguages(companyFeatures).length > 0 ? ["Deutsch", ...getAllowedLanguages(companyFeatures).filter(l => l !== "Deutsch" && languages.includes(l as Language))] : languages).map((lang) => (<option key={lang} value={lang}>🌐 {lang}</option>))}
           </select>
           <select className="border p-2 rounded text-black bg-white text-sm" value={pdfLanguage} onChange={(e) => setPdfLanguage(e.target.value)}>
-            {(getAllowedLanguages(companyFeatures).length > 0
-              ? getAllowedLanguages(companyFeatures).filter(l => pdfLanguages.includes(l))
-              : pdfLanguages
-            ).map((lang) => (<option key={lang} value={lang}>📄 {lang}</option>))}
+            {(getAllowedLanguages(companyFeatures).length > 0 ? getAllowedLanguages(companyFeatures).filter(l => pdfLanguages.includes(l)) : pdfLanguages).map((lang) => (<option key={lang} value={lang}>📄 {lang}</option>))}
           </select>
         </div>
       </header>
 
       <nav className="flex flex-wrap gap-2">
-        <TabButton label={t.dashboard}            tabName="dashboard"           activeTab={activeTab} onClick={() => setActiveTab("dashboard")} />
-        <TabButton label={t.tabReport}            tabName="regiebericht"        activeTab={activeTab} onClick={() => setActiveTab("regiebericht")} />
-        <TabButton label={t.saveLoad}             tabName="berichte"            activeTab={activeTab} onClick={() => setActiveTab("berichte")} />
-        <TabButton label={t.projectsTab}          tabName="projekte"            activeTab={activeTab} onClick={() => { setActiveTab("projekte"); loadProjects(); }} />
-        <TabButton label={t.workInstructions}     tabName="arbeitsanweisungen"  activeTab={activeTab} onClick={() => setActiveTab("arbeitsanweisungen")} />
-        <TabButton label={t.employeeManagement}   tabName="mitarbeiter"         activeTab={activeTab} onClick={() => setActiveTab("mitarbeiter")} />
-        <TabButton label={t.companyData}          tabName="firmendaten"         activeTab={activeTab} onClick={() => setActiveTab("firmendaten")} />
-        <TabButton label={t.tabDay}               tabName="tag"                 activeTab={activeTab} onClick={() => setActiveTab("tag")} />
-        <TabButton label={t.tabWeek}              tabName="woche"               activeTab={activeTab} onClick={() => setActiveTab("woche")} />
-        <TabButton label={t.tabMonth}             tabName="monat"               activeTab={activeTab} onClick={() => setActiveTab("monat")} />
+        <TabButton label={t.dashboard}          tabName="dashboard"          activeTab={activeTab} onClick={() => setActiveTab("dashboard")} />
+        <TabButton label={t.tabReport}          tabName="regiebericht"       activeTab={activeTab} onClick={() => setActiveTab("regiebericht")} />
+        <TabButton label={t.saveLoad}           tabName="berichte"           activeTab={activeTab} onClick={() => setActiveTab("berichte")} />
+        <TabButton label={t.projectsTab}        tabName="projekte"           activeTab={activeTab} onClick={() => { setActiveTab("projekte"); loadProjects(); }} />
+        <TabButton label={t.workInstructions}   tabName="arbeitsanweisungen" activeTab={activeTab} onClick={() => setActiveTab("arbeitsanweisungen")} />
+        <TabButton label={t.employeeManagement} tabName="mitarbeiter"        activeTab={activeTab} onClick={() => setActiveTab("mitarbeiter")} />
+        <TabButton label={t.companyData}        tabName="firmendaten"        activeTab={activeTab} onClick={() => setActiveTab("firmendaten")} />
+        <TabButton label={t.tabDay}             tabName="tag"                activeTab={activeTab} onClick={() => setActiveTab("tag")} />
+        <TabButton label={t.tabWeek}            tabName="woche"              activeTab={activeTab} onClick={() => setActiveTab("woche")} />
+        <TabButton label={t.tabMonth}           tabName="monat"              activeTab={activeTab} onClick={() => setActiveTab("monat")} />
       </nav>
 
       {message && <div className="border rounded p-3 bg-yellow-100 text-black">{message}</div>}
@@ -1892,11 +1470,11 @@ export default function Home() {
           <h2 className="text-xl font-bold">{t.dashboard}</h2>
           {(() => {
             const allTasks = workInstructions.flatMap((i) => i.work_instruction_tasks || []);
-            const openCount      = allTasks.filter((t: any) => (t.status || "open") === "open").length;
-            const progressCount  = allTasks.filter((t: any) => t.status === "in_progress").length;
-            const stoppedCount   = allTasks.filter((t: any) => t.status === "stopped").length;
+            const openCount = allTasks.filter((t: any) => (t.status || "open") === "open").length;
+            const progressCount = allTasks.filter((t: any) => t.status === "in_progress").length;
+            const stoppedCount = allTasks.filter((t: any) => t.status === "stopped").length;
             const completedCount = allTasks.filter((t: any) => t.status === "completed").length;
-            const totalTasks     = allTasks.length;
+            const totalTasks = allTasks.length;
             const progressPercent = totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0;
             const today = new Date().toISOString().split("T")[0];
             const todayInstructions = workInstructions.filter((i: any) => i.work_date === today);
@@ -1906,31 +1484,13 @@ export default function Home() {
                 <p>{t.workInstructions}: <strong>{workInstructions.length}</strong></p>
                 <p>{t.dueToday}: <strong>{todayInstructions.length}</strong></p>
                 <div className="border rounded p-3 bg-gray-100">
-                  <p>{t.statusOpen}: {openCount}</p>
-                  <p>{t.statusInProgress}: {progressCount}</p>
-                  <p>{t.statusStopped}: {stoppedCount}</p>
-                  <p>{t.statusCompleted}: {completedCount}</p>
+                  <p>{t.statusOpen}: {openCount}</p><p>{t.statusInProgress}: {progressCount}</p>
+                  <p>{t.statusStopped}: {stoppedCount}</p><p>{t.statusCompleted}: {completedCount}</p>
                   <p className="font-bold mt-3">{t.totalProgress}: {progressPercent}%</p>
-                  <div className="w-full bg-gray-300 rounded h-4 mt-1">
-                    <div className="bg-green-600 h-4 rounded" style={{ width: `${progressPercent}%` }} />
-                  </div>
+                  <div className="w-full bg-gray-300 rounded h-4 mt-1"><div className="bg-green-600 h-4 rounded" style={{ width: `${progressPercent}%` }} /></div>
                 </div>
-                {stoppedCount > 0 && (
-                  <div className="border rounded p-3 bg-red-50">
-                    <h3 className="font-bold mb-2">{t.stoppedSteps}</h3>
-                    {allTasks.filter((t: any) => t.status === "stopped").map((task: any) => (
-                      <p key={task.id}><strong>{workInstructions.find((i) => (i.work_instruction_tasks || []).some((t: any) => t.id === task.id))?.project || t.noProject}</strong>{" — "}⛔ {task.task_text}{task.note ? ` — ${task.note}` : ""}</p>
-                    ))}
-                  </div>
-                )}
-                {progressCount > 0 && (
-                  <div className="border rounded p-3 bg-yellow-50">
-                    <h3 className="font-bold mb-2">{t.stepsInProgress}</h3>
-                    {allTasks.filter((t: any) => t.status === "in_progress").map((task: any) => (
-                      <p key={task.id}><strong>{workInstructions.find((i) => (i.work_instruction_tasks || []).some((t: any) => t.id === task.id))?.project || t.noProject}</strong>{" — "}🟡 {task.task_text}{task.note ? ` — ${task.note}` : ""}</p>
-                    ))}
-                  </div>
-                )}
+                {stoppedCount > 0 && (<div className="border rounded p-3 bg-red-50"><h3 className="font-bold mb-2">{t.stoppedSteps}</h3>{allTasks.filter((t: any) => t.status === "stopped").map((task: any) => (<p key={task.id}><strong>{workInstructions.find((i) => (i.work_instruction_tasks || []).some((t: any) => t.id === task.id))?.project || t.noProject}</strong>{" — "}⛔ {task.task_text}{task.note ? ` — ${task.note}` : ""}</p>))}</div>)}
+                {progressCount > 0 && (<div className="border rounded p-3 bg-yellow-50"><h3 className="font-bold mb-2">{t.stepsInProgress}</h3>{allTasks.filter((t: any) => t.status === "in_progress").map((task: any) => (<p key={task.id}><strong>{workInstructions.find((i) => (i.work_instruction_tasks || []).some((t: any) => t.id === task.id))?.project || t.noProject}</strong>{" — "}🟡 {task.task_text}{task.note ? ` — ${task.note}` : ""}</p>))}</div>)}
               </div>
             );
           })()}
@@ -1964,34 +1524,15 @@ export default function Home() {
                 <input className="border p-3 text-black bg-white" placeholder={t.hours} value={day.hours} onChange={(e) => updateDay(index, "hours", e.target.value)} />
               </div>
               <textarea className="border p-3 w-full h-28 text-black bg-white" placeholder={t.description} value={day.description} onChange={(e) => updateDay(index, "description", e.target.value)} />
-              {companyFeatures?.photos_enabled
-                ? <input type="file" accept="image/*" multiple className="border p-3 w-full text-black bg-white" onChange={(e) => handlePhotos(index, e.target.files)} />
-                : <div className="border rounded p-3 bg-gray-50 text-sm text-gray-400">🔒 Foto-Upload ist in deinem Paket nicht aktiviert.</div>
-              }
-              {day.photos.length > 0 && (
-                <div className="grid grid-cols-2 gap-3">
-                  {day.photos.map((photo, photoIndex) => (
-                    <div key={photoIndex} className="border rounded p-2">
-                      <img src={photo} alt="Foto" className="w-full h-32 object-cover" />
-                      <button type="button" onClick={() => deletePhoto(index, photoIndex)} className="mt-2 bg-red-600 text-white px-2 py-2 rounded w-full">{t.deletePhoto}</button>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {day.translation && (
-                <div className="border p-3 rounded bg-gray-100 text-black">
-                  <strong>{t.translation}:</strong>
-                  <p>{day.translation}</p>
-                </div>
-              )}
+              {companyFeatures?.photos_enabled ? <input type="file" accept="image/*" multiple className="border p-3 w-full text-black bg-white" onChange={(e) => handlePhotos(index, e.target.files)} /> : <div className="border rounded p-3 bg-gray-50 text-sm text-gray-400">🔒 Foto-Upload ist in deinem Paket nicht aktiviert.</div>}
+              {day.photos.length > 0 && (<div className="grid grid-cols-2 gap-3">{day.photos.map((photo, photoIndex) => (<div key={photoIndex} className="border rounded p-2"><img src={photo} alt="Foto" className="w-full h-32 object-cover" /><button type="button" onClick={() => deletePhoto(index, photoIndex)} className="mt-2 bg-red-600 text-white px-2 py-2 rounded w-full">{t.deletePhoto}</button></div>))}</div>)}
+              {day.translation && (<div className="border p-3 rounded bg-gray-100 text-black"><strong>{t.translation}:</strong><p>{day.translation}</p></div>)}
             </section>
           ))}
           <section className="border rounded p-4 space-y-2 bg-white text-black">
             <h2 className="text-xl font-bold">{t.hoursOverview}</h2>
             <p><strong>{t.total}:</strong> {totalHours.toString().replace(".", ",")} {t.hours}</p>
-            {Object.entries(projectTotals).map(([project, total]) => (
-              <p key={project}><strong>{t.projectNumber} {project}:</strong> {total.toString().replace(".", ",")} {t.hours}</p>
-            ))}
+            {Object.entries(projectTotals).map(([project, total]) => (<p key={project}><strong>{t.projectNumber} {project}:</strong> {total.toString().replace(".", ",")} {t.hours}</p>))}
           </section>
           <div className="flex flex-wrap gap-4">
             <button type="button" onClick={translateAll} className="bg-black text-white px-4 py-3 rounded">{loading ? t.translating : t.translateWeek}</button>
@@ -2010,21 +1551,7 @@ export default function Home() {
             <button type="button" onClick={saveReport} className="bg-orange-600 text-white px-4 py-3 rounded">{currentReportId ? t.updateReport : t.saveReport}</button>
             <button type="button" onClick={() => { newReport(); setMessage(t.msgNewReport); }} className="bg-gray-700 text-white px-4 py-3 rounded">{t.newReport}</button>
           </div>
-          {savedReports.length > 0 && (
-            <div className="space-y-2">
-              <h3 className="font-bold">{t.savedReports}</h3>
-              {savedReports.map((report) => (
-                <div key={report.id} className="border rounded p-3 space-y-2">
-                  <strong>{report.report_name}</strong>
-                  <p className="text-sm text-gray-700">{t.employee}: {report.employee || "-"} | {new Date(report.created_at).toLocaleString("de-DE")}</p>
-                  <div className="flex gap-2">
-                    <button type="button" onClick={() => loadReport(report)} className="bg-blue-600 text-white px-3 py-2 rounded">{t.loadEdit}</button>
-                    <button type="button" onClick={() => deleteReport(report.id)} className="bg-red-600 text-white px-3 py-2 rounded">{t.delete}</button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+          {savedReports.length > 0 && (<div className="space-y-2"><h3 className="font-bold">{t.savedReports}</h3>{savedReports.map((report) => (<div key={report.id} className="border rounded p-3 space-y-2"><strong>{report.report_name}</strong><p className="text-sm text-gray-700">{t.employee}: {report.employee || "-"} | {new Date(report.created_at).toLocaleString("de-DE")}</p><div className="flex gap-2"><button type="button" onClick={() => loadReport(report)} className="bg-blue-600 text-white px-3 py-2 rounded">{t.loadEdit}</button><button type="button" onClick={() => deleteReport(report.id)} className="bg-red-600 text-white px-3 py-2 rounded">{t.delete}</button></div></div>))}</div>)}
         </section>
       )}
 
@@ -2055,16 +1582,7 @@ export default function Home() {
                       const tasks = workInstructions.filter((i) => i.project_id === project.id).flatMap((i) => i.work_instruction_tasks || []);
                       const completedCount = tasks.filter((t: any) => t.status === "completed").length;
                       const progressPercent = tasks.length > 0 ? Math.round((completedCount / tasks.length) * 100) : 0;
-                      return (
-                        <div className="border rounded p-3 bg-gray-100">
-                          <p>{t.statusOpen}: {tasks.filter((t: any) => (t.status || "open") === "open").length}</p>
-                          <p>{t.statusInProgress}: {tasks.filter((t: any) => t.status === "in_progress").length}</p>
-                          <p>{t.statusStopped}: {tasks.filter((t: any) => t.status === "stopped").length}</p>
-                          <p>{t.statusCompleted}: {completedCount}</p>
-                          <p className="font-bold mt-2">{t.progress}: {progressPercent}%</p>
-                          <div className="w-full bg-gray-300 rounded h-4 mt-1"><div className="bg-green-600 h-4 rounded" style={{ width: `${progressPercent}%` }} /></div>
-                        </div>
-                      );
+                      return (<div className="border rounded p-3 bg-gray-100"><p>{t.statusOpen}: {tasks.filter((t: any) => (t.status || "open") === "open").length}</p><p>{t.statusInProgress}: {tasks.filter((t: any) => t.status === "in_progress").length}</p><p>{t.statusStopped}: {tasks.filter((t: any) => t.status === "stopped").length}</p><p>{t.statusCompleted}: {completedCount}</p><p className="font-bold mt-2">{t.progress}: {progressPercent}%</p><div className="w-full bg-gray-300 rounded h-4 mt-1"><div className="bg-green-600 h-4 rounded" style={{ width: `${progressPercent}%` }} /></div></div>);
                     })()}
                     <h4 className="font-bold">{t.workInstructions}</h4>
                     {workInstructions.filter((i) => i.project_id === project.id).map((instruction) => (
@@ -2074,13 +1592,7 @@ export default function Home() {
                         <p><strong>{t.customer}:</strong> {instruction.customer || "-"}</p>
                         <p><strong>{t.site}:</strong> {instruction.site || "-"}</p>
                         {instruction.problems_text && <p><strong>{t.problems}:</strong> {instruction.problems_text}</p>}
-                        {(instruction.work_instruction_tasks || []).length > 0 && (
-                          <ul className="list-disc pl-6 space-y-1">
-                            {instruction.work_instruction_tasks.map((task: any) => (
-                              <li key={task.id}>{task.status === "completed" ? t.statusCompleted : task.status === "in_progress" ? t.statusInProgress : task.status === "stopped" ? t.statusStopped : t.statusOpen}{" "}{task.task_text}{task.note && <div className="text-sm text-gray-600 ml-2">{t.feedbackLabel}: {task.note}</div>}</li>
-                            ))}
-                          </ul>
-                        )}
+                        {(instruction.work_instruction_tasks || []).length > 0 && (<ul className="list-disc pl-6 space-y-1">{instruction.work_instruction_tasks.map((task: any) => (<li key={task.id}>{task.status === "completed" ? t.statusCompleted : task.status === "in_progress" ? t.statusInProgress : task.status === "stopped" ? t.statusStopped : t.statusOpen}{" "}{task.task_text}{task.note && <div className="text-sm text-gray-600 ml-2">{t.feedbackLabel}: {task.note}</div>}</li>))}</ul>)}
                         {companyFeatures?.module_auto_reports ? (<button type="button" onClick={() => createReportFromInstruction(instruction)} className="bg-green-700 text-white px-3 py-2 rounded">{t.toReport}</button>) : (<p className="text-sm text-gray-500">{t.autoReportLocked}</p>)}
                       </div>
                     ))}
@@ -2103,12 +1615,7 @@ export default function Home() {
             <h2 className="text-xl font-bold">{t.newInstruction}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <input className="border p-3 text-black bg-white" placeholder={t.instructionTitle} value={instructionTitle} onChange={(e) => setInstructionTitle(e.target.value)} />
-              <select className="border p-3 text-black bg-white" value={selectedProjectId} onChange={(e) => {
-                const projectId = e.target.value;
-                setSelectedProjectId(projectId);
-                const selectedProject = projects.find((p) => p.id === projectId);
-                if (selectedProject) { setInstructionProject(selectedProject.name || ""); setInstructionCustomer(selectedProject.customer || ""); setInstructionSite(selectedProject.site || ""); }
-              }}>
+              <select className="border p-3 text-black bg-white" value={selectedProjectId} onChange={(e) => { const pid = e.target.value; setSelectedProjectId(pid); const sp = projects.find((p) => p.id === pid); if (sp) { setInstructionProject(sp.name || ""); setInstructionCustomer(sp.customer || ""); setInstructionSite(sp.site || ""); } }}>
                 <option value="">{t.selectProject}</option>
                 {projects.map((project) => <option key={project.id} value={project.id}>{project.name}</option>)}
               </select>
@@ -2121,37 +1628,14 @@ export default function Home() {
               <div>
                 <h3 className="font-bold mb-2">{t.photos}</h3>
                 <input type="file" accept="image/*" multiple className="border p-3 w-full text-black bg-white" onChange={(e) => handleInstructionPhotos(e.target.files)} />
-                {instructionPhotos.length > 0 && (
-                  <div className="grid grid-cols-3 gap-2 mt-2">
-                    {instructionPhotos.map((photo, i) => (
-                      <div key={i} className="relative">
-                        <img src={photo} alt="Foto" className="w-full h-24 object-cover rounded" />
-                        <button type="button" onClick={() => setInstructionPhotos((prev) => prev.filter((_, idx) => idx !== i))} className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 text-xs">✕</button>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                {instructionPhotos.length > 0 && (<div className="grid grid-cols-3 gap-2 mt-2">{instructionPhotos.map((photo, i) => (<div key={i} className="relative"><img src={photo} alt="Foto" className="w-full h-24 object-cover rounded" /><button type="button" onClick={() => setInstructionPhotos((prev) => prev.filter((_, idx) => idx !== i))} className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 text-xs">✕</button></div>))}</div>)}
               </div>
             )}
             <h3 className="font-bold">{t.workSteps}</h3>
             {instructionTasks.map((task, index) => (
               <div key={index} className="border rounded p-3 space-y-2 bg-gray-50">
                 <input className="border p-3 w-full text-black bg-white" placeholder={`${t.workSteps} ${index + 1}`} value={task} onChange={(e) => { const copy = [...instructionTasks]; copy[index] = e.target.value; setInstructionTasks(copy); }} />
-                {companyFeatures?.photos_enabled && (
-                  <>
-                    <input type="file" accept="image/*" multiple className="border p-2 w-full text-black bg-white text-sm" onChange={(e) => handleInstructionTaskPhotos(index, e.target.files)} />
-                    {(instructionTaskPhotos[index] || []).length > 0 && (
-                      <div className="grid grid-cols-3 gap-2">
-                        {(instructionTaskPhotos[index] || []).map((photo, pi) => (
-                          <div key={pi} className="relative">
-                            <img src={photo} alt="Foto" className="w-full h-20 object-cover rounded" />
-                            <button type="button" onClick={() => setInstructionTaskPhotos((prev) => ({ ...prev, [index]: (prev[index] || []).filter((_, idx) => idx !== pi) }))} className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 text-xs">✕</button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </>
-                )}
+                {companyFeatures?.photos_enabled && (<><input type="file" accept="image/*" multiple className="border p-2 w-full text-black bg-white text-sm" onChange={(e) => handleInstructionTaskPhotos(index, e.target.files)} />{(instructionTaskPhotos[index] || []).length > 0 && (<div className="grid grid-cols-3 gap-2">{(instructionTaskPhotos[index] || []).map((photo, pi) => (<div key={pi} className="relative"><img src={photo} alt="Foto" className="w-full h-20 object-cover rounded" /><button type="button" onClick={() => setInstructionTaskPhotos((prev) => ({ ...prev, [index]: (prev[index] || []).filter((_, idx) => idx !== pi) }))} className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 text-xs">✕</button></div>))}</div>)}</>)}
               </div>
             ))}
             <div className="flex gap-3">
@@ -2159,9 +1643,7 @@ export default function Home() {
               <button type="button" onClick={saveWorkInstruction} className="bg-blue-700 text-white px-4 py-3 rounded">{t.saveInstruction}</button>
             </div>
           </section>
-          <section className="border rounded p-4 bg-blue-50 text-black">
-            <p className="text-blue-700 text-sm">💡 {t.savedInstructions} → {t.tabDay} / {t.tabWeek} / {t.tabMonth}</p>
-          </section>
+          <section className="border rounded p-4 bg-blue-50 text-black"><p className="text-blue-700 text-sm">💡 {t.savedInstructions} → {t.tabDay} / {t.tabWeek} / {t.tabMonth}</p></section>
         </div>
       )}
 
@@ -2176,41 +1658,29 @@ export default function Home() {
             if (dayInstructions.length === 0) return (<section className="border rounded p-4 bg-white text-black"><p className="text-gray-500">{t.noInstructionsDay}</p></section>);
             return dayInstructions.map((instruction) => (
               <section key={instruction.id} className="border rounded p-4 bg-white text-black space-y-2">
-                <div className="flex justify-between items-start">
-                  <h3 className="font-bold text-lg">{instruction.title}</h3>
-                  <span className="text-sm text-gray-500">{instruction.work_date}</span>
-                </div>
+                <div className="flex justify-between items-start"><h3 className="font-bold text-lg">{instruction.title}</h3><span className="text-sm text-gray-500">{instruction.work_date}</span></div>
                 <p><strong>{t.project}:</strong> {instruction.project || "-"}</p>
                 <p><strong>{t.customer}:</strong> {instruction.customer || "-"}</p>
                 <p><strong>{t.site}:</strong> {instruction.site || "-"}</p>
                 {instruction.problems_text && (<div className="bg-yellow-50 border rounded p-2"><strong>{t.problemsHints}:</strong> {instruction.problems_text}</div>)}
-                {(instruction.photos || []).length > 0 && companyFeatures?.photos_enabled && (
-                  <div className="grid grid-cols-3 gap-2">{(instruction.photos || []).map((photo: string, i: number) => (<img key={i} src={photo} alt="Foto" className="w-full h-24 object-cover rounded border" />))}</div>
-                )}
+                {(instruction.photos || []).length > 0 && companyFeatures?.photos_enabled && (<div className="grid grid-cols-3 gap-2">{(instruction.photos || []).map((photo: string, i: number) => (<img key={i} src={photo} alt="Foto" className="w-full h-24 object-cover rounded border" />))}</div>)}
                 <ul className="space-y-2 mt-2">
                   {(instruction.work_instruction_tasks || []).sort((a: any, b: any) => a.sort_order - b.sort_order).map((task: any) => (
                     <li key={task.id} className="border rounded p-2 space-y-1">
                       <div className="flex items-center gap-2">
                         <select className="border rounded p-1 text-sm text-black bg-white" value={task.status || "open"} onChange={(e) => updateTaskStatus(task.id, e.target.value)}>
-                          <option value="open">{t.statusOpen}</option>
-                          <option value="in_progress">{t.statusInProgress}</option>
-                          <option value="stopped">{t.statusStopped}</option>
-                          <option value="completed">{t.statusCompleted}</option>
+                          <option value="open">{t.statusOpen}</option><option value="in_progress">{t.statusInProgress}</option><option value="stopped">{t.statusStopped}</option><option value="completed">{t.statusCompleted}</option>
                         </select>
                         <span className="font-medium">{task.task_text}</span>
                       </div>
                       {task.note && <p className="text-sm text-gray-600 ml-2">{t.feedbackLabel}: {task.note}</p>}
-                      {(task.photos || []).length > 0 && companyFeatures?.photos_enabled && (
-                        <div className="grid grid-cols-3 gap-1">{(task.photos || []).map((photo: string, pi: number) => (<img key={pi} src={photo} alt="Foto" className="w-full h-16 object-cover rounded" />))}</div>
-                      )}
+                      {(task.photos || []).length > 0 && companyFeatures?.photos_enabled && (<div className="grid grid-cols-3 gap-1">{(task.photos || []).map((photo: string, pi: number) => (<img key={pi} src={photo} alt="Foto" className="w-full h-16 object-cover rounded" />))}</div>)}
                     </li>
                   ))}
                 </ul>
                 <div className="flex gap-2 pt-2 border-t">
                   {companyFeatures?.module_auto_reports && (<button type="button" onClick={() => createReportFromInstruction(instruction)} className="bg-green-700 text-white px-3 py-2 rounded text-sm">📋 {t.toReport}</button>)}
-                  {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
-                    <button type="button" onClick={() => deleteWorkInstruction(instruction.id)} className="bg-red-600 text-white px-3 py-2 rounded text-sm">{t.deleteInstruction}</button>
-                  )}
+                  {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => deleteWorkInstruction(instruction.id)} className="bg-red-600 text-white px-3 py-2 rounded text-sm">{t.deleteInstruction}</button>)}
                 </div>
               </section>
             ));
@@ -2222,10 +1692,7 @@ export default function Home() {
         <div className="space-y-4">
           <section className="border rounded p-4 bg-white text-black space-y-3">
             <h2 className="text-xl font-bold">{t.weekView}</h2>
-            <div className="flex items-center gap-3">
-              <label className="text-sm font-medium">{t.selectDate}:</label>
-              <input type="date" className="border p-3 rounded text-black bg-white" value={selectedWeek} onChange={(e) => setSelectedWeek(e.target.value)} />
-            </div>
+            <div className="flex items-center gap-3"><label className="text-sm font-medium">{t.selectDate}:</label><input type="date" className="border p-3 rounded text-black bg-white" value={selectedWeek} onChange={(e) => setSelectedWeek(e.target.value)} /></div>
             <p className="text-sm text-gray-500">{t.week}: {getCalendarWeek(selectedWeek)}</p>
           </section>
           {(() => {
@@ -2233,11 +1700,8 @@ export default function Home() {
             const [y, m, d] = selectedWeek.split("-").map(Number);
             const date = new Date(Date.UTC(y, m - 1, d));
             const dayNum = date.getUTCDay() || 7;
-            const monday = new Date(date);
-            monday.setUTCDate(date.getUTCDate() - dayNum + 1);
-            const weekDates = Array.from({ length: 7 }, (_, i) => {
-              const nd = new Date(monday); nd.setUTCDate(monday.getUTCDate() + i); return nd.toISOString().split("T")[0];
-            });
+            const monday = new Date(date); monday.setUTCDate(date.getUTCDate() - dayNum + 1);
+            const weekDates = Array.from({ length: 7 }, (_, i) => { const nd = new Date(monday); nd.setUTCDate(monday.getUTCDate() + i); return nd.toISOString().split("T")[0]; });
             const weekInstructions = workInstructions.filter((i) => weekDates.includes(i.work_date));
             if (weekInstructions.length === 0) return (<section className="border rounded p-4 bg-white text-black"><p className="text-gray-500">{t.noInstructionsWeek}</p></section>);
             return weekDates.map((dateStr, di) => {
@@ -2258,10 +1722,7 @@ export default function Home() {
                         {(instruction.work_instruction_tasks || []).sort((a: any, b: any) => a.sort_order - b.sort_order).map((task: any) => (
                           <li key={task.id} className="flex items-center gap-2 text-sm">
                             <select className="border rounded p-1 text-xs text-black bg-white" value={task.status || "open"} onChange={(e) => updateTaskStatus(task.id, e.target.value)}>
-                              <option value="open">{t.statusOpen}</option>
-                              <option value="in_progress">{t.statusInProgress}</option>
-                              <option value="stopped">{t.statusStopped}</option>
-                              <option value="completed">{t.statusCompleted}</option>
+                              <option value="open">{t.statusOpen}</option><option value="in_progress">{t.statusInProgress}</option><option value="stopped">{t.statusStopped}</option><option value="completed">{t.statusCompleted}</option>
                             </select>
                             <span>{task.task_text}</span>{task.note && <span className="text-gray-500">— {task.note}</span>}
                           </li>
@@ -2295,36 +1756,21 @@ export default function Home() {
               <>
                 <section className="border rounded p-4 bg-white text-black">
                   <h3 className="font-bold mb-3">{selectedMonth}</h3>
-                  <div className="grid grid-cols-7 gap-1 mb-1">
-                    {t.weekdays.map((label) => (<div key={label} className="text-center text-xs font-bold text-gray-500 py-1">{label.slice(0, 2)}</div>))}
-                  </div>
+                  <div className="grid grid-cols-7 gap-1 mb-1">{t.weekdays.map((label) => (<div key={label} className="text-center text-xs font-bold text-gray-500 py-1">{label.slice(0, 2)}</div>))}</div>
                   <div className="grid grid-cols-7 gap-1">
                     {cells.map((day, i) => {
                       if (!day) return <div key={`e-${i}`} />;
                       const dateStr = `${selectedMonth}-${String(day).padStart(2, "0")}`;
                       const entries = monthInstructions.filter((inst) => inst.work_date === dateStr);
                       const isToday = dateStr === new Date().toISOString().split("T")[0];
-                      return (
-                        <div key={day} onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }}
-                          className={`border rounded p-1 min-h-14 cursor-pointer hover:border-blue-400 transition-colors ${isToday ? "border-blue-500 bg-blue-50" : entries.length > 0 ? "bg-green-50 border-green-300" : "bg-white"}`}>
-                          <div className={`text-xs font-bold ${isToday ? "text-blue-600" : "text-gray-700"}`}>{day}</div>
-                          {entries.length > 0 && <div className="text-xs text-green-700 font-medium">{entries.length} ✓</div>}
-                          {entries[0] && <div className="text-xs text-gray-500 truncate">{entries[0].title}</div>}
-                        </div>
-                      );
+                      return (<div key={day} onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }} className={`border rounded p-1 min-h-14 cursor-pointer hover:border-blue-400 transition-colors ${isToday ? "border-blue-500 bg-blue-50" : entries.length > 0 ? "bg-green-50 border-green-300" : "bg-white"}`}><div className={`text-xs font-bold ${isToday ? "text-blue-600" : "text-gray-700"}`}>{day}</div>{entries.length > 0 && <div className="text-xs text-green-700 font-medium">{entries.length} ✓</div>}{entries[0] && <div className="text-xs text-gray-500 truncate">{entries[0].title}</div>}</div>);
                     })}
                   </div>
                 </section>
                 <section className="border rounded p-4 bg-white text-black space-y-2">
                   <h3 className="font-bold">{t.workInstructions} ({monthInstructions.length})</h3>
                   {monthInstructions.length === 0 && <p className="text-gray-500">{t.noInstructionsMonth}</p>}
-                  {monthInstructions.sort((a, b) => (a.work_date || "").localeCompare(b.work_date || "")).map((instruction) => (
-                    <div key={instruction.id} onClick={() => { setSelectedDayDate(instruction.work_date); setActiveTab("tag"); }}
-                      className="border rounded p-3 bg-gray-50 cursor-pointer hover:bg-gray-100 flex justify-between items-center">
-                      <div><span className="font-medium">{instruction.title}</span><span className="text-gray-500 text-sm ml-2">{instruction.customer || "-"}</span></div>
-                      <span className="text-sm text-gray-500">{instruction.work_date}</span>
-                    </div>
-                  ))}
+                  {monthInstructions.sort((a, b) => (a.work_date || "").localeCompare(b.work_date || "")).map((instruction) => (<div key={instruction.id} onClick={() => { setSelectedDayDate(instruction.work_date); setActiveTab("tag"); }} className="border rounded p-3 bg-gray-50 cursor-pointer hover:bg-gray-100 flex justify-between items-center"><div><span className="font-medium">{instruction.title}</span><span className="text-gray-500 text-sm ml-2">{instruction.customer || "-"}</span></div><span className="text-sm text-gray-500">{instruction.work_date}</span></div>))}
                 </section>
               </>
             );
@@ -2370,10 +1816,7 @@ export default function Home() {
         <section className="border rounded p-4 space-y-4 bg-white text-black">
           <h2 className="text-xl font-bold">{t.companyData}</h2>
           {companySettings?.company_logo && (<img src={companySettings.company_logo} alt="Firmenlogo" className="h-20 object-contain" />)}
-          <div>
-            <label className="block text-sm font-medium mb-1">{t.uploadLogo}</label>
-            <input type="file" accept="image/*" className="border p-3 w-full text-black bg-white" onChange={(e) => uploadCompanyLogo(e.target.files)} />
-          </div>
+          <div><label className="block text-sm font-medium mb-1">{t.uploadLogo}</label><input type="file" accept="image/*" className="border p-3 w-full text-black bg-white" onChange={(e) => uploadCompanyLogo(e.target.files)} /></div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <input className="border p-3 text-black bg-white" placeholder={t.companyName} value={companySettings?.company_name || ""} onChange={(e) => updateCompanyField("company_name", e.target.value)} />
             <input className="border p-3 text-black bg-white" placeholder={t.street} value={companySettings?.street || ""} onChange={(e) => updateCompanyField("street", e.target.value)} />
