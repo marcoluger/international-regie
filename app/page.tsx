@@ -1072,10 +1072,22 @@ export default function Home() {
   }
   // App-Sprache bleibt immer Deutsch (oder was der User gewählt hat)
 
+    // Passwort-Änderung prüfen
+    const { data: pwCheck } = await supabase
+      .from("company_users")
+      .select("must_change_password")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (pwCheck?.must_change_password === true) {
+      setMustChangePassword(true);
+      return; // Stopp — kein weiteres Laden
+    }
+
     // Alle Ladefunktionen erhalten jetzt die companyId direkt
     await loadCompanyUsers(companyUser.company_id);
     await loadWorkInstructions(companyUser.company_id);
-    await loadProjects(companyUser.company_id); // FIX 2: companyId direkt übergeben
+    await loadProjects(companyUser.company_id);
   }
 
   async function loadWorkInstructions(companyId: string) {
@@ -1300,18 +1312,6 @@ export default function Home() {
   }
 
   async function loadCompanySettings(userId: string) {
-    // Zuerst prüfen ob Passwort geändert werden muss
-    const { data: companyUserCheck } = await supabase
-      .from("company_users")
-      .select("must_change_password")
-      .eq("user_id", userId)
-      .maybeSingle();
-
-    if (companyUserCheck?.must_change_password) {
-      setMustChangePassword(true);
-      return; // Kein Onboarding zeigen solange Passwort nicht geändert
-    }
-
     const { data, error } = await supabase.from("company_settings").select("*").eq("user_id", userId).single();
     if (error && error.code !== "PGRST116") { setMessage("Fehler beim Laden der Firmendaten: " + error.message); return; }
     
