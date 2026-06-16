@@ -1618,18 +1618,30 @@ export default function Home() {
       return;
     }
     setChangingPassword(true);
-    const { error } = await supabase.auth.updateUser({ password: newPassword });
-    if (error) { setMessage("Fehler: " + error.message); setChangingPassword(false); return; }
 
-    // must_change_password auf false setzen
+    // Zuerst must_change_password auf false setzen (vor updateUser!)
     await supabase.from("company_users")
       .update({ must_change_password: false })
       .eq("user_id", user?.id);
+
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) { 
+      setMessage("Fehler: " + error.message); 
+      setChangingPassword(false); 
+      return; 
+    }
 
     setMustChangePassword(false);
     setNewPassword("");
     setNewPasswordConfirm("");
     setChangingPassword(false);
+
+    // Jetzt alles laden
+    if (user) {
+      await loadCompanyContext(user.id);
+      await loadReportsFromDatabase();
+      await loadCompanySettings(user.id);
+    }
     setMessage("Passwort wurde erfolgreich geändert. Willkommen!");
   }
 
