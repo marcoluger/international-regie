@@ -1618,26 +1618,44 @@ export default function Home() {
       return;
     }
     setChangingPassword(true);
+    setMessage("Speichere...");
 
-    // Zuerst must_change_password auf false setzen (vor updateUser!)
-    await supabase.from("company_users")
-      .update({ must_change_password: false })
-      .eq("user_id", user?.id);
+    try {
+      // Schritt 1: must_change_password auf false
+      const { error: dbError } = await supabase.from("company_users")
+        .update({ must_change_password: false })
+        .eq("user_id", user?.id);
+      
+      if (dbError) {
+        setMessage("DB Fehler: " + dbError.message);
+        setChangingPassword(false);
+        return;
+      }
+      setMessage("Schritt 1 OK...");
 
-    const { error } = await supabase.auth.updateUser({ password: newPassword });
-    if (error) { 
-      setMessage("Fehler: " + error.message); 
-      setChangingPassword(false); 
-      return; 
+      // Schritt 2: Passwort ändern per API Route
+      const res = await fetch("/api/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          userId: user?.id,
+          newPassword 
+        }),
+      });
+      const data = await res.json();
+      
+      if (data.error) {
+        setMessage("Fehler: " + data.error);
+        setChangingPassword(false);
+        return;
+      }
+
+      setMessage("Passwort geändert! Weiterleitung...");
+      setTimeout(() => window.location.reload(), 1000);
+    } catch (err) {
+      setMessage("Unbekannter Fehler: " + String(err));
+      setChangingPassword(false);
     }
-
-    setChangingPassword(false);
-    setMustChangePassword(false);
-    setNewPassword("");
-    setNewPasswordConfirm("");
-
-    // Seite neu laden damit alles sauber startet
-    window.location.reload();
   }
 
   async function saveOnboarding() {
