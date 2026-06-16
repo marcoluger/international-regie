@@ -818,6 +818,7 @@ export default function Home() {
   const [selectedProjectId, setSelectedProjectId] = useState("");
   const [selectedProjectDetailId, setSelectedProjectDetailId] = useState("");
   const [instructionDate, setInstructionDate] = useState("");
+  const [assignedUserId, setAssignedUserId] = useState("");
   const [selectedDayDate, setSelectedDayDate] = useState(new Date().toISOString().split("T")[0]);
   const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
   const [selectedWeek, setSelectedWeek] = useState(new Date().toISOString().split("T")[0]);
@@ -999,14 +1000,14 @@ export default function Home() {
     setMessage(t.msgSaving);
     if (!currentCompany) { setMessage(t.msgNoFirm); return; }
     if (!instructionTitle.trim()) { setMessage(t.msgNoTitle); return; }
-    const { data: instruction, error } = await supabase.from("work_instructions").insert({ company_id: currentCompany.company_id, project_id: selectedProjectId || null, work_date: instructionDate || null, created_by: user?.id, title: instructionTitle, project: instructionProject, customer: instructionCustomer, site: instructionSite, description: instructionDescription, problems_text: instructionProblems, photos: instructionPhotos }).select().single();
+    const { data: instruction, error } = await supabase.from("work_instructions").insert({ company_id: currentCompany.company_id, project_id: selectedProjectId || null, work_date: instructionDate || null, created_by: user?.id, assigned_user_id: assignedUserId || null, title: instructionTitle, project: instructionProject, customer: instructionCustomer, site: instructionSite, description: instructionDescription, problems_text: instructionProblems, photos: instructionPhotos }).select().single();
     if (error) { setMessage("Fehler: " + error.message); return; }
     const taskRows = instructionTasks.filter((task) => task.trim() !== "").map((task, index) => ({ work_instruction_id: instruction.id, task_text: task, sort_order: index, photos: instructionTaskPhotos[index] || [] }));
     if (taskRows.length > 0) {
       const { error: taskError } = await supabase.from("work_instruction_tasks").insert(taskRows);
       if (taskError) { setMessage("Arbeitsanweisung gespeichert, aber Schritte nicht: " + taskError.message); return; }
     }
-    setInstructionTitle(""); setInstructionProject(""); setInstructionCustomer(""); setInstructionSite(""); setInstructionDescription(""); setInstructionTasks([""]); setInstructionProblems(""); setInstructionPhotos([]); setInstructionTaskPhotos({});
+    setInstructionTitle(""); setInstructionProject(""); setInstructionCustomer(""); setInstructionSite(""); setInstructionDescription(""); setInstructionTasks([""]); setInstructionProblems(""); setInstructionPhotos([]); setInstructionTaskPhotos({}); setAssignedUserId("");
     await loadWorkInstructions(currentCompany.company_id);
     setMessage(t.msgInstructionSaved);
   }
@@ -1651,6 +1652,12 @@ export default function Home() {
               <input className="border p-3 text-black bg-white" placeholder={t.customer} value={instructionCustomer} onChange={(e) => setInstructionCustomer(e.target.value)} />
               <input className="border p-3 text-black bg-white" placeholder={t.site} value={instructionSite} onChange={(e) => setInstructionSite(e.target.value)} />
               <input type="date" className="border p-3 text-black bg-white" value={instructionDate} onChange={(e) => setInstructionDate(e.target.value)} />
+              <select className="border p-3 text-black bg-white" value={assignedUserId} onChange={(e) => setAssignedUserId(e.target.value)}>
+                <option value="">👤 Mitarbeiter zuweisen (optional)</option>
+                {companyUsers.filter(m => m.role === "employee").map((m) => (
+                  <option key={m.user_id} value={m.user_id}>{m.full_name || m.email}</option>
+                ))}
+              </select>
             </div>
             <input className="border p-3 w-full text-black bg-white" placeholder={t.problems} value={instructionProblems} onChange={(e) => setInstructionProblems(e.target.value)} />
             {companyFeatures?.photos_enabled && (
