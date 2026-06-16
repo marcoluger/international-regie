@@ -1813,7 +1813,7 @@ export default function Home() {
       {activeTab === "mitarbeiter" && (
         <section className="border rounded p-4 space-y-4 bg-white text-black">
           <h2 className="text-xl font-bold">{t.employeeManagement}</h2>
-          {(currentCompany?.role === "owner" || currentCompany?.role === "admin") && (
+          {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
             <div className="border rounded p-4 bg-gray-50 space-y-3">
               <h3 className="font-bold">Neuen Mitarbeiter anlegen</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -1822,7 +1822,7 @@ export default function Home() {
                 <input className="border p-3 text-black bg-white" placeholder="Passwort *" type="password" value={newUserPassword} onChange={(e) => setNewUserPassword(e.target.value)} />
                 <select className="border p-3 text-black bg-white" value={newUserRole} onChange={(e) => setNewUserRole(e.target.value)}>
                   <option value="employee">{t.roleEmployee}</option>
-                  <option value="project_manager">{t.roleProjectManager}</option>
+                  {(currentCompany?.role === "owner" || currentCompany?.role === "admin") && <option value="project_manager">{t.roleProjectManager}</option>}
                   {currentCompany?.role === "owner" && <option value="admin">{t.roleAdmin}</option>}
                 </select>
               </div>
