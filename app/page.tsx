@@ -972,6 +972,18 @@ export default function Home() {
       const { data } = await supabase.auth.getUser();
       setUser(data.user);
       if (data.user) {
+        // ZUERST: Passwort-Änderung prüfen
+        const { data: pwCheck } = await supabase
+          .from("company_users")
+          .select("must_change_password")
+          .eq("user_id", data.user.id)
+          .maybeSingle();
+
+        if (pwCheck?.must_change_password === true) {
+          setMustChangePassword(true);
+          return; // Nichts anderes laden!
+        }
+
         await loadCompanyContext(data.user.id);
         await loadReportsFromDatabase();
         await loadCompanySettings(data.user.id);
@@ -980,9 +992,21 @@ export default function Home() {
 
     loadUser();
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user || null);
       if (session?.user) {
+        // ZUERST: Passwort-Änderung prüfen
+        const { data: pwCheck } = await supabase
+          .from("company_users")
+          .select("must_change_password")
+          .eq("user_id", session.user.id)
+          .maybeSingle();
+
+        if (pwCheck?.must_change_password === true) {
+          setMustChangePassword(true);
+          return;
+        }
+
         loadCompanyContext(session.user.id);
         loadReportsFromDatabase();
         loadCompanySettings(session.user.id);
@@ -1071,18 +1095,6 @@ export default function Home() {
     setToLanguage(firstTarget); // Regiebericht-Zielsprache
   }
   // App-Sprache bleibt immer Deutsch (oder was der User gewählt hat)
-
-    // Passwort-Änderung prüfen
-    const { data: pwCheck } = await supabase
-      .from("company_users")
-      .select("must_change_password")
-      .eq("user_id", userId)
-      .maybeSingle();
-
-    if (pwCheck?.must_change_password === true) {
-      setMustChangePassword(true);
-      return; // Stopp — kein weiteres Laden
-    }
 
     // Alle Ladefunktionen erhalten jetzt die companyId direkt
     await loadCompanyUsers(companyUser.company_id);
