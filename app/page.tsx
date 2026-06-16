@@ -1441,7 +1441,7 @@ export default function Home() {
         <h1 className="text-3xl font-bold">{t.title}</h1>
         <p className="text-gray-600">{t.subtitle}</p>
         <p className="text-gray-700">{t.loggedInAs}: <strong>{user.email}</strong></p>
-        {currentCompany && (<p className="text-gray-700">{t.firma}: <strong>{currentCompany.companies.name}</strong> | {t.role}: <strong>{currentCompany.role}</strong></p>)}
+        {currentCompany && (<p className="text-gray-700">{t.firma}: <strong>{currentCompany.companies.name}</strong> | {t.role}: <strong>{currentCompany.role === "owner" ? "Owner" : currentCompany.role === "admin" ? t.roleAdmin : currentCompany.role === "project_manager" ? t.roleProjectManager : t.roleEmployee}</strong></p>)}
         <div className="flex items-center gap-3 mt-2">
           <button type="button" onClick={signOut} className="bg-gray-800 text-white px-4 py-2 rounded">{t.logout}</button>
           <select className="border p-2 rounded text-black bg-white text-sm" value={uiLanguage} onChange={(e) => setUiLanguage(e.target.value as Language)}>
@@ -1614,6 +1614,7 @@ export default function Home() {
 
       {activeTab === "arbeitsanweisungen" && (
         <div className="space-y-4">
+          {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") ? (
           <section className="border rounded p-4 space-y-4 bg-white text-black">
             <h2 className="text-xl font-bold">{t.newInstruction}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -1646,6 +1647,9 @@ export default function Home() {
               <button type="button" onClick={saveWorkInstruction} className="bg-blue-700 text-white px-4 py-3 rounded">{t.saveInstruction}</button>
             </div>
           </section>
+          ) : (
+            <section className="border rounded p-4 bg-yellow-50 text-black"><p className="text-yellow-700 text-sm">🔒 Arbeitsanweisungen anlegen ist nur für Projektleiter und Admins möglich.</p></section>
+          )}
           <section className="border rounded p-4 bg-blue-50 text-black"><p className="text-blue-700 text-sm">💡 {t.savedInstructions} → {t.tabDay} / {t.tabWeek} / {t.tabMonth}</p></section>
         </div>
       )}
