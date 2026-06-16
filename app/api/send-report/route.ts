@@ -1,58 +1,57 @@
+import { createClient } from "@supabase/supabase-js";
+
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+    const { username, password, fullName, role, companyId } = body;
 
-    const to = body.to;
-    const subject = body.subject || "Regiebericht";
-    const pdfBase64 = body.pdfBase64;
-    const filename = body.filename || "regiebericht.pdf";
-
-    if (!to || !pdfBase64) {
-      return Response.json(
-        { error: "Empfänger oder PDF fehlt." },
-        { status: 400 }
-      );
+    if (!username || !password || !companyId) {
+      return Response.json({ error: "Benutzername, Passwort und Firma fehlen." }, { status: 400 });
     }
 
-    const resendResponse = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: process.env.EMAIL_FROM || "Regiebericht <onboarding@resend.dev>",
-        to: [to],
-        subject,
-        html: "<p>Anbei der Regiebericht als PDF.</p>",
-        attachments: [
-          {
-            filename,
-            content: pdfBase64,
-          },
-        ],
-      }),
-    });
+    // Fake-E-Mail aus Benutzername generieren
+    const email = `${username.toLowerCase().replace(/\s+/g, ".")}@regie-internal.app`;
 
-    const data = await resendResponse.json();
-
-    if (!resendResponse.ok) {
-      return Response.json(
-        { error: data.message || "E-Mail konnte nicht gesendet werden." },
-        { status: 500 }
-      );
-    }
-
-    return Response.json({
-      success: true,
-      data,
-    });
-  } catch (error) {
-    return Response.json(
-      { error: String(error) },
-      { status: 500 }
+    // Supabase Admin Client mit Service Role
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL || "",
+      process.env.SUPABASE_SERVICE_ROLE_KEY || ""
     );
+
+    // User in auth.users anlegen
+    const { data: newUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true, // Keine E-Mail-Bestätigung nötig
+      user_metadata: {
+        full_name: fullName,
+        username,
+      },
+    });
+
+    if (authError) {
+      return Response.json({ error: authError.message }, { status: 500 });
+    }
+
+    // User in company_users eintragen
+    const { error: companyUserError } = await supabaseAdmin
+      .from("company_users")
+      .insert({
+        company_id: companyId,
+        user_id: newUser.user.id,
+        email,
+        full_name: fullName,
+        role: role || "employee",
+      });
+
+    if (companyUserError) {
+      return Response.json({ error: companyUserError.message }, { status: 500 });
+    }
+
+    return Response.json({ success: true, email });
+  } catch (error) {
+    return Response.json({ error: String(error) }, { status: 500 });
   }
 }

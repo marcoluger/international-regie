@@ -907,6 +907,8 @@ export default function Home() {
   const [user, setUser] = useState<User | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
+  const [isUsernameLogin, setIsUsernameLogin] = useState(false);
   const [companySettings, setCompanySettings] = useState<CompanySettings | null>(null);
   const [currentReportId, setCurrentReportId] = useState<string | null>(null);
   const [employee, setEmployee] = useState("");
@@ -926,7 +928,10 @@ export default function Home() {
   const [companyUsers, setCompanyUsers] = useState<any[]>([]);
   const [newUserEmail, setNewUserEmail] = useState("");
   const [newUserName, setNewUserName] = useState("");
+  const [newUserUsername, setNewUserUsername] = useState("");
+  const [newUserPassword, setNewUserPassword] = useState("");
   const [newUserRole, setNewUserRole] = useState("employee");
+  const [creatingEmployee, setCreatingEmployee] = useState(false);
   const [instructionProblems, setInstructionProblems] = useState("");
   const [instructionTitle, setInstructionTitle] = useState("");
   const [instructionProject, setInstructionProject] = useState("");
@@ -994,7 +999,11 @@ export default function Home() {
 
   async function signIn() {
     setMessage("");
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    // Benutzername → Fake-E-Mail konvertieren
+    const loginEmail = isUsernameLogin
+      ? `${username.toLowerCase().replace(/\s+/g, ".")}@regie-internal.app`
+      : email;
+    const { error } = await supabase.auth.signInWithPassword({ email: loginEmail, password });
     if (error) { setMessage(t.msgLoginFail + error.message); return; }
     setMessage(t.msgLoginOk);
   }
@@ -1095,16 +1104,28 @@ export default function Home() {
 
   async function addCompanyUser() {
     if (!currentCompany) return;
-    const { error } = await supabase.from("company_users").insert({
-      company_id: currentCompany.company_id,
-      full_name: newUserName,
-      email: newUserEmail,
-      role: newUserRole,
+    if (!newUserName.trim() || !newUserUsername.trim() || !newUserPassword.trim()) {
+      setMessage("Bitte alle Pflichtfelder ausfüllen.");
+      return;
+    }
+    setCreatingEmployee(true);
+    const res = await fetch("/api/create-employee", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: newUserUsername,
+        password: newUserPassword,
+        fullName: newUserName,
+        role: newUserRole,
+        companyId: currentCompany.company_id,
+      }),
     });
-    if (error) { setMessage("Fehler beim Hinzufügen: " + error.message); return; }
-    setNewUserName(""); setNewUserEmail(""); setNewUserRole("employee");
+    const data = await res.json();
+    setCreatingEmployee(false);
+    if (data.error) { setMessage("Fehler: " + data.error); return; }
+    setNewUserName(""); setNewUserEmail(""); setNewUserUsername(""); setNewUserPassword(""); setNewUserRole("employee");
     await loadCompanyUsers(currentCompany.company_id);
-    setMessage(t.msgEmployeeAdded);
+    setMessage(`✅ Mitarbeiter angelegt. Login: ${data.email}`);
   }
 
   async function resetCompanyUserPassword(memberEmail: string) {
@@ -1801,12 +1822,33 @@ export default function Home() {
             {languages.map((lang) => <option key={lang} value={lang}>{lang}</option>)}
           </select>
           {message && <div className="border rounded p-3 bg-yellow-100 text-black">{message}</div>}
-          <input className="border p-3 w-full text-black bg-white" placeholder={t.email} value={email} onChange={(e) => setEmail(e.target.value)} />
+          
+          {/* Login-Typ wählen */}
+          <div className="flex gap-2">
+            <button type="button"
+              onClick={() => setIsUsernameLogin(false)}
+              className={`flex-1 py-2 rounded font-medium ${!isUsernameLogin ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-700"}`}>
+              📧 E-Mail
+            </button>
+            <button type="button"
+              onClick={() => setIsUsernameLogin(true)}
+              className={`flex-1 py-2 rounded font-medium ${isUsernameLogin ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-700"}`}>
+              👤 Benutzername
+            </button>
+          </div>
+
+          {isUsernameLogin ? (
+            <input className="border p-3 w-full text-black bg-white" placeholder="Benutzername" value={username} onChange={(e) => setUsername(e.target.value)} />
+          ) : (
+            <input className="border p-3 w-full text-black bg-white" placeholder={t.email} value={email} onChange={(e) => setEmail(e.target.value)} />
+          )}
           <input className="border p-3 w-full text-black bg-white" placeholder={t.password} type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
           <div className="flex flex-wrap gap-3">
-            <button type="button" onClick={signIn} className="bg-blue-600 text-white px-4 py-3 rounded">{t.login}</button>
-            <button type="button" onClick={signUp} className="bg-green-600 text-white px-4 py-3 rounded">{t.register}</button>
+            <button type="button" onClick={signIn} className="bg-blue-600 text-white px-4 py-3 rounded w-full">{t.login}</button>
           </div>
+          <p className="text-center text-sm text-gray-500">Noch kein Konto? 
+            <button type="button" onClick={signUp} className="text-blue-600 underline ml-1">{t.register}</button>
+          </p>
         </section>
       </main>
     );
@@ -2590,16 +2632,25 @@ export default function Home() {
       {activeTab === "mitarbeiter" && (
         <section className="border rounded p-4 space-y-4 bg-white text-black">
           <h2 className="text-xl font-bold">{t.employeeManagement}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <input className="border p-3 text-black bg-white" placeholder={t.name} value={newUserName} onChange={(e) => setNewUserName(e.target.value)} />
-            <input className="border p-3 text-black bg-white" placeholder={t.email} value={newUserEmail} onChange={(e) => setNewUserEmail(e.target.value)} />
-            <select className="border p-3 text-black bg-white" value={newUserRole} onChange={(e) => setNewUserRole(e.target.value)}>
-              <option value="employee">{t.roleEmployee}</option>
-              <option value="project_manager">{t.roleProjectManager}</option>
-              <option value="admin">{t.roleAdmin}</option>
-            </select>
-          </div>
-          <button type="button" onClick={addCompanyUser} className="bg-blue-700 text-white px-4 py-3 rounded">{t.addEmployee}</button>
+          {(currentCompany?.role === "owner" || currentCompany?.role === "admin") && (
+            <div className="border rounded p-4 bg-gray-50 space-y-3">
+              <h3 className="font-bold">Neuen Mitarbeiter anlegen</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <input className="border p-3 text-black bg-white" placeholder="Vollständiger Name *" value={newUserName} onChange={(e) => setNewUserName(e.target.value)} />
+                <input className="border p-3 text-black bg-white" placeholder="Benutzername * (für Login)" value={newUserUsername} onChange={(e) => setNewUserUsername(e.target.value)} />
+                <input className="border p-3 text-black bg-white" placeholder="Passwort *" type="password" value={newUserPassword} onChange={(e) => setNewUserPassword(e.target.value)} />
+                <select className="border p-3 text-black bg-white" value={newUserRole} onChange={(e) => setNewUserRole(e.target.value)}>
+                  <option value="employee">{t.roleEmployee}</option>
+                  <option value="project_manager">{t.roleProjectManager}</option>
+                  {currentCompany?.role === "owner" && <option value="admin">{t.roleAdmin}</option>}
+                </select>
+              </div>
+              <button type="button" onClick={addCompanyUser} disabled={creatingEmployee} className="bg-blue-700 text-white px-4 py-3 rounded disabled:opacity-50">
+                {creatingEmployee ? "Wird angelegt..." : t.addEmployee}
+              </button>
+              <p className="text-xs text-gray-400">Der Mitarbeiter meldet sich mit seinem Benutzernamen und Passwort an.</p>
+            </div>
+          )}
           <p>{t.currentEmployees}: <strong>{companyUsers.length}</strong></p>
           <div className="space-y-3">
             {companyUsers.map((member) => (
