@@ -1015,9 +1015,11 @@ export default function Home() {
       .from("company_users")
       .select("company_id, role")
       .eq("user_id", userId)
-      .single();
+      .maybeSingle();
 
+    // Kein Eintrag gefunden → Onboarding zeigen
     if (error) { setMessage("Fehler beim Laden der Firma: " + error.message); return; }
+    if (!companyUser) { setShowOnboarding(true); return; }
 
     // Schritt 2: company separat laden
     const { data: companyData, error: companyError } = await supabase
@@ -1558,11 +1560,66 @@ export default function Home() {
 
   async function saveOnboarding() {
     if (!user || !companySettings) return;
+
+    // Prüfen ob User schon eine Firma hat
+    const { data: existingUser } = await supabase
+      .from("company_users")
+      .select("company_id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    let companyId = existingUser?.company_id;
+
+    if (!companyId) {
+      // Neue Firma anlegen
+      const { data: newCompany, error: companyError } = await supabase
+        .from("companies")
+        .insert({
+          name: companySettings.company_name || "Meine Firma",
+          owner_user_id: user.id,
+          status: "active",
+        })
+        .select()
+        .single();
+
+      if (companyError) { setMessage("Fehler beim Anlegen der Firma: " + companyError.message); return; }
+      companyId = newCompany.id;
+
+      // User als owner eintragen
+      const { error: userError } = await supabase.from("company_users").insert({
+        company_id: companyId,
+        user_id: user.id,
+        email: user.email,
+        full_name: companySettings.company_name,
+        role: "owner",
+      });
+      if (userError) { setMessage("Fehler beim Anlegen des Benutzers: " + userError.message); return; }
+
+      // Standard company_features anlegen
+      await supabase.from("company_features").insert({
+        company_id: companyId,
+        package_name: "starter",
+        max_employees: 5,
+        module_reports: true,
+        module_work_orders: false,
+        module_auto_reports: false,
+        photos_enabled: false,
+        email_enabled: false,
+        signature_enabled: false,
+        ai_enabled: false,
+        allowed_languages: ["Deutsch"],
+      });
+    }
+
+    // Firmendaten speichern
     const { error } = await supabase.from("company_settings").upsert(
       { ...companySettings, user_id: user.id },
       { onConflict: "user_id" }
     );
     if (error) { setMessage("Fehler beim Speichern: " + error.message); return; }
+
+    // Kontext neu laden
+    await loadCompanyContext(user.id);
     setShowOnboarding(false);
     setOnboardingDone(true);
     setMessage("Willkommen! Ihre Firmendaten wurden gespeichert.");
