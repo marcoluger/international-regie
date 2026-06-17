@@ -883,7 +883,7 @@ export default function Home() {
   async function loadCompanyContext(userId: string) {
     const { data: companyUser, error } = await supabase.from("company_users").select("company_id, role").eq("user_id", userId).maybeSingle();
     if (error) { setMessage("Fehler beim Laden der Firma: " + error.message); return; }
-    if (!companyUser) { setShowOnboarding(true); return; }
+    if (!companyUser) { return; } // Kein Onboarding hier – wird in loadCompanySettings entschieden
     const { data: companyData, error: companyError } = await supabase.from("companies").select("id, name, slug").eq("id", companyUser.company_id).single();
     if (companyError) { setMessage("Fehler beim Laden der Firmendaten: " + companyError.message); return; }
     const company: CurrentCompany = { company_id: companyUser.company_id, role: companyUser.role, companies: { id: companyData.id, name: companyData.name, slug: companyData.slug || "" } };
@@ -1080,24 +1080,20 @@ export default function Home() {
   async function loadCompanySettings(userId: string) {
     const { data: companyUser } = await supabase.from("company_users").select("company_id, role").eq("user_id", userId).maybeSingle();
     
-    // Hat bereits eine Firma = kein Onboarding
+    // Hat company_id = Firma existiert bereits = KEIN Onboarding
     if (companyUser?.company_id) {
       setShowOnboarding(false);
-    } else {
-      // Kein company_users Eintrag = ganz neuer User = Onboarding
-      setShowOnboarding(true);
+      // Owner der Firma finden für company_settings
+      const { data: ownerUser } = await supabase.from("company_users").select("user_id").eq("company_id", companyUser.company_id).eq("role", "owner").maybeSingle();
+      const ownerUserId = ownerUser?.user_id || userId;
+      const { data } = await supabase.from("company_settings").select("*").eq("user_id", ownerUserId).single();
+      const settings = data || { user_id: ownerUserId, company_name: "", company_logo: "", street: "", zip_code: "", city: "", phone: "", email: "", website: "", tax_number: "" };
+      setCompanySettings(settings);
       return;
     }
 
-    // Owner der Firma finden
-    const { data: ownerUser } = await supabase.from("company_users").select("user_id").eq("company_id", companyUser.company_id).eq("role", "owner").maybeSingle();
-    const ownerUserId = ownerUser?.user_id || userId;
-
-    const { data, error } = await supabase.from("company_settings").select("*").eq("user_id", ownerUserId).single();
-    if (error && error.code !== "PGRST116") { setMessage("Fehler beim Laden der Firmendaten: " + error.message); return; }
-    
-    const settings = data || { user_id: ownerUserId, company_name: "", company_logo: "", street: "", zip_code: "", city: "", phone: "", email: "", website: "", tax_number: "" };
-    setCompanySettings(settings);
+    // Kein company_users Eintrag = selbst registriert, noch keine Firma = Onboarding
+    setShowOnboarding(true);
   }
 
   async function saveCompanySettings() {
