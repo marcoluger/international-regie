@@ -1006,6 +1006,18 @@ export default function Home() {
     setMessage(t.msgPhotoOk);
   }
 
+  function getTranslated(instructionId: string, field: string, fallback: string): string {
+    const trans = instructionTranslations[instructionId];
+    if (trans && trans.language === uiLanguage && trans[field]) return trans[field];
+    return fallback;
+  }
+
+  function getTranslatedTask(instructionId: string, taskId: string, fallback: string): string {
+    const trans = instructionTranslations[instructionId];
+    if (trans && trans.language === uiLanguage && trans.tasks?.[taskId]) return trans.tasks[taskId];
+    return fallback;
+  }
+
   async function saveWorkInstruction() {
     setMessage(t.msgSaving);
     if (!currentCompany) { setMessage(t.msgNoFirm); return; }
@@ -1494,7 +1506,40 @@ export default function Home() {
         {currentCompany && (<p className="text-gray-700">{t.firma}: <strong>{currentCompany.companies.name}</strong> | {t.role}: <strong>{currentCompany.role === "owner" ? "Owner" : currentCompany.role === "admin" ? t.roleAdmin : currentCompany.role === "project_manager" ? t.roleProjectManager : t.roleEmployee}</strong></p>)}
         <div className="flex items-center gap-3 mt-2">
           <button type="button" onClick={signOut} className="bg-gray-800 text-white px-4 py-2 rounded">{t.logout}</button>
-          <select className="border p-2 rounded text-black bg-white text-sm" value={uiLanguage} onChange={(e) => setUiLanguage(e.target.value as Language)}>
+          <select className="border p-2 rounded text-black bg-white text-sm" value={uiLanguage} onChange={async (e) => {
+            const newLang = e.target.value as Language;
+            setUiLanguage(newLang);
+            // Automatisch alle Arbeitsanweisungen übersetzen wenn nicht Deutsch
+            if (newLang !== "Deutsch") {
+              setMessage("Übersetze Arbeitsanweisungen...");
+              const newTranslations: Record<string, any> = { ...instructionTranslations };
+              for (const instruction of workInstructions) {
+                if (newTranslations[instruction.id]?.language === newLang) continue;
+                const textsToTranslate = [
+                  { key: "title", text: instruction.title || "" },
+                  { key: "problems_text", text: instruction.problems_text || "" },
+                  { key: "description", text: instruction.description || "" },
+                ];
+                const translatedFields: Record<string, string> = {};
+                for (const item of textsToTranslate) {
+                  if (!item.text.trim()) continue;
+                  const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: item.text, fromLanguage: "Deutsch", toLanguage: newLang }) });
+                  const data = await res.json();
+                  translatedFields[item.key] = data.error ? item.text : data.translation;
+                }
+                const translatedTasks: Record<string, string> = {};
+                for (const task of instruction.work_instruction_tasks || []) {
+                  if (!task.task_text?.trim()) continue;
+                  const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: task.task_text, fromLanguage: "Deutsch", toLanguage: newLang }) });
+                  const data = await res.json();
+                  translatedTasks[task.id] = data.error ? task.task_text : data.translation;
+                }
+                newTranslations[instruction.id] = { ...translatedFields, tasks: translatedTasks, language: newLang };
+              }
+              setInstructionTranslations(newTranslations);
+              setMessage("");
+            }
+          }}>
             {(getAllowedLanguages(companyFeatures).length > 0 ? ["Deutsch", ...getAllowedLanguages(companyFeatures).filter(l => l !== "Deutsch" && languages.includes(l as Language))] : languages).map((lang) => (<option key={lang} value={lang}>🌐 {lang}</option>))}
           </select>
           <select className="border p-2 rounded text-black bg-white text-sm" value={pdfLanguage} onChange={(e) => setPdfLanguage(e.target.value)}>
@@ -1640,7 +1685,7 @@ export default function Home() {
                     <h4 className="font-bold">{t.workInstructions}</h4>
                     {workInstructions.filter((i) => i.project_id === project.id).map((instruction) => (
                       <div key={instruction.id} className="border rounded p-3 bg-white space-y-2">
-                        <strong>{instruction.title}</strong>
+                        <strong>{getTranslated(instruction.id, "title", instruction.title)}</strong>
                         <p><strong>{t.date}:</strong> {instruction.work_date || "-"}</p>
                         <p><strong>{t.customer}:</strong> {instruction.customer || "-"}</p>
                         <p><strong>{t.site}:</strong> {instruction.site || "-"}</p>
@@ -1744,7 +1789,7 @@ export default function Home() {
             if (dayInstructions.length === 0) return (<section className="border rounded p-4 bg-white text-black"><p className="text-gray-500">{t.noInstructionsDay}</p></section>);
             return dayInstructions.map((instruction) => (
               <section key={instruction.id} className="border rounded p-4 bg-white text-black space-y-2">
-                <div className="flex justify-between items-start"><h3 className="font-bold text-lg">{instruction.title}</h3><span className="text-sm text-gray-500">{instruction.work_date}</span></div>
+                <div className="flex justify-between items-start"><h3 className="font-bold text-lg">{getTranslated(instruction.id, "title", instruction.title)}</h3><span className="text-sm text-gray-500">{instruction.work_date}</span></div>
                 <p><strong>{t.project}:</strong> {instruction.project || "-"}</p>
                 <p><strong>{t.customer}:</strong> {instruction.customer || "-"}</p>
                 <p><strong>{t.site}:</strong> {instruction.site || "-"}</p>
@@ -1757,7 +1802,7 @@ export default function Home() {
                         <select className="border rounded p-1 text-sm text-black bg-white" value={task.status || "open"} onChange={(e) => updateTaskStatus(task.id, e.target.value)}>
                           <option value="open">{t.statusOpen}</option><option value="in_progress">{t.statusInProgress}</option><option value="stopped">{t.statusStopped}</option><option value="completed">{t.statusCompleted}</option>
                         </select>
-                        <span className="font-medium">{task.task_text}</span>
+                        <span className="font-medium">{getTranslatedTask(instruction.id, task.id, task.task_text)}</span>
                       </div>
                       {task.note && <p className="text-sm text-gray-600 ml-2">{t.feedbackLabel}: {task.note}</p>}
                       {(task.photos || []).length > 0 && companyFeatures?.photos_enabled && (<div className="grid grid-cols-3 gap-1">{(task.photos || []).map((photo: string, pi: number) => (<img key={pi} src={photo} alt="Foto" className="w-full h-16 object-cover rounded" />))}</div>)}
@@ -1807,7 +1852,7 @@ export default function Home() {
                   </div>
                   {dayInstructions.map((instruction) => (
                     <div key={instruction.id} className="border rounded p-3 space-y-2">
-                      <div className="flex justify-between"><strong>{instruction.title}</strong><span className="text-sm text-gray-500">{instruction.project || "-"}</span></div>
+                      <div className="flex justify-between"><strong>{getTranslated(instruction.id, "title", instruction.title)}</strong><span className="text-sm text-gray-500">{instruction.project || "-"}</span></div>
                       <p className="text-sm"><strong>{t.customer}:</strong> {instruction.customer || "-"} | <strong>{t.site}:</strong> {instruction.site || "-"}</p>
                       {instruction.problems_text && (<div className="bg-yellow-50 border rounded p-2 text-sm"><strong>{t.problemsHints}:</strong> {instruction.problems_text}</div>)}
                       <ul className="space-y-1">
@@ -1816,7 +1861,7 @@ export default function Home() {
                             <select className="border rounded p-1 text-xs text-black bg-white" value={task.status || "open"} onChange={(e) => updateTaskStatus(task.id, e.target.value)}>
                               <option value="open">{t.statusOpen}</option><option value="in_progress">{t.statusInProgress}</option><option value="stopped">{t.statusStopped}</option><option value="completed">{t.statusCompleted}</option>
                             </select>
-                            <span>{task.task_text}</span>{task.note && <span className="text-gray-500">— {task.note}</span>}
+                            <span>{getTranslatedTask(instruction.id, task.id, task.task_text)}</span>{task.note && <span className="text-gray-500">— {task.note}</span>}
                           </li>
                         ))}
                       </ul>
