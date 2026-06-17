@@ -4,49 +4,48 @@ export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { username, password, fullName, role, companyId, mustChangePassword } = body;
+    const { username, password, fullName, role, companyId, companySlug } = await request.json();
 
     if (!username || !password || !companyId) {
-      return Response.json({ error: "Benutzername, Passwort und Firma fehlen." }, { status: 400 });
+      return Response.json({ error: "Pflichtfelder fehlen." }, { status: 400 });
     }
-
-    const email = `${username.toLowerCase().replace(/[^a-z0-9]/g, ".")}@regie-internal.app`;
 
     const supabaseAdmin = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL || "",
       process.env.SUPABASE_SERVICE_ROLE_KEY || ""
     );
 
-    // User in auth.users anlegen
-    const { data: newUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
+    // E-Mail aus Slug + Benutzername bauen
+    const slug = companySlug || companyId.slice(0, 8);
+    const cleanUsername = username.toLowerCase().replace(/\s+/g, ".");
+    const email = `${slug}.${cleanUsername}@regie-internal.app`;
+
+    // Auth-User anlegen
+    const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
       email_confirm: true,
-      user_metadata: { full_name: fullName, username },
     });
 
     if (authError) {
       return Response.json({ error: authError.message }, { status: 500 });
     }
 
-    // User in company_users eintragen
-    const { error: companyUserError } = await supabaseAdmin
-      .from("company_users")
-      .insert({
-        company_id: companyId,
-        user_id: newUser.user.id,
-        email,
-        full_name: fullName || username,
-        role: role || "employee",
-        must_change_password: mustChangePassword !== false, // default true
-      });
+    // company_users Eintrag anlegen
+    const { error: dbError } = await supabaseAdmin.from("company_users").insert({
+      company_id: companyId,
+      user_id: authUser.user.id,
+      email,
+      full_name: fullName || username,
+      role: role || "employee",
+      must_change_password: true,
+    });
 
-    if (companyUserError) {
-      return Response.json({ error: companyUserError.message }, { status: 500 });
+    if (dbError) {
+      return Response.json({ error: dbError.message }, { status: 500 });
     }
 
-    return Response.json({ success: true, email, username });
+    return Response.json({ success: true, email });
   } catch (error) {
     return Response.json({ error: String(error) }, { status: 500 });
   }
