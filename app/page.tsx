@@ -888,12 +888,13 @@ export default function Home() {
     if (companyError) { setMessage("Fehler beim Laden der Firmendaten: " + companyError.message); return; }
     const company: CurrentCompany = { company_id: companyUser.company_id, role: companyUser.role, companies: { id: companyData.id, name: companyData.name, slug: companyData.slug || "" } };
     setCurrentCompany(company);
-    const { data: features, error: featureError } = await supabase.from("company_features").select("*").eq("company_id", companyUser.company_id).single();
-    if (featureError) { setMessage("Fehler beim Laden der Module: " + featureError.message); return; }
-    setCompanyFeatures(features as CompanyFeatures);
-    const allowed = Array.isArray(features.allowed_languages) ? features.allowed_languages : (typeof features.allowed_languages === "string" ? JSON.parse(features.allowed_languages) : []);
-    const firstTarget = allowed.filter((l: string) => l !== "Deutsch")[0];
-    if (firstTarget) { setInstructionToLanguage(firstTarget); setToLanguage(firstTarget); }
+    const { data: features } = await supabase.from("company_features").select("*").eq("company_id", companyUser.company_id).maybeSingle();
+    if (features) {
+      setCompanyFeatures(features as CompanyFeatures);
+      const allowed = Array.isArray(features.allowed_languages) ? features.allowed_languages : (typeof features.allowed_languages === "string" ? JSON.parse(features.allowed_languages) : []);
+      const firstTarget = allowed.filter((l: string) => l !== "Deutsch")[0];
+      if (firstTarget) { setInstructionToLanguage(firstTarget); setToLanguage(firstTarget); }
+    }
     await loadCompanyUsers(companyUser.company_id);
     await loadWorkInstructions(companyUser.company_id);
     await loadProjects(companyUser.company_id);
@@ -1427,7 +1428,7 @@ export default function Home() {
     );
   }
 
-  if (user && showOnboarding) {
+  if (user && showOnboarding && false) {
     return (
       <main className="max-w-xl mx-auto p-4 md:p-8 min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="bg-white border rounded-xl p-6 space-y-6 w-full shadow-lg">
