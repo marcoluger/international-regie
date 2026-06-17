@@ -1080,8 +1080,11 @@ export default function Home() {
   async function loadCompanySettings(userId: string) {
     const { data: companyUser } = await supabase.from("company_users").select("company_id, role").eq("user_id", userId).maybeSingle();
     
-    // Kein Eintrag in company_users = komplett neuer User ohne Firma = Onboarding
-    if (!companyUser) {
+    // Hat bereits eine Firma = kein Onboarding
+    if (companyUser?.company_id) {
+      setShowOnboarding(false);
+    } else {
+      // Kein company_users Eintrag = ganz neuer User = Onboarding
       setShowOnboarding(true);
       return;
     }
@@ -1095,17 +1098,6 @@ export default function Home() {
     
     const settings = data || { user_id: ownerUserId, company_name: "", company_logo: "", street: "", zip_code: "", city: "", phone: "", email: "", website: "", tax_number: "" };
     setCompanySettings(settings);
-    
-    // Onboarding NUR wenn: Owner-Rolle UND keine company_settings UND keine Firma über Admin angelegt
-    // Wenn company_id existiert wurde die Firma bereits angelegt - kein Onboarding nötig
-    if (!data && companyUser.role === "owner") {
-      // Prüfen ob Firma bereits einen Namen in companies-Tabelle hat
-      const { data: companyData } = await supabase.from("companies").select("name").eq("id", companyUser.company_id).single();
-      if (!companyData?.name) {
-        setShowOnboarding(true);
-      }
-      // Firma hat Namen = über Admin angelegt = kein Onboarding
-    }
   }
 
   async function saveCompanySettings() {
