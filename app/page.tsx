@@ -858,6 +858,7 @@ export default function Home() {
   }
 
   const [companySlug, setCompanySlug] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   async function signIn() {
     setMessage("");
@@ -1404,7 +1405,10 @@ export default function Home() {
           ) : (
             <input name="email" autoComplete="email" className="border p-3 w-full text-black bg-white" placeholder={t.email} value={email} onChange={(e) => setEmail(e.target.value)} />
           )}
-          <input name="password" autoComplete="current-password" className="border p-3 w-full text-black bg-white" placeholder={t.password} type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+          <div className="relative">
+            <input name="password" autoComplete="current-password" className="border p-3 w-full text-black bg-white pr-12" placeholder={t.password} type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} />
+            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-lg">{showPassword ? "🙈" : "👁️"}</button>
+          </div>
           <button type="submit" className="bg-blue-600 text-white px-4 py-3 rounded w-full">{t.login}</button>
           </form>
           <p className="text-center text-sm text-gray-500">Noch kein Konto? <button type="button" onClick={signUp} className="text-blue-600 underline ml-1">{t.register}</button></p>
