@@ -1271,7 +1271,8 @@ export default function Home() {
       if (dbError) { setMessage("DB Fehler: " + dbError.message); setChangingPassword(false); return; }
       if (user?.email) { await supabase.auth.signInWithPassword({ email: user.email, password: newPassword }); }
       setMustChangePassword(false); setNewPassword(""); setNewPasswordConfirm(""); setMessage("✅ Passwort geändert!");
-      if (user?.id) { await loadCompanyContext(user.id); await loadReportsFromDatabase(); await loadCompanySettings(user.id); }
+      setShowOnboarding(false); // Onboarding nie zeigen nach Passwortänderung
+      if (user?.id) { await loadCompanyContext(user.id); await loadReportsFromDatabase(); }
     } catch (err) { setMessage("Unbekannter Fehler: " + String(err)); setChangingPassword(false); }
   }
 
