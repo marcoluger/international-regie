@@ -216,6 +216,15 @@ export default function AdminPage() {
     const pkg = PACKAGES[newOwnerPackage] || PACKAGES.starter;
     await supabase.from("company_features").insert({ ...EMPTY_FEATURES(company.id), ...pkg.defaults, company_id: company.id, package_name: newOwnerPackage });
 
+    // 4. Company settings anlegen damit kein Onboarding erscheint
+    const ownerUserId = ownerData.userId;
+    if (ownerUserId) {
+      await supabase.from("company_settings").insert({
+        user_id: ownerUserId,
+        company_name: newCompanyName.trim(),
+      });
+    }
+
     setLastCreatedCredentials({ username: newOwnerUsername, password: newOwnerPassword, company: newCompanyName.trim(), slug });
     setNewCompanyName(""); setNewCompanySlug(""); setNewOwnerUsername(""); setNewOwnerFullName(""); setNewOwnerPassword(""); setNewOwnerPackage("starter");
     setCreatingCompany(false);

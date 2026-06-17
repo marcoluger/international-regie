@@ -4,7 +4,7 @@ export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   try {
-    const { username, password, fullName, role, companyId, companySlug } = await request.json();
+    const { username, password, fullName, role, companyId, companySlug, mustChangePassword } = await request.json();
 
     if (!username || !password || !companyId) {
       return Response.json({ error: "Pflichtfelder fehlen." }, { status: 400 });
@@ -38,14 +38,14 @@ export async function POST(request: Request) {
       email,
       full_name: fullName || username,
       role: role || "employee",
-      must_change_password: true,
+      must_change_password: mustChangePassword ?? true,
     });
 
     if (dbError) {
       return Response.json({ error: dbError.message }, { status: 500 });
     }
 
-    return Response.json({ success: true, email });
+    return Response.json({ success: true, email, userId: authUser.user.id });
   } catch (error) {
     return Response.json({ error: String(error) }, { status: 500 });
   }
