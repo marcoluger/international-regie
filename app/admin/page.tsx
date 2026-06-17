@@ -89,6 +89,7 @@ function Badge({ text, color }: { text: string; color: string }) {
 export default function AdminPage() {
   const [adminEmail, setAdminEmail] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
+  const [showAdminPassword, setShowAdminPassword] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [message, setMessage] = useState("");
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -248,9 +249,14 @@ export default function AdminPage() {
         <div className="bg-white rounded-xl p-6 space-y-4 shadow-xl">
           <h1 className="text-2xl font-bold text-center">🔐 Admin-Login</h1>
           {message && <div className="bg-red-100 border rounded p-3 text-sm text-red-800">{message}</div>}
-          <input className="border p-3 w-full rounded" placeholder="Admin E-Mail" value={adminEmail} onChange={(e) => setAdminEmail(e.target.value)} />
-          <input className="border p-3 w-full rounded" placeholder="Passwort" type="password" value={adminPassword} onChange={(e) => setAdminPassword(e.target.value)} />
-          <button type="button" onClick={adminLogin} className="w-full bg-gray-900 text-white py-3 rounded font-bold">Einloggen</button>
+          <form onSubmit={(e) => { e.preventDefault(); adminLogin(); }} autoComplete="on" className="space-y-4">
+          <input name="email" autoComplete="email" className="border p-3 w-full rounded" placeholder="Admin E-Mail" value={adminEmail} onChange={(e) => setAdminEmail(e.target.value)} />
+          <div className="relative">
+            <input name="password" autoComplete="current-password" className="border p-3 w-full rounded pr-12" placeholder="Passwort" type={showAdminPassword ? "text" : "password"} value={adminPassword} onChange={(e) => setAdminPassword(e.target.value)} />
+            <button type="button" onClick={() => setShowAdminPassword(!showAdminPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-lg">{showAdminPassword ? "🙈" : "👁️"}</button>
+          </div>
+          <button type="submit" className="w-full bg-gray-900 text-white py-3 rounded font-bold">Einloggen</button>
+          </form>
         </div>
       </main>
     );
