@@ -844,7 +844,7 @@ export default function Home() {
         if (pwCheck?.must_change_password === true) { setMustChangePassword(true); return; }
         loadCompanyContext(session.user.id);
         loadReportsFromDatabase();
-        loadCompanySettings(session.user.id);
+        // loadCompanySettings NICHT hier aufrufen - wird nur einmal in loadUser aufgerufen
       }
     });
     return () => { authListener.subscription.unsubscribe(); };
