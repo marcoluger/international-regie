@@ -1395,16 +1395,18 @@ export default function Home() {
             <button type="button" onClick={() => setIsUsernameLogin(false)} className={`flex-1 py-2 rounded font-medium ${!isUsernameLogin ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-700"}`}>📧 E-Mail</button>
             <button type="button" onClick={() => setIsUsernameLogin(true)} className={`flex-1 py-2 rounded font-medium ${isUsernameLogin ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-700"}`}>👤 Benutzername</button>
           </div>
+          <form onSubmit={(e) => { e.preventDefault(); signIn(); }} autoComplete="on" className="space-y-3">
           {isUsernameLogin ? (
             <div className="space-y-3">
-              <input className="border p-3 w-full text-black bg-white rounded" placeholder="Firmenkürzel (z.B. luger)" value={companySlug} onChange={(e) => setCompanySlug(e.target.value)} />
-              <input className="border p-3 w-full text-black bg-white rounded" placeholder="Benutzername (z.B. max)" value={username} onChange={(e) => setUsername(e.target.value)} />
+              <input name="company" autoComplete="organization" className="border p-3 w-full text-black bg-white rounded" placeholder="Firmenkürzel (z.B. luger)" value={companySlug} onChange={(e) => setCompanySlug(e.target.value)} />
+              <input name="username" autoComplete="username" className="border p-3 w-full text-black bg-white rounded" placeholder="Benutzername (z.B. max)" value={username} onChange={(e) => setUsername(e.target.value)} />
             </div>
           ) : (
-            <input className="border p-3 w-full text-black bg-white" placeholder={t.email} value={email} onChange={(e) => setEmail(e.target.value)} />
+            <input name="email" autoComplete="email" className="border p-3 w-full text-black bg-white" placeholder={t.email} value={email} onChange={(e) => setEmail(e.target.value)} />
           )}
-          <input className="border p-3 w-full text-black bg-white" placeholder={t.password} type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-          <button type="button" onClick={signIn} className="bg-blue-600 text-white px-4 py-3 rounded w-full">{t.login}</button>
+          <input name="password" autoComplete="current-password" className="border p-3 w-full text-black bg-white" placeholder={t.password} type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+          <button type="submit" className="bg-blue-600 text-white px-4 py-3 rounded w-full">{t.login}</button>
+          </form>
           <p className="text-center text-sm text-gray-500">Noch kein Konto? <button type="button" onClick={signUp} className="text-blue-600 underline ml-1">{t.register}</button></p>
         </section>
       </main>
