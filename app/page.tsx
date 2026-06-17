@@ -61,6 +61,7 @@ type CurrentCompany = {
   companies: {
     id: string;
     name: string;
+    slug: string;
   };
 };
 
@@ -856,9 +857,19 @@ export default function Home() {
     setMessage(t.msgRegisterOk);
   }
 
+  const [companySlug, setCompanySlug] = useState("");
+
   async function signIn() {
     setMessage("");
-    const loginEmail = isUsernameLogin ? `${username.toLowerCase().replace(/\s+/g, ".")}@regie-internal.app` : email;
+    let loginEmail = "";
+    if (email.includes("@")) {
+      // Direkte E-Mail (für Owner/Admin)
+      loginEmail = email;
+    } else {
+      // Firmenkürzel + Benutzername
+      if (!companySlug.trim()) { setMessage("Bitte Firmenkürzel eingeben."); return; }
+      loginEmail = `${companySlug.toLowerCase().trim()}.${username.toLowerCase().trim()}@regie-internal.app`;
+    }
     const { error } = await supabase.auth.signInWithPassword({ email: loginEmail, password });
     if (error) { setMessage(t.msgLoginFail + error.message); return; }
     setMessage(t.msgLoginOk);
@@ -873,9 +884,9 @@ export default function Home() {
     const { data: companyUser, error } = await supabase.from("company_users").select("company_id, role").eq("user_id", userId).maybeSingle();
     if (error) { setMessage("Fehler beim Laden der Firma: " + error.message); return; }
     if (!companyUser) { setShowOnboarding(true); return; }
-    const { data: companyData, error: companyError } = await supabase.from("companies").select("id, name").eq("id", companyUser.company_id).single();
+    const { data: companyData, error: companyError } = await supabase.from("companies").select("id, name, slug").eq("id", companyUser.company_id).single();
     if (companyError) { setMessage("Fehler beim Laden der Firmendaten: " + companyError.message); return; }
-    const company: CurrentCompany = { company_id: companyUser.company_id, role: companyUser.role, companies: { id: companyData.id, name: companyData.name } };
+    const company: CurrentCompany = { company_id: companyUser.company_id, role: companyUser.role, companies: { id: companyData.id, name: companyData.name, slug: companyData.slug || "" } };
     setCurrentCompany(company);
     const { data: features, error: featureError } = await supabase.from("company_features").select("*").eq("company_id", companyUser.company_id).single();
     if (featureError) { setMessage("Fehler beim Laden der Module: " + featureError.message); return; }
@@ -911,7 +922,7 @@ export default function Home() {
     if (!currentCompany) return;
     if (!newUserName.trim() || !newUserUsername.trim() || !newUserPassword.trim()) { setMessage("Bitte alle Pflichtfelder ausfüllen."); return; }
     setCreatingEmployee(true);
-    const res = await fetch("/api/create-employee", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: newUserUsername, password: newUserPassword, fullName: newUserName, role: newUserRole, companyId: currentCompany.company_id }) });
+    const res = await fetch("/api/create-employee", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: newUserUsername, password: newUserPassword, fullName: newUserName, role: newUserRole, companyId: currentCompany.company_id, companySlug: currentCompany.companies.slug }) });
     const data = await res.json();
     setCreatingEmployee(false);
     if (data.error) { setMessage("Fehler: " + data.error); return; }
@@ -1384,7 +1395,14 @@ export default function Home() {
             <button type="button" onClick={() => setIsUsernameLogin(false)} className={`flex-1 py-2 rounded font-medium ${!isUsernameLogin ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-700"}`}>📧 E-Mail</button>
             <button type="button" onClick={() => setIsUsernameLogin(true)} className={`flex-1 py-2 rounded font-medium ${isUsernameLogin ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-700"}`}>👤 Benutzername</button>
           </div>
-          {isUsernameLogin ? <input className="border p-3 w-full text-black bg-white" placeholder="Benutzername" value={username} onChange={(e) => setUsername(e.target.value)} /> : <input className="border p-3 w-full text-black bg-white" placeholder={t.email} value={email} onChange={(e) => setEmail(e.target.value)} />}
+          {isUsernameLogin ? (
+            <div className="space-y-3">
+              <input className="border p-3 w-full text-black bg-white rounded" placeholder="Firmenkürzel (z.B. luger)" value={companySlug} onChange={(e) => setCompanySlug(e.target.value)} />
+              <input className="border p-3 w-full text-black bg-white rounded" placeholder="Benutzername (z.B. max)" value={username} onChange={(e) => setUsername(e.target.value)} />
+            </div>
+          ) : (
+            <input className="border p-3 w-full text-black bg-white" placeholder={t.email} value={email} onChange={(e) => setEmail(e.target.value)} />
+          )}
           <input className="border p-3 w-full text-black bg-white" placeholder={t.password} type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
           <button type="button" onClick={signIn} className="bg-blue-600 text-white px-4 py-3 rounded w-full">{t.login}</button>
           <p className="text-center text-sm text-gray-500">Noch kein Konto? <button type="button" onClick={signUp} className="text-blue-600 underline ml-1">{t.register}</button></p>
