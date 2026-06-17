@@ -1689,8 +1689,8 @@ export default function Home() {
                         <p><strong>{t.date}:</strong> {instruction.work_date || "-"}</p>
                         <p><strong>{t.customer}:</strong> {instruction.customer || "-"}</p>
                         <p><strong>{t.site}:</strong> {instruction.site || "-"}</p>
-                        {instruction.problems_text && <p><strong>{t.problems}:</strong> {instruction.problems_text}</p>}
-                        {(instruction.work_instruction_tasks || []).length > 0 && (<ul className="list-disc pl-6 space-y-1">{instruction.work_instruction_tasks.map((task: any) => (<li key={task.id}>{task.status === "completed" ? t.statusCompleted : task.status === "in_progress" ? t.statusInProgress : task.status === "stopped" ? t.statusStopped : t.statusOpen}{" "}{task.task_text}{task.note && <div className="text-sm text-gray-600 ml-2">{t.feedbackLabel}: {task.note}</div>}</li>))}</ul>)}
+                        {instruction.problems_text && <p><strong>{t.problems}:</strong> {getTranslated(instruction.id, "problems_text", instruction.problems_text)}</p>}
+                        {(instruction.work_instruction_tasks || []).length > 0 && (<ul className="list-disc pl-6 space-y-1">{instruction.work_instruction_tasks.map((task: any) => (<li key={task.id}>{task.status === "completed" ? t.statusCompleted : task.status === "in_progress" ? t.statusInProgress : task.status === "stopped" ? t.statusStopped : t.statusOpen}{" "}{getTranslatedTask(instruction.id, task.id, task.task_text)}{task.note && <div className="text-sm text-gray-600 ml-2">{t.feedbackLabel}: {task.note}</div>}</li>))}</ul>)}
                         {companyFeatures?.module_auto_reports ? (<button type="button" onClick={() => createReportFromInstruction(instruction)} className="bg-green-700 text-white px-3 py-2 rounded">{t.toReport}</button>) : (<p className="text-sm text-gray-500">{t.autoReportLocked}</p>)}
                       </div>
                     ))}
@@ -1913,7 +1913,7 @@ export default function Home() {
                 <section className="border rounded p-4 bg-white text-black space-y-2">
                   <h3 className="font-bold">{t.workInstructions} ({monthInstructions.length})</h3>
                   {monthInstructions.length === 0 && <p className="text-gray-500">{t.noInstructionsMonth}</p>}
-                  {monthInstructions.sort((a, b) => (a.work_date || "").localeCompare(b.work_date || "")).map((instruction) => (<div key={instruction.id} onClick={() => { setSelectedDayDate(instruction.work_date); setActiveTab("tag"); }} className="border rounded p-3 bg-gray-50 cursor-pointer hover:bg-gray-100 flex justify-between items-center"><div><span className="font-medium">{instruction.title}</span><span className="text-gray-500 text-sm ml-2">{instruction.customer || "-"}</span></div><span className="text-sm text-gray-500">{instruction.work_date}</span></div>))}
+                  {monthInstructions.sort((a, b) => (a.work_date || "").localeCompare(b.work_date || "")).map((instruction) => (<div key={instruction.id} onClick={() => { setSelectedDayDate(instruction.work_date); setActiveTab("tag"); }} className="border rounded p-3 bg-gray-50 cursor-pointer hover:bg-gray-100 flex justify-between items-center"><div><span className="font-medium">{getTranslated(instruction.id, "title", instruction.title)}</span><span className="text-gray-500 text-sm ml-2">{instruction.customer || "-"}</span></div><span className="text-sm text-gray-500">{instruction.work_date}</span></div>))}
                 </section>
               </>
             );
