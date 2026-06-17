@@ -1079,7 +1079,15 @@ export default function Home() {
   // ── FIXED: Onboarding nur für Owner, Settings über owner in company_users ──
   async function loadCompanySettings(userId: string) {
     const { data: companyUser } = await supabase.from("company_users").select("company_id, role").eq("user_id", userId).maybeSingle();
-    if (!companyUser?.company_id) return; // Kein Onboarding mehr - einfach nichts tun
+    
+    // Kein Eintrag = selbst registriert ohne Firma = Onboarding zeigen
+    if (!companyUser?.company_id) {
+      setShowOnboarding(true);
+      return;
+    }
+
+    // Hat Firma = kein Onboarding
+    setShowOnboarding(false);
 
     const { data: ownerUser } = await supabase.from("company_users").select("user_id").eq("company_id", companyUser.company_id).eq("role", "owner").maybeSingle();
     const ownerUserId = ownerUser?.user_id || userId;
@@ -1419,7 +1427,7 @@ export default function Home() {
     );
   }
 
-  if (user && showOnboarding && false) { // Onboarding deaktiviert
+  if (user && showOnboarding) {
     return (
       <main className="max-w-xl mx-auto p-4 md:p-8 min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="bg-white border rounded-xl p-6 space-y-6 w-full shadow-lg">
