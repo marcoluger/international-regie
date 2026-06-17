@@ -935,16 +935,15 @@ export default function Home() {
   async function deleteCompanyUser(memberId: string, memberUserId: string) {
     if (!currentCompany) return;
     if (!window.confirm("Mitarbeiter wirklich löschen?")) return;
-    // Aus company_users entfernen
     const { error } = await supabase.from("company_users").delete().eq("id", memberId);
     if (error) { setMessage("Fehler beim Löschen: " + error.message); return; }
-    // Auth-User löschen per API (Fehler ignorieren falls User nicht existiert)
     await fetch("/api/delete-employee", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ userId: memberUserId }),
     });
-    await loadCompanyUsers(currentCompany.company_id);
+    // Direkt aus State entfernen
+    setCompanyUsers(prev => prev.filter(u => u.id !== memberId));
     setMessage("Mitarbeiter wurde gelöscht.");
   }
 
