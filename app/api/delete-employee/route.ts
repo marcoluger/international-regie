@@ -15,9 +15,10 @@ export async function POST(request: Request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY || ""
     );
 
+    // Auth-User löschen - Fehler ignorieren wenn nicht gefunden
     const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
-
-    if (error) {
+    
+    if (error && !error.message.includes("not found") && !error.message.includes("User not found")) {
       return Response.json({ error: error.message }, { status: 500 });
     }
 
