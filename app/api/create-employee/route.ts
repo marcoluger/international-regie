@@ -15,37 +15,46 @@ export async function POST(request: Request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY || ""
     );
 
-    // E-Mail aus Slug + Benutzername bauen
     const slug = companySlug || companyId.slice(0, 8);
     const cleanUsername = username.toLowerCase().replace(/\s+/g, ".");
     const email = `${slug}.${cleanUsername}@regie-internal.app`;
 
-    // Auth-User anlegen
-    const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true,
-    });
+    // Prüfen ob Auth-User bereits existiert
+    const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
+    const existingUser = existingUsers?.users?.find(u => u.email === email);
 
-    if (authError) {
-      return Response.json({ error: authError.message }, { status: 500 });
+    let userId: string;
+
+    if (existingUser) {
+      // Auth-User existiert bereits – Passwort updaten und wiederverwenden
+      await supabaseAdmin.auth.admin.updateUserById(existingUser.id, { password });
+      userId = existingUser.id;
+      // Alten company_users Eintrag löschen falls vorhanden
+      await supabaseAdmin.from("company_users").delete().eq("user_id", existingUser.id);
+    } else {
+      // Neuen Auth-User anlegen
+      const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+      });
+      if (authError) return Response.json({ error: authError.message }, { status: 500 });
+      userId = authUser.user.id;
     }
 
     // company_users Eintrag anlegen
     const { error: dbError } = await supabaseAdmin.from("company_users").insert({
       company_id: companyId,
-      user_id: authUser.user.id,
+      user_id: userId,
       email,
       full_name: fullName || username,
       role: role || "employee",
       must_change_password: mustChangePassword ?? true,
     });
 
-    if (dbError) {
-      return Response.json({ error: dbError.message }, { status: 500 });
-    }
+    if (dbError) return Response.json({ error: dbError.message }, { status: 500 });
 
-    return Response.json({ success: true, email, userId: authUser.user.id });
+    return Response.json({ success: true, email, userId });
   } catch (error) {
     return Response.json({ error: String(error) }, { status: 500 });
   }
