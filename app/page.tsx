@@ -1079,21 +1079,13 @@ export default function Home() {
   // ── FIXED: Onboarding nur für Owner, Settings über owner in company_users ──
   async function loadCompanySettings(userId: string) {
     const { data: companyUser } = await supabase.from("company_users").select("company_id, role").eq("user_id", userId).maybeSingle();
-    
-    // Hat company_id = Firma existiert bereits = KEIN Onboarding
-    if (companyUser?.company_id) {
-      setShowOnboarding(false);
-      // Owner der Firma finden für company_settings
-      const { data: ownerUser } = await supabase.from("company_users").select("user_id").eq("company_id", companyUser.company_id).eq("role", "owner").maybeSingle();
-      const ownerUserId = ownerUser?.user_id || userId;
-      const { data } = await supabase.from("company_settings").select("*").eq("user_id", ownerUserId).single();
-      const settings = data || { user_id: ownerUserId, company_name: "", company_logo: "", street: "", zip_code: "", city: "", phone: "", email: "", website: "", tax_number: "" };
-      setCompanySettings(settings);
-      return;
-    }
+    if (!companyUser?.company_id) return; // Kein Onboarding mehr - einfach nichts tun
 
-    // Kein company_users Eintrag = selbst registriert, noch keine Firma = Onboarding
-    setShowOnboarding(true);
+    const { data: ownerUser } = await supabase.from("company_users").select("user_id").eq("company_id", companyUser.company_id).eq("role", "owner").maybeSingle();
+    const ownerUserId = ownerUser?.user_id || userId;
+    const { data } = await supabase.from("company_settings").select("*").eq("user_id", ownerUserId).single();
+    const settings = data || { user_id: ownerUserId, company_name: "", company_logo: "", street: "", zip_code: "", city: "", phone: "", email: "", website: "", tax_number: "" };
+    setCompanySettings(settings);
   }
 
   async function saveCompanySettings() {
@@ -1427,7 +1419,7 @@ export default function Home() {
     );
   }
 
-  if (user && showOnboarding) {
+  if (user && showOnboarding && false) { // Onboarding deaktiviert
     return (
       <main className="max-w-xl mx-auto p-4 md:p-8 min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="bg-white border rounded-xl p-6 space-y-6 w-full shadow-lg">
@@ -1466,7 +1458,7 @@ export default function Home() {
             <div className="space-y-4">
               <h2 className="text-2xl font-bold">🖼️ Firmenlogo</h2>
               <p className="text-gray-600">Optional — kann später hinzugefügt werden.</p>
-              {companySettings?.company_logo && (<img src={companySettings.company_logo} alt="Logo" className="h-20 object-contain border rounded p-2" />)}
+              {companySettings?.company_logo && (<img src={companySettings?.company_logo} alt="Logo" className="h-20 object-contain border rounded p-2" />)}
               <input type="file" accept="image/*" className="border p-3 w-full rounded text-black bg-white" onChange={(e) => uploadCompanyLogo(e.target.files)} />
               {message && <div className="bg-yellow-50 border rounded p-3 text-sm">{message}</div>}
               <div className="flex gap-3">
