@@ -33,7 +33,12 @@ export async function POST(request: Request) {
 
   if (action === "saveFeatures") {
     const { companyId, features } = body;
-    const { error } = await supabaseAdmin.from("company_features").upsert({ ...features, company_id: companyId }, { onConflict: "company_id" });
+    const cleanFeatures = {
+      ...features,
+      valid_until: features.valid_until || null, // Leerer String → null
+      company_id: companyId,
+    };
+    const { error } = await supabaseAdmin.from("company_features").upsert(cleanFeatures, { onConflict: "company_id" });
     if (error) return Response.json({ error: error.message }, { status: 500 });
     return Response.json({ success: true });
   }
