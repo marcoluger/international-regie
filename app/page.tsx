@@ -61,6 +61,7 @@ type CurrentCompany = {
   companies: {
     id: string;
     name: string;
+    slug: string;
   };
 };
 
@@ -117,6 +118,126 @@ const texts = {
     update: "Aktualisieren",
     downloadPdf: "PDF herunterladen",
     sendPdf: "PDF per E-Mail senden",
+    dashboard: "Dashboard",
+    projects: "Projekte",
+    workInstructions: "Arbeitsanweisungen",
+    dueToday: "Heute fällig",
+    totalProgress: "Gesamtfortschritt",
+    stoppedSteps: "Gestoppte Arbeitsschritte",
+    stepsInProgress: "Arbeitsschritte in Arbeit",
+    noProject: "Kein Projekt",
+    projectsTab: "Projekte",
+    projectName: "Projektname",
+    projectCustomer: "Kunde",
+    projectSite: "Baustelle",
+    projectManager: "Projektleiter",
+    saveProject: "Projekt speichern",
+    deleteProject: "Projekt löschen",
+    openProject: "Projekt öffnen",
+    closeProject: "Schließen",
+    progress: "Fortschritt",
+    noInstructions: "Noch keine Arbeitsanweisungen für dieses Projekt.",
+    noReports: "Noch keine Regieberichte für dieses Projekt.",
+    reportsTab: "Regieberichte",
+    newInstruction: "Neue Arbeitsanweisung",
+    instructionTitle: "Titel",
+    selectProject: "Projekt auswählen",
+    problems: "Probleme / Hinweise",
+    workSteps: "Arbeitsschritte",
+    addStep: "+ Arbeitsschritt",
+    saveInstruction: "Arbeitsanweisung speichern",
+    savedInstructions: "Gespeicherte Arbeitsanweisungen",
+    noInstructionsSaved: "Noch keine Arbeitsanweisungen vorhanden.",
+    date: "Datum",
+    project: "Projekt",
+    translateTo: "Übersetzen nach",
+    translating2: "Übersetze...",
+    translated: "Übersetzt",
+    feedback: "Rückmeldung",
+    saveFeedback: "Rückmeldung speichern",
+    toReport: "In Regiebericht übernehmen",
+    deleteInstruction: "Arbeitsanweisung löschen",
+    autoReportLocked: "Automatische Regieberichte sind in deinem Paket nicht aktiviert.",
+    employeeManagement: "Mitarbeiterverwaltung",
+    name: "Name",
+    role: "Rolle",
+    addEmployee: "Mitarbeiter hinzufügen",
+    currentEmployees: "Aktuelle Mitarbeiter",
+    resetPassword: "Passwort zurücksetzen",
+    companyData: "Firmendaten",
+    uploadLogo: "Firmenlogo hochladen",
+    companyName: "Firmenname",
+    street: "Straße",
+    zip: "PLZ",
+    city: "Ort",
+    phone: "Telefon",
+    website: "Webseite",
+    taxNumber: "UID / Steuernummer",
+    saveCompany: "Firmendaten speichern",
+    reportNameLabel: "Berichtsname",
+    firma: "Firma",
+    feedbackLabel: "Rückmeldung",
+    noProjectsYet: "Noch keine Projekte vorhanden.",
+    weekdays: ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"],
+    noInstructionsYet: "Noch keine Arbeitsanweisungen vorhanden.",
+    msgLoginOk: "Login erfolgreich.",
+    msgLogout: "Du wurdest abgemeldet.",
+    msgRegisterOk: "Registrierung erfolgreich.",
+    msgRegisterFail: "Registrierung fehlgeschlagen: ",
+    msgLoginFail: "Login fehlgeschlagen: ",
+    msgSaved: "Neuer Bericht wurde gespeichert.",
+    msgUpdated: "Bericht wurde aktualisiert.",
+    msgLoaded: "Bericht wurde geladen.",
+    msgDeleted: "Bericht wurde gelöscht.",
+    msgTranslated: "Woche wurde übersetzt.",
+    msgTranslateErr: "Fehler beim Übersetzen: ",
+    msgPhotoUploading: "Fotos werden hochgeladen...",
+    msgPhotoOk: "Fotos wurden hochgeladen.",
+    msgPhotoErr: "Fehler beim Foto-Upload: ",
+    msgSaving: "Speichere Arbeitsanweisung...",
+    msgNoFirm: "Keine Firma geladen.",
+    msgNoTitle: "Bitte Titel der Arbeitsanweisung eintragen.",
+    msgInstructionSaved: "Arbeitsanweisung gespeichert.",
+    msgInstructionDeleted: "Arbeitsanweisung gelöscht.",
+    msgFeedbackSaved: "Rückmeldung gespeichert.",
+    msgEmployeeAdded: "Mitarbeiter wurde angelegt.",
+    msgPasswordReset: "Passwort-Reset-E-Mail wurde gesendet.",
+    msgCompanySaved: "Firmendaten wurden gespeichert.",
+    msgProjectSaved: "Projekt gespeichert.",
+    msgProjectDeleted: "Projekt gelöscht.",
+    msgInstructionTranslated: "Arbeitsanweisung wurde übersetzt.",
+    msgNewReport: "Neuer Bericht gestartet.",
+    msgNoEmployee: "Bitte Mitarbeiter eintragen.",
+    msgEmailRequired: "Bitte Empfänger-E-Mail eintragen.",
+    msgEmailSending: "PDF wird per E-Mail gesendet...",
+    msgEmailSent: "PDF wurde per E-Mail gesendet.",
+    tabReport: "Regiebericht",
+    photos: "Fotos",
+    deletePhoto2: "Foto löschen",
+    tabDay: "Tagesansicht",
+    tabWeek: "Wochenansicht",
+    weekView: "Wochenansicht",
+    noInstructionsDay: "Keine Arbeitsanweisungen für diesen Tag.",
+    noInstructionsWeek: "Keine Arbeitsanweisungen für diese Woche.",
+    noInstructionsMonth: "Keine Arbeitsanweisungen für diesen Monat.",
+    tabMonth: "Monatsansicht",
+    dayView: "Tagesansicht",
+    monthView: "Monatsansicht",
+    selectDate: "Datum wählen",
+    noEntries: "Keine Einträge gefunden.",
+    totalHoursMonth: "Gesamtstunden im Monat",
+    hoursPerProject: "Stunden pro Projekt",
+    dailyEntry: "Tageseintrag",
+    saveDayEntry: "Tageseintrag speichern",
+    week: "Woche",
+    statusOpen: "⬜ Offen",
+    statusInProgress: "🟡 In Arbeit",
+    statusStopped: "⛔ Gestoppt",
+    statusCompleted: "✅ Erledigt",
+    problemsHints: "Probleme / Hinweise",
+    roleEmployee: "Mitarbeiter",
+    roleProjectManager: "Projektleiter",
+    roleAdmin: "Admin",
   },
   Kroatisch: {
     title: "Tjedni režijski izvještaj",
@@ -157,6 +278,126 @@ const texts = {
     update: "Ažuriraj",
     downloadPdf: "Preuzmi PDF",
     sendPdf: "Pošalji PDF e-poštom",
+    dashboard: "Nadzorna ploča",
+    projects: "Projekti",
+    workInstructions: "Radne upute",
+    dueToday: "Danas dospijeva",
+    totalProgress: "Ukupni napredak",
+    stoppedSteps: "Zaustavljeni koraci",
+    stepsInProgress: "Koraci u tijeku",
+    noProject: "Nema projekta",
+    projectsTab: "Projekti",
+    projectName: "Naziv projekta",
+    projectCustomer: "Kupac",
+    projectSite: "Gradilište",
+    projectManager: "Voditelj projekta",
+    saveProject: "Spremi projekt",
+    deleteProject: "Obriši projekt",
+    openProject: "Otvori projekt",
+    closeProject: "Zatvori",
+    progress: "Napredak",
+    noInstructions: "Još nema radnih uputa za ovaj projekt.",
+    noReports: "Još nema izvještaja za ovaj projekt.",
+    reportsTab: "Režijski izvještaji",
+    newInstruction: "Nova radna uputa",
+    instructionTitle: "Naslov",
+    selectProject: "Odaberi projekt",
+    problems: "Problemi / napomene",
+    workSteps: "Radni koraci",
+    addStep: "+ Korak",
+    saveInstruction: "Spremi radnu uputu",
+    savedInstructions: "Spremljene radne upute",
+    noInstructionsSaved: "Još nema radnih uputa.",
+    date: "Datum",
+    project: "Projekt",
+    translateTo: "Prevedi na",
+    translating2: "Prevođenje...",
+    translated: "Prevedeno",
+    feedback: "Povratna informacija",
+    saveFeedback: "Spremi povratnu informaciju",
+    toReport: "Prenesi u izvještaj",
+    deleteInstruction: "Obriši radnu uputu",
+    autoReportLocked: "Automatski izvještaji nisu aktivni u vašem paketu.",
+    employeeManagement: "Upravljanje radnicima",
+    name: "Ime",
+    role: "Uloga",
+    addEmployee: "Dodaj radnika",
+    currentEmployees: "Trenutni radnici",
+    resetPassword: "Resetiraj lozinku",
+    companyData: "Podaci o tvrtki",
+    uploadLogo: "Učitaj logotip",
+    companyName: "Naziv tvrtke",
+    street: "Ulica",
+    zip: "Poštanski broj",
+    city: "Grad",
+    phone: "Telefon",
+    website: "Web stranica",
+    taxNumber: "OIB / Porezni broj",
+    saveCompany: "Spremi podatke tvrtke",
+    reportNameLabel: "Naziv izvještaja",
+    firma: "Tvrtka",
+    feedbackLabel: "Povratna informacija",
+    noProjectsYet: "Još nema projekata.",
+    weekdays: ["Ponedjeljak", "Utorak", "Srijeda", "Četvrtak", "Petak", "Subota", "Nedjelja"],
+    noInstructionsYet: "Još nema radnih uputa.",
+    msgLoginOk: "Prijava uspješna.",
+    msgLogout: "Odjavljeni ste.",
+    msgRegisterOk: "Registracija uspješna.",
+    msgRegisterFail: "Registracija neuspješna: ",
+    msgLoginFail: "Prijava neuspješna: ",
+    msgSaved: "Novi izvještaj je spremljen.",
+    msgUpdated: "Izvještaj je ažuriran.",
+    msgLoaded: "Izvještaj je učitan.",
+    msgDeleted: "Izvještaj je obrisan.",
+    msgTranslated: "Tjedan je preveden.",
+    msgTranslateErr: "Pogreška pri prevođenju: ",
+    msgPhotoUploading: "Učitavanje fotografija...",
+    msgPhotoOk: "Fotografije su učitane.",
+    msgPhotoErr: "Pogreška pri učitavanju fotografije: ",
+    msgSaving: "Sprema se radna uputa...",
+    msgNoFirm: "Tvrtka nije učitana.",
+    msgNoTitle: "Unesite naslov radne upute.",
+    msgInstructionSaved: "Radna uputa je spremljena.",
+    msgInstructionDeleted: "Radna uputa je obrisana.",
+    msgFeedbackSaved: "Povratna informacija je spremljena.",
+    msgEmployeeAdded: "Radnik je dodan.",
+    msgPasswordReset: "E-mail za resetiranje lozinke je poslan.",
+    msgCompanySaved: "Podaci o tvrtki su spremljeni.",
+    msgProjectSaved: "Projekt je spremljen.",
+    msgProjectDeleted: "Projekt je obrisan.",
+    msgInstructionTranslated: "Radna uputa je prevedena.",
+    msgNewReport: "Novi izvještaj je pokrenut.",
+    msgNoEmployee: "Unesite ime radnika.",
+    msgEmailRequired: "Unesite e-mail primatelja.",
+    msgEmailSending: "PDF se šalje e-poštom...",
+    msgEmailSent: "PDF je poslan e-poštom.",
+    tabReport: "Režijski izvještaj",
+    photos: "Fotografije",
+    deletePhoto2: "Obriši fotografiju",
+    tabDay: "Dnevni pregled",
+    tabWeek: "Tedenski pregled",
+    weekView: "Tedenski pregled",
+    noInstructionsDay: "Ni delovnih navodil za ta dan.",
+    noInstructionsWeek: "Ni delovnih navodil za ta teden.",
+    noInstructionsMonth: "Ni delovnih navodil za ta mesec.",
+    tabMonth: "Mjesečni pregled",
+    dayView: "Dnevni pregled",
+    monthView: "Mjesečni pregled",
+    selectDate: "Odaberi datum",
+    noEntries: "Nema unosa.",
+    totalHoursMonth: "Ukupno sati u mjesecu",
+    hoursPerProject: "Sati po projektu",
+    dailyEntry: "Dnevni unos",
+    saveDayEntry: "Spremi dnevni unos",
+    week: "Tjedan",
+    statusOpen: "⬜ Otvoreno",
+    statusInProgress: "🟡 U tijeku",
+    statusStopped: "⛔ Zaustavljeno",
+    statusCompleted: "✅ Završeno",
+    problemsHints: "Problemi / napomene",
+    roleEmployee: "Radnik",
+    roleProjectManager: "Voditelj projekta",
+    roleAdmin: "Administrator",
   },
   Slowenisch: {
     title: "Tedensko poročilo",
@@ -197,6 +438,126 @@ const texts = {
     update: "Posodobi",
     downloadPdf: "Prenesi PDF",
     sendPdf: "Pošlji PDF po e-pošti",
+    dashboard: "Nadzorna plošča",
+    projects: "Projekti",
+    workInstructions: "Delovne navodila",
+    dueToday: "Danes dospeva",
+    totalProgress: "Skupni napredek",
+    stoppedSteps: "Ustavljeni koraki",
+    stepsInProgress: "Koraki v teku",
+    noProject: "Ni projekta",
+    projectsTab: "Projekti",
+    projectName: "Ime projekta",
+    projectCustomer: "Stranka",
+    projectSite: "Gradbišče",
+    projectManager: "Vodja projekta",
+    saveProject: "Shrani projekt",
+    deleteProject: "Izbriši projekt",
+    openProject: "Odpri projekt",
+    closeProject: "Zapri",
+    progress: "Napredek",
+    noInstructions: "Še ni delovnih navodil za ta projekt.",
+    noReports: "Še ni poročil za ta projekt.",
+    reportsTab: "Režijska poročila",
+    newInstruction: "Novo delovno navodilo",
+    instructionTitle: "Naslov",
+    selectProject: "Izberi projekt",
+    problems: "Težave / opombe",
+    workSteps: "Delovni koraki",
+    addStep: "+ Korak",
+    saveInstruction: "Shrani delovno navodilo",
+    savedInstructions: "Shranjena delovna navodila",
+    noInstructionsSaved: "Še ni delovnih navodil.",
+    date: "Datum",
+    project: "Projekt",
+    translateTo: "Prevedi v",
+    translating2: "Prevajam...",
+    translated: "Prevedeno",
+    feedback: "Povratna informacija",
+    saveFeedback: "Shrani povratno informacijo",
+    toReport: "Prenesi v poročilo",
+    deleteInstruction: "Izbriši delovno navodilo",
+    autoReportLocked: "Samodejno poročanje ni aktivno v vašem paketu.",
+    employeeManagement: "Upravljanje zaposlenih",
+    name: "Ime",
+    role: "Vloga",
+    addEmployee: "Dodaj zaposlenega",
+    currentEmployees: "Trenutni zaposleni",
+    resetPassword: "Ponastavi geslo",
+    companyData: "Podatki o podjetju",
+    uploadLogo: "Naloži logotip",
+    companyName: "Ime podjetja",
+    street: "Ulica",
+    zip: "Poštna številka",
+    city: "Mesto",
+    phone: "Telefon",
+    website: "Spletna stran",
+    taxNumber: "DDV / Davčna številka",
+    saveCompany: "Shrani podatke podjetja",
+    reportNameLabel: "Ime poročila",
+    firma: "Podjetje",
+    feedbackLabel: "Povratna informacija",
+    noProjectsYet: "Še ni projektov.",
+    weekdays: ["Ponedeljek", "Torek", "Sreda", "Četrtek", "Petek", "Sobota", "Nedelja"],
+    noInstructionsYet: "Še ni delovnih navodil.",
+    msgLoginOk: "Prijava uspešna.",
+    msgLogout: "Odjavljeni ste.",
+    msgRegisterOk: "Registracija uspešna.",
+    msgRegisterFail: "Registracija neuspešna: ",
+    msgLoginFail: "Prijava neuspešna: ",
+    msgSaved: "Novo poročilo je shranjeno.",
+    msgUpdated: "Poročilo je posodobljeno.",
+    msgLoaded: "Poročilo je naloženo.",
+    msgDeleted: "Poročilo je izbrisano.",
+    msgTranslated: "Teden je preveden.",
+    msgTranslateErr: "Napaka pri prevajanju: ",
+    msgPhotoUploading: "Nalaganje fotografij...",
+    msgPhotoOk: "Fotografije so naložene.",
+    msgPhotoErr: "Napaka pri nalaganju fotografije: ",
+    msgSaving: "Shranjevanje delovnega navodila...",
+    msgNoFirm: "Podjetje ni naloženo.",
+    msgNoTitle: "Vnesite naslov delovnega navodila.",
+    msgInstructionSaved: "Delovno navodilo je shranjeno.",
+    msgInstructionDeleted: "Delovno navodilo je izbrisano.",
+    msgFeedbackSaved: "Povratna informacija je shranjena.",
+    msgEmployeeAdded: "Zaposleni je dodan.",
+    msgPasswordReset: "E-pošta za ponastavitev gesla je poslana.",
+    msgCompanySaved: "Podatki podjetja so shranjeni.",
+    msgProjectSaved: "Projekt je shranjen.",
+    msgProjectDeleted: "Projekt je izbrisan.",
+    msgInstructionTranslated: "Delovno navodilo je prevedeno.",
+    msgNewReport: "Novo poročilo je začeto.",
+    msgNoEmployee: "Vnesite ime zaposlenega.",
+    msgEmailRequired: "Vnesite e-pošto prejemnika.",
+    msgEmailSending: "PDF se pošilja po e-pošti...",
+    msgEmailSent: "PDF je poslan po e-pošti.",
+    tabReport: "Režijsko poročilo",
+    photos: "Fotografije",
+    deletePhoto2: "Izbriši fotografijo",
+    tabDay: "Dnevni pregled",
+    tabWeek: "Tjedni pregled",
+    weekView: "Tjedni pregled",
+    noInstructionsDay: "Nema radnih uputa za ovaj dan.",
+    noInstructionsWeek: "Nema radnih uputa za ovaj tjedan.",
+    noInstructionsMonth: "Nema radnih uputa za ovaj mjesec.",
+    tabMonth: "Mesečni pregled",
+    dayView: "Dnevni pregled",
+    monthView: "Mesečni pregled",
+    selectDate: "Izberi datum",
+    noEntries: "Ni vnosov.",
+    totalHoursMonth: "Skupno ur v mesecu",
+    hoursPerProject: "Ure po projektu",
+    dailyEntry: "Dnevni vnos",
+    saveDayEntry: "Shrani dnevni vnos",
+    week: "Teden",
+    statusOpen: "⬜ Odprto",
+    statusInProgress: "🟡 V teku",
+    statusStopped: "⛔ Ustavljeno",
+    statusCompleted: "✅ Končano",
+    problemsHints: "Težave / opombe",
+    roleEmployee: "Zaposleni",
+    roleProjectManager: "Vodja projekta",
+    roleAdmin: "Administrator",
   },
   Polnisch: {
     title: "Tygodniowy raport roboczy",
@@ -237,124 +598,139 @@ const texts = {
     update: "Aktualizuj",
     downloadPdf: "Pobierz PDF",
     sendPdf: "Wyślij PDF e-mailem",
+    dashboard: "Panel główny",
+    projects: "Projekty",
+    workInstructions: "Instrukcje pracy",
+    dueToday: "Należne dzisiaj",
+    totalProgress: "Ogólny postęp",
+    stoppedSteps: "Zatrzymane kroki",
+    stepsInProgress: "Kroki w toku",
+    noProject: "Brak projektu",
+    projectsTab: "Projekty",
+    projectName: "Nazwa projektu",
+    projectCustomer: "Klient",
+    projectSite: "Budowa",
+    projectManager: "Kierownik projektu",
+    saveProject: "Zapisz projekt",
+    deleteProject: "Usuń projekt",
+    openProject: "Otwórz projekt",
+    closeProject: "Zamknij",
+    progress: "Postęp",
+    noInstructions: "Brak instrukcji dla tego projektu.",
+    noReports: "Brak raportów dla tego projektu.",
+    reportsTab: "Raporty robocze",
+    newInstruction: "Nowa instrukcja pracy",
+    instructionTitle: "Tytuł",
+    selectProject: "Wybierz projekt",
+    problems: "Problemy / Uwagi",
+    workSteps: "Kroki pracy",
+    addStep: "+ Krok",
+    saveInstruction: "Zapisz instrukcję",
+    savedInstructions: "Zapisane instrukcje",
+    noInstructionsSaved: "Brak zapisanych instrukcji.",
+    date: "Data",
+    project: "Projekt",
+    translateTo: "Przetłumacz na",
+    translating2: "Tłumaczenie...",
+    translated: "Przetłumaczono",
+    feedback: "Informacja zwrotna",
+    saveFeedback: "Zapisz informację",
+    toReport: "Przenieś do raportu",
+    deleteInstruction: "Usuń instrukcję",
+    autoReportLocked: "Automatyczne raporty nie są aktywne w Twoim pakiecie.",
+    employeeManagement: "Zarządzanie pracownikami",
+    name: "Imię",
+    role: "Rola",
+    addEmployee: "Dodaj pracownika",
+    currentEmployees: "Aktualni pracownicy",
+    resetPassword: "Resetuj hasło",
+    companyData: "Dane firmy",
+    uploadLogo: "Prześlij logo",
+    companyName: "Nazwa firmy",
+    street: "Ulica",
+    zip: "Kod pocztowy",
+    city: "Miasto",
+    phone: "Telefon",
+    website: "Strona internetowa",
+    taxNumber: "NIP",
+    saveCompany: "Zapisz dane firmy",
+    reportNameLabel: "Nazwa raportu",
+    firma: "Firma",
+    feedbackLabel: "Informacja zwrotna",
+    noProjectsYet: "Brak projektów.",
+    weekdays: ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota", "Niedziela"],
+    noInstructionsYet: "Brak instrukcji pracy.",
+    msgLoginOk: "Logowanie zakończone sukcesem.",
+    msgLogout: "Zostałeś wylogowany.",
+    msgRegisterOk: "Rejestracja zakończona sukcesem.",
+    msgRegisterFail: "Rejestracja nieudana: ",
+    msgLoginFail: "Logowanie nieudane: ",
+    msgSaved: "Nowy raport został zapisany.",
+    msgUpdated: "Raport został zaktualizowany.",
+    msgLoaded: "Raport został wczytany.",
+    msgDeleted: "Raport został usunięty.",
+    msgTranslated: "Tydzień został przetłumaczony.",
+    msgTranslateErr: "Błąd tłumaczenia: ",
+    msgPhotoUploading: "Przesyłanie zdjęć...",
+    msgPhotoOk: "Zdjęcia zostały przesłane.",
+    msgPhotoErr: "Błąd przesyłania zdjęcia: ",
+    msgSaving: "Zapisywanie instrukcji pracy...",
+    msgNoFirm: "Firma nie jest załadowana.",
+    msgNoTitle: "Wprowadź tytuł instrukcji pracy.",
+    msgInstructionSaved: "Instrukcja pracy została zapisana.",
+    msgInstructionDeleted: "Instrukcja pracy została usunięta.",
+    msgFeedbackSaved: "Informacja zwrotna została zapisana.",
+    msgEmployeeAdded: "Pracownik został dodany.",
+    msgPasswordReset: "E-mail do resetowania hasła został wysłany.",
+    msgCompanySaved: "Dane firmy zostały zapisane.",
+    msgProjectSaved: "Projekt został zapisany.",
+    msgProjectDeleted: "Projekt został usunięty.",
+    msgInstructionTranslated: "Instrukcja pracy została przetłumaczona.",
+    msgNewReport: "Nowy raport został rozpoczęty.",
+    msgNoEmployee: "Wprowadź imię pracownika.",
+    msgEmailRequired: "Wprowadź e-mail odbiorcy.",
+    msgEmailSending: "PDF jest wysyłany e-mailem...",
+    msgEmailSent: "PDF został wysłany e-mailem.",
+    tabReport: "Raport roboczy",
+    photos: "Zdjęcia",
+    deletePhoto2: "Usuń zdjęcie",
+    tabDay: "Widok dzienny",
+    tabWeek: "Widok tygodniowy",
+    weekView: "Widok tygodniowy",
+    noInstructionsDay: "Brak instrukcji na ten dzień.",
+    noInstructionsWeek: "Brak instrukcji na ten tydzień.",
+    noInstructionsMonth: "Brak instrukcji na ten miesiąc.",
+    tabMonth: "Widok miesięczny",
+    dayView: "Widok dzienny",
+    monthView: "Widok miesięczny",
+    selectDate: "Wybierz datę",
+    noEntries: "Brak wpisów.",
+    totalHoursMonth: "Łączne godziny w miesiącu",
+    hoursPerProject: "Godziny na projekt",
+    dailyEntry: "Wpis dzienny",
+    saveDayEntry: "Zapisz wpis dzienny",
+    week: "Tydzień",
+    statusOpen: "⬜ Otwarte",
+    statusInProgress: "🟡 W toku",
+    statusStopped: "⛔ Zatrzymane",
+    statusCompleted: "✅ Zakończone",
+    problemsHints: "Problemy / uwagi",
+    roleEmployee: "Pracownik",
+    roleProjectManager: "Kierownik projektu",
+    roleAdmin: "Administrator",
   },
 };
 
 const pdfTexts = {
-  Deutsch: {
-    title: "Wochen-Regiebericht",
-    company: "Elektrotechnik Luger",
-    report: "Bericht",
-    calendarWeek: "Kalenderwoche",
-    employee: "Mitarbeiter",
-    dailyReports: "Tagesberichte",
-    customer: "Kunde",
-    project: "Projekt",
-    site: "Baustelle",
-    hours: "Stunden",
-    description: "Arbeitsbeschreibung",
-    photos: "Fotos",
-    photo: "Foto",
-    summary: "Zusammenfassung",
-    totalHours: "Gesamtstunden",
-    signatureEmployee: "Unterschrift Mitarbeiter",
-    signatureCustomer: "Unterschrift Kunde / Bauleitung",
-    createdAt: "Erstellt am",
-  },
-  Kroatisch: {
-    title: "Tjedni režijski izvještaj",
-    company: "Elektrotechnik Luger",
-    report: "Izvještaj",
-    calendarWeek: "Kalendarski tjedan",
-    employee: "Radnik",
-    dailyReports: "Dnevni izvještaji",
-    customer: "Kupac",
-    project: "Projekt",
-    site: "Gradilište",
-    hours: "Sati",
-    description: "Opis rada",
-    photos: "Fotografije",
-    photo: "Fotografija",
-    summary: "Sažetak",
-    totalHours: "Ukupno sati",
-    signatureEmployee: "Potpis radnika",
-    signatureCustomer: "Potpis kupca / voditelja gradilišta",
-    createdAt: "Izrađeno dana",
-  },
-  Slowenisch: {
-    title: "Tedensko poročilo",
-    company: "Elektrotechnik Luger",
-    report: "Poročilo",
-    calendarWeek: "Koledarski teden",
-    employee: "Zaposleni",
-    dailyReports: "Dnevna poročila",
-    customer: "Stranka",
-    project: "Projekt",
-    site: "Gradbišče",
-    hours: "Ure",
-    description: "Opis dela",
-    photos: "Fotografije",
-    photo: "Fotografija",
-    summary: "Povzetek",
-    totalHours: "Skupno število ur",
-    signatureEmployee: "Podpis zaposlenega",
-    signatureCustomer: "Podpis stranke / vodje gradbišča",
-    createdAt: "Ustvarjeno dne",
-  },
-  Polnisch: {
-    title: "Tygodniowy raport roboczy",
-    company: "Elektrotechnik Luger",
-    report: "Raport",
-    calendarWeek: "Tydzień kalendarzowy",
-    employee: "Pracownik",
-    dailyReports: "Raporty dzienne",
-    customer: "Klient",
-    project: "Projekt",
-    site: "Budowa",
-    hours: "Godziny",
-    description: "Opis pracy",
-    photos: "Zdjęcia",
-    photo: "Zdjęcie",
-    summary: "Podsumowanie",
-    totalHours: "Łączna liczba godzin",
-    signatureEmployee: "Podpis pracownika",
-    signatureCustomer: "Podpis klienta / kierownika budowy",
-    createdAt: "Utworzono dnia",
-  },
-  Englisch: {
-    title: "Weekly Work Report",
-    company: "Elektrotechnik Luger",
-    report: "Report",
-    calendarWeek: "Calendar week",
-    employee: "Employee",
-    dailyReports: "Daily reports",
-    customer: "Customer",
-    project: "Project",
-    site: "Site",
-    hours: "Hours",
-    description: "Work description",
-    photos: "Photos",
-    photo: "Photo",
-    summary: "Summary",
-    totalHours: "Total hours",
-    signatureEmployee: "Employee signature",
-    signatureCustomer: "Customer / Site manager signature",
-    createdAt: "Created on",
-  },
+  Deutsch: { title: "Wochen-Regiebericht", company: "Elektrotechnik Luger", report: "Bericht", calendarWeek: "Kalenderwoche", employee: "Mitarbeiter", dailyReports: "Tagesberichte", customer: "Kunde", project: "Projekt", site: "Baustelle", hours: "Stunden", description: "Arbeitsbeschreibung", photos: "Fotos", photo: "Foto", summary: "Zusammenfassung", totalHours: "Gesamtstunden", signatureEmployee: "Unterschrift Mitarbeiter", signatureCustomer: "Unterschrift Kunde / Bauleitung", createdAt: "Erstellt am" },
+  Kroatisch: { title: "Tjedni režijski izvještaj", company: "Elektrotechnik Luger", report: "Izvještaj", calendarWeek: "Kalendarski tjedan", employee: "Radnik", dailyReports: "Dnevni izvještaji", customer: "Kupac", project: "Projekt", site: "Gradilište", hours: "Sati", description: "Opis rada", photos: "Fotografije", photo: "Fotografija", summary: "Sažetak", totalHours: "Ukupno sati", signatureEmployee: "Potpis radnika", signatureCustomer: "Potpis kupca / voditelja gradilišta", createdAt: "Izrađeno dana" },
+  Slowenisch: { title: "Tedensko poročilo", company: "Elektrotechnik Luger", report: "Poročilo", calendarWeek: "Koledarski teden", employee: "Zaposleni", dailyReports: "Dnevna poročila", customer: "Stranka", project: "Projekt", site: "Gradbišče", hours: "Ure", description: "Opis dela", photos: "Fotografije", photo: "Fotografija", summary: "Povzetek", totalHours: "Skupno število ur", signatureEmployee: "Podpis zaposlenega", signatureCustomer: "Podpis stranke / vodje gradbišča", createdAt: "Ustvarjeno dne" },
+  Polnisch: { title: "Tygodniowy raport roboczy", company: "Elektrotechnik Luger", report: "Raport", calendarWeek: "Tydzień kalendarzowy", employee: "Pracownik", dailyReports: "Raporty dzienne", customer: "Klient", project: "Projekt", site: "Budowa", hours: "Godziny", description: "Opis pracy", photos: "Zdjęcia", photo: "Zdjęcie", summary: "Podsumowanie", totalHours: "Łączna liczba godzin", signatureEmployee: "Podpis pracownika", signatureCustomer: "Podpis klienta / kierownika budowy", createdAt: "Utworzono dnia" },
+  Englisch: { title: "Weekly Work Report", company: "Elektrotechnik Luger", report: "Report", calendarWeek: "Calendar week", employee: "Employee", dailyReports: "Daily reports", customer: "Customer", project: "Project", site: "Site", hours: "Hours", description: "Work description", photos: "Photos", photo: "Photo", summary: "Summary", totalHours: "Total hours", signatureEmployee: "Employee signature", signatureCustomer: "Customer / Site manager signature", createdAt: "Created on" },
 };
 
 function createEmptyDays(): DayEntry[] {
-  return weekdays.map((day) => ({
-    weekday: day,
-    date: "",
-    customer: "",
-    projectNumber: "",
-    site: "",
-    hours: "",
-    description: "",
-    translation: "",
-    photos: [],
-  }));
+  return weekdays.map((day) => ({ weekday: day, date: "", customer: "", projectNumber: "", site: "", hours: "", description: "", translation: "", photos: [] }));
 }
 
 function getCalendarWeek(dateString: string) {
@@ -368,40 +744,37 @@ function getCalendarWeek(dateString: string) {
   return `KW ${weekNumber}`;
 }
 
-// ─── Tab-Button Hilfkomponente ────────────────────────────────────────────────
-function TabButton({
-  label,
-  tabName,
-  activeTab,
-  onClick,
-}: {
-  label: string;
-  tabName: string;
-  activeTab: string;
-  onClick: () => void;
-}) {
+function TabButton({ label, tabName, activeTab, onClick }: { label: string; tabName: string; activeTab: string; onClick: () => void }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`px-4 py-2 rounded font-medium transition-colors ${
-        activeTab === tabName
-          ? "bg-blue-700 text-white"
-          : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-      }`}
-    >
+    <button type="button" onClick={onClick} className={`px-4 py-2 rounded font-medium transition-colors ${activeTab === tabName ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-800 hover:bg-gray-300"}`}>
       {label}
     </button>
   );
 }
 
+function getAllowedLanguages(companyFeatures: any): string[] {
+  if (!companyFeatures) return ["Deutsch"]; // Kein Features = nur Deutsch
+  const raw = companyFeatures?.allowed_languages;
+  if (!raw) return ["Deutsch"];
+  if (Array.isArray(raw)) return raw.length > 0 ? raw : ["Deutsch"];
+  try { const parsed = JSON.parse(raw); return parsed.length > 0 ? parsed : ["Deutsch"]; } catch { return ["Deutsch"]; }
+}
+
 export default function Home() {
   const [uiLanguage, setUiLanguage] = useState<Language>("Deutsch");
   const t = texts[uiLanguage];
-
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [onboardingStep, setOnboardingStep] = useState(1);
+  const [onboardingDone, setOnboardingDone] = useState(false);
+  const [mustChangePassword, setMustChangePassword] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
+  const [changingPassword, setChangingPassword] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
+  const [isUsernameLogin, setIsUsernameLogin] = useState(false);
   const [companySettings, setCompanySettings] = useState<CompanySettings | null>(null);
   const [currentReportId, setCurrentReportId] = useState<string | null>(null);
   const [employee, setEmployee] = useState("");
@@ -421,7 +794,12 @@ export default function Home() {
   const [companyUsers, setCompanyUsers] = useState<any[]>([]);
   const [newUserEmail, setNewUserEmail] = useState("");
   const [newUserName, setNewUserName] = useState("");
+  const [newUserUsername, setNewUserUsername] = useState("");
+  const [newUserPassword, setNewUserPassword] = useState("");
   const [newUserRole, setNewUserRole] = useState("employee");
+  const [creatingEmployee, setCreatingEmployee] = useState(false);
+  const [taskComments, setTaskComments] = useState<Record<string, string>>({});
+  const [reportInstruction, setReportInstruction] = useState<any>(null);
   const [instructionProblems, setInstructionProblems] = useState("");
   const [instructionTitle, setInstructionTitle] = useState("");
   const [instructionProject, setInstructionProject] = useState("");
@@ -429,11 +807,13 @@ export default function Home() {
   const [instructionSite, setInstructionSite] = useState("");
   const [instructionDescription, setInstructionDescription] = useState("");
   const [instructionTasks, setInstructionTasks] = useState<string[]>([""]);
+  const [instructionPhotos, setInstructionPhotos] = useState<string[]>([]);
+  const [instructionTaskPhotos, setInstructionTaskPhotos] = useState<Record<number, string[]>>({});
   const [workInstructions, setWorkInstructions] = useState<any[]>([]);
-
-  // FIX 1: "dashboard" als Standard-Tab, alle Tabs klar definiert
+  const [instructionTranslations, setInstructionTranslations] = useState<Record<string, any>>({});
+  const [translatingInstructionId, setTranslatingInstructionId] = useState<string | null>(null);
+  const [instructionToLanguage, setInstructionToLanguage] = useState("Polnisch");
   const [activeTab, setActiveTab] = useState("dashboard");
-
   const [projects, setProjects] = useState<any[]>([]);
   const [projectName, setProjectName] = useState("");
   const [projectCustomer, setProjectCustomer] = useState("");
@@ -442,145 +822,154 @@ export default function Home() {
   const [selectedProjectId, setSelectedProjectId] = useState("");
   const [selectedProjectDetailId, setSelectedProjectDetailId] = useState("");
   const [instructionDate, setInstructionDate] = useState("");
+  const [assignedUserIds, setAssignedUserIds] = useState<string[]>([]);
+  const [selectedDayDate, setSelectedDayDate] = useState(new Date().toISOString().split("T")[0]);
+  const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
+  const [selectedWeek, setSelectedWeek] = useState(new Date().toISOString().split("T")[0]);
 
   useEffect(() => {
     async function loadUser() {
       const { data } = await supabase.auth.getUser();
       setUser(data.user);
       if (data.user) {
+        const { data: pwCheck } = await supabase.from("company_users").select("must_change_password").eq("user_id", data.user.id).maybeSingle();
+        if (pwCheck?.must_change_password === true) { setMustChangePassword(true); return; }
         await loadCompanyContext(data.user.id);
         await loadReportsFromDatabase();
         await loadCompanySettings(data.user.id);
       }
     }
-
     loadUser();
-
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user || null);
       if (session?.user) {
+        const { data: pwCheck } = await supabase.from("company_users").select("must_change_password").eq("user_id", session.user.id).maybeSingle();
+        if (pwCheck?.must_change_password === true) { setMustChangePassword(true); return; }
         loadCompanyContext(session.user.id);
         loadReportsFromDatabase();
-        loadCompanySettings(session.user.id);
+        // loadCompanySettings NICHT hier aufrufen - wird nur einmal in loadUser aufgerufen
       }
     });
-
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
+    return () => { authListener.subscription.unsubscribe(); };
   }, []);
 
   async function signUp() {
     setMessage("");
     const { error } = await supabase.auth.signUp({ email, password });
-    if (error) { setMessage("Registrierung fehlgeschlagen: " + error.message); return; }
-    setMessage("Registrierung erfolgreich.");
+    if (error) { setMessage(t.msgRegisterFail + error.message); return; }
+    setMessage(t.msgRegisterOk);
   }
+
+  const [companySlug, setCompanySlug] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   async function signIn() {
     setMessage("");
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) { setMessage("Login fehlgeschlagen: " + error.message); return; }
-    setMessage("Login erfolgreich.");
+    let loginEmail = "";
+    if (email.includes("@")) {
+      // Direkte E-Mail (für Owner/Admin)
+      loginEmail = email;
+    } else {
+      // Firmenkürzel + Benutzername
+      if (!companySlug.trim()) { setMessage("Bitte Firmenkürzel eingeben."); return; }
+      loginEmail = `${companySlug.toLowerCase().trim()}.${username.toLowerCase().trim()}@regie-internal.app`;
+    }
+    const { error } = await supabase.auth.signInWithPassword({ email: loginEmail, password });
+    if (error) { setMessage(t.msgLoginFail + error.message); return; }
+    setMessage(t.msgLoginOk);
   }
 
   async function signOut() {
     await supabase.auth.signOut();
-    setUser(null);
-    newReport();
-    setSavedReports([]);
-    setMessage("Du wurdest abgemeldet.");
+    setUser(null); newReport(); setSavedReports([]); setMessage(t.msgLogout);
   }
 
-  // FIX 2: loadProjects bekommt companyId als Parameter, damit es nicht auf
-  // den noch nicht gesetzten currentCompany-State angewiesen ist
   async function loadCompanyContext(userId: string) {
-    const { data: companyUser, error } = await supabase
-      .from("company_users")
-      .select("company_id, role, companies(id, name)")
-      .eq("user_id", userId)
-      .single();
-
+    const { data: companyUser, error } = await supabase.from("company_users").select("company_id, role").eq("user_id", userId).maybeSingle();
     if (error) { setMessage("Fehler beim Laden der Firma: " + error.message); return; }
-
-    const companyData = Array.isArray(companyUser.companies)
-      ? companyUser.companies[0]
-      : companyUser.companies;
-
-    const company: CurrentCompany = {
-      company_id: companyUser.company_id,
-      role: companyUser.role,
-      companies: { id: companyData.id, name: companyData.name },
-    };
-
+    if (!companyUser) { return; } // Kein Onboarding hier – wird in loadCompanySettings entschieden
+    const { data: companyData, error: companyError } = await supabase.from("companies").select("id, name, slug").eq("id", companyUser.company_id).single();
+    if (companyError) { setMessage("Fehler beim Laden der Firmendaten: " + companyError.message); return; }
+    const company: CurrentCompany = { company_id: companyUser.company_id, role: companyUser.role, companies: { id: companyData.id, name: companyData.name, slug: companyData.slug || "" } };
     setCurrentCompany(company);
-
-    const { data: features, error: featureError } = await supabase
-      .from("company_features")
-      .select("*")
-      .eq("company_id", companyUser.company_id)
-      .single();
-
-    if (featureError) { setMessage("Fehler beim Laden der Module: " + featureError.message); return; }
-
-    setCompanyFeatures(features as CompanyFeatures);
-
-    // Alle Ladefunktionen erhalten jetzt die companyId direkt
+    const { data: features } = await supabase.from("company_features").select("*").eq("company_id", companyUser.company_id).maybeSingle();
+    if (features) {
+      setCompanyFeatures(features as CompanyFeatures);
+      const allowed = Array.isArray(features.allowed_languages) ? features.allowed_languages : (typeof features.allowed_languages === "string" ? JSON.parse(features.allowed_languages) : []);
+      const firstTarget = allowed.filter((l: string) => l !== "Deutsch")[0];
+      if (firstTarget) { setInstructionToLanguage(firstTarget); setToLanguage(firstTarget); }
+    }
     await loadCompanyUsers(companyUser.company_id);
     await loadWorkInstructions(companyUser.company_id);
-    await loadProjects(companyUser.company_id); // FIX 2: companyId direkt übergeben
+    await loadProjects(companyUser.company_id);
   }
 
   async function loadWorkInstructions(companyId: string) {
-    const { data, error } = await supabase
-      .from("work_instructions")
-      .select(`*, work_instruction_tasks (*)`)
-      .eq("company_id", companyId)
-      .order("created_at", { ascending: false });
-
+    const { data, error } = await supabase.from("work_instructions").select(`*, work_instruction_tasks (*)`).eq("company_id", companyId).order("created_at", { ascending: false });
     if (error) { setMessage("Fehler beim Laden der Arbeitsanweisungen: " + error.message); return; }
     setWorkInstructions(data || []);
+  }
+
+  async function updateTaskComment(taskId: string, comment: string) {
+    const { error } = await supabase.from("work_instruction_tasks").update({ employee_comment: comment }).eq("id", taskId);
+    if (error) { setMessage("Fehler beim Speichern des Kommentars: " + error.message); return; }
+    if (currentCompany) await loadWorkInstructions(currentCompany.company_id);
+    setMessage("✅ Kommentar gespeichert.");
   }
 
   async function updateTaskNote(taskId: string, note: string) {
     const { error } = await supabase.from("work_instruction_tasks").update({ note }).eq("id", taskId);
     if (error) { setMessage("Fehler beim Speichern der Rückmeldung: " + error.message); return; }
     if (currentCompany) await loadWorkInstructions(currentCompany.company_id);
-    setMessage("Rückmeldung gespeichert.");
+    setMessage(t.msgFeedbackSaved);
   }
 
   async function loadCompanyUsers(companyId: string) {
-    const { data, error } = await supabase
-      .from("company_users")
-      .select("*")
-      .eq("company_id", companyId)
-      .order("created_at", { ascending: true });
-
+    const { data, error } = await supabase.from("company_users").select("*").eq("company_id", companyId).order("created_at", { ascending: true });
     if (error) { setMessage("Fehler beim Laden der Mitarbeiter: " + error.message); return; }
     setCompanyUsers(data || []);
   }
 
   async function addCompanyUser() {
     if (!currentCompany) return;
-    const { error } = await supabase.from("company_users").insert({
-      company_id: currentCompany.company_id,
-      full_name: newUserName,
-      email: newUserEmail,
-      role: newUserRole,
-    });
-    if (error) { setMessage("Fehler beim Hinzufügen: " + error.message); return; }
-    setNewUserName(""); setNewUserEmail(""); setNewUserRole("employee");
+    if (!newUserName.trim() || !newUserUsername.trim() || !newUserPassword.trim()) { setMessage("Bitte alle Pflichtfelder ausfüllen."); return; }
+    setCreatingEmployee(true);
+    const res = await fetch("/api/create-employee", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: newUserUsername, password: newUserPassword, fullName: newUserName, role: newUserRole, companyId: currentCompany.company_id, companySlug: currentCompany.companies.slug }) });
+    const data = await res.json();
+    setCreatingEmployee(false);
+    if (data.error) { setMessage("Fehler: " + data.error); return; }
+    setNewUserName(""); setNewUserEmail(""); setNewUserUsername(""); setNewUserPassword(""); setNewUserRole("employee");
     await loadCompanyUsers(currentCompany.company_id);
-    setMessage("Mitarbeiter wurde angelegt.");
+    setMessage(`✅ Mitarbeiter angelegt. Login: ${data.email}`);
+  }
+
+  async function deleteCompanyUser(memberId: string, memberUserId: string) {
+    if (!currentCompany) return;
+    if (!window.confirm("Mitarbeiter wirklich löschen?")) return;
+    const { error } = await supabase.from("company_users").delete().eq("id", memberId);
+    if (error) { setMessage("Fehler beim Löschen: " + error.message); return; }
+    await fetch("/api/delete-employee", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: memberUserId }),
+    });
+    // Direkt aus State entfernen
+    setCompanyUsers(prev => prev.filter(u => u.id !== memberId));
+    setMessage("Mitarbeiter wurde gelöscht.");
+  }
+
+  function canDelete(myRole: string, memberRole: string): boolean {
+    if (myRole === "owner") return memberRole !== "owner";
+    if (myRole === "admin") return memberRole === "employee" || memberRole === "project_manager";
+    if (myRole === "project_manager") return memberRole === "employee";
+    return false;
   }
 
   async function resetCompanyUserPassword(memberEmail: string) {
     if (!memberEmail) { setMessage("Keine E-Mail-Adresse vorhanden."); return; }
-    const { error } = await supabase.auth.resetPasswordForEmail(memberEmail, {
-      redirectTo: "https://international-regie.vercel.app",
-    });
+    const { error } = await supabase.auth.resetPasswordForEmail(memberEmail, { redirectTo: "https://international-regie.vercel.app" });
     if (error) { setMessage("Fehler beim Passwort-Reset: " + error.message); return; }
-    setMessage("Passwort-Reset-E-Mail wurde gesendet.");
+    setMessage(t.msgPasswordReset);
   }
 
   async function loadReportsFromDatabase() {
@@ -590,49 +979,75 @@ export default function Home() {
   }
 
   function updateDay(index: number, field: keyof DayEntry, value: string) {
-    const copy = [...days];
-    copy[index] = { ...copy[index], [field]: value };
-    setDays(copy);
+    const copy = [...days]; copy[index] = { ...copy[index], [field]: value }; setDays(copy);
+  }
+
+  async function handleInstructionPhotos(files: FileList | null) {
+    if (!files || !user) return;
+    setMessage(t.msgPhotoUploading);
+    const uploaded: string[] = [];
+    for (const file of Array.from(files)) {
+      const fileExt = file.name.split(".").pop() || "jpg";
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `${user.id}/instructions/${fileName}`;
+      const { error } = await supabase.storage.from("report-photos").upload(filePath, file);
+      if (error) { setMessage(t.msgPhotoErr + error.message); return; }
+      const { data } = supabase.storage.from("report-photos").getPublicUrl(filePath);
+      uploaded.push(data.publicUrl);
+    }
+    setInstructionPhotos((prev) => [...prev, ...uploaded]);
+    setMessage(t.msgPhotoOk);
+  }
+
+  async function handleInstructionTaskPhotos(taskIndex: number, files: FileList | null) {
+    if (!files || !user) return;
+    setMessage(t.msgPhotoUploading);
+    const uploaded: string[] = [];
+    for (const file of Array.from(files)) {
+      const fileExt = file.name.split(".").pop() || "jpg";
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `${user.id}/instructions/tasks/${fileName}`;
+      const { error } = await supabase.storage.from("report-photos").upload(filePath, file);
+      if (error) { setMessage(t.msgPhotoErr + error.message); return; }
+      const { data } = supabase.storage.from("report-photos").getPublicUrl(filePath);
+      uploaded.push(data.publicUrl);
+    }
+    setInstructionTaskPhotos((prev) => ({ ...prev, [taskIndex]: [...(prev[taskIndex] || []), ...uploaded] }));
+    setMessage(t.msgPhotoOk);
+  }
+
+  function getTranslated(instructionId: string, field: string, fallback: string): string {
+    const trans = instructionTranslations[instructionId];
+    if (trans && trans.language === uiLanguage && trans[field]) return trans[field];
+    return fallback;
+  }
+
+  function getTranslatedComment(instructionId: string, taskId: string, fallback: string): string {
+    const trans = instructionTranslations[instructionId];
+    if (trans && trans.language === uiLanguage && trans.tasks?.[`comment_${taskId}`]) return trans.tasks[`comment_${taskId}`];
+    return fallback;
+  }
+
+  function getTranslatedTask(instructionId: string, taskId: string, fallback: string): string {
+    const trans = instructionTranslations[instructionId];
+    if (trans && trans.language === uiLanguage && trans.tasks?.[taskId]) return trans.tasks[taskId];
+    return fallback;
   }
 
   async function saveWorkInstruction() {
-    setMessage("Speichere Arbeitsanweisung...");
-    if (!currentCompany) { setMessage("Keine Firma geladen."); return; }
-    if (!instructionTitle.trim()) { setMessage("Bitte Titel der Arbeitsanweisung eintragen."); return; }
-
-    const { data: instruction, error } = await supabase
-      .from("work_instructions")
-      .insert({
-        company_id: currentCompany.company_id,
-        project_id: selectedProjectId || null,
-        work_date: instructionDate || null,
-        created_by: user?.id,
-        title: instructionTitle,
-        project: instructionProject,
-        customer: instructionCustomer,
-        site: instructionSite,
-        description: instructionDescription,
-        problems_text: instructionProblems,
-      })
-      .select()
-      .single();
-
+    setMessage(t.msgSaving);
+    if (!currentCompany) { setMessage(t.msgNoFirm); return; }
+    if (!instructionTitle.trim()) { setMessage(t.msgNoTitle); return; }
+    const { data: instruction, error } = await supabase.from("work_instructions").insert({ company_id: currentCompany.company_id, project_id: selectedProjectId || null, work_date: instructionDate || null, created_by: user?.id, assigned_user_ids: assignedUserIds, title: instructionTitle, project: instructionProject, customer: instructionCustomer, site: instructionSite, description: instructionDescription, problems_text: instructionProblems, photos: instructionPhotos }).select().single();
     if (error) { setMessage("Fehler: " + error.message); return; }
-
-    const taskRows = instructionTasks
-      .filter((task) => task.trim() !== "")
-      .map((task, index) => ({ work_instruction_id: instruction.id, task_text: task, sort_order: index }));
-
+    const taskRows = instructionTasks.filter((task) => task.trim() !== "").map((task, index) => ({ work_instruction_id: instruction.id, task_text: task, sort_order: index, photos: instructionTaskPhotos[index] || [] }));
     if (taskRows.length > 0) {
       const { error: taskError } = await supabase.from("work_instruction_tasks").insert(taskRows);
       if (taskError) { setMessage("Arbeitsanweisung gespeichert, aber Schritte nicht: " + taskError.message); return; }
     }
-
-    setInstructionTitle(""); setInstructionProject(""); setInstructionCustomer("");
-    setInstructionSite(""); setInstructionDescription(""); setInstructionTasks([""]); setInstructionProblems("");
-
+    setInstructionTitle(""); setInstructionProject(""); setInstructionCustomer(""); setInstructionSite(""); setInstructionDescription(""); setInstructionTasks([""]); setInstructionProblems(""); setInstructionPhotos([]); setInstructionTaskPhotos({}); setAssignedUserIds([]);
     await loadWorkInstructions(currentCompany.company_id);
-    setMessage("Arbeitsanweisung gespeichert.");
+    setMessage(t.msgInstructionSaved);
   }
 
   async function deleteWorkInstruction(id: string) {
@@ -640,7 +1055,7 @@ export default function Home() {
     const { error } = await supabase.from("work_instructions").delete().eq("id", id);
     if (error) { setMessage("Fehler beim Löschen: " + error.message); return; }
     await loadWorkInstructions(currentCompany.company_id);
-    setMessage("Arbeitsanweisung gelöscht.");
+    setMessage(t.msgInstructionDeleted);
   }
 
   function updateFullWeekFromMonday(selectedValue: string) {
@@ -661,12 +1076,8 @@ export default function Home() {
     setMessage("Notiz wurde gespeichert.");
   }
 
-  function parseHours(value: string) {
-    return Number(value.replace(",", ".")) || 0;
-  }
-
+  function parseHours(value: string) { return Number(value.replace(",", ".")) || 0; }
   const totalHours = days.reduce((sum, day) => sum + parseHours(day.hours), 0);
-
   const projectTotals = days.reduce<Record<string, number>>((acc, day) => {
     if (!day.projectNumber) return acc;
     acc[day.projectNumber] = (acc[day.projectNumber] || 0) + parseHours(day.hours);
@@ -675,51 +1086,53 @@ export default function Home() {
 
   async function handlePhotos(index: number, files: FileList | null) {
     if (!files || !user) return;
-    setMessage("Fotos werden hochgeladen...");
+    setMessage(t.msgPhotoUploading);
     for (const file of Array.from(files)) {
       const fileExt = file.name.split(".").pop() || "jpg";
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `${user.id}/${calendarWeek || "ohne-kw"}/${fileName}`;
       const { error } = await supabase.storage.from("report-photos").upload(filePath, file);
-      if (error) { setMessage("Fehler beim Foto-Upload: " + error.message); return; }
+      if (error) { setMessage(t.msgPhotoErr + error.message); return; }
       const { data } = supabase.storage.from("report-photos").getPublicUrl(filePath);
-      const copy = [...days];
-      copy[index] = { ...copy[index], photos: [...copy[index].photos, data.publicUrl] };
-      setDays(copy);
+      const copy = [...days]; copy[index] = { ...copy[index], photos: [...copy[index].photos, data.publicUrl] }; setDays(copy);
     }
-    setMessage("Fotos wurden hochgeladen.");
+    setMessage(t.msgPhotoOk);
   }
 
   function deletePhoto(dayIndex: number, photoIndex: number) {
-    const copy = [...days];
-    copy[dayIndex] = { ...copy[dayIndex], photos: copy[dayIndex].photos.filter((_, index) => index !== photoIndex) };
-    setDays(copy);
+    const copy = [...days]; copy[dayIndex] = { ...copy[dayIndex], photos: copy[dayIndex].photos.filter((_, index) => index !== photoIndex) }; setDays(copy);
   }
 
+  // ── FIXED: Onboarding nur für Owner, Settings über owner in company_users ──
   async function loadCompanySettings(userId: string) {
-    const { data, error } = await supabase.from("company_settings").select("*").eq("user_id", userId).single();
-    if (error && error.code !== "PGRST116") { setMessage("Fehler beim Laden der Firmendaten: " + error.message); return; }
-    setCompanySettings(data || {
-      user_id: userId, company_name: "Elektrotechnik Luger", company_logo: "",
-      street: "", zip_code: "", city: "", phone: "", email: "", website: "", tax_number: "",
-    });
+    const { data: companyUser } = await supabase.from("company_users").select("company_id, role").eq("user_id", userId).maybeSingle();
+    
+    // Kein Eintrag = selbst registriert ohne Firma = Onboarding zeigen
+    if (!companyUser?.company_id) {
+      setShowOnboarding(true);
+      return;
+    }
+
+    // Hat Firma = kein Onboarding
+    setShowOnboarding(false);
+
+    const { data: ownerUser } = await supabase.from("company_users").select("user_id").eq("company_id", companyUser.company_id).eq("role", "owner").maybeSingle();
+    const ownerUserId = ownerUser?.user_id || userId;
+    const { data } = await supabase.from("company_settings").select("*").eq("user_id", ownerUserId).single();
+    const settings = data || { user_id: ownerUserId, company_name: "", company_logo: "", street: "", zip_code: "", city: "", phone: "", email: "", website: "", tax_number: "" };
+    setCompanySettings(settings);
   }
 
   async function saveCompanySettings() {
     if (!user || !companySettings) return;
     const { error } = await supabase.from("company_settings").upsert({ ...companySettings, user_id: user.id }, { onConflict: "user_id" });
     if (error) { setMessage("Fehler beim Speichern der Firmendaten: " + error.message); return; }
-    setMessage("Firmendaten wurden gespeichert.");
+    setMessage(t.msgCompanySaved);
   }
 
   function updateCompanyField(field: keyof CompanySettings, value: string) {
     if (!user) return;
-    setCompanySettings((current) => ({
-      user_id: user.id,
-      company_name: current?.company_name || "Elektrotechnik Luger",
-      ...current,
-      [field]: value,
-    }));
+    setCompanySettings((current) => ({ user_id: user.id, company_name: current?.company_name || "", ...current, [field]: value }));
   }
 
   async function uploadCompanyLogo(files: FileList | null) {
@@ -739,10 +1152,7 @@ export default function Home() {
     setMessage("");
     if (!user) { setMessage("Bitte zuerst anmelden."); return; }
     const name = reportName.trim() || `${calendarWeek || "Woche"} - ${employee || "Bericht"}`;
-    const reportData = {
-      report_name: name, employee, from_language: fromLanguage, to_language: toLanguage,
-      pdf_language: pdfLanguage, days, user_id: user.id, project_id: selectedProjectId || null,
-    };
+    const reportData = { report_name: name, employee, from_language: fromLanguage, to_language: toLanguage, pdf_language: pdfLanguage, days, user_id: user.id, project_id: selectedProjectId || null };
     let error;
     if (currentReportId) {
       ({ error } = await supabase.from("reports").update(reportData).eq("id", currentReportId));
@@ -753,56 +1163,43 @@ export default function Home() {
     }
     if (error) { setMessage("Fehler beim Speichern: " + error.message); return; }
     setReportName(name);
-    setMessage(currentReportId ? "Bericht wurde aktualisiert." : "Neuer Bericht wurde gespeichert.");
+    setMessage(currentReportId ? t.msgUpdated : t.msgSaved);
     await loadReportsFromDatabase();
   }
 
   function loadReport(report: SavedReport) {
-    setCurrentReportId(report.id);
-    setReportName(report.report_name);
-    setEmployee(report.employee || "");
-    setFromLanguage(report.from_language || "Deutsch");
-    setToLanguage(report.to_language || "Polnisch");
-    setPdfLanguage(report.pdf_language || "Deutsch");
-    setDays(report.days || createEmptyDays());
-    setMessage("Bericht wurde geladen.");
-    setActiveTab("regiebericht"); // Nach Laden direkt zum Bericht springen
+    setCurrentReportId(report.id); setReportName(report.report_name); setEmployee(report.employee || "");
+    setFromLanguage(report.from_language || "Deutsch"); setToLanguage(report.to_language || "Polnisch");
+    setPdfLanguage(report.pdf_language || "Deutsch"); setDays(report.days || createEmptyDays());
+    setMessage(t.msgLoaded); setActiveTab("regiebericht");
   }
 
   async function deleteReport(id: string) {
     const { error } = await supabase.from("reports").delete().eq("id", id);
     if (error) { setMessage("Fehler beim Löschen: " + error.message); return; }
     if (currentReportId === id) newReport();
-    setMessage("Bericht wurde gelöscht.");
-    await loadReportsFromDatabase();
+    setMessage(t.msgDeleted); await loadReportsFromDatabase();
   }
 
   function newReport() {
     setCurrentReportId(null); setReportName(""); setEmployee(""); setEmailTo("");
-    setFromLanguage("Deutsch"); setToLanguage("Polnisch"); setPdfLanguage("Deutsch");
-    setDays(createEmptyDays());
+    setFromLanguage("Deutsch"); setToLanguage("Polnisch"); setPdfLanguage("Deutsch"); setDays(createEmptyDays());
   }
 
-  // FIX 2: companyId als Parameter
   async function loadProjects(companyId?: string) {
     const id = companyId ?? currentCompany?.company_id;
     if (!id) return;
-    const { data, error } = await supabase
-      .from("projects").select("*").eq("company_id", id).order("created_at", { ascending: false });
+    const { data, error } = await supabase.from("projects").select("*").eq("company_id", id).order("created_at", { ascending: false });
     if (error) { setMessage("Fehler beim Laden der Projekte: " + error.message); return; }
     setProjects(data || []);
   }
 
   async function saveProject() {
     if (!currentCompany) return;
-    const { error } = await supabase.from("projects").insert({
-      company_id: currentCompany.company_id,
-      name: projectName, customer: projectCustomer, site: projectSite, project_manager: projectManager,
-    });
+    const { error } = await supabase.from("projects").insert({ company_id: currentCompany.company_id, name: projectName, customer: projectCustomer, site: projectSite, project_manager: projectManager });
     if (error) { setMessage("Fehler beim Speichern: " + error.message); return; }
     setProjectName(""); setProjectCustomer(""); setProjectSite(""); setProjectManager("");
-    await loadProjects();
-    setMessage("Projekt gespeichert.");
+    await loadProjects(); setMessage(t.msgProjectSaved);
   }
 
   async function deleteProject(id: string) {
@@ -810,8 +1207,7 @@ export default function Home() {
     const { error } = await supabase.from("projects").delete().eq("id", id);
     if (error) { setMessage("Fehler beim Löschen des Projekts: " + error.message); return; }
     if (selectedProjectDetailId === id) setSelectedProjectDetailId("");
-    await loadProjects();
-    setMessage("Projekt gelöscht.");
+    await loadProjects(); setMessage(t.msgProjectDeleted);
   }
 
   async function updateTaskStatus(taskId: string, status: string) {
@@ -822,78 +1218,175 @@ export default function Home() {
 
   async function translateAll() {
     setMessage("");
-    if (!employee.trim()) { setMessage("Bitte Mitarbeiter eintragen."); return; }
+    if (!employee.trim()) { setMessage(t.msgNoEmployee); return; }
     setLoading(true);
     const translatedDays = [...days];
     try {
       for (let i = 0; i < translatedDays.length; i++) {
         const day = translatedDays[i];
         if (!day.description.trim()) continue;
-        const res = await fetch("/api/translate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ hours: day.hours, description: day.description, fromLanguage, toLanguage }),
-        });
+        const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ hours: day.hours, description: day.description, fromLanguage, toLanguage }) });
         const data = await res.json();
         translatedDays[i].translation = data.error ? data.error : data.translation;
       }
-      setDays(translatedDays);
-      setMessage("Woche wurde übersetzt.");
-    } catch (error) {
-      setMessage("Fehler beim Übersetzen: " + String(error));
-    }
+      setDays(translatedDays); setMessage(t.msgTranslated);
+    } catch (error) { setMessage(t.msgTranslateErr + String(error)); }
     setLoading(false);
   }
 
-  function createReportFromInstruction(instruction: any) {
-    const completedTasks = (instruction.work_instruction_tasks || []).map((task: any) => {
-      const statusText =
-        task.status === "completed" ? "✅ Erledigt"
-        : task.status === "in_progress" ? "🟡 In Arbeit"
-        : task.status === "stopped" ? "⛔ Gestoppt"
-        : "⬜ Offen";
-      return [
-        `${statusText}: ${task.task_text}`,
-        task.note ? `Rückmeldung: ${task.note}` : "",
-      ].filter(Boolean).join("\n");
-    });
+  async function translateInstruction(instruction: any) {
+    setTranslatingInstructionId(instruction.id); setMessage("");
+    try {
+      const textsToTranslate = [{ key: "title", text: instruction.title || "" }, { key: "problems_text", text: instruction.problems_text || "" }, { key: "description", text: instruction.description || "" }];
+      const translatedFields: Record<string, string> = {};
+      for (const item of textsToTranslate) {
+        if (!item.text.trim()) continue;
+        const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: item.text, fromLanguage: "Deutsch", toLanguage: instructionToLanguage }) });
+        const data = await res.json();
+        translatedFields[item.key] = data.error ? item.text : data.translation;
+      }
+      const translatedTasks: Record<string, string> = {};
+      for (const task of instruction.work_instruction_tasks || []) {
+        if (!task.task_text?.trim()) continue;
+        const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: task.task_text, fromLanguage: "Deutsch", toLanguage: instructionToLanguage }) });
+        const data = await res.json();
+        translatedTasks[task.id] = data.error ? task.task_text : data.translation;
+        if (task.note?.trim()) {
+          const resNote = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: task.note, fromLanguage: "Deutsch", toLanguage: instructionToLanguage }) });
+          const dataNote = await resNote.json();
+          translatedTasks[`note_${task.id}`] = dataNote.error ? task.note : dataNote.translation;
+        }
+        if (task.employee_comment?.trim()) {
+          const resComment = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: task.employee_comment, fromLanguage: "Deutsch", toLanguage: instructionToLanguage }) });
+          const dataComment = await resComment.json();
+          translatedTasks[`comment_${task.id}`] = dataComment.error ? task.employee_comment : dataComment.translation;
+        }
+      }
+      setInstructionTranslations((prev) => ({ ...prev, [instruction.id]: { ...translatedFields, tasks: translatedTasks, language: instructionToLanguage } }));
+      setMessage(t.msgInstructionTranslated);
+    } catch (err) { setMessage(t.msgTranslateErr + String(err)); }
+    setTranslatingInstructionId(null);
+  }
 
+  async function createReportFromInstruction(instruction: any) {
+    // Frisch laden damit employee_comment aktuell ist
+    if (currentCompany) {
+      const { data } = await supabase.from("work_instructions").select("*, work_instruction_tasks (*)").eq("id", instruction.id).single();
+      if (data) instruction = data;
+    }
+
+    // Übersetzungen zusammenführen
+    const currentTranslations = instructionTranslations[instruction.id] || {};
+    const mergedTasks = { ...currentTranslations.tasks };
+    
+    // Automatisch übersetzen wenn Sprache nicht Deutsch und noch keine Übersetzung
+    if (uiLanguage !== "Deutsch" && currentTranslations.language !== uiLanguage) {
+      setMessage("Übersetze...");
+      const targetLang = uiLanguage;
+      const translatedFields: Record<string, string> = {};
+      for (const item of [
+        { key: "title", text: instruction.title || "" },
+        { key: "problems_text", text: instruction.problems_text || "" },
+      ]) {
+        if (!item.text.trim()) continue;
+        const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: item.text, fromLanguage: "Deutsch", toLanguage: targetLang }) });
+        const data = await res.json();
+        translatedFields[item.key] = data.error ? item.text : data.translation;
+      }
+      for (const task of instruction.work_instruction_tasks || []) {
+        if (task.task_text?.trim()) {
+          const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: task.task_text, fromLanguage: "Deutsch", toLanguage: targetLang }) });
+          const data = await res.json();
+          mergedTasks[task.id] = data.error ? task.task_text : data.translation;
+        }
+        if (task.employee_comment?.trim()) {
+          const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: task.employee_comment, fromLanguage: "Deutsch", toLanguage: targetLang }) });
+          const data = await res.json();
+          mergedTasks[`comment_${task.id}`] = data.error ? task.employee_comment : data.translation;
+        }
+      }
+      setInstructionTranslations(prev => ({ ...prev, [instruction.id]: { ...translatedFields, tasks: mergedTasks, language: targetLang } }));
+      setMessage("");
+      // Direkt die frischen Übersetzungen verwenden
+      Object.assign(currentTranslations, translatedFields);
+    }
+
+    const getTaskText = (taskId: string, fallback: string) => mergedTasks[taskId] || fallback;
+    const getCommentText = (taskId: string, fallback: string) => mergedTasks[`comment_${taskId}`] || fallback;
+    const getTitleText = () => currentTranslations.title || instruction.title;
+    const getProblemsText = () => currentTranslations.problems_text || instruction.problems_text || "";
+
+    const completedTasks = (instruction.work_instruction_tasks || [])
+      .sort((a: any, b: any) => a.sort_order - b.sort_order)
+      .map((task: any) => {
+        const statusText = task.status === "completed" ? t.statusCompleted : task.status === "in_progress" ? t.statusInProgress : task.status === "stopped" ? t.statusStopped : t.statusOpen;
+        const taskText = getTaskText(task.id, task.task_text);
+        const lines = [`${statusText}: ${taskText}`];
+        if (task.note) lines.push(`   📝 ${t.feedbackLabel}: ${task.note}`);
+        if (task.employee_comment) {
+          const comment = getCommentText(task.id, task.employee_comment);
+          lines.push(`   💬 Kommentar: ${comment}`);
+        }
+        return lines.join("\n");
+      });
+    const titleTranslated = getTitleText();
+    const problemsTranslated = getProblemsText();
     const description = [
+      titleTranslated !== instruction.title ? `📋 ${titleTranslated}` : "",
       ...completedTasks,
-      instruction.problems_text ? "Probleme / Hinweise: " + instruction.problems_text : "",
-      instruction.employee_note ? "Rückmeldung Mitarbeiter: " + instruction.employee_note : "",
-    ].filter(Boolean).join("\n");
-
+      problemsTranslated ? `─────\n⚠️ ${t.problemsHints}: ${problemsTranslated}` : "",
+      instruction.employee_note ? `${t.feedbackLabel}: ${instruction.employee_note}` : ""
+    ].filter(Boolean).join("\n─────\n");
     const copy = [...days];
     const targetDate = instruction.work_date || "";
-
     if (targetDate) {
       const [year, month, day] = targetDate.split("-").map(Number);
       const selectedDate = new Date(Date.UTC(year, month - 1, day));
       const dayNumber = selectedDate.getUTCDay() || 7;
       const monday = new Date(selectedDate);
       monday.setUTCDate(selectedDate.getUTCDate() - dayNumber + 1);
-      for (let i = 0; i < 7; i++) {
-        const nextDate = new Date(monday);
-        nextDate.setUTCDate(monday.getUTCDate() + i);
-        copy[i] = { ...copy[i], date: nextDate.toISOString().split("T")[0] };
-      }
+      for (let i = 0; i < 7; i++) { const nextDate = new Date(monday); nextDate.setUTCDate(monday.getUTCDate() + i); copy[i] = { ...copy[i], date: nextDate.toISOString().split("T")[0] }; }
     }
-
     const targetIndex = targetDate ? copy.findIndex((day) => day.date === targetDate) : 0;
     const indexToUse = targetIndex >= 0 ? targetIndex : 0;
+    copy[indexToUse] = { ...copy[indexToUse], customer: instruction.customer || "", projectNumber: instruction.project || "", site: instruction.site || "", description, photos: [] };
+    setDays(copy); setReportInstruction(instruction); setActiveTab("regiebericht"); setMessage("Regiebericht wurde aus Arbeitsanweisung vorbereitet.");
+  }
 
-    copy[indexToUse] = {
-      ...copy[indexToUse],
-      customer: instruction.customer || "",
-      projectNumber: instruction.project || "",
-      site: instruction.site || "",
-      description,
-    };
+  // ── FIXED: kein window.location.reload() ──
+  async function changePassword() {
+    if (!newPassword.trim() || newPassword.length < 6) { setMessage("Passwort muss mindestens 6 Zeichen haben."); return; }
+    if (newPassword !== newPasswordConfirm) { setMessage("Passwörter stimmen nicht überein."); return; }
+    setChangingPassword(true); setMessage("Speichere...");
+    try {
+      const res = await fetch("/api/change-password", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId: user?.id, newPassword }) });
+      const data = await res.json();
+      if (data.error) { setMessage("Fehler: " + data.error); setChangingPassword(false); return; }
+      const { error: dbError } = await supabase.from("company_users").update({ must_change_password: false }).eq("user_id", user?.id);
+      if (dbError) { setMessage("DB Fehler: " + dbError.message); setChangingPassword(false); return; }
+      if (user?.email) { await supabase.auth.signInWithPassword({ email: user.email, password: newPassword }); }
+      setMustChangePassword(false); setNewPassword(""); setNewPasswordConfirm(""); setMessage("✅ Passwort geändert!");
+      setShowOnboarding(false); // Onboarding nie zeigen nach Passwortänderung
+      if (user?.id) { await loadCompanyContext(user.id); await loadReportsFromDatabase(); }
+    } catch (err) { setMessage("Unbekannter Fehler: " + String(err)); setChangingPassword(false); }
+  }
 
-    setDays(copy);
-    setActiveTab("regiebericht"); // FIX 3: korrekter Tab-Name
-    setMessage("Regiebericht wurde aus Arbeitsanweisung vorbereitet.");
+  async function saveOnboarding() {
+    if (!user || !companySettings) return;
+    const { data: existingUser } = await supabase.from("company_users").select("company_id").eq("user_id", user.id).maybeSingle();
+    let companyId = existingUser?.company_id;
+    if (!companyId) {
+      const { data: newCompany, error: companyError } = await supabase.from("companies").insert({ name: companySettings.company_name || "Meine Firma", owner_user_id: user.id, status: "active" }).select().single();
+      if (companyError) { setMessage("Fehler beim Anlegen der Firma: " + companyError.message); return; }
+      companyId = newCompany.id;
+      const { error: userError } = await supabase.from("company_users").insert({ company_id: companyId, user_id: user.id, email: user.email, full_name: companySettings.company_name, role: "owner" });
+      if (userError) { setMessage("Fehler beim Anlegen des Benutzers: " + userError.message); return; }
+      await supabase.from("company_features").insert({ company_id: companyId, package_name: "starter", max_employees: 5, module_reports: true, module_work_orders: false, module_auto_reports: false, photos_enabled: false, email_enabled: false, signature_enabled: false, ai_enabled: false, allowed_languages: ["Deutsch"] });
+    }
+    const { error } = await supabase.from("company_settings").upsert({ ...companySettings, user_id: user.id }, { onConflict: "user_id" });
+    if (error) { setMessage("Fehler beim Speichern: " + error.message); return; }
+    await loadCompanyContext(user.id);
+    setShowOnboarding(false); setOnboardingDone(true); setMessage("Willkommen! Ihre Firmendaten wurden gespeichert.");
   }
 
   async function createPDF(sendByEmail = false) {
@@ -901,656 +1394,705 @@ export default function Home() {
     const doc = new jsPDF("p", "mm", "a4");
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
-    const marginLeft = 15;
-    const marginRight = 15;
+    const marginLeft = 15; const marginRight = 15;
     const contentWidth = pageWidth - marginLeft - marginRight;
     let y = 15;
-
-    const addFooter = () => {
-      doc.setFontSize(8); doc.setTextColor(120);
-      doc.text(p.company, marginLeft, pageHeight - 10);
-      doc.text(`${p.createdAt}: ${new Date().toLocaleDateString("de-DE")}`, pageWidth - marginRight, pageHeight - 10, { align: "right" });
-      doc.setTextColor(0);
-    };
-
-    const addNewPageIfNeeded = (neededHeight: number) => {
-      if (y + neededHeight > pageHeight - 25) { addFooter(); doc.addPage(); y = 15; }
-    };
-
+    const addFooter = () => { doc.setFontSize(8); doc.setTextColor(120); doc.text(p.company, marginLeft, pageHeight - 10); doc.text(`${p.createdAt}: ${new Date().toLocaleDateString("de-DE")}`, pageWidth - marginRight, pageHeight - 10, { align: "right" }); doc.setTextColor(0); };
+    const addNewPageIfNeeded = (neededHeight: number) => { if (y + neededHeight > pageHeight - 25) { addFooter(); doc.addPage(); y = 15; } };
     const qrText = `${p.title} ${calendarWeek || ""} - ${employee}`;
     const qrImage = await QRCode.toDataURL(qrText);
-
     let logoBase64 = "";
     if (companySettings?.company_logo) {
       try {
         const response = await fetch(companySettings.company_logo);
         const blob = await response.blob();
-        logoBase64 = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result as string);
-          reader.onerror = reject;
-          reader.readAsDataURL(blob);
-        });
-      } catch (error) {
-        console.error("Logo konnte nicht geladen werden:", error);
-      }
+        logoBase64 = await new Promise<string>((resolve, reject) => { const reader = new FileReader(); reader.onloadend = () => resolve(reader.result as string); reader.onerror = reject; reader.readAsDataURL(blob); });
+      } catch (error) { console.error("Logo konnte nicht geladen werden:", error); }
     }
-
-    doc.setFillColor(240, 240, 240);
-    doc.rect(0, 0, pageWidth, 70, "F");
-    doc.setFontSize(20); doc.setFont("helvetica", "bold");
-    doc.text(p.title, marginLeft, y);
-    doc.setFontSize(11); doc.setFont("helvetica", "normal");
-    y += 8;
-
+    doc.setFillColor(240, 240, 240); doc.rect(0, 0, pageWidth, 70, "F");
+    doc.setFontSize(20); doc.setFont("helvetica", "bold"); doc.text(p.title, marginLeft, y);
+    doc.setFontSize(11); doc.setFont("helvetica", "normal"); y += 8;
     doc.text(companySettings?.company_name || "Elektrotechnik Luger", marginLeft, y); y += 6;
     if (companySettings?.street) { doc.text(companySettings.street, marginLeft, y); y += 5; }
-    if (companySettings?.zip_code || companySettings?.city) {
-      doc.text(`${companySettings?.zip_code || ""} ${companySettings?.city || ""}`, marginLeft, y); y += 5;
-    }
+    if (companySettings?.zip_code || companySettings?.city) { doc.text(`${companySettings?.zip_code || ""} ${companySettings?.city || ""}`, marginLeft, y); y += 5; }
     if (companySettings?.phone) { doc.text(`Tel: ${companySettings.phone}`, marginLeft, y); y += 5; }
     if (companySettings?.email) { doc.text(`E-Mail: ${companySettings.email}`, marginLeft, y); y += 5; }
     if (companySettings?.website) { doc.text(`Web: ${companySettings.website}`, marginLeft, y); y += 5; }
     if (companySettings?.tax_number) { doc.text(`UID: ${companySettings.tax_number}`, marginLeft, y); y += 5; }
-
     y += 7;
     doc.text(`${p.report}: ${reportName || "-"}`, marginLeft, y); y += 6;
     doc.text(`${p.calendarWeek}: ${calendarWeek || "-"}`, marginLeft, y); y += 6;
     doc.text(`${p.employee}: ${employee || "-"}`, marginLeft, y);
-
-    if (logoBase64) {
-      doc.addImage(logoBase64, "PNG", pageWidth - 45, 8, 30, 30);
-    } else {
-      doc.addImage(qrImage, "PNG", pageWidth - 42, 8, 28, 28);
-    }
-
-    y += 10;
-    if (y < 75) y = 75;
-
-    doc.setFontSize(12); doc.setFont("helvetica", "bold");
-    doc.text(p.dailyReports, marginLeft, y); y += 8;
-
+    if (logoBase64) { doc.addImage(logoBase64, "PNG", pageWidth - 45, 8, 30, 30); } else { doc.addImage(qrImage, "PNG", pageWidth - 42, 8, 28, 28); }
+    y += 10; if (y < 75) y = 75;
+    doc.setFontSize(12); doc.setFont("helvetica", "bold"); doc.text(p.dailyReports, marginLeft, y); y += 8;
     for (const day of days) {
       const hasContent = day.description || day.hours || day.customer || day.projectNumber || day.site || day.photos.length > 0;
-      if (!hasContent) continue; // FIX: war "return", jetzt "continue" damit alle Tage verarbeitet werden
-
+      if (!hasContent) continue;
       const descriptionText = day.translation || day.description || "-";
       const splitDescription = doc.splitTextToSize(descriptionText, contentWidth - 8);
       const estimatedHeight = 45 + splitDescription.length * 5 + day.photos.length * 10;
       addNewPageIfNeeded(estimatedHeight);
-
-      doc.setFillColor(230, 230, 230);
-      doc.rect(marginLeft, y, contentWidth, 9, "F");
-      doc.setFontSize(11); doc.setFont("helvetica", "bold");
-      doc.text(`${day.weekday} - ${day.date || "-"}`, marginLeft + 3, y + 6);
-      y += 13;
-
+      doc.setFillColor(230, 230, 230); doc.rect(marginLeft, y, contentWidth, 9, "F");
+      doc.setFontSize(11); doc.setFont("helvetica", "bold"); doc.text(`${day.weekday} - ${day.date || "-"}`, marginLeft + 3, y + 6); y += 13;
       doc.setFont("helvetica", "normal"); doc.setFontSize(9);
-      doc.text(`${p.customer}: ${day.customer || "-"}`, marginLeft + 3, y);
-      doc.text(`${p.project}: ${day.projectNumber || "-"}`, marginLeft + 80, y); y += 6;
-      doc.text(`${p.site}: ${day.site || "-"}`, marginLeft + 3, y);
-      doc.text(`${p.hours}: ${day.hours || "-"}`, marginLeft + 80, y); y += 8;
-
+      doc.text(`${p.customer}: ${day.customer || "-"}`, marginLeft + 3, y); doc.text(`${p.project}: ${day.projectNumber || "-"}`, marginLeft + 80, y); y += 6;
+      doc.text(`${p.site}: ${day.site || "-"}`, marginLeft + 3, y); doc.text(`${p.hours}: ${day.hours || "-"}`, marginLeft + 80, y); y += 8;
       doc.setFont("helvetica", "bold"); doc.text(`${p.description}:`, marginLeft + 3, y); y += 6;
-      doc.setFont("helvetica", "normal"); doc.text(splitDescription, marginLeft + 3, y);
-      y += splitDescription.length * 5 + 5;
-
+      doc.setFont("helvetica", "normal"); doc.text(splitDescription, marginLeft + 3, y); y += splitDescription.length * 5 + 5;
       if (day.photos.length > 0) {
         doc.setFont("helvetica", "bold"); doc.text(`${p.photos}:`, marginLeft + 3, y); y += 6;
         doc.setFont("helvetica", "normal"); doc.setFontSize(8);
         for (let photoIndex = 0; photoIndex < day.photos.length; photoIndex++) {
-          const photo = day.photos[photoIndex];
           try {
-            const response = await fetch(photo);
+            const response = await fetch(day.photos[photoIndex]);
             const blob = await response.blob();
-            const photoBase64 = await new Promise<string>((resolve, reject) => {
-              const reader = new FileReader();
-              reader.onloadend = () => resolve(reader.result as string);
-              reader.onerror = reject;
-              reader.readAsDataURL(blob);
-            });
+            const photoBase64 = await new Promise<string>((resolve, reject) => { const reader = new FileReader(); reader.onloadend = () => resolve(reader.result as string); reader.onerror = reject; reader.readAsDataURL(blob); });
             addNewPageIfNeeded(65);
             doc.text(`${p.photo} ${photoIndex + 1}:`, marginLeft + 3, y); y += 5;
             doc.addImage(photoBase64, "JPEG", marginLeft + 3, y, 70, 50); y += 56;
-          } catch (error) {
-            doc.text(`${p.photo} ${photoIndex + 1}: konnte nicht geladen werden`, marginLeft + 3, y); y += 6;
-          }
+          } catch (error) { doc.text(`${p.photo} ${photoIndex + 1}: konnte nicht geladen werden`, marginLeft + 3, y); y += 6; }
         }
         y += 2;
       }
-
       doc.setDrawColor(200); doc.line(marginLeft, y, pageWidth - marginRight, y); y += 10; doc.setDrawColor(0);
     }
-
     addNewPageIfNeeded(65);
     doc.setFontSize(12); doc.setFont("helvetica", "bold"); doc.text(p.summary, marginLeft, y); y += 8;
     doc.setFontSize(10); doc.setFont("helvetica", "normal");
     doc.text(`${p.totalHours}: ${totalHours.toString().replace(".", ",")} ${p.hours}`, marginLeft, y); y += 8;
-    Object.entries(projectTotals).forEach(([project, total]) => {
-      doc.text(`${p.project} ${project}: ${total.toString().replace(".", ",")} ${p.hours}`, marginLeft, y); y += 6;
-    });
-
+    Object.entries(projectTotals).forEach(([project, total]) => { doc.text(`${p.project} ${project}: ${total.toString().replace(".", ",")} ${p.hours}`, marginLeft, y); y += 6; });
     y += 18;
-    doc.line(marginLeft, y, marginLeft + 70, y);
-    doc.line(pageWidth - marginRight - 70, y, pageWidth - marginRight, y);
-    y += 6; doc.setFontSize(9);
-    doc.text(p.signatureEmployee, marginLeft, y);
-    doc.text(p.signatureCustomer, pageWidth - marginRight - 70, y);
+    doc.line(marginLeft, y, marginLeft + 70, y); doc.line(pageWidth - marginRight - 70, y, pageWidth - marginRight, y);
+    y += 6; doc.setFontSize(9); doc.text(p.signatureEmployee, marginLeft, y); doc.text(p.signatureCustomer, pageWidth - marginRight - 70, y);
     addFooter();
-
     const filename = `Regiebericht_${calendarWeek || "Woche"}_${employee || "Mitarbeiter"}.pdf`;
-
     if (sendByEmail) {
-      if (!emailTo.trim()) { setMessage("Bitte Empfänger-E-Mail eintragen."); return; }
-      setMessage("PDF wird per E-Mail gesendet...");
+      if (!emailTo.trim()) { setMessage(t.msgEmailRequired); return; }
+      setMessage(t.msgEmailSending);
       const pdfBase64 = doc.output("datauristring").split(",")[1];
-      const res = await fetch("/api/send-report", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ to: emailTo, subject: `${p.title} ${calendarWeek || ""}`, pdfBase64, filename }),
-      });
+      const res = await fetch("/api/send-report", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ to: emailTo, subject: `${p.title} ${calendarWeek || ""}`, pdfBase64, filename }) });
       const data = await res.json();
       if (data.error) { setMessage("Fehler beim E-Mail-Versand: " + data.error); return; }
-      setMessage("PDF wurde per E-Mail gesendet.");
-      return;
+      setMessage(t.msgEmailSent); return;
     }
-
     doc.save(filename);
   }
 
-  // ─── Login-Screen ──────────────────────────────────────────────────────────
   if (!user) {
     return (
       <main className="max-w-xl mx-auto p-4 md:p-8 space-y-6 bg-gray-100 min-h-screen text-black">
         <section className="border rounded p-4 space-y-4 bg-white">
           <h1 className="text-3xl font-bold">{t.loginTitle}</h1>
-          <select
-            className="border p-3 w-full text-black bg-white"
-            value={uiLanguage}
-            onChange={(e) => setUiLanguage(e.target.value as Language)}
-          >
+          <select className="border p-3 w-full text-black bg-white" value={uiLanguage} onChange={(e) => setUiLanguage(e.target.value as Language)}>
             {languages.map((lang) => <option key={lang} value={lang}>{lang}</option>)}
           </select>
           {message && <div className="border rounded p-3 bg-yellow-100 text-black">{message}</div>}
-          <input className="border p-3 w-full text-black bg-white" placeholder={t.email} value={email} onChange={(e) => setEmail(e.target.value)} />
-          <input className="border p-3 w-full text-black bg-white" placeholder={t.password} type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-          <div className="flex flex-wrap gap-3">
-            <button type="button" onClick={signIn} className="bg-blue-600 text-white px-4 py-3 rounded">{t.login}</button>
-            <button type="button" onClick={signUp} className="bg-green-600 text-white px-4 py-3 rounded">{t.register}</button>
+          <div className="flex gap-2">
+            <button type="button" onClick={() => setIsUsernameLogin(false)} className={`flex-1 py-2 rounded font-medium ${!isUsernameLogin ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-700"}`}>📧 E-Mail</button>
+            <button type="button" onClick={() => setIsUsernameLogin(true)} className={`flex-1 py-2 rounded font-medium ${isUsernameLogin ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-700"}`}>👤 Benutzername</button>
           </div>
+          <form onSubmit={(e) => { e.preventDefault(); signIn(); }} autoComplete="on" className="space-y-3">
+          {isUsernameLogin ? (
+            <div className="space-y-3">
+              <input name="company" autoComplete="organization" className="border p-3 w-full text-black bg-white rounded" placeholder="Firmenkürzel (z.B. luger)" value={companySlug} onChange={(e) => setCompanySlug(e.target.value)} />
+              <input name="username" autoComplete="username" className="border p-3 w-full text-black bg-white rounded" placeholder="Benutzername (z.B. max)" value={username} onChange={(e) => setUsername(e.target.value)} />
+            </div>
+          ) : (
+            <input name="email" autoComplete="email" className="border p-3 w-full text-black bg-white" placeholder={t.email} value={email} onChange={(e) => setEmail(e.target.value)} />
+          )}
+          <div className="relative">
+            <input name="password" autoComplete="current-password" className="border p-3 w-full text-black bg-white pr-12" placeholder={t.password} type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} />
+            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-lg">{showPassword ? "🙈" : "👁️"}</button>
+          </div>
+          <button type="submit" className="bg-blue-600 text-white px-4 py-3 rounded w-full">{t.login}</button>
+          </form>
+          <p className="text-center text-sm text-gray-500">Noch kein Konto? <button type="button" onClick={signUp} className="text-blue-600 underline ml-1">{t.register}</button></p>
         </section>
       </main>
     );
   }
 
-  // ─── Haupt-App ─────────────────────────────────────────────────────────────
+  if (user && mustChangePassword) {
+    return (
+      <main className="max-w-md mx-auto p-4 md:p-8 min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="bg-white border rounded-xl p-6 space-y-5 w-full shadow-lg">
+          <div className="text-center"><div className="text-5xl mb-3">🔐</div><h2 className="text-2xl font-bold">Passwort ändern</h2><p className="text-gray-500 text-sm mt-1">Bitte ändern Sie Ihr temporäres Passwort.</p></div>
+          {message && <div className="bg-yellow-50 border rounded p-3 text-sm">{message}</div>}
+          <input className="border p-3 w-full rounded text-black" placeholder="Neues Passwort (min. 6 Zeichen)" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+          <input className="border p-3 w-full rounded text-black" placeholder="Passwort bestätigen" type="password" value={newPasswordConfirm} onChange={(e) => setNewPasswordConfirm(e.target.value)} />
+          <button type="button" onClick={changePassword} disabled={changingPassword} className="w-full bg-blue-700 text-white py-3 rounded font-bold disabled:opacity-50">{changingPassword ? "Wird gespeichert..." : "Passwort speichern & weiter"}</button>
+        </div>
+      </main>
+    );
+  }
+
+  if (user && showOnboarding && false) {
+    return (
+      <main className="max-w-xl mx-auto p-4 md:p-8 min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="bg-white border rounded-xl p-6 space-y-6 w-full shadow-lg">
+          <div className="flex items-center gap-2 mb-2">{[1, 2, 3].map((step) => (<div key={step} className={`flex-1 h-2 rounded-full ${onboardingStep >= step ? "bg-blue-600" : "bg-gray-200"}`} />))}</div>
+          {onboardingStep === 1 && (
+            <div className="space-y-4">
+              <h2 className="text-2xl font-bold">👋 Willkommen!</h2>
+              <p className="text-gray-600">Bitte hinterlegen Sie zuerst Ihre Firmendaten.</p>
+              <div className="space-y-3">
+                <input className="border p-3 w-full rounded text-black" placeholder="Firmenname *" value={companySettings?.company_name || ""} onChange={(e) => updateCompanyField("company_name", e.target.value)} />
+                <input className="border p-3 w-full rounded text-black" placeholder="Straße" value={companySettings?.street || ""} onChange={(e) => updateCompanyField("street", e.target.value)} />
+                <div className="grid grid-cols-2 gap-3">
+                  <input className="border p-3 rounded text-black" placeholder="PLZ" value={companySettings?.zip_code || ""} onChange={(e) => updateCompanyField("zip_code", e.target.value)} />
+                  <input className="border p-3 rounded text-black" placeholder="Ort" value={companySettings?.city || ""} onChange={(e) => updateCompanyField("city", e.target.value)} />
+                </div>
+              </div>
+              <button type="button" onClick={() => { if (!companySettings?.company_name?.trim()) { setMessage("Bitte Firmenname eingeben."); return; } setOnboardingStep(2); }} className="w-full bg-blue-700 text-white py-3 rounded font-bold">Weiter →</button>
+            </div>
+          )}
+          {onboardingStep === 2 && (
+            <div className="space-y-4">
+              <h2 className="text-2xl font-bold">📞 Kontaktdaten</h2>
+              <div className="space-y-3">
+                <input className="border p-3 w-full rounded text-black" placeholder="Telefon" value={companySettings?.phone || ""} onChange={(e) => updateCompanyField("phone", e.target.value)} />
+                <input className="border p-3 w-full rounded text-black" placeholder="E-Mail" value={companySettings?.email || ""} onChange={(e) => updateCompanyField("email", e.target.value)} />
+                <input className="border p-3 w-full rounded text-black" placeholder="Webseite" value={companySettings?.website || ""} onChange={(e) => updateCompanyField("website", e.target.value)} />
+                <input className="border p-3 w-full rounded text-black" placeholder="UID / Steuernummer" value={companySettings?.tax_number || ""} onChange={(e) => updateCompanyField("tax_number", e.target.value)} />
+              </div>
+              <div className="flex gap-3">
+                <button type="button" onClick={() => setOnboardingStep(1)} className="flex-1 bg-gray-200 text-gray-800 py-3 rounded font-medium">← Zurück</button>
+                <button type="button" onClick={() => setOnboardingStep(3)} className="flex-1 bg-blue-700 text-white py-3 rounded font-bold">Weiter →</button>
+              </div>
+            </div>
+          )}
+          {onboardingStep === 3 && (
+            <div className="space-y-4">
+              <h2 className="text-2xl font-bold">🖼️ Firmenlogo</h2>
+              <p className="text-gray-600">Optional — kann später hinzugefügt werden.</p>
+              {companySettings?.company_logo && (<img src={companySettings?.company_logo} alt="Logo" className="h-20 object-contain border rounded p-2" />)}
+              <input type="file" accept="image/*" className="border p-3 w-full rounded text-black bg-white" onChange={(e) => uploadCompanyLogo(e.target.files)} />
+              {message && <div className="bg-yellow-50 border rounded p-3 text-sm">{message}</div>}
+              <div className="flex gap-3">
+                <button type="button" onClick={() => setOnboardingStep(2)} className="flex-1 bg-gray-200 text-gray-800 py-3 rounded font-medium">← Zurück</button>
+                <button type="button" onClick={saveOnboarding} className="flex-1 bg-green-700 text-white py-3 rounded font-bold">✅ Speichern & Starten</button>
+              </div>
+              <button type="button" onClick={() => setShowOnboarding(false)} className="w-full text-gray-400 text-sm underline">Überspringen</button>
+            </div>
+          )}
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="max-w-5xl mx-auto p-4 md:p-8 space-y-6 bg-gray-100 min-h-screen text-black">
-
-      {/* Header */}
       <header className="bg-white border rounded p-4 space-y-1">
         <h1 className="text-3xl font-bold">{t.title}</h1>
         <p className="text-gray-600">{t.subtitle}</p>
         <p className="text-gray-700">{t.loggedInAs}: <strong>{user.email}</strong></p>
-        {currentCompany && (
-          <p className="text-gray-700">
-            Firma: <strong>{currentCompany.companies.name}</strong> | Rolle: <strong>{currentCompany.role}</strong>
-          </p>
-        )}
-        <button type="button" onClick={signOut} className="mt-2 bg-gray-800 text-white px-4 py-2 rounded">
-          {t.logout}
-        </button>
+        {currentCompany && (<p className="text-gray-700">{t.firma}: <strong>{currentCompany.companies.name}</strong> | {t.role}: <strong>{currentCompany.role === "owner" ? "Owner" : currentCompany.role === "admin" ? t.roleAdmin : currentCompany.role === "project_manager" ? t.roleProjectManager : t.roleEmployee}</strong></p>)}
+        <div className="flex items-center gap-3 mt-2">
+          <button type="button" onClick={signOut} className="bg-gray-800 text-white px-4 py-2 rounded">{t.logout}</button>
+          <select className="border p-2 rounded text-black bg-white text-sm" value={uiLanguage} onChange={async (e) => {
+            const newLang = e.target.value as Language;
+            setUiLanguage(newLang);
+            // Automatisch alle Arbeitsanweisungen übersetzen wenn nicht Deutsch
+            if (newLang !== "Deutsch") {
+              setMessage("Übersetze Arbeitsanweisungen...");
+              const newTranslations: Record<string, any> = { ...instructionTranslations };
+              for (const instruction of workInstructions) {
+                if (newTranslations[instruction.id]?.language === newLang) continue;
+                const textsToTranslate = [
+                  { key: "title", text: instruction.title || "" },
+                  { key: "problems_text", text: instruction.problems_text || "" },
+                  { key: "description", text: instruction.description || "" },
+                ];
+                const translatedFields: Record<string, string> = {};
+                for (const item of textsToTranslate) {
+                  if (!item.text.trim()) continue;
+                  const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: item.text, fromLanguage: "Deutsch", toLanguage: newLang }) });
+                  const data = await res.json();
+                  translatedFields[item.key] = data.error ? item.text : data.translation;
+                }
+                const translatedTasks: Record<string, string> = {};
+                for (const task of instruction.work_instruction_tasks || []) {
+                  if (!task.task_text?.trim()) continue;
+                  const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: task.task_text, fromLanguage: "Deutsch", toLanguage: newLang }) });
+                  const data = await res.json();
+                  translatedTasks[task.id] = data.error ? task.task_text : data.translation;
+                  if (task.employee_comment?.trim()) {
+                    const resC = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: task.employee_comment, fromLanguage: "Deutsch", toLanguage: newLang }) });
+                    const dataC = await resC.json();
+                    translatedTasks[`comment_${task.id}`] = dataC.error ? task.employee_comment : dataC.translation;
+                  }
+                }
+                newTranslations[instruction.id] = { ...translatedFields, tasks: translatedTasks, language: newLang };
+              }
+              setInstructionTranslations(newTranslations);
+              setMessage("");
+            }
+          }}>
+            {getAllowedLanguages(companyFeatures).filter(l => languages.includes(l as Language)).map((lang) => (<option key={lang} value={lang}>🌐 {lang}</option>))}
+          </select>
+          <select className="border p-2 rounded text-black bg-white text-sm" value={pdfLanguage} onChange={(e) => setPdfLanguage(e.target.value)}>
+            {getAllowedLanguages(companyFeatures).filter(l => pdfLanguages.includes(l)).map((lang) => (<option key={lang} value={lang}>📄 {lang}</option>))}
+          </select>
+        </div>
       </header>
 
-      {/* FIX 3: Alle Bereiche als eigene Tabs, sauber strukturiert */}
       <nav className="flex flex-wrap gap-2">
-        <TabButton label="Dashboard"            tabName="dashboard"           activeTab={activeTab} onClick={() => setActiveTab("dashboard")} />
-        <TabButton label="Regiebericht"         tabName="regiebericht"        activeTab={activeTab} onClick={() => setActiveTab("regiebericht")} />
-        <TabButton label="Berichte"             tabName="berichte"            activeTab={activeTab} onClick={() => setActiveTab("berichte")} />
-        <TabButton label="Projekte"             tabName="projekte"            activeTab={activeTab} onClick={() => { setActiveTab("projekte"); loadProjects(); }} />
-        <TabButton label="Arbeitsanweisungen"   tabName="arbeitsanweisungen"  activeTab={activeTab} onClick={() => setActiveTab("arbeitsanweisungen")} />
-        <TabButton label="Mitarbeiter"          tabName="mitarbeiter"         activeTab={activeTab} onClick={() => setActiveTab("mitarbeiter")} />
-        <TabButton label="Firmendaten"          tabName="firmendaten"         activeTab={activeTab} onClick={() => setActiveTab("firmendaten")} />
+        <TabButton label={t.dashboard}          tabName="dashboard"          activeTab={activeTab} onClick={() => setActiveTab("dashboard")} />
+        <TabButton label={t.tabReport}          tabName="regiebericht"       activeTab={activeTab} onClick={() => setActiveTab("regiebericht")} />
+        <TabButton label={t.saveLoad}           tabName="berichte"           activeTab={activeTab} onClick={() => setActiveTab("berichte")} />
+        <TabButton label={t.projectsTab}        tabName="projekte"           activeTab={activeTab} onClick={() => { setActiveTab("projekte"); loadProjects(); }} />
+        <TabButton label={t.workInstructions}   tabName="arbeitsanweisungen" activeTab={activeTab} onClick={() => setActiveTab("arbeitsanweisungen")} />
+        <TabButton label={t.employeeManagement} tabName="mitarbeiter"        activeTab={activeTab} onClick={() => setActiveTab("mitarbeiter")} />
+        <TabButton label={t.companyData}        tabName="firmendaten"        activeTab={activeTab} onClick={() => setActiveTab("firmendaten")} />
+        <TabButton label={t.tabDay}             tabName="tag"                activeTab={activeTab} onClick={() => setActiveTab("tag")} />
+        <TabButton label={t.tabWeek}            tabName="woche"              activeTab={activeTab} onClick={() => setActiveTab("woche")} />
+        <TabButton label={t.tabMonth}           tabName="monat"              activeTab={activeTab} onClick={() => setActiveTab("monat")} />
       </nav>
 
-      {/* Globale Statusmeldung */}
-      {message && (
-        <div className="border rounded p-3 bg-yellow-100 text-black">{message}</div>
-      )}
+      {message && <div className="border rounded p-3 bg-yellow-100 text-black">{message}</div>}
 
-      {/* ── TAB: Dashboard ── */}
       {activeTab === "dashboard" && (
         <section className="border rounded p-4 space-y-4 bg-white text-black">
-          <h2 className="text-xl font-bold">Dashboard</h2>
+          <h2 className="text-xl font-bold">{t.dashboard}</h2>
           {(() => {
             const allTasks = workInstructions.flatMap((i) => i.work_instruction_tasks || []);
-            const openCount      = allTasks.filter((t: any) => (t.status || "open") === "open").length;
-            const progressCount  = allTasks.filter((t: any) => t.status === "in_progress").length;
-            const stoppedCount   = allTasks.filter((t: any) => t.status === "stopped").length;
+            const openCount = allTasks.filter((t: any) => (t.status || "open") === "open").length;
+            const progressCount = allTasks.filter((t: any) => t.status === "in_progress").length;
+            const stoppedCount = allTasks.filter((t: any) => t.status === "stopped").length;
             const completedCount = allTasks.filter((t: any) => t.status === "completed").length;
-            const totalTasks     = allTasks.length;
+            const totalTasks = allTasks.length;
             const progressPercent = totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0;
             const today = new Date().toISOString().split("T")[0];
             const todayInstructions = workInstructions.filter((i: any) => i.work_date === today);
-
             return (
               <div className="space-y-3">
-                <p>Projekte: <strong>{projects.length}</strong></p>
-                <p>Arbeitsanweisungen: <strong>{workInstructions.length}</strong></p>
-                <p>Heute fällig: <strong>{todayInstructions.length}</strong></p>
-
+                <p>{t.projects}: <strong>{projects.length}</strong></p>
+                <p>{t.workInstructions}: <strong>{workInstructions.length}</strong></p>
+                <p>{t.dueToday}: <strong>{todayInstructions.length}</strong></p>
                 <div className="border rounded p-3 bg-gray-100">
-                  <p>⬜ Offen: {openCount}</p>
-                  <p>🟡 In Arbeit: {progressCount}</p>
-                  <p>⛔ Gestoppt: {stoppedCount}</p>
-                  <p>✅ Erledigt: {completedCount}</p>
-                  <p className="font-bold mt-3">Gesamtfortschritt: {progressPercent}%</p>
-                  <div className="w-full bg-gray-300 rounded h-4 mt-1">
-                    <div className="bg-green-600 h-4 rounded" style={{ width: `${progressPercent}%` }} />
-                  </div>
+                  <p>{t.statusOpen}: {openCount}</p><p>{t.statusInProgress}: {progressCount}</p>
+                  <p>{t.statusStopped}: {stoppedCount}</p><p>{t.statusCompleted}: {completedCount}</p>
+                  <p className="font-bold mt-3">{t.totalProgress}: {progressPercent}%</p>
+                  <div className="w-full bg-gray-300 rounded h-4 mt-1"><div className="bg-green-600 h-4 rounded" style={{ width: `${progressPercent}%` }} /></div>
                 </div>
-
-                {stoppedCount > 0 && (
-                  <div className="border rounded p-3 bg-red-50">
-                    <h3 className="font-bold mb-2">Gestoppte Arbeitsschritte</h3>
-                    {allTasks.filter((t: any) => t.status === "stopped").map((task: any) => (
-                      <p key={task.id}>
-                        <strong>{workInstructions.find((i) => (i.work_instruction_tasks || []).some((t: any) => t.id === task.id))?.project || "Kein Projekt"}</strong>
-                        {" — "}⛔ {task.task_text}{task.note ? ` — ${task.note}` : ""}
-                      </p>
-                    ))}
-                  </div>
-                )}
-
-                {progressCount > 0 && (
-                  <div className="border rounded p-3 bg-yellow-50">
-                    <h3 className="font-bold mb-2">Arbeitsschritte in Arbeit</h3>
-                    {allTasks.filter((t: any) => t.status === "in_progress").map((task: any) => (
-                      <p key={task.id}>
-                        <strong>{workInstructions.find((i) => (i.work_instruction_tasks || []).some((t: any) => t.id === task.id))?.project || "Kein Projekt"}</strong>
-                        {" — "}🟡 {task.task_text}{task.note ? ` — ${task.note}` : ""}
-                      </p>
-                    ))}
-                  </div>
-                )}
+                {stoppedCount > 0 && (<div className="border rounded p-3 bg-red-50"><h3 className="font-bold mb-2">{t.stoppedSteps}</h3>{allTasks.filter((t: any) => t.status === "stopped").map((task: any) => (<p key={task.id}><strong>{workInstructions.find((i) => (i.work_instruction_tasks || []).some((t: any) => t.id === task.id))?.project || t.noProject}</strong>{" — "}⛔ {task.task_text}{task.note ? ` — ${task.note}` : ""}</p>))}</div>)}
+                {progressCount > 0 && (<div className="border rounded p-3 bg-yellow-50"><h3 className="font-bold mb-2">{t.stepsInProgress}</h3>{allTasks.filter((t: any) => t.status === "in_progress").map((task: any) => (<p key={task.id}><strong>{workInstructions.find((i) => (i.work_instruction_tasks || []).some((t: any) => t.id === task.id))?.project || t.noProject}</strong>{" — "}🟡 {task.task_text}{task.note ? ` — ${task.note}` : ""}</p>))}</div>)}
               </div>
             );
           })()}
         </section>
       )}
 
-      {/* ── TAB: Regiebericht (Eingabe) ── */}
       {activeTab === "regiebericht" && (
         <div className="space-y-4">
-          {/* Allgemeine Angaben */}
           <section className="border rounded p-4 space-y-4 bg-white text-black">
             <h2 className="text-xl font-bold">{t.general}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <select className="border p-3 text-black bg-white" value={uiLanguage} onChange={(e) => setUiLanguage(e.target.value as Language)}>
-                {languages.map((lang) => <option key={lang} value={lang}>{t.appLanguage}: {lang}</option>)}
-              </select>
-              <select className="border p-3 text-black bg-white" value={pdfLanguage} onChange={(e) => setPdfLanguage(e.target.value)}>
-                {pdfLanguages.map((lang) => <option key={lang} value={lang}>{t.pdfLanguage}: {lang}</option>)}
-              </select>
               <input className="border p-3 text-black bg-white" placeholder={t.employee} value={employee} onChange={(e) => setEmployee(e.target.value)} />
               <input className="border p-3 bg-gray-200 text-black" value={calendarWeek} readOnly placeholder={t.calendarWeek} />
               <select className="border p-3 text-black bg-white" value={fromLanguage} onChange={(e) => setFromLanguage(e.target.value)}>
-                {languages.map((lang) => <option key={lang} value={lang}>{lang}</option>)}
+                {(getAllowedLanguages(companyFeatures).length > 0 ? getAllowedLanguages(companyFeatures) : languages).map((lang) => <option key={lang} value={lang}>{lang}</option>)}
               </select>
               <select className="border p-3 text-black bg-white" value={toLanguage} onChange={(e) => setToLanguage(e.target.value)}>
-                {languages.map((lang) => <option key={lang} value={lang}>{lang}</option>)}
+                {(getAllowedLanguages(companyFeatures).length > 0 ? getAllowedLanguages(companyFeatures) : languages).filter((lang) => lang !== "Deutsch").map((lang) => <option key={lang} value={lang}>{lang}</option>)}
               </select>
               <input className="border p-3 text-black bg-white md:col-span-2" placeholder={t.recipientEmail} value={emailTo} onChange={(e) => setEmailTo(e.target.value)} />
             </div>
           </section>
-
-          {/* Tageseinträge */}
           {days.map((day, index) => (
             <section key={day.weekday} className="border rounded p-4 space-y-3 bg-white text-black">
-              <h2 className="text-xl font-bold">{day.weekday}</h2>
+              <h2 className="text-xl font-bold">{t.weekdays[index] || day.weekday}</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <input
-                  type="date" className="border p-3 text-black bg-white" value={day.date}
-                  onChange={(e) => { if (index === 0) updateFullWeekFromMonday(e.target.value); else updateDay(index, "date", e.target.value); }}
-                />
+                <input type="date" className="border p-3 text-black bg-white" value={day.date} onChange={(e) => { if (index === 0) updateFullWeekFromMonday(e.target.value); else updateDay(index, "date", e.target.value); }} />
                 <input className="border p-3 text-black bg-white" placeholder={t.customer} value={day.customer} onChange={(e) => updateDay(index, "customer", e.target.value)} />
                 <input className="border p-3 text-black bg-white" placeholder={t.projectNumber} value={day.projectNumber} onChange={(e) => updateDay(index, "projectNumber", e.target.value)} />
                 <input className="border p-3 text-black bg-white" placeholder={t.site} value={day.site} onChange={(e) => updateDay(index, "site", e.target.value)} />
                 <input className="border p-3 text-black bg-white" placeholder={t.hours} value={day.hours} onChange={(e) => updateDay(index, "hours", e.target.value)} />
               </div>
-              <textarea className="border p-3 w-full h-28 text-black bg-white" placeholder={t.description} value={day.description} onChange={(e) => updateDay(index, "description", e.target.value)} />
-              <input type="file" accept="image/*" multiple className="border p-3 w-full text-black bg-white" onChange={(e) => handlePhotos(index, e.target.files)} />
-              {day.photos.length > 0 && (
-                <div className="grid grid-cols-2 gap-3">
-                  {day.photos.map((photo, photoIndex) => (
-                    <div key={photoIndex} className="border rounded p-2">
-                      <img src={photo} alt="Foto" className="w-full h-32 object-cover" />
-                      <button type="button" onClick={() => deletePhoto(index, photoIndex)} className="mt-2 bg-red-600 text-white px-2 py-2 rounded w-full">{t.deletePhoto}</button>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {day.translation && (
-                <div className="border p-3 rounded bg-gray-100 text-black">
-                  <strong>{t.translation}:</strong>
-                  <p>{day.translation}</p>
-                </div>
-              )}
+              <textarea className="border p-3 w-full text-black bg-white resize-none overflow-hidden" rows={Math.max(4, (day.description || "").split("\n").length + 1)} placeholder={t.description} value={day.description} onChange={(e) => updateDay(index, "description", e.target.value)} />
+              {companyFeatures?.photos_enabled ? <input type="file" accept="image/*" multiple className="border p-3 w-full text-black bg-white" onChange={(e) => handlePhotos(index, e.target.files)} /> : <div className="border rounded p-3 bg-gray-50 text-sm text-gray-400">🔒 Foto-Upload ist in deinem Paket nicht aktiviert.</div>}
+              {day.photos.length > 0 && (<div className="grid grid-cols-2 gap-3">{day.photos.map((photo, photoIndex) => (<div key={photoIndex} className="border rounded p-2"><img src={photo} alt="Foto" className="w-full h-32 object-cover" /><button type="button" onClick={() => deletePhoto(index, photoIndex)} className="mt-2 bg-red-600 text-white px-2 py-2 rounded w-full">{t.deletePhoto}</button></div>))}</div>)}
+              {day.translation && (<div className="border p-3 rounded bg-gray-100 text-black"><strong>{t.translation}:</strong><p>{day.translation}</p></div>)}
             </section>
           ))}
-
-          {/* Stundenübersicht */}
           <section className="border rounded p-4 space-y-2 bg-white text-black">
             <h2 className="text-xl font-bold">{t.hoursOverview}</h2>
             <p><strong>{t.total}:</strong> {totalHours.toString().replace(".", ",")} {t.hours}</p>
-            {Object.entries(projectTotals).map(([project, total]) => (
-              <p key={project}><strong>{t.projectNumber} {project}:</strong> {total.toString().replace(".", ",")} {t.hours}</p>
-            ))}
+            {Object.entries(projectTotals).map(([project, total]) => (<p key={project}><strong>{t.projectNumber} {project}:</strong> {total.toString().replace(".", ",")} {t.hours}</p>))}
           </section>
-
-          {/* Aktions-Buttons */}
           <div className="flex flex-wrap gap-4">
-            <button type="button" onClick={translateAll} className="bg-black text-white px-4 py-3 rounded">
-              {loading ? t.translating : t.translateWeek}
-            </button>
-            <button type="button" onClick={saveReport} className="bg-orange-600 text-white px-4 py-3 rounded">
-              {currentReportId ? t.update : t.save}
-            </button>
-            <button type="button" onClick={() => createPDF(false)} className="bg-green-600 text-white px-4 py-3 rounded">
-              {t.downloadPdf}
-            </button>
-            <button type="button" onClick={() => createPDF(true)} className="bg-purple-600 text-white px-4 py-3 rounded">
-              {t.sendPdf}
-            </button>
+            <button type="button" onClick={translateAll} className="bg-black text-white px-4 py-3 rounded">{loading ? t.translating : t.translateWeek}</button>
+            <button type="button" onClick={saveReport} className="bg-orange-600 text-white px-4 py-3 rounded">{currentReportId ? t.update : t.save}</button>
+            <button type="button" onClick={() => createPDF(false)} className="bg-green-600 text-white px-4 py-3 rounded">{t.downloadPdf}</button>
+            <button type="button" onClick={() => createPDF(true)} className="bg-purple-600 text-white px-4 py-3 rounded">{t.sendPdf}</button>
           </div>
         </div>
       )}
 
-      {/* ── TAB: Berichte (Speichern / Laden) ── */}
       {activeTab === "berichte" && (
         <section className="border rounded p-4 space-y-4 bg-white text-black">
           <h2 className="text-xl font-bold">{t.saveLoad}</h2>
           <input className="border p-3 w-full text-black bg-white" placeholder={t.reportName} value={reportName} onChange={(e) => setReportName(e.target.value)} />
           <div className="flex flex-wrap gap-3">
-            <button type="button" onClick={saveReport} className="bg-orange-600 text-white px-4 py-3 rounded">
-              {currentReportId ? t.updateReport : t.saveReport}
-            </button>
-            <button type="button" onClick={() => { newReport(); setMessage("Neuer Bericht gestartet."); }} className="bg-gray-700 text-white px-4 py-3 rounded">
-              {t.newReport}
-            </button>
+            <button type="button" onClick={saveReport} className="bg-orange-600 text-white px-4 py-3 rounded">{currentReportId ? t.updateReport : t.saveReport}</button>
+            <button type="button" onClick={() => { newReport(); setMessage(t.msgNewReport); }} className="bg-gray-700 text-white px-4 py-3 rounded">{t.newReport}</button>
           </div>
-
-          {savedReports.length > 0 && (
-            <div className="space-y-2">
-              <h3 className="font-bold">{t.savedReports}</h3>
-              {savedReports.map((report) => (
-                <div key={report.id} className="border rounded p-3 space-y-2">
-                  <strong>{report.report_name}</strong>
-                  <p className="text-sm text-gray-700">
-                    {t.employee}: {report.employee || "-"} | {new Date(report.created_at).toLocaleString("de-DE")}
-                  </p>
-                  <div className="flex gap-2">
-                    <button type="button" onClick={() => loadReport(report)} className="bg-blue-600 text-white px-3 py-2 rounded">{t.loadEdit}</button>
-                    <button type="button" onClick={() => deleteReport(report.id)} className="bg-red-600 text-white px-3 py-2 rounded">{t.delete}</button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+          {savedReports.length > 0 && (<div className="space-y-2"><h3 className="font-bold">{t.savedReports}</h3>{savedReports.map((report) => (<div key={report.id} className="border rounded p-3 space-y-2"><strong>{report.report_name}</strong><p className="text-sm text-gray-700">{t.employee}: {report.employee || "-"} | {new Date(report.created_at).toLocaleString("de-DE")}</p><div className="flex gap-2"><button type="button" onClick={() => loadReport(report)} className="bg-blue-600 text-white px-3 py-2 rounded">{t.loadEdit}</button><button type="button" onClick={() => deleteReport(report.id)} className="bg-red-600 text-white px-3 py-2 rounded">{t.delete}</button></div></div>))}</div>)}
         </section>
       )}
 
-      {/* ── TAB: Projekte ── */}
       {activeTab === "projekte" && (
         <section className="border rounded p-4 space-y-4 bg-white text-black">
-          <h2 className="text-xl font-bold">Projekte</h2>
+          <h2 className="text-xl font-bold">{t.projectsTab}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <input className="border p-3 w-full" placeholder="Projektname" value={projectName} onChange={(e) => setProjectName(e.target.value)} />
-            <input className="border p-3 w-full" placeholder="Kunde" value={projectCustomer} onChange={(e) => setProjectCustomer(e.target.value)} />
-            <input className="border p-3 w-full" placeholder="Baustelle" value={projectSite} onChange={(e) => setProjectSite(e.target.value)} />
-            <input className="border p-3 w-full" placeholder="Projektleiter" value={projectManager} onChange={(e) => setProjectManager(e.target.value)} />
+            <input className="border p-3 w-full" placeholder={t.projectName} value={projectName} onChange={(e) => setProjectName(e.target.value)} />
+            <input className="border p-3 w-full" placeholder={t.customer} value={projectCustomer} onChange={(e) => setProjectCustomer(e.target.value)} />
+            <input className="border p-3 w-full" placeholder={t.site} value={projectSite} onChange={(e) => setProjectSite(e.target.value)} />
+            <input className="border p-3 w-full" placeholder={t.projectManager} value={projectManager} onChange={(e) => setProjectManager(e.target.value)} />
           </div>
-          <button type="button" onClick={saveProject} className="bg-blue-700 text-white px-4 py-3 rounded">Projekt speichern</button>
-
+          <button type="button" onClick={saveProject} className="bg-blue-700 text-white px-4 py-3 rounded">{t.saveProject}</button>
           <div className="space-y-3 mt-4">
             {projects.map((project) => (
               <div key={project.id} className="border rounded p-3 space-y-2">
                 <strong>{project.name}</strong>
-                <p>Kunde: {project.customer || "-"}</p>
-                <p>Baustelle: {project.site || "-"}</p>
-                <p>Projektleiter: {project.project_manager || "-"}</p>
+                <p>{t.customer}: {project.customer || "-"}</p>
+                <p>{t.site}: {project.site || "-"}</p>
+                <p>{t.projectManager}: {project.project_manager || "-"}</p>
                 <div className="flex gap-2">
-                  <button type="button" onClick={() => setSelectedProjectDetailId(project.id === selectedProjectDetailId ? "" : project.id)} className="bg-gray-700 text-white px-3 py-2 rounded">
-                    {project.id === selectedProjectDetailId ? "Schließen" : "Projekt öffnen"}
-                  </button>
-                  <button type="button" onClick={() => deleteProject(project.id)} className="bg-red-600 text-white px-3 py-2 rounded">Projekt löschen</button>
+                  <button type="button" onClick={() => setSelectedProjectDetailId(project.id === selectedProjectDetailId ? "" : project.id)} className="bg-gray-700 text-white px-3 py-2 rounded">{project.id === selectedProjectDetailId ? t.closeProject : t.openProject}</button>
+                  <button type="button" onClick={() => deleteProject(project.id)} className="bg-red-600 text-white px-3 py-2 rounded">{t.deleteProject}</button>
                 </div>
-
                 {selectedProjectDetailId === project.id && (
                   <div className="border rounded p-3 bg-gray-50 space-y-3 mt-2">
                     {(() => {
                       const tasks = workInstructions.filter((i) => i.project_id === project.id).flatMap((i) => i.work_instruction_tasks || []);
-                      const openCount      = tasks.filter((t: any) => (t.status || "open") === "open").length;
-                      const progressCount  = tasks.filter((t: any) => t.status === "in_progress").length;
-                      const stoppedCount   = tasks.filter((t: any) => t.status === "stopped").length;
                       const completedCount = tasks.filter((t: any) => t.status === "completed").length;
-                      const totalTasks     = tasks.length;
-                      const progressPercent = totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0;
-                      return (
-                        <div className="border rounded p-3 bg-gray-100">
-                          <p>⬜ Offen: {openCount}</p><p>🟡 In Arbeit: {progressCount}</p>
-                          <p>⛔ Gestoppt: {stoppedCount}</p><p>✅ Erledigt: {completedCount}</p>
-                          <p className="font-bold mt-2">Fortschritt: {progressPercent}%</p>
-                          <div className="w-full bg-gray-300 rounded h-4 mt-1">
-                            <div className="bg-green-600 h-4 rounded" style={{ width: `${progressPercent}%` }} />
-                          </div>
-                        </div>
-                      );
+                      const progressPercent = tasks.length > 0 ? Math.round((completedCount / tasks.length) * 100) : 0;
+                      return (<div className="border rounded p-3 bg-gray-100"><p>{t.statusOpen}: {tasks.filter((t: any) => (t.status || "open") === "open").length}</p><p>{t.statusInProgress}: {tasks.filter((t: any) => t.status === "in_progress").length}</p><p>{t.statusStopped}: {tasks.filter((t: any) => t.status === "stopped").length}</p><p>{t.statusCompleted}: {completedCount}</p><p className="font-bold mt-2">{t.progress}: {progressPercent}%</p><div className="w-full bg-gray-300 rounded h-4 mt-1"><div className="bg-green-600 h-4 rounded" style={{ width: `${progressPercent}%` }} /></div></div>);
                     })()}
-
-                    <h4 className="font-bold">Arbeitsanweisungen</h4>
+                    <h4 className="font-bold">{t.workInstructions}</h4>
                     {workInstructions.filter((i) => i.project_id === project.id).map((instruction) => (
                       <div key={instruction.id} className="border rounded p-3 bg-white space-y-2">
-                        <strong>{instruction.title}</strong>
-                        <p><strong>Datum:</strong> {instruction.work_date || "-"}</p>
-                        <p><strong>Kunde:</strong> {instruction.customer || "-"}</p>
-                        <p><strong>Baustelle:</strong> {instruction.site || "-"}</p>
-                        {instruction.problems_text && <p><strong>Probleme:</strong> {instruction.problems_text}</p>}
-                        {(instruction.work_instruction_tasks || []).length > 0 && (
-                          <ul className="list-disc pl-6 space-y-1">
-                            {instruction.work_instruction_tasks.map((task: any) => (
-                              <li key={task.id}>
-                                {task.status === "completed" ? "✅ Erledigt" : task.status === "in_progress" ? "🟡 In Arbeit" : task.status === "stopped" ? "⛔ Gestoppt" : "⬜ Offen"}{" "}{task.task_text}
-                                {task.note && <div className="text-sm text-gray-600 ml-2">Rückmeldung: {task.note}</div>}
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                        {companyFeatures?.module_auto_reports ? (
-                          <button type="button" onClick={() => createReportFromInstruction(instruction)} className="bg-green-700 text-white px-3 py-2 rounded">Regiebericht erzeugen</button>
-                        ) : (
-                          <p className="text-sm text-gray-500">Automatische Regieberichte sind in deinem Paket nicht aktiviert.</p>
-                        )}
+                        <strong>{getTranslated(instruction.id, "title", instruction.title)}</strong>
+                        <p><strong>{t.date}:</strong> {instruction.work_date || "-"}</p>
+                        <p><strong>{t.customer}:</strong> {instruction.customer || "-"}</p>
+                        <p><strong>{t.site}:</strong> {instruction.site || "-"}</p>
+                        {instruction.problems_text && <p><strong>{t.problems}:</strong> {getTranslated(instruction.id, "problems_text", instruction.problems_text)}</p>}
+                        {(instruction.work_instruction_tasks || []).length > 0 && (<ul className="list-disc pl-6 space-y-1">{instruction.work_instruction_tasks.map((task: any) => (<li key={task.id}>{task.status === "completed" ? t.statusCompleted : task.status === "in_progress" ? t.statusInProgress : task.status === "stopped" ? t.statusStopped : t.statusOpen}{" "}{getTranslatedTask(instruction.id, task.id, task.task_text)}{task.note && <div className="text-sm text-gray-600 ml-2">{t.feedbackLabel}: {task.note}</div>}</li>))}</ul>)}
+                        {companyFeatures?.module_auto_reports ? (<button type="button" onClick={() => createReportFromInstruction(instruction)} className="bg-green-700 text-white px-3 py-2 rounded">{t.toReport}</button>) : (<p className="text-sm text-gray-500">{t.autoReportLocked}</p>)}
                       </div>
                     ))}
-                    {workInstructions.filter((i) => i.project_id === project.id).length === 0 && (
-                      <p className="text-gray-600">Noch keine Arbeitsanweisungen für dieses Projekt.</p>
-                    )}
-
-                    <h4 className="font-bold mt-2">Regieberichte</h4>
-                    {savedReports.filter((r: any) => r.project_id === project.id).map((report: any) => (
-                      <div key={report.id} className="border rounded p-3 bg-white">
-                        <strong>{report.report_name}</strong>
-                        <p>Mitarbeiter: {report.employee || "-"}</p>
-                      </div>
-                    ))}
-                    {savedReports.filter((r: any) => r.project_id === project.id).length === 0 && (
-                      <p className="text-gray-600">Noch keine Regieberichte für dieses Projekt.</p>
-                    )}
+                    {workInstructions.filter((i) => i.project_id === project.id).length === 0 && <p className="text-gray-600">{t.noInstructions}</p>}
+                    <h4 className="font-bold mt-2">{t.reportsTab}</h4>
+                    {savedReports.filter((r: any) => r.project_id === project.id).map((report: any) => (<div key={report.id} className="border rounded p-3 bg-white"><strong>{report.report_name}</strong><p>{t.employee}: {report.employee || "-"}</p></div>))}
+                    {savedReports.filter((r: any) => r.project_id === project.id).length === 0 && <p className="text-gray-600">{t.noReports}</p>}
                   </div>
                 )}
               </div>
             ))}
-            {projects.length === 0 && <p className="text-gray-600">Noch keine Projekte vorhanden.</p>}
+            {projects.length === 0 && <p className="text-gray-600">{t.noProjectsYet}</p>}
           </div>
         </section>
       )}
 
-      {/* ── TAB: Arbeitsanweisungen ── */}
       {activeTab === "arbeitsanweisungen" && (
         <div className="space-y-4">
+          {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") ? (
           <section className="border rounded p-4 space-y-4 bg-white text-black">
-            <h2 className="text-xl font-bold">Neue Arbeitsanweisung</h2>
+            <h2 className="text-xl font-bold">{t.newInstruction}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <input className="border p-3 text-black bg-white" placeholder="Titel" value={instructionTitle} onChange={(e) => setInstructionTitle(e.target.value)} />
-              <select className="border p-3 text-black bg-white" value={selectedProjectId} onChange={(e) => {
-                const projectId = e.target.value;
-                setSelectedProjectId(projectId);
-                const selectedProject = projects.find((p) => p.id === projectId);
-                if (selectedProject) {
-                  setInstructionProject(selectedProject.name || "");
-                  setInstructionCustomer(selectedProject.customer || "");
-                  setInstructionSite(selectedProject.site || "");
-                }
-              }}>
-                <option value="">Projekt auswählen</option>
+              <input className="border p-3 text-black bg-white" placeholder={t.instructionTitle} value={instructionTitle} onChange={(e) => setInstructionTitle(e.target.value)} />
+              <select className="border p-3 text-black bg-white" value={selectedProjectId} onChange={(e) => { const pid = e.target.value; setSelectedProjectId(pid); const sp = projects.find((p) => p.id === pid); if (sp) { setInstructionProject(sp.name || ""); setInstructionCustomer(sp.customer || ""); setInstructionSite(sp.site || ""); } }}>
+                <option value="">{t.selectProject}</option>
                 {projects.map((project) => <option key={project.id} value={project.id}>{project.name}</option>)}
               </select>
-              <input className="border p-3 text-black bg-white" placeholder="Kunde" value={instructionCustomer} onChange={(e) => setInstructionCustomer(e.target.value)} />
-              <input className="border p-3 text-black bg-white" placeholder="Baustelle" value={instructionSite} onChange={(e) => setInstructionSite(e.target.value)} />
+              <input className="border p-3 text-black bg-white" placeholder={t.customer} value={instructionCustomer} onChange={(e) => setInstructionCustomer(e.target.value)} />
+              <input className="border p-3 text-black bg-white" placeholder={t.site} value={instructionSite} onChange={(e) => setInstructionSite(e.target.value)} />
               <input type="date" className="border p-3 text-black bg-white" value={instructionDate} onChange={(e) => setInstructionDate(e.target.value)} />
             </div>
-            <input className="border p-3 w-full text-black bg-white" placeholder="Probleme / Hinweise" value={instructionProblems} onChange={(e) => setInstructionProblems(e.target.value)} />
-            <h3 className="font-bold">Arbeitsschritte</h3>
+            {/* Mitarbeiter zuweisen – Mehrfachauswahl */}
+            {companyUsers.filter(m => m.role === "employee").length > 0 && (
+              <div className="border rounded p-3 bg-gray-50 space-y-2">
+                <h3 className="font-bold text-sm">👤 Mitarbeiter zuweisen</h3>
+                {companyUsers.filter(m => m.role === "employee").map((m) => (
+                  <label key={m.user_id} className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={assignedUserIds.includes(m.user_id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setAssignedUserIds(prev => [...prev, m.user_id]);
+                        } else {
+                          setAssignedUserIds(prev => prev.filter(id => id !== m.user_id));
+                        }
+                      }}
+                      className="w-4 h-4"
+                    />
+                    <span>{m.full_name || m.email}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+            <input className="border p-3 w-full text-black bg-white" placeholder={t.problems} value={instructionProblems} onChange={(e) => setInstructionProblems(e.target.value)} />
+            {companyFeatures?.photos_enabled && (
+              <div>
+                <h3 className="font-bold mb-2">{t.photos}</h3>
+                <input type="file" accept="image/*" multiple className="border p-3 w-full text-black bg-white" onChange={(e) => handleInstructionPhotos(e.target.files)} />
+                {instructionPhotos.length > 0 && (<div className="grid grid-cols-3 gap-2 mt-2">{instructionPhotos.map((photo, i) => (<div key={i} className="relative"><img src={photo} alt="Foto" className="w-full h-24 object-cover rounded" /><button type="button" onClick={() => setInstructionPhotos((prev) => prev.filter((_, idx) => idx !== i))} className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 text-xs">✕</button></div>))}</div>)}
+              </div>
+            )}
+            <h3 className="font-bold">{t.workSteps}</h3>
             {instructionTasks.map((task, index) => (
-              <input key={index} className="border p-3 w-full text-black bg-white" placeholder={`Arbeitsschritt ${index + 1}`} value={task}
-                onChange={(e) => { const copy = [...instructionTasks]; copy[index] = e.target.value; setInstructionTasks(copy); }} />
-            ))}
-            <div className="flex gap-3">
-              <button type="button" onClick={() => setInstructionTasks([...instructionTasks, ""])} className="bg-gray-700 text-white px-4 py-3 rounded">+ Arbeitsschritt</button>
-              <button type="button" onClick={saveWorkInstruction} className="bg-blue-700 text-white px-4 py-3 rounded">Arbeitsanweisung speichern</button>
-            </div>
-          </section>
-
-          <section className="border rounded p-4 space-y-4 bg-white text-black">
-            <h2 className="text-xl font-bold">Gespeicherte Arbeitsanweisungen</h2>
-            {workInstructions.length === 0 && <p className="text-gray-600">Noch keine Arbeitsanweisungen vorhanden.</p>}
-            {workInstructions.map((instruction) => (
-              <div key={instruction.id} className="border rounded p-4 space-y-2">
-                <h3 className="font-bold text-lg">{instruction.title}</h3>
-                <p><strong>Datum:</strong> {instruction.work_date || "-"}</p>
-                <p><strong>Projekt:</strong> {instruction.project || "-"}</p>
-                <p><strong>Kunde:</strong> {instruction.customer || "-"}</p>
-                <p><strong>Baustelle:</strong> {instruction.site || "-"}</p>
-                {instruction.problems_text && (
-                  <div className="bg-yellow-50 border rounded p-3">
-                    <strong>Probleme / Hinweise:</strong>
-                    <p>{instruction.problems_text}</p>
-                  </div>
-                )}
-                <ul className="list-disc pl-6 mt-2 space-y-2">
-                  {(instruction.work_instruction_tasks || [])
-                    .sort((a: any, b: any) => a.sort_order - b.sort_order)
-                    .map((task: any) => (
-                      <li key={task.id} className="space-y-2 border rounded p-2 list-none">
-                        <div className="flex items-center gap-2">
-                          <select className="border rounded p-2 font-medium text-black bg-white" value={task.status || "open"} onChange={(e) => updateTaskStatus(task.id, e.target.value)}>
-                            <option value="open">⬜ Offen</option>
-                            <option value="in_progress">🟡 In Arbeit</option>
-                            <option value="stopped">⛔ Gestoppt</option>
-                            <option value="completed">✅ Erledigt</option>
-                          </select>
-                          <div className="font-medium">{task.task_text}</div>
-                        </div>
-                        <input className="border p-2 w-full text-black bg-white" placeholder="Rückmeldung" defaultValue={task.note || ""} id={`task-note-${task.id}`} />
-                        <button type="button" onClick={() => {
-                          const field = document.getElementById(`task-note-${task.id}`) as HTMLInputElement;
-                          updateTaskNote(task.id, field.value);
-                        }} className="bg-gray-700 text-white px-3 py-2 rounded">Rückmeldung speichern</button>
-                      </li>
-                    ))}
-                </ul>
-                {/* Button: Arbeitsanweisung → Regiebericht */}
-                <div className="border-t pt-3 mt-2">
-                  {companyFeatures?.module_auto_reports ? (
-                    <button
-                      type="button"
-                      onClick={() => createReportFromInstruction(instruction)}
-                      className="bg-green-700 text-white px-4 py-2 rounded font-medium"
-                    >
-                      📋 In Regiebericht übernehmen
-                    </button>
-                  ) : (
-                    <div className="bg-gray-50 border rounded p-3 text-sm text-gray-500">
-                      🔒 Automatische Regieberichte sind in deinem Paket nicht aktiviert.
-                    </div>
-                  )}
-                </div>
-
-                {(currentCompany?.role === "owner" || currentCompany?.role === "project_manager" || currentCompany?.role === "admin") && (
-                  <button type="button" onClick={() => deleteWorkInstruction(instruction.id)} className="bg-red-600 text-white px-3 py-2 rounded">Arbeitsanweisung löschen</button>
-                )}
+              <div key={index} className="border rounded p-3 space-y-2 bg-gray-50">
+                <input className="border p-3 w-full text-black bg-white" placeholder={`${t.workSteps} ${index + 1}`} value={task} onChange={(e) => { const copy = [...instructionTasks]; copy[index] = e.target.value; setInstructionTasks(copy); }} />
+                {companyFeatures?.photos_enabled && (<><input type="file" accept="image/*" multiple className="border p-2 w-full text-black bg-white text-sm" onChange={(e) => handleInstructionTaskPhotos(index, e.target.files)} />{(instructionTaskPhotos[index] || []).length > 0 && (<div className="grid grid-cols-3 gap-2">{(instructionTaskPhotos[index] || []).map((photo, pi) => (<div key={pi} className="relative"><img src={photo} alt="Foto" className="w-full h-20 object-cover rounded" /><button type="button" onClick={() => setInstructionTaskPhotos((prev) => ({ ...prev, [index]: (prev[index] || []).filter((_, idx) => idx !== pi) }))} className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 text-xs">✕</button></div>))}</div>)}</>)}
               </div>
             ))}
+            <div className="flex gap-3">
+              <button type="button" onClick={() => setInstructionTasks([...instructionTasks, ""])} className="bg-gray-700 text-white px-4 py-3 rounded">{t.addStep}</button>
+              <button type="button" onClick={saveWorkInstruction} className="bg-blue-700 text-white px-4 py-3 rounded">{t.saveInstruction}</button>
+            </div>
           </section>
+          ) : (
+            <section className="border rounded p-4 bg-yellow-50 text-black"><p className="text-yellow-700 text-sm">🔒 Arbeitsanweisungen anlegen ist nur für Projektleiter und Admins möglich.</p></section>
+          )}
+          <section className="border rounded p-4 bg-blue-50 text-black"><p className="text-blue-700 text-sm">💡 {t.savedInstructions} → {t.tabDay} / {t.tabWeek} / {t.tabMonth}</p></section>
         </div>
       )}
 
-      {/* ── TAB: Mitarbeiter ── */}
+      {activeTab === "tag" && (
+        <div className="space-y-4">
+          <section className="border rounded p-4 bg-white text-black space-y-3">
+            <h2 className="text-xl font-bold">{t.dayView}</h2>
+            <input type="date" className="border p-3 rounded text-black bg-white" value={selectedDayDate} onChange={(e) => setSelectedDayDate(e.target.value)} />
+          </section>
+          {(() => {
+            const dayInstructions = workInstructions.filter((i) => {
+              if (i.work_date !== selectedDayDate) return false;
+              if (currentCompany?.role === "employee") {
+                return (i.assigned_user_ids || []).includes(user?.id);
+              }
+              return true;
+            });
+            if (dayInstructions.length === 0) return (<section className="border rounded p-4 bg-white text-black"><p className="text-gray-500">{t.noInstructionsDay}</p></section>);
+            return dayInstructions.map((instruction) => (
+              <section key={instruction.id} className="border rounded p-4 bg-white text-black space-y-2">
+                <div className="flex justify-between items-start"><h3 className="font-bold text-lg">{getTranslated(instruction.id, "title", instruction.title)}</h3><span className="text-sm text-gray-500">{instruction.work_date}</span></div>
+                <p><strong>{t.project}:</strong> {instruction.project || "-"}</p>
+                <p><strong>{t.customer}:</strong> {instruction.customer || "-"}</p>
+                <p><strong>{t.site}:</strong> {instruction.site || "-"}</p>
+                {instruction.problems_text && (<div className="bg-yellow-50 border rounded p-2"><strong>{t.problemsHints}:</strong> {instruction.problems_text}</div>)}
+                {(instruction.photos || []).length > 0 && companyFeatures?.photos_enabled && (<div className="grid grid-cols-3 gap-2">{(instruction.photos || []).map((photo: string, i: number) => (<img key={i} src={photo} alt="Foto" className="w-full h-24 object-cover rounded border" />))}</div>)}
+                <ul className="space-y-4 mt-2">
+                  {(instruction.work_instruction_tasks || []).sort((a: any, b: any) => a.sort_order - b.sort_order).map((task: any) => (
+                    <li key={task.id} className="border rounded-lg p-3 bg-gray-50 space-y-3">
+                      <div className="flex items-center gap-2">
+                        <select className="border rounded p-1 text-sm text-black bg-white" value={task.status || "open"} onChange={(e) => updateTaskStatus(task.id, e.target.value)}>
+                          <option value="open">{t.statusOpen}</option><option value="in_progress">{t.statusInProgress}</option><option value="stopped">{t.statusStopped}</option><option value="completed">{t.statusCompleted}</option>
+                        </select>
+                        <span className="font-medium">{getTranslatedTask(instruction.id, task.id, task.task_text)}</span>
+                      </div>
+                      {task.note && <p className="text-sm text-gray-600 ml-2">{t.feedbackLabel}: {task.note}</p>}
+                      {(task.photos || []).length > 0 && companyFeatures?.photos_enabled && (<div className="grid grid-cols-3 gap-1">{(task.photos || []).map((photo: string, pi: number) => (<img key={pi} src={photo} alt="Foto" className="w-full h-16 object-cover rounded" />))}</div>)}
+                      {/* Mitarbeiter-Kommentar */}
+                      <div className="border-t pt-2 space-y-2">
+                        <p className="text-sm font-medium text-gray-700">💬 Kommentar (max. 1000 Zeichen):</p>
+                        <textarea
+                          className="border p-2 w-full rounded text-sm text-black bg-white"
+                          rows={5}
+                          maxLength={1000}
+                          placeholder="Kommentar eingeben..."
+                          value={taskComments[task.id] !== undefined ? taskComments[task.id] : (task.employee_comment || "")}
+                          onChange={(e) => setTaskComments(prev => ({ ...prev, [task.id]: e.target.value.slice(0, 1000) }))}
+                        />
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-gray-500">
+                            {((taskComments[task.id] !== undefined ? taskComments[task.id] : task.employee_comment) || "").length} / 1000 Zeichen
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => updateTaskComment(task.id, taskComments[task.id] || "")}
+                            className="bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium"
+                          >
+                            💾 Speichern
+                          </button>
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+                <div className="flex gap-2 pt-2 border-t">
+                  {companyFeatures?.module_auto_reports && (<button type="button" onClick={() => createReportFromInstruction(instruction)} className="bg-green-700 text-white px-3 py-2 rounded text-sm">📋 {t.toReport}</button>)}
+                  {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => deleteWorkInstruction(instruction.id)} className="bg-red-600 text-white px-3 py-2 rounded text-sm">{t.deleteInstruction}</button>)}
+                </div>
+              </section>
+            ));
+          })()}
+        </div>
+      )}
+
+      {activeTab === "woche" && (
+        <div className="space-y-4">
+          <section className="border rounded p-4 bg-white text-black space-y-3">
+            <h2 className="text-xl font-bold">{t.weekView}</h2>
+            <div className="flex items-center gap-3"><label className="text-sm font-medium">{t.selectDate}:</label><input type="date" className="border p-3 rounded text-black bg-white" value={selectedWeek} onChange={(e) => setSelectedWeek(e.target.value)} /></div>
+            <p className="text-sm text-gray-500">{t.week}: {getCalendarWeek(selectedWeek)}</p>
+          </section>
+          {(() => {
+            if (!selectedWeek) return null;
+            const [y, m, d] = selectedWeek.split("-").map(Number);
+            const date = new Date(Date.UTC(y, m - 1, d));
+            const dayNum = date.getUTCDay() || 7;
+            const monday = new Date(date); monday.setUTCDate(date.getUTCDate() - dayNum + 1);
+            const weekDates = Array.from({ length: 7 }, (_, i) => { const nd = new Date(monday); nd.setUTCDate(monday.getUTCDate() + i); return nd.toISOString().split("T")[0]; });
+            const weekInstructions = workInstructions.filter((i) => {
+              if (!weekDates.includes(i.work_date)) return false;
+              if (currentCompany?.role === "employee") {
+                return (i.assigned_user_ids || []).includes(user?.id);
+              }
+              return true;
+            });
+            if (weekInstructions.length === 0) return (<section className="border rounded p-4 bg-white text-black"><p className="text-gray-500">{t.noInstructionsWeek}</p></section>);
+            return weekDates.map((dateStr, di) => {
+              const dayInstructions = weekInstructions.filter((i) => i.work_date === dateStr);
+              if (dayInstructions.length === 0) return null;
+              return (
+                <section key={dateStr} className="border rounded p-4 bg-white text-black space-y-3">
+                  <div className="flex justify-between items-center bg-gray-100 rounded p-2">
+                    <h3 className="font-bold">{t.weekdays[di]} — {dateStr}</h3>
+                    <button type="button" onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }} className="text-blue-600 text-sm hover:underline">→ {t.dayView}</button>
+                  </div>
+                  {dayInstructions.map((instruction) => (
+                    <div key={instruction.id} className="border rounded p-3 space-y-2">
+                      <div className="flex justify-between"><strong>{getTranslated(instruction.id, "title", instruction.title)}</strong><span className="text-sm text-gray-500">{instruction.project || "-"}</span></div>
+                      <p className="text-sm"><strong>{t.customer}:</strong> {instruction.customer || "-"} | <strong>{t.site}:</strong> {instruction.site || "-"}</p>
+                      {instruction.problems_text && (<div className="bg-yellow-50 border rounded p-2 text-sm"><strong>{t.problemsHints}:</strong> {instruction.problems_text}</div>)}
+                      <ul className="space-y-1">
+                        {(instruction.work_instruction_tasks || []).sort((a: any, b: any) => a.sort_order - b.sort_order).map((task: any) => (
+                          <li key={task.id} className="flex items-center gap-2 text-sm">
+                            <select className="border rounded p-1 text-xs text-black bg-white" value={task.status || "open"} onChange={(e) => updateTaskStatus(task.id, e.target.value)}>
+                              <option value="open">{t.statusOpen}</option><option value="in_progress">{t.statusInProgress}</option><option value="stopped">{t.statusStopped}</option><option value="completed">{t.statusCompleted}</option>
+                            </select>
+                            <span>{getTranslatedTask(instruction.id, task.id, task.task_text)}</span>{task.note && <span className="text-gray-500">— {task.note}</span>}
+                          </li>
+                        ))}
+                      </ul>
+                      {companyFeatures?.module_auto_reports && (<button type="button" onClick={() => createReportFromInstruction(instruction)} className="bg-green-700 text-white px-3 py-1 rounded text-sm">📋 {t.toReport}</button>)}
+                    </div>
+                  ))}
+                </section>
+              );
+            });
+          })()}
+        </div>
+      )}
+
+      {activeTab === "monat" && (
+        <div className="space-y-4">
+          <section className="border rounded p-4 bg-white text-black space-y-3">
+            <h2 className="text-xl font-bold">{t.monthView}</h2>
+            <input type="month" className="border p-3 rounded text-black bg-white" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} />
+          </section>
+          {(() => {
+            const monthInstructions = workInstructions.filter((i) => {
+              if (!i.work_date?.startsWith(selectedMonth)) return false;
+              if (currentCompany?.role === "employee") {
+                return (i.assigned_user_ids || []).includes(user?.id);
+              }
+              return true;
+            });
+            const [year, month] = selectedMonth.split("-").map(Number);
+            const daysInMonth = new Date(year, month, 0).getDate();
+            const firstDay = (new Date(year, month - 1, 1).getDay() + 6) % 7;
+            const cells: (number | null)[] = [];
+            for (let i = 0; i < firstDay; i++) cells.push(null);
+            for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+            return (
+              <>
+                <section className="border rounded p-4 bg-white text-black">
+                  <h3 className="font-bold mb-3">{selectedMonth}</h3>
+                  <div className="grid grid-cols-7 gap-1 mb-1">{t.weekdays.map((label) => (<div key={label} className="text-center text-xs font-bold text-gray-500 py-1">{label.slice(0, 2)}</div>))}</div>
+                  <div className="grid grid-cols-7 gap-1">
+                    {cells.map((day, i) => {
+                      if (!day) return <div key={`e-${i}`} />;
+                      const dateStr = `${selectedMonth}-${String(day).padStart(2, "0")}`;
+                      const entries = monthInstructions.filter((inst) => inst.work_date === dateStr);
+                      const isToday = dateStr === new Date().toISOString().split("T")[0];
+                      return (<div key={day} onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }} className={`border rounded p-1 min-h-14 cursor-pointer hover:border-blue-400 transition-colors ${isToday ? "border-blue-500 bg-blue-50" : entries.length > 0 ? "bg-green-50 border-green-300" : "bg-white"}`}><div className={`text-xs font-bold ${isToday ? "text-blue-600" : "text-gray-700"}`}>{day}</div>{entries.length > 0 && <div className="text-xs text-green-700 font-medium">{entries.length} ✓</div>}{entries[0] && <div className="text-xs text-gray-500 truncate">{entries[0].title}</div>}</div>);
+                    })}
+                  </div>
+                </section>
+                <section className="border rounded p-4 bg-white text-black space-y-2">
+                  <h3 className="font-bold">{t.workInstructions} ({monthInstructions.length})</h3>
+                  {monthInstructions.length === 0 && <p className="text-gray-500">{t.noInstructionsMonth}</p>}
+                  {monthInstructions.sort((a, b) => (a.work_date || "").localeCompare(b.work_date || "")).map((instruction) => (<div key={instruction.id} onClick={() => { setSelectedDayDate(instruction.work_date); setActiveTab("tag"); }} className="border rounded p-3 bg-gray-50 cursor-pointer hover:bg-gray-100 flex justify-between items-center"><div><span className="font-medium">{getTranslated(instruction.id, "title", instruction.title)}</span><span className="text-gray-500 text-sm ml-2">{instruction.customer || "-"}</span></div><span className="text-sm text-gray-500">{instruction.work_date}</span></div>))}
+                </section>
+              </>
+            );
+          })()}
+        </div>
+      )}
+
       {activeTab === "mitarbeiter" && (
         <section className="border rounded p-4 space-y-4 bg-white text-black">
-          <h2 className="text-xl font-bold">Mitarbeiterverwaltung</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <input className="border p-3 text-black bg-white" placeholder="Name" value={newUserName} onChange={(e) => setNewUserName(e.target.value)} />
-            <input className="border p-3 text-black bg-white" placeholder="E-Mail" value={newUserEmail} onChange={(e) => setNewUserEmail(e.target.value)} />
-            <select className="border p-3 text-black bg-white" value={newUserRole} onChange={(e) => setNewUserRole(e.target.value)}>
-              <option value="employee">Mitarbeiter</option>
-              <option value="project_manager">Projektleiter</option>
-              <option value="admin">Admin</option>
-            </select>
-          </div>
-          <button type="button" onClick={addCompanyUser} className="bg-blue-700 text-white px-4 py-3 rounded">Mitarbeiter hinzufügen</button>
-          <p>Aktuelle Mitarbeiter: <strong>{companyUsers.length}</strong></p>
+          <h2 className="text-xl font-bold">{t.employeeManagement}</h2>
+          {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
+            <div className="border rounded p-4 bg-gray-50 space-y-3">
+              <h3 className="font-bold">Neuen Mitarbeiter anlegen</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <input className="border p-3 text-black bg-white" placeholder="Vollständiger Name *" value={newUserName} onChange={(e) => setNewUserName(e.target.value)} />
+                <input className="border p-3 text-black bg-white" placeholder="Benutzername * (für Login)" value={newUserUsername} onChange={(e) => setNewUserUsername(e.target.value)} />
+                <input className="border p-3 text-black bg-white" placeholder="Passwort *" type="password" value={newUserPassword} onChange={(e) => setNewUserPassword(e.target.value)} />
+                <select className="border p-3 text-black bg-white" value={newUserRole} onChange={(e) => setNewUserRole(e.target.value)}>
+                  <option value="employee">{t.roleEmployee}</option>
+                  {(currentCompany?.role === "owner" || currentCompany?.role === "admin") && <option value="project_manager">{t.roleProjectManager}</option>}
+                  {currentCompany?.role === "owner" && <option value="admin">{t.roleAdmin}</option>}
+                </select>
+              </div>
+              <button type="button" onClick={addCompanyUser} disabled={creatingEmployee} className="bg-blue-700 text-white px-4 py-3 rounded disabled:opacity-50">{creatingEmployee ? "Wird angelegt..." : t.addEmployee}</button>
+              <p className="text-xs text-gray-400">Der Mitarbeiter meldet sich mit seinem Benutzernamen und Passwort an.</p>
+            </div>
+          )}
+          <p>{t.currentEmployees}: <strong>{companyUsers.length}</strong></p>
           <div className="space-y-3">
             {companyUsers.map((member) => (
               <div key={member.id} className="border rounded p-3 space-y-2">
                 <strong>{member.full_name || "-"}</strong>
                 <p>{member.email || "-"}</p>
-                <p>Rolle: {member.role}</p>
-                {member.email && (
-                  <button type="button" onClick={() => resetCompanyUserPassword(member.email)} className="bg-gray-700 text-white px-3 py-2 rounded">Passwort zurücksetzen</button>
-                )}
+                <p>{t.role}: {member.role === "owner" ? "Owner" : member.role === "admin" ? t.roleAdmin : member.role === "project_manager" ? t.roleProjectManager : t.roleEmployee}</p>
+                <div className="flex gap-2 flex-wrap">
+                  {member.email && (<button type="button" onClick={() => resetCompanyUserPassword(member.email)} className="bg-gray-700 text-white px-3 py-2 rounded">{t.resetPassword}</button>)}
+                  {currentCompany && canDelete(currentCompany.role, member.role) && member.user_id !== user?.id && (
+                    <button type="button" onClick={() => deleteCompanyUser(member.id, member.user_id)} className="bg-red-600 text-white px-3 py-2 rounded">🗑️ Löschen</button>
+                  )}
+                </div>
               </div>
             ))}
           </div>
         </section>
       )}
 
-      {/* ── TAB: Firmendaten ── */}
       {activeTab === "firmendaten" && (
         <section className="border rounded p-4 space-y-4 bg-white text-black">
-          <h2 className="text-xl font-bold">Firmendaten</h2>
-          {companySettings?.company_logo && (
-            <img src={companySettings.company_logo} alt="Firmenlogo" className="h-20 object-contain" />
-          )}
-          <div>
-            <label className="block text-sm font-medium mb-1">Firmenlogo hochladen</label>
-            <input type="file" accept="image/*" className="border p-3 w-full text-black bg-white" onChange={(e) => uploadCompanyLogo(e.target.files)} />
-          </div>
+          <h2 className="text-xl font-bold">{t.companyData}</h2>
+          {companySettings?.company_logo && (<img src={companySettings.company_logo} alt="Firmenlogo" className="h-20 object-contain" />)}
+          <div><label className="block text-sm font-medium mb-1">{t.uploadLogo}</label><input type="file" accept="image/*" className="border p-3 w-full text-black bg-white" onChange={(e) => uploadCompanyLogo(e.target.files)} /></div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <input className="border p-3 text-black bg-white" placeholder="Firmenname"        value={companySettings?.company_name || ""} onChange={(e) => updateCompanyField("company_name", e.target.value)} />
-            <input className="border p-3 text-black bg-white" placeholder="Straße"            value={companySettings?.street || ""}        onChange={(e) => updateCompanyField("street", e.target.value)} />
-            <input className="border p-3 text-black bg-white" placeholder="PLZ"               value={companySettings?.zip_code || ""}      onChange={(e) => updateCompanyField("zip_code", e.target.value)} />
-            <input className="border p-3 text-black bg-white" placeholder="Ort"               value={companySettings?.city || ""}          onChange={(e) => updateCompanyField("city", e.target.value)} />
-            <input className="border p-3 text-black bg-white" placeholder="Telefon"           value={companySettings?.phone || ""}         onChange={(e) => updateCompanyField("phone", e.target.value)} />
-            <input className="border p-3 text-black bg-white" placeholder="E-Mail"            value={companySettings?.email || ""}         onChange={(e) => updateCompanyField("email", e.target.value)} />
-            <input className="border p-3 text-black bg-white" placeholder="Webseite"          value={companySettings?.website || ""}       onChange={(e) => updateCompanyField("website", e.target.value)} />
-            <input className="border p-3 text-black bg-white" placeholder="UID / Steuernummer" value={companySettings?.tax_number || ""}   onChange={(e) => updateCompanyField("tax_number", e.target.value)} />
+            <input className="border p-3 text-black bg-white" placeholder={t.companyName} value={companySettings?.company_name || ""} onChange={(e) => updateCompanyField("company_name", e.target.value)} />
+            <input className="border p-3 text-black bg-white" placeholder={t.street} value={companySettings?.street || ""} onChange={(e) => updateCompanyField("street", e.target.value)} />
+            <input className="border p-3 text-black bg-white" placeholder={t.zip} value={companySettings?.zip_code || ""} onChange={(e) => updateCompanyField("zip_code", e.target.value)} />
+            <input className="border p-3 text-black bg-white" placeholder={t.city} value={companySettings?.city || ""} onChange={(e) => updateCompanyField("city", e.target.value)} />
+            <input className="border p-3 text-black bg-white" placeholder={t.phone} value={companySettings?.phone || ""} onChange={(e) => updateCompanyField("phone", e.target.value)} />
+            <input className="border p-3 text-black bg-white" placeholder={t.email} value={companySettings?.email || ""} onChange={(e) => updateCompanyField("email", e.target.value)} />
+            <input className="border p-3 text-black bg-white" placeholder={t.website} value={companySettings?.website || ""} onChange={(e) => updateCompanyField("website", e.target.value)} />
+            <input className="border p-3 text-black bg-white" placeholder={t.taxNumber} value={companySettings?.tax_number || ""} onChange={(e) => updateCompanyField("tax_number", e.target.value)} />
           </div>
-          <button type="button" onClick={saveCompanySettings} className="bg-blue-700 text-white px-4 py-3 rounded">Firmendaten speichern</button>
+          <button type="button" onClick={saveCompanySettings} className="bg-blue-700 text-white px-4 py-3 rounded">{t.saveCompany}</button>
         </section>
       )}
 
     </main>
   );
 }
+
