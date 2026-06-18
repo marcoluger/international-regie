@@ -10,14 +10,26 @@ export async function POST(request: Request) {
 
     if (!description?.trim()) return Response.json({ translation: "" });
 
-    const prompt = hours
-      ? `Du bist ein professioneller Übersetzer für Bauberichte. Übersetze den folgenden Arbeitsbericht von ${fromLanguage} nach ${toLanguage}. Gib NUR die Übersetzung zurück, ohne Erklärungen.\n\nText:\n${description}`
-      : `Übersetze den folgenden Text exakt von ${fromLanguage} nach ${toLanguage}. Gib NUR die direkte Übersetzung zurück, keine Erklärungen. Auch einzelne Wörter müssen übersetzt werden.\n\nText: ${description}`;
+    const systemPrompt = `Du bist ein professioneller Übersetzer. Deine einzige Aufgabe ist es, Text zu übersetzen. 
+Regeln:
+- Gib IMMER NUR die Übersetzung zurück, niemals Erklärungen
+- Übersetze auch einzelne Wörter, Namen und kurze Texte direkt
+- Wenn ein Wort ein Eigenname ist (z.B. Personenname), behalte ihn unverändert
+- Schreibe KEINE Kommentare, KEINE Erklärungen, KEINE Entschuldigungen
+- Antworte immer nur mit dem übersetzten Text`;
+
+    const userPrompt = hours
+      ? `Übersetze von ${fromLanguage} nach ${toLanguage}:\n\n${description}`
+      : `Übersetze von ${fromLanguage} nach ${toLanguage}: ${description}`;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
-      messages: [{ role: "user", content: prompt }],
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt }
+      ],
       max_tokens: 1000,
+      temperature: 0.1,
     });
 
     const translation = completion.choices[0]?.message?.content?.trim() || "";
