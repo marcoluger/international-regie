@@ -798,6 +798,7 @@ export default function Home() {
   const [newUserPassword, setNewUserPassword] = useState("");
   const [newUserRole, setNewUserRole] = useState("employee");
   const [creatingEmployee, setCreatingEmployee] = useState(false);
+  const [taskComments, setTaskComments] = useState<Record<string, string>>({});
   const [instructionProblems, setInstructionProblems] = useState("");
   const [instructionTitle, setInstructionTitle] = useState("");
   const [instructionProject, setInstructionProject] = useState("");
@@ -906,6 +907,13 @@ export default function Home() {
     const { data, error } = await supabase.from("work_instructions").select(`*, work_instruction_tasks (*)`).eq("company_id", companyId).order("created_at", { ascending: false });
     if (error) { setMessage("Fehler beim Laden der Arbeitsanweisungen: " + error.message); return; }
     setWorkInstructions(data || []);
+  }
+
+  async function updateTaskComment(taskId: string, comment: string) {
+    const { error } = await supabase.from("work_instruction_tasks").update({ employee_comment: comment }).eq("id", taskId);
+    if (error) { setMessage("Fehler beim Speichern des Kommentars: " + error.message); return; }
+    if (currentCompany) await loadWorkInstructions(currentCompany.company_id);
+    setMessage("✅ Kommentar gespeichert.");
   }
 
   async function updateTaskNote(taskId: string, note: string) {
@@ -1807,6 +1815,32 @@ export default function Home() {
                       </div>
                       {task.note && <p className="text-sm text-gray-600 ml-2">{t.feedbackLabel}: {task.note}</p>}
                       {(task.photos || []).length > 0 && companyFeatures?.photos_enabled && (<div className="grid grid-cols-3 gap-1">{(task.photos || []).map((photo: string, pi: number) => (<img key={pi} src={photo} alt="Foto" className="w-full h-16 object-cover rounded" />))}</div>)}
+                      {/* Mitarbeiter-Kommentar */}
+                      <div className="mt-2 space-y-1">
+                        <textarea
+                          className="border p-2 w-full rounded text-sm text-black bg-gray-50"
+                          rows={4}
+                          placeholder={`Kommentar eingeben (min. 1000 Zeichen)...`}
+                          value={taskComments[task.id] ?? (task.employee_comment || "")}
+                          onChange={(e) => setTaskComments(prev => ({ ...prev, [task.id]: e.target.value }))}
+                        />
+                        <div className="flex items-center justify-between">
+                          <span className={`text-xs ${((taskComments[task.id] ?? task.employee_comment) || "").length >= 1000 ? "text-green-600" : "text-red-500"}`}>
+                            {((taskComments[task.id] ?? task.employee_comment) || "").length} / 1000 Zeichen
+                          </span>
+                          <button
+                            type="button"
+                            disabled={((taskComments[task.id] ?? task.employee_comment) || "").length < 1000}
+                            onClick={() => updateTaskComment(task.id, taskComments[task.id] ?? "")}
+                            className="bg-blue-600 text-white px-3 py-1 rounded text-sm disabled:opacity-40"
+                          >
+                            💾 Kommentar speichern
+                          </button>
+                        </div>
+                        {task.employee_comment && !(taskComments[task.id]) && (
+                          <p className="text-xs text-green-600">✅ Kommentar gespeichert</p>
+                        )}
+                      </div>
                     </li>
                   ))}
                 </ul>
