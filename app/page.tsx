@@ -1316,13 +1316,14 @@ export default function Home() {
     const getTitleText = () => currentTranslations.title || instruction.title;
     const getProblemsText = () => currentTranslations.problems_text || instruction.problems_text || "";
 
+    const currentTexts = texts[uiLanguage];
     const completedTasks = (instruction.work_instruction_tasks || [])
       .sort((a: any, b: any) => a.sort_order - b.sort_order)
       .map((task: any) => {
-        const statusText = task.status === "completed" ? t.statusCompleted : task.status === "in_progress" ? t.statusInProgress : task.status === "stopped" ? t.statusStopped : t.statusOpen;
+        const statusText = task.status === "completed" ? currentTexts.statusCompleted : task.status === "in_progress" ? currentTexts.statusInProgress : task.status === "stopped" ? currentTexts.statusStopped : currentTexts.statusOpen;
         const taskText = getTaskText(task.id, task.task_text);
         const lines = [`${statusText}: ${taskText}`];
-        if (task.note) lines.push(`   📝 ${t.feedbackLabel}: ${task.note}`);
+        if (task.note) lines.push(`   📝 ${currentTexts.feedbackLabel}: ${task.note}`);
         if (task.employee_comment) {
           const comment = getCommentText(task.id, task.employee_comment);
           lines.push(`   💬 Kommentar: ${comment}`);
@@ -1334,8 +1335,8 @@ export default function Home() {
     const description = [
       titleTranslated !== instruction.title ? `📋 ${titleTranslated}` : "",
       ...completedTasks,
-      problemsTranslated ? `─────\n⚠️ ${t.problemsHints}: ${problemsTranslated}` : "",
-      instruction.employee_note ? `${t.feedbackLabel}: ${instruction.employee_note}` : ""
+      problemsTranslated ? `─────\n⚠️ ${currentTexts.problemsHints}: ${problemsTranslated}` : "",
+      instruction.employee_note ? `${currentTexts.feedbackLabel}: ${instruction.employee_note}` : ""
     ].filter(Boolean).join("\n─────\n");
     const copy = [...days];
     const targetDate = instruction.work_date || "";
