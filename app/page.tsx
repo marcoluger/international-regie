@@ -1264,13 +1264,15 @@ export default function Home() {
     }
     const completedTasks = (instruction.work_instruction_tasks || []).map((task: any) => {
       const statusText = task.status === "completed" ? "✅ Erledigt" : task.status === "in_progress" ? "🟡 In Arbeit" : task.status === "stopped" ? "⛔ Gestoppt" : "⬜ Offen";
-      return [
-        `${statusText}: ${task.task_text}`,
-        task.note ? `   📝 Rückmeldung: ${task.note}` : "",
-        task.employee_comment ? `   💬 Kommentar: ${task.employee_comment}` : ""
-      ].filter(Boolean).join("\n");
+      const lines = [`${statusText}: ${task.task_text}`];
+      if (task.note) lines.push(`   📝 Rückmeldung: ${task.note}`);
+      if (task.employee_comment) lines.push(`   💬 Kommentar: ${task.employee_comment}`);
+      return lines.join("\n");
     });
-    const description = [...completedTasks, instruction.problems_text ? "Probleme / Hinweise: " + instruction.problems_text : "", instruction.employee_note ? "Rückmeldung Mitarbeiter: " + instruction.employee_note : ""].filter(Boolean).join("\n");
+    const description = [...completedTasks, 
+      instruction.problems_text ? "─────\nProbleme / Hinweise: " + instruction.problems_text : "", 
+      instruction.employee_note ? "Rückmeldung Mitarbeiter: " + instruction.employee_note : ""
+    ].filter(Boolean).join("\n─────\n");
     const copy = [...days];
     const targetDate = instruction.work_date || "";
     if (targetDate) {
