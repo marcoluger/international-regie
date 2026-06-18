@@ -1904,12 +1904,12 @@ export default function Home() {
                           rows={5}
                           maxLength={1000}
                           placeholder="Kommentar eingeben..."
-                          value={taskComments[task.id] !== undefined ? taskComments[task.id] : (task.employee_comment || "")}
+                          value={taskComments[task.id] !== undefined ? taskComments[task.id] : (getTranslatedComment(instruction.id, task.id, task.employee_comment || ""))}
                           onChange={(e) => setTaskComments(prev => ({ ...prev, [task.id]: e.target.value.slice(0, 1000) }))}
                         />
                         <div className="flex items-center justify-between">
                           <span className="text-xs text-gray-500">
-                            {((taskComments[task.id] !== undefined ? taskComments[task.id] : task.employee_comment) || "").length} / 1000 Zeichen
+                            {((taskComments[task.id] !== undefined ? taskComments[task.id] : getTranslatedComment(instruction.id, task.id, task.employee_comment || "")) || "").length} / 1000 Zeichen
                           </span>
                           <button
                             type="button"
