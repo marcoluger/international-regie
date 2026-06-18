@@ -1804,9 +1804,9 @@ export default function Home() {
                 <p><strong>{t.site}:</strong> {instruction.site || "-"}</p>
                 {instruction.problems_text && (<div className="bg-yellow-50 border rounded p-2"><strong>{t.problemsHints}:</strong> {instruction.problems_text}</div>)}
                 {(instruction.photos || []).length > 0 && companyFeatures?.photos_enabled && (<div className="grid grid-cols-3 gap-2">{(instruction.photos || []).map((photo: string, i: number) => (<img key={i} src={photo} alt="Foto" className="w-full h-24 object-cover rounded border" />))}</div>)}
-                <ul className="space-y-2 mt-2">
+                <ul className="space-y-4 mt-2">
                   {(instruction.work_instruction_tasks || []).sort((a: any, b: any) => a.sort_order - b.sort_order).map((task: any) => (
-                    <li key={task.id} className="border rounded p-2 space-y-1">
+                    <li key={task.id} className="border rounded-lg p-3 bg-gray-50 space-y-3">
                       <div className="flex items-center gap-2">
                         <select className="border rounded p-1 text-sm text-black bg-white" value={task.status || "open"} onChange={(e) => updateTaskStatus(task.id, e.target.value)}>
                           <option value="open">{t.statusOpen}</option><option value="in_progress">{t.statusInProgress}</option><option value="stopped">{t.statusStopped}</option><option value="completed">{t.statusCompleted}</option>
@@ -1816,30 +1816,28 @@ export default function Home() {
                       {task.note && <p className="text-sm text-gray-600 ml-2">{t.feedbackLabel}: {task.note}</p>}
                       {(task.photos || []).length > 0 && companyFeatures?.photos_enabled && (<div className="grid grid-cols-3 gap-1">{(task.photos || []).map((photo: string, pi: number) => (<img key={pi} src={photo} alt="Foto" className="w-full h-16 object-cover rounded" />))}</div>)}
                       {/* Mitarbeiter-Kommentar */}
-                      <div className="mt-2 space-y-1">
+                      <div className="border-t pt-2 space-y-2">
+                        <p className="text-sm font-medium text-gray-700">💬 Kommentar (min. 1000 Zeichen):</p>
                         <textarea
-                          className="border p-2 w-full rounded text-sm text-black bg-gray-50"
-                          rows={4}
-                          placeholder={`Kommentar eingeben (min. 1000 Zeichen)...`}
-                          value={taskComments[task.id] ?? (task.employee_comment || "")}
+                          className="border p-2 w-full rounded text-sm text-black bg-white"
+                          rows={5}
+                          placeholder="Kommentar eingeben..."
+                          value={taskComments[task.id] !== undefined ? taskComments[task.id] : (task.employee_comment || "")}
                           onChange={(e) => setTaskComments(prev => ({ ...prev, [task.id]: e.target.value }))}
                         />
                         <div className="flex items-center justify-between">
-                          <span className={`text-xs ${((taskComments[task.id] ?? task.employee_comment) || "").length >= 1000 ? "text-green-600" : "text-red-500"}`}>
-                            {((taskComments[task.id] ?? task.employee_comment) || "").length} / 1000 Zeichen
+                          <span className={`text-xs font-medium ${((taskComments[task.id] !== undefined ? taskComments[task.id] : task.employee_comment) || "").length >= 1000 ? "text-green-600" : "text-orange-500"}`}>
+                            {((taskComments[task.id] !== undefined ? taskComments[task.id] : task.employee_comment) || "").length} / 1000 Zeichen
                           </span>
                           <button
                             type="button"
-                            disabled={((taskComments[task.id] ?? task.employee_comment) || "").length < 1000}
-                            onClick={() => updateTaskComment(task.id, taskComments[task.id] ?? "")}
-                            className="bg-blue-600 text-white px-3 py-1 rounded text-sm disabled:opacity-40"
+                            disabled={((taskComments[task.id] !== undefined ? taskComments[task.id] : task.employee_comment) || "").length < 1000}
+                            onClick={() => updateTaskComment(task.id, taskComments[task.id] || "")}
+                            className="bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium disabled:opacity-40"
                           >
-                            💾 Kommentar speichern
+                            💾 Speichern
                           </button>
                         </div>
-                        {task.employee_comment && !(taskComments[task.id]) && (
-                          <p className="text-xs text-green-600">✅ Kommentar gespeichert</p>
-                        )}
                       </div>
                     </li>
                   ))}
