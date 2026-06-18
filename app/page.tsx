@@ -915,6 +915,26 @@ export default function Home() {
     if (error) { setMessage("Fehler beim Speichern des Kommentars: " + error.message); return; }
     if (currentCompany) await loadWorkInstructions(currentCompany.company_id);
     setMessage("✅ Kommentar gespeichert.");
+    // Wenn Sprache nicht Deutsch: Kommentar sofort übersetzen
+    if (uiLanguage !== "Deutsch" && comment.trim()) {
+      const instructionId = workInstructions.find(i => (i.work_instruction_tasks || []).some((t: any) => t.id === taskId))?.id;
+      if (instructionId) {
+        const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: comment, fromLanguage: "Deutsch", toLanguage: uiLanguage }) });
+        const data = await res.json();
+        if (!data.error) {
+          setInstructionTranslations(prev => ({
+            ...prev,
+            [instructionId]: {
+              ...prev[instructionId],
+              tasks: { ...prev[instructionId]?.tasks, [`comment_${taskId}`]: data.translation },
+              language: uiLanguage,
+            }
+          }));
+        }
+      }
+    }
+    // Lokalen State aktualisieren
+    setTaskComments(prev => ({ ...prev, [taskId]: comment }));
   }
 
   async function updateTaskNote(taskId: string, note: string) {
