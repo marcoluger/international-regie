@@ -8,68 +8,16 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
 );
 
-type Company = {
-  id: string;
-  name: string;
-  slug: string;
-  created_at: string;
-};
+type Company = { id: string; name: string; slug: string; created_at: string; features: any; users: any[] };
 
-type CompanyFeatures = {
-  id?: string;
-  company_id: string;
-  package_name: string;
-  max_employees: number;
-  valid_until: string;
-  module_reports: boolean;
-  module_work_orders: boolean;
-  module_auto_reports: boolean;
-  photos_enabled: boolean;
-  email_enabled: boolean;
-  signature_enabled: boolean;
-  ai_enabled: boolean;
-  allowed_languages: string[];
-};
-
-type CompanyUser = {
-  id: string;
-  company_id: string;
-  full_name: string;
-  email: string;
-  role: string;
-};
-
-const PACKAGES: Record<string, { label: string; color: string; defaults: Partial<CompanyFeatures> }> = {
-  starter: {
-    label: "Starter (bis 5 MA)",
-    color: "bg-gray-100 border-gray-300",
-    defaults: { max_employees: 5, module_reports: true, module_work_orders: false, module_auto_reports: false, photos_enabled: false, email_enabled: false, signature_enabled: false, ai_enabled: false, allowed_languages: ["Deutsch"] },
-  },
-  team: {
-    label: "Team (bis 20 MA)",
-    color: "bg-blue-50 border-blue-300",
-    defaults: { max_employees: 20, module_reports: true, module_work_orders: true, module_auto_reports: false, photos_enabled: true, email_enabled: true, signature_enabled: false, ai_enabled: true, allowed_languages: ["Deutsch", "Polnisch"] },
-  },
-  business: {
-    label: "Business (bis 100 MA)",
-    color: "bg-green-50 border-green-300",
-    defaults: { max_employees: 100, module_reports: true, module_work_orders: true, module_auto_reports: true, photos_enabled: true, email_enabled: true, signature_enabled: true, ai_enabled: true, allowed_languages: ["Deutsch", "Kroatisch", "Slowenisch", "Polnisch", "Englisch"] },
-  },
-  enterprise: {
-    label: "Enterprise (unbegrenzt)",
-    color: "bg-purple-50 border-purple-300",
-    defaults: { max_employees: 9999, module_reports: true, module_work_orders: true, module_auto_reports: true, photos_enabled: true, email_enabled: true, signature_enabled: true, ai_enabled: true, allowed_languages: ["Deutsch", "Kroatisch", "Slowenisch", "Polnisch", "Englisch"] },
-  },
+const PACKAGES: Record<string, { label: string; color: string; defaults: any }> = {
+  starter:    { label: "Starter (bis 5 MA)",      color: "bg-gray-100 border-gray-300",   defaults: { max_employees: 5,    module_reports: true,  module_work_orders: false, module_auto_reports: false, photos_enabled: false, email_enabled: false, signature_enabled: false, ai_enabled: false, allowed_languages: ["Deutsch"] } },
+  team:       { label: "Team (bis 20 MA)",         color: "bg-blue-50 border-blue-300",    defaults: { max_employees: 20,   module_reports: true,  module_work_orders: true,  module_auto_reports: false, photos_enabled: true,  email_enabled: true,  signature_enabled: false, ai_enabled: true,  allowed_languages: ["Deutsch", "Polnisch"] } },
+  business:   { label: "Business (bis 100 MA)",   color: "bg-green-50 border-green-300",  defaults: { max_employees: 100,  module_reports: true,  module_work_orders: true,  module_auto_reports: true,  photos_enabled: true,  email_enabled: true,  signature_enabled: true,  ai_enabled: true,  allowed_languages: ["Deutsch", "Kroatisch", "Slowenisch", "Polnisch", "Englisch"] } },
+  enterprise: { label: "Enterprise (unbegrenzt)", color: "bg-purple-50 border-purple-300", defaults: { max_employees: 9999, module_reports: true,  module_work_orders: true,  module_auto_reports: true,  photos_enabled: true,  email_enabled: true,  signature_enabled: true,  ai_enabled: true,  allowed_languages: ["Deutsch", "Kroatisch", "Slowenisch", "Polnisch", "Englisch"] } },
 };
 
 const ALL_LANGUAGES = ["Deutsch", "Kroatisch", "Slowenisch", "Polnisch", "Englisch"];
-
-const EMPTY_FEATURES = (companyId: string): CompanyFeatures => ({
-  company_id: companyId, package_name: "starter", max_employees: 5, valid_until: "",
-  module_reports: true, module_work_orders: false, module_auto_reports: false,
-  photos_enabled: false, email_enabled: false, signature_enabled: false, ai_enabled: false,
-  allowed_languages: ["Deutsch"],
-});
 
 function Toggle({ label, value, onChange }: { label: string; value: boolean; onChange: (v: boolean) => void }) {
   return (
@@ -82,10 +30,6 @@ function Toggle({ label, value, onChange }: { label: string; value: boolean; onC
   );
 }
 
-function Badge({ text, color }: { text: string; color: string }) {
-  return <span className={`text-xs font-bold px-2 py-1 rounded border ${color}`}>{text}</span>;
-}
-
 export default function AdminPage() {
   const [adminEmail, setAdminEmail] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
@@ -93,8 +37,7 @@ export default function AdminPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [message, setMessage] = useState("");
   const [companies, setCompanies] = useState<Company[]>([]);
-  const [featuresMap, setFeaturesMap] = useState<Record<string, CompanyFeatures>>({});
-  const [usersMap, setUsersMap] = useState<Record<string, CompanyUser[]>>({});
+  const [featuresMap, setFeaturesMap] = useState<Record<string, any>>({});
   const [openCompanyId, setOpenCompanyId] = useState<string | null>(null);
   const [saving, setSaving] = useState<string | null>(null);
 
@@ -105,7 +48,7 @@ export default function AdminPage() {
   const [newOwnerPassword, setNewOwnerPassword] = useState("");
   const [newOwnerPackage, setNewOwnerPackage] = useState("starter");
   const [creatingCompany, setCreatingCompany] = useState(false);
-  const [lastCreatedCredentials, setLastCreatedCredentials] = useState<{ username: string; password: string; company: string; slug: string } | null>(null);
+  const [lastCreated, setLastCreated] = useState<{ username: string; password: string; company: string; slug: string } | null>(null);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -129,133 +72,109 @@ export default function AdminPage() {
     loadAll();
   }
 
-  async function loadAll() { await loadCompanies(); }
-
-  async function loadCompanies() {
-    const { data, error } = await supabase.from("companies").select("*").order("created_at", { ascending: false });
-    if (error) { setMessage("Fehler: " + error.message); return; }
-    const list = data || [];
-    setCompanies(list);
-    for (const company of list) {
-      await loadFeatures(company.id);
-      await loadUsers(company.id);
+  async function loadAll() {
+    setMessage("Lade Daten...");
+    const res = await fetch("/api/admin-data");
+    const data = await res.json();
+    if (data.error) { setMessage("Fehler: " + data.error); return; }
+    setCompanies(data.companies || []);
+    const map: Record<string, any> = {};
+    for (const c of data.companies || []) {
+      map[c.id] = c.features || { company_id: c.id, package_name: "starter", max_employees: 5, valid_until: "", module_reports: true, module_work_orders: false, module_auto_reports: false, photos_enabled: false, email_enabled: false, signature_enabled: false, ai_enabled: false, allowed_languages: ["Deutsch"] };
     }
+    setFeaturesMap(map);
+    setMessage("");
   }
 
-  async function loadFeatures(companyId: string) {
-    const { data } = await supabase.from("company_features").select("*").eq("company_id", companyId).single();
-    setFeaturesMap((prev) => ({ ...prev, [companyId]: data || EMPTY_FEATURES(companyId) }));
-  }
-
-  async function loadUsers(companyId: string) {
-    const { data } = await supabase.from("company_users").select("*").eq("company_id", companyId);
-    setUsersMap((prev) => ({ ...prev, [companyId]: data || [] }));
-  }
-
-  function updateFeature<K extends keyof CompanyFeatures>(companyId: string, field: K, value: CompanyFeatures[K]) {
-    setFeaturesMap((prev) => ({ ...prev, [companyId]: { ...prev[companyId], [field]: value } }));
+  function updateFeature(companyId: string, field: string, value: any) {
+    setFeaturesMap(prev => ({ ...prev, [companyId]: { ...prev[companyId], [field]: value } }));
   }
 
   function applyPackage(companyId: string, packageName: string) {
     const pkg = PACKAGES[packageName];
     if (!pkg) return;
-    setFeaturesMap((prev) => ({ ...prev, [companyId]: { ...prev[companyId], ...pkg.defaults, package_name: packageName, company_id: companyId } }));
+    setFeaturesMap(prev => ({ ...prev, [companyId]: { ...prev[companyId], ...pkg.defaults, package_name: packageName, company_id: companyId } }));
   }
 
   function toggleLanguage(companyId: string, lang: string) {
     const current = featuresMap[companyId]?.allowed_languages || [];
-    const updated = current.includes(lang) ? current.filter((l) => l !== lang) : [...current, lang];
+    const updated = current.includes(lang) ? current.filter((l: string) => l !== lang) : [...current, lang];
     updateFeature(companyId, "allowed_languages", updated);
   }
 
   async function saveFeatures(companyId: string) {
     setSaving(companyId);
-    const features = featuresMap[companyId];
-    if (!features) return;
-    const { error } = await supabase.from("company_features").upsert({ ...features, company_id: companyId }, { onConflict: "company_id" });
+    const features = { ...featuresMap[companyId] };
+    features.valid_until = features.valid_until || null; // Leerer String → null
+    const res = await fetch("/api/admin-data", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "saveFeatures", companyId, features }),
+    });
+    const data = await res.json();
     setSaving(null);
-    if (error) { setMessage("Fehler: " + error.message); return; }
-    setMessage(`✅ Einstellungen gespeichert.`);
+    if (data.error) { setMessage("Fehler: " + data.error); return; }
+    setMessage("✅ Einstellungen gespeichert.");
+    loadAll();
   }
 
   async function createCompany() {
-    if (!newCompanyName.trim()) { setMessage("Bitte Firmenname eingeben."); return; }
-    if (!newCompanySlug.trim()) { setMessage("Bitte Firmenkürzel eingeben."); return; }
-    if (!newOwnerUsername.trim()) { setMessage("Bitte Benutzername eingeben."); return; }
-    if (!newOwnerPassword.trim() || newOwnerPassword.length < 6) { setMessage("Passwort muss mindestens 6 Zeichen haben."); return; }
-
+    if (!newCompanyName.trim() || !newCompanySlug.trim() || !newOwnerUsername.trim() || newOwnerPassword.length < 6) {
+      setMessage("Bitte alle Pflichtfelder ausfüllen (Passwort min. 6 Zeichen)."); return;
+    }
     setCreatingCompany(true);
-    setMessage("");
-
-    // Slug bereinigen
     const slug = newCompanySlug.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
-
-    // 1. Firma anlegen
-    const { data: company, error: companyError } = await supabase.from("companies")
-      .insert({ name: newCompanyName.trim(), slug })
-      .select().single();
-    if (companyError) { setMessage("Fehler: " + companyError.message); setCreatingCompany(false); return; }
-
-    // 2. Owner per API anlegen
-    const res = await fetch("/api/create-employee", {
+    const res = await fetch("/api/admin-data", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        username: newOwnerUsername,
-        password: newOwnerPassword,
-        fullName: newOwnerFullName || newOwnerUsername,
-        role: "owner",
-        companyId: company.id,
-        companySlug: slug,
-        mustChangePassword: true,
-      }),
+      body: JSON.stringify({ action: "createCompany", name: newCompanyName.trim(), slug, ownerUsername: newOwnerUsername, ownerFullName: newOwnerFullName || newOwnerUsername, ownerPassword: newOwnerPassword, packageName: newOwnerPackage }),
     });
-    const ownerData = await res.json();
-    if (ownerData.error) { setMessage("Fehler beim Owner anlegen: " + ownerData.error); setCreatingCompany(false); return; }
-
-    // 3. Features anlegen
-    const pkg = PACKAGES[newOwnerPackage] || PACKAGES.starter;
-    await supabase.from("company_features").insert({ ...EMPTY_FEATURES(company.id), ...pkg.defaults, company_id: company.id, package_name: newOwnerPackage });
-
-    // 4. Company settings anlegen damit kein Onboarding erscheint
-    const ownerUserId = ownerData.userId;
-    if (ownerUserId) {
-      await supabase.from("company_settings").insert({
-        user_id: ownerUserId,
-        company_name: newCompanyName.trim(),
-      });
-    }
-
-    setLastCreatedCredentials({ username: newOwnerUsername, password: newOwnerPassword, company: newCompanyName.trim(), slug });
-    setNewCompanyName(""); setNewCompanySlug(""); setNewOwnerUsername(""); setNewOwnerFullName(""); setNewOwnerPassword(""); setNewOwnerPackage("starter");
+    const data = await res.json();
     setCreatingCompany(false);
-    setMessage(`✅ Firma "${company.name}" mit Owner wurde angelegt.`);
-    await loadCompanies();
+    if (data.error) { setMessage("Fehler: " + data.error); return; }
+    setLastCreated({ username: newOwnerUsername, password: newOwnerPassword, company: newCompanyName.trim(), slug });
+    setNewCompanyName(""); setNewCompanySlug(""); setNewOwnerUsername(""); setNewOwnerFullName(""); setNewOwnerPassword(""); setNewOwnerPackage("starter");
+    setMessage(`✅ Firma "${newCompanyName}" angelegt.`);
+    loadAll();
   }
 
   async function deleteCompany(companyId: string, companyName: string) {
     if (!confirm(`Firma "${companyName}" wirklich löschen?`)) return;
-    await supabase.from("company_features").delete().eq("company_id", companyId);
-    await supabase.from("company_users").delete().eq("company_id", companyId);
-    const { error } = await supabase.from("companies").delete().eq("id", companyId);
-    if (error) { setMessage("Fehler: " + error.message); return; }
+    const res = await fetch("/api/admin-data", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "deleteCompany", companyId }),
+    });
+    const data = await res.json();
+    if (data.error) { setMessage("Fehler: " + data.error); return; }
     setMessage(`Firma "${companyName}" gelöscht.`);
-    await loadCompanies();
+    loadAll();
+  }
+
+  async function updateSlug(companyId: string, newSlug: string) {
+    const res = await fetch("/api/admin-data", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "updateSlug", companyId, slug: newSlug }),
+    });
+    const data = await res.json();
+    if (data.error) { setMessage("Fehler beim Slug-Update: " + data.error); return; }
+    setCompanies(prev => prev.map(c => c.id === companyId ? { ...c, slug: newSlug } : c));
   }
 
   if (!isAdmin) {
     return (
-      <main className="max-w-sm mx-auto p-8 space-y-4 min-h-screen bg-gray-900 flex flex-col justify-center">
+      <main className="max-w-sm mx-auto p-8 min-h-screen bg-gray-900 flex flex-col justify-center">
         <div className="bg-white rounded-xl p-6 space-y-4 shadow-xl">
           <h1 className="text-2xl font-bold text-center">🔐 Admin-Login</h1>
           {message && <div className="bg-red-100 border rounded p-3 text-sm text-red-800">{message}</div>}
           <form onSubmit={(e) => { e.preventDefault(); adminLogin(); }} autoComplete="on" className="space-y-4">
-          <input name="email" autoComplete="email" className="border p-3 w-full rounded" placeholder="Admin E-Mail" value={adminEmail} onChange={(e) => setAdminEmail(e.target.value)} />
-          <div className="relative">
-            <input name="password" autoComplete="current-password" className="border p-3 w-full rounded pr-12" placeholder="Passwort" type={showAdminPassword ? "text" : "password"} value={adminPassword} onChange={(e) => setAdminPassword(e.target.value)} />
-            <button type="button" onClick={() => setShowAdminPassword(!showAdminPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-lg">{showAdminPassword ? "🙈" : "👁️"}</button>
-          </div>
-          <button type="submit" className="w-full bg-gray-900 text-white py-3 rounded font-bold">Einloggen</button>
+            <input name="email" autoComplete="email" className="border p-3 w-full rounded" placeholder="Admin E-Mail" value={adminEmail} onChange={(e) => setAdminEmail(e.target.value)} />
+            <div className="relative">
+              <input name="password" autoComplete="current-password" className="border p-3 w-full rounded pr-12" placeholder="Passwort" type={showAdminPassword ? "text" : "password"} value={adminPassword} onChange={(e) => setAdminPassword(e.target.value)} />
+              <button type="button" onClick={() => setShowAdminPassword(!showAdminPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-lg">{showAdminPassword ? "🙈" : "👁️"}</button>
+            </div>
+            <button type="submit" className="w-full bg-gray-900 text-white py-3 rounded font-bold">Einloggen</button>
           </form>
         </div>
       </main>
@@ -271,178 +190,132 @@ export default function AdminPage() {
 
       {message && <div className="border rounded p-3 bg-yellow-50 text-black">{message}</div>}
 
+      {/* Neue Firma */}
       <section className="bg-white border rounded-xl p-4 space-y-4">
         <h2 className="text-lg font-bold">➕ Neue Firma anlegen</h2>
-
-        {lastCreatedCredentials && (
+        {lastCreated && (
           <div className="bg-green-50 border-2 border-green-500 rounded-xl p-4 space-y-2">
             <h3 className="font-bold text-green-700">✅ Zugangsdaten für den Kunden:</h3>
-            <p><strong>Firma:</strong> {lastCreatedCredentials.company}</p>
-            <p><strong>Firmenkürzel:</strong> {lastCreatedCredentials.slug}</p>
-            <p><strong>Benutzername:</strong> {lastCreatedCredentials.username}</p>
-            <p><strong>Passwort:</strong> {lastCreatedCredentials.password}</p>
-            <p className="text-sm text-gray-500">Login: Firmenkürzel <strong>{lastCreatedCredentials.slug}</strong> + Benutzername <strong>{lastCreatedCredentials.username}</strong></p>
-            <p className="text-sm text-orange-600">⚠️ Bitte jetzt notieren — wird nicht mehr angezeigt!</p>
-            <button type="button" onClick={() => setLastCreatedCredentials(null)} className="bg-gray-200 text-gray-700 px-4 py-2 rounded text-sm">Schließen</button>
+            <p><strong>Firma:</strong> {lastCreated.company}</p>
+            <p><strong>Firmenkürzel:</strong> {lastCreated.slug}</p>
+            <p><strong>Benutzername:</strong> {lastCreated.username}</p>
+            <p><strong>Passwort:</strong> {lastCreated.password}</p>
+            <p className="text-sm text-orange-600">⚠️ Bitte jetzt notieren!</p>
+            <button type="button" onClick={() => setLastCreated(null)} className="bg-gray-200 px-4 py-2 rounded text-sm">Schließen</button>
           </div>
         )}
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <input className="border p-3 rounded" placeholder="Firmenname * (z.B. Elektrotechnik Luger)" value={newCompanyName} onChange={(e) => setNewCompanyName(e.target.value)} />
-          <input className="border p-3 rounded" placeholder="Firmenkürzel * (z.B. luger) — für Login" value={newCompanySlug} onChange={(e) => setNewCompanySlug(e.target.value)} />
+          <input className="border p-3 rounded" placeholder="Firmenname *" value={newCompanyName} onChange={(e) => setNewCompanyName(e.target.value)} />
+          <input className="border p-3 rounded" placeholder="Firmenkürzel * (z.B. luger)" value={newCompanySlug} onChange={(e) => setNewCompanySlug(e.target.value)} />
           <input className="border p-3 rounded" placeholder="Owner Vollständiger Name" value={newOwnerFullName} onChange={(e) => setNewOwnerFullName(e.target.value)} />
-          <input className="border p-3 rounded" placeholder="Owner Benutzername * (z.B. marco)" value={newOwnerUsername} onChange={(e) => setNewOwnerUsername(e.target.value)} />
-          <input className="border p-3 rounded" placeholder="Owner Temporäres Passwort *" type="password" value={newOwnerPassword} onChange={(e) => setNewOwnerPassword(e.target.value)} />
-          <div className="flex items-center">
-            {newCompanySlug && newOwnerUsername && (
-              <p className="text-sm text-blue-600">Login wird: Kürzel <strong>{newCompanySlug.toLowerCase()}</strong> + Benutzer <strong>{newOwnerUsername.toLowerCase()}</strong></p>
-            )}
-          </div>
+          <input className="border p-3 rounded" placeholder="Owner Benutzername *" value={newOwnerUsername} onChange={(e) => setNewOwnerUsername(e.target.value)} />
+          <input className="border p-3 rounded" placeholder="Owner Passwort *" type="password" value={newOwnerPassword} onChange={(e) => setNewOwnerPassword(e.target.value)} />
+          <div className="flex items-center">{newCompanySlug && newOwnerUsername && <p className="text-sm text-blue-600">Login: <strong>{newCompanySlug.toLowerCase()}</strong> + <strong>{newOwnerUsername.toLowerCase()}</strong></p>}</div>
           <div className="md:col-span-2">
-            <label className="text-sm font-medium text-gray-600 block mb-1">Paket</label>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
               {Object.entries(PACKAGES).map(([key, pkg]) => (
-                <button key={key} type="button" onClick={() => setNewOwnerPackage(key)}
-                  className={`border-2 rounded-lg p-2 text-sm font-medium ${newOwnerPackage === key ? "border-blue-600 bg-blue-50 text-blue-700" : "border-gray-200"}`}>
-                  {pkg.label}
-                </button>
+                <button key={key} type="button" onClick={() => setNewOwnerPackage(key)} className={`border-2 rounded-lg p-2 text-sm font-medium ${newOwnerPackage === key ? "border-blue-600 bg-blue-50 text-blue-700" : "border-gray-200"}`}>{pkg.label}</button>
               ))}
             </div>
           </div>
         </div>
-        <button type="button" onClick={createCompany} disabled={creatingCompany}
-          className="bg-blue-700 text-white px-6 py-3 rounded font-medium w-full disabled:opacity-50">
+        <button type="button" onClick={createCompany} disabled={creatingCompany} className="bg-blue-700 text-white px-6 py-3 rounded font-medium w-full disabled:opacity-50">
           {creatingCompany ? "Wird angelegt..." : "➕ Firma + Owner anlegen"}
         </button>
       </section>
 
+      {/* Firmen Liste */}
       <section className="space-y-4">
         <h2 className="text-lg font-bold">🏢 Firmen ({companies.length})</h2>
         {companies.length === 0 && <div className="bg-white border rounded-xl p-6 text-gray-500 text-center">Noch keine Firmen vorhanden.</div>}
         {companies.map((company) => {
-          const features = featuresMap[company.id] || EMPTY_FEATURES(company.id);
-          const users = usersMap[company.id] || [];
+          const features = featuresMap[company.id] || {};
           const pkg = PACKAGES[features.package_name] || PACKAGES.starter;
           const isOpen = openCompanyId === company.id;
+          const users = company.users || [];
           return (
             <div key={company.id} className={`border-2 rounded-xl overflow-hidden ${pkg.color}`}>
               <div className="p-4 flex items-center justify-between cursor-pointer" onClick={() => setOpenCompanyId(isOpen ? null : company.id)}>
                 <div className="flex items-center gap-3">
-                  <span className="text-xl">{isOpen ? "▾" : "▸"}</span>
+                  <span>{isOpen ? "▾" : "▸"}</span>
                   <div>
                     <div className="font-bold text-lg">{company.name}</div>
                     <div className="text-sm text-gray-500">Kürzel: <strong>{company.slug || "—"}</strong> | {users.length} Mitarbeiter | {new Date(company.created_at).toLocaleDateString("de-DE")}</div>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Badge text={pkg.label} color={pkg.color} />
-                  {features.valid_until && new Date(features.valid_until) < new Date() && (
-                    <Badge text="⚠️ Abgelaufen" color="bg-red-100 border-red-400 text-red-700" />
-                  )}
-                </div>
+                <span className={`text-xs font-bold px-2 py-1 rounded border ${pkg.color}`}>{pkg.label}</span>
               </div>
 
               {isOpen && (
                 <div className="bg-white border-t p-4 space-y-6">
-                  {/* Slug bearbeiten */}
                   <div>
-                    <h3 className="font-bold mb-2">🔑 Firmenkürzel (für Mitarbeiter-Login)</h3>
-                    <input className="border p-2 rounded w-full max-w-xs" placeholder="Kürzel z.B. luger"
-                      value={company.slug || ""}
-                      onChange={async (e) => {
-                        const newSlug = e.target.value.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
-                        await supabase.from("companies").update({ slug: newSlug }).eq("id", company.id);
-                        setCompanies(prev => prev.map(c => c.id === company.id ? { ...c, slug: newSlug } : c));
-                      }}
-                    />
-                    <p className="text-xs text-gray-400 mt-1">Mitarbeiter loggen sich ein mit: Kürzel + Benutzername + Passwort</p>
+                    <h3 className="font-bold mb-2">🔑 Firmenkürzel</h3>
+                    <input className="border p-2 rounded w-full max-w-xs" value={company.slug || ""} onChange={(e) => { const s = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""); updateSlug(company.id, s); }} />
                   </div>
-
                   <div>
                     <h3 className="font-bold mb-3">📦 Paket</h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                       {Object.entries(PACKAGES).map(([key, pkg]) => (
-                        <button key={key} type="button" onClick={() => applyPackage(company.id, key)}
-                          className={`border-2 rounded-lg p-3 text-sm font-medium ${features.package_name === key ? "border-blue-600 bg-blue-50 text-blue-700" : "border-gray-200 bg-white hover:border-gray-400"}`}>
-                          {pkg.label}
-                        </button>
+                        <button key={key} type="button" onClick={() => applyPackage(company.id, key)} className={`border-2 rounded-lg p-3 text-sm font-medium ${features.package_name === key ? "border-blue-600 bg-blue-50 text-blue-700" : "border-gray-200 bg-white"}`}>{pkg.label}</button>
                       ))}
                     </div>
                   </div>
-
                   <div>
                     <h3 className="font-bold mb-3">📅 Lizenz & Limits</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div>
                         <label className="text-sm text-gray-600 block mb-1">Max. Mitarbeiter</label>
-                        <input type="number" className="border p-2 rounded w-full" value={features.max_employees} onChange={(e) => updateFeature(company.id, "max_employees", Number(e.target.value))} />
+                        <input type="number" className="border p-2 rounded w-full" value={features.max_employees || 5} onChange={(e) => updateFeature(company.id, "max_employees", Number(e.target.value))} />
                       </div>
                       <div>
                         <label className="text-sm text-gray-600 block mb-1">Gültig bis</label>
                         <input type="date" className="border p-2 rounded w-full" value={features.valid_until || ""} onChange={(e) => updateFeature(company.id, "valid_until", e.target.value)} />
                       </div>
-                      <div className="flex items-end">
-                        {features.valid_until ? (
-                          <p className={`text-sm font-medium ${new Date(features.valid_until) >= new Date() ? "text-green-600" : "text-red-600"}`}>
-                            {new Date(features.valid_until) >= new Date() ? `✅ Noch ${Math.ceil((new Date(features.valid_until).getTime() - Date.now()) / 86400000)} Tage` : "⚠️ Abgelaufen"}
-                          </p>
-                        ) : <p className="text-sm text-gray-400">Kein Ablaufdatum</p>}
-                      </div>
                     </div>
                   </div>
-
                   <div>
                     <h3 className="font-bold mb-3">🧩 Module</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <Toggle label="📋 Regieberichte"      value={features.module_reports}      onChange={(v) => updateFeature(company.id, "module_reports", v)} />
-                      <Toggle label="📝 Arbeitsanweisungen" value={features.module_work_orders}  onChange={(v) => updateFeature(company.id, "module_work_orders", v)} />
-                      <Toggle label="🤖 Auto-Regieberichte" value={features.module_auto_reports} onChange={(v) => updateFeature(company.id, "module_auto_reports", v)} />
-                      <Toggle label="🧠 KI-Übersetzung"     value={features.ai_enabled}          onChange={(v) => updateFeature(company.id, "ai_enabled", v)} />
-                      <Toggle label="📸 Foto-Upload"        value={features.photos_enabled}      onChange={(v) => updateFeature(company.id, "photos_enabled", v)} />
-                      <Toggle label="✉️ E-Mail-Versand"      value={features.email_enabled}       onChange={(v) => updateFeature(company.id, "email_enabled", v)} />
-                      <Toggle label="✍️ Unterschriften"     value={features.signature_enabled}   onChange={(v) => updateFeature(company.id, "signature_enabled", v)} />
+                      <Toggle label="📋 Regieberichte"      value={!!features.module_reports}      onChange={(v) => updateFeature(company.id, "module_reports", v)} />
+                      <Toggle label="📝 Arbeitsanweisungen" value={!!features.module_work_orders}  onChange={(v) => updateFeature(company.id, "module_work_orders", v)} />
+                      <Toggle label="🤖 Auto-Regieberichte" value={!!features.module_auto_reports} onChange={(v) => updateFeature(company.id, "module_auto_reports", v)} />
+                      <Toggle label="🧠 KI-Übersetzung"     value={!!features.ai_enabled}          onChange={(v) => updateFeature(company.id, "ai_enabled", v)} />
+                      <Toggle label="📸 Foto-Upload"        value={!!features.photos_enabled}      onChange={(v) => updateFeature(company.id, "photos_enabled", v)} />
+                      <Toggle label="✉️ E-Mail-Versand"      value={!!features.email_enabled}       onChange={(v) => updateFeature(company.id, "email_enabled", v)} />
+                      <Toggle label="✍️ Unterschriften"     value={!!features.signature_enabled}   onChange={(v) => updateFeature(company.id, "signature_enabled", v)} />
                     </div>
                   </div>
-
                   <div>
                     <h3 className="font-bold mb-3">🌐 Sprachen</h3>
                     <div className="flex flex-wrap gap-2">
                       {ALL_LANGUAGES.map((lang) => {
-                        const active = features.allowed_languages?.includes(lang);
+                        const active = (features.allowed_languages || []).includes(lang);
                         return (
-                          <button key={lang} type="button" onClick={() => toggleLanguage(company.id, lang)}
-                            className={`border-2 rounded-lg px-4 py-2 text-sm font-medium ${active ? "border-green-600 bg-green-50 text-green-700" : "border-gray-200 bg-white text-gray-400"}`}>
+                          <button key={lang} type="button" onClick={() => toggleLanguage(company.id, lang)} className={`border-2 rounded-lg px-4 py-2 text-sm font-medium ${active ? "border-green-600 bg-green-50 text-green-700" : "border-gray-200 bg-white text-gray-400"}`}>
                             {active ? "✓ " : ""}{lang}
                           </button>
                         );
                       })}
                     </div>
                   </div>
-
                   <div>
-                    <h3 className="font-bold mb-3">👥 Mitarbeiter ({users.length} / {features.max_employees})</h3>
+                    <h3 className="font-bold mb-3">👥 Mitarbeiter ({users.length} / {features.max_employees || 5})</h3>
                     {users.length === 0 ? <p className="text-gray-400 text-sm">Noch keine Mitarbeiter.</p> : (
                       <div className="space-y-2">
-                        {users.map((u) => (
+                        {users.map((u: any) => (
                           <div key={u.id} className="flex items-center justify-between border rounded p-2 bg-gray-50">
                             <div><span className="font-medium">{u.full_name || "-"}</span><span className="text-gray-500 text-sm ml-2">{u.email || "-"}</span></div>
-                            <span className={`text-xs px-2 py-1 rounded font-bold ${u.role === "owner" ? "bg-orange-100 text-orange-700" : u.role === "admin" ? "bg-purple-100 text-purple-700" : u.role === "project_manager" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"}`}>
-                              {u.role}
-                            </span>
+                            <span className={`text-xs px-2 py-1 rounded font-bold ${u.role === "owner" ? "bg-orange-100 text-orange-700" : u.role === "admin" ? "bg-purple-100 text-purple-700" : u.role === "project_manager" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"}`}>{u.role}</span>
                           </div>
                         ))}
                       </div>
                     )}
                   </div>
-
                   <div className="flex flex-wrap gap-3 pt-2 border-t">
-                    <button type="button" onClick={() => saveFeatures(company.id)} disabled={saving === company.id}
-                      className="bg-blue-700 text-white px-6 py-3 rounded font-bold disabled:opacity-50">
+                    <button type="button" onClick={() => saveFeatures(company.id)} disabled={saving === company.id} className="bg-blue-700 text-white px-6 py-3 rounded font-bold disabled:opacity-50">
                       {saving === company.id ? "Speichert..." : "💾 Einstellungen speichern"}
                     </button>
-                    <button type="button" onClick={() => deleteCompany(company.id, company.name)} className="bg-red-600 text-white px-4 py-3 rounded">
-                      🗑 Firma löschen
-                    </button>
+                    <button type="button" onClick={() => deleteCompany(company.id, company.name)} className="bg-red-600 text-white px-4 py-3 rounded">🗑 Firma löschen</button>
                   </div>
                 </div>
               )}
