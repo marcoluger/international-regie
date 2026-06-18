@@ -5,6 +5,7 @@ import type { User } from "@supabase/supabase-js";
 import { createClient } from "@supabase/supabase-js";
 import jsPDF from "jspdf";
 import QRCode from "qrcode";
+import build from "next/dist/build";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || "",
@@ -2105,5 +2106,3 @@ export default function Home() {
 
     </main>
   );
-}
-
