@@ -753,10 +753,11 @@ function TabButton({ label, tabName, activeTab, onClick }: { label: string; tabN
 }
 
 function getAllowedLanguages(companyFeatures: any): string[] {
+  if (!companyFeatures) return ["Deutsch"]; // Kein Features = nur Deutsch
   const raw = companyFeatures?.allowed_languages;
-  if (!raw) return [];
-  if (Array.isArray(raw)) return raw;
-  try { return JSON.parse(raw); } catch { return []; }
+  if (!raw) return ["Deutsch"];
+  if (Array.isArray(raw)) return raw.length > 0 ? raw : ["Deutsch"];
+  try { const parsed = JSON.parse(raw); return parsed.length > 0 ? parsed : ["Deutsch"]; } catch { return ["Deutsch"]; }
 }
 
 export default function Home() {
@@ -1540,10 +1541,10 @@ export default function Home() {
               setMessage("");
             }
           }}>
-            {(getAllowedLanguages(companyFeatures).length > 0 ? ["Deutsch", ...getAllowedLanguages(companyFeatures).filter(l => l !== "Deutsch" && languages.includes(l as Language))] : languages).map((lang) => (<option key={lang} value={lang}>🌐 {lang}</option>))}
+            {getAllowedLanguages(companyFeatures).filter(l => languages.includes(l as Language)).map((lang) => (<option key={lang} value={lang}>🌐 {lang}</option>))}
           </select>
           <select className="border p-2 rounded text-black bg-white text-sm" value={pdfLanguage} onChange={(e) => setPdfLanguage(e.target.value)}>
-            {(getAllowedLanguages(companyFeatures).length > 0 ? getAllowedLanguages(companyFeatures).filter(l => pdfLanguages.includes(l)) : pdfLanguages).map((lang) => (<option key={lang} value={lang}>📄 {lang}</option>))}
+            {getAllowedLanguages(companyFeatures).filter(l => pdfLanguages.includes(l)).map((lang) => (<option key={lang} value={lang}>📄 {lang}</option>))}
           </select>
         </div>
       </header>
