@@ -1256,10 +1256,19 @@ export default function Home() {
     setTranslatingInstructionId(null);
   }
 
-  function createReportFromInstruction(instruction: any) {
+  async function createReportFromInstruction(instruction: any) {
+    // Frisch laden damit employee_comment aktuell ist
+    if (currentCompany) {
+      const { data } = await supabase.from("work_instructions").select("*, work_instruction_tasks (*)").eq("id", instruction.id).single();
+      if (data) instruction = data;
+    }
     const completedTasks = (instruction.work_instruction_tasks || []).map((task: any) => {
       const statusText = task.status === "completed" ? "✅ Erledigt" : task.status === "in_progress" ? "🟡 In Arbeit" : task.status === "stopped" ? "⛔ Gestoppt" : "⬜ Offen";
-      return [`${statusText}: ${task.task_text}`, task.note ? `Rückmeldung: ${task.note}` : ""].filter(Boolean).join("\n");
+      return [
+        `${statusText}: ${task.task_text}`,
+        task.note ? `Rückmeldung: ${task.note}` : "",
+        task.employee_comment ? `Kommentar: ${task.employee_comment}` : ""
+      ].filter(Boolean).join("\n");
     });
     const description = [...completedTasks, instruction.problems_text ? "Probleme / Hinweise: " + instruction.problems_text : "", instruction.employee_note ? "Rückmeldung Mitarbeiter: " + instruction.employee_note : ""].filter(Boolean).join("\n");
     const copy = [...days];
@@ -1630,7 +1639,7 @@ export default function Home() {
                 <input className="border p-3 text-black bg-white" placeholder={t.site} value={day.site} onChange={(e) => updateDay(index, "site", e.target.value)} />
                 <input className="border p-3 text-black bg-white" placeholder={t.hours} value={day.hours} onChange={(e) => updateDay(index, "hours", e.target.value)} />
               </div>
-              <textarea className="border p-3 w-full h-28 text-black bg-white" placeholder={t.description} value={day.description} onChange={(e) => updateDay(index, "description", e.target.value)} />
+              <textarea className="border p-3 w-full text-black bg-white" style={{minHeight: "7rem", height: "auto"}} placeholder={t.description} value={day.description} onChange={(e) => { updateDay(index, "description", e.target.value); e.target.style.height = "auto"; e.target.style.height = e.target.scrollHeight + "px"; }} />
               {companyFeatures?.photos_enabled ? <input type="file" accept="image/*" multiple className="border p-3 w-full text-black bg-white" onChange={(e) => handlePhotos(index, e.target.files)} /> : <div className="border rounded p-3 bg-gray-50 text-sm text-gray-400">🔒 Foto-Upload ist in deinem Paket nicht aktiviert.</div>}
               {day.photos.length > 0 && (<div className="grid grid-cols-2 gap-3">{day.photos.map((photo, photoIndex) => (<div key={photoIndex} className="border rounded p-2"><img src={photo} alt="Foto" className="w-full h-32 object-cover" /><button type="button" onClick={() => deletePhoto(index, photoIndex)} className="mt-2 bg-red-600 text-white px-2 py-2 rounded w-full">{t.deletePhoto}</button></div>))}</div>)}
               {day.translation && (<div className="border p-3 rounded bg-gray-100 text-black"><strong>{t.translation}:</strong><p>{day.translation}</p></div>)}
