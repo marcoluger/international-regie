@@ -1021,6 +1021,12 @@ export default function Home() {
     return fallback;
   }
 
+  function getTranslatedComment(instructionId: string, taskId: string, fallback: string): string {
+    const trans = instructionTranslations[instructionId];
+    if (trans && trans.language === uiLanguage && trans.tasks?.[`comment_${taskId}`]) return trans.tasks[`comment_${taskId}`];
+    return fallback;
+  }
+
   function getTranslatedTask(instructionId: string, taskId: string, fallback: string): string {
     const trans = instructionTranslations[instructionId];
     if (trans && trans.language === uiLanguage && trans.tasks?.[taskId]) return trans.tasks[taskId];
@@ -1249,6 +1255,11 @@ export default function Home() {
           const dataNote = await resNote.json();
           translatedTasks[`note_${task.id}`] = dataNote.error ? task.note : dataNote.translation;
         }
+        if (task.employee_comment?.trim()) {
+          const resComment = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: task.employee_comment, fromLanguage: "Deutsch", toLanguage: instructionToLanguage }) });
+          const dataComment = await resComment.json();
+          translatedTasks[`comment_${task.id}`] = dataComment.error ? task.employee_comment : dataComment.translation;
+        }
       }
       setInstructionTranslations((prev) => ({ ...prev, [instruction.id]: { ...translatedFields, tasks: translatedTasks, language: instructionToLanguage } }));
       setMessage(t.msgInstructionTranslated);
@@ -1265,15 +1276,23 @@ export default function Home() {
     const completedTasks = (instruction.work_instruction_tasks || [])
       .sort((a: any, b: any) => a.sort_order - b.sort_order)
       .map((task: any) => {
-        const statusText = task.status === "completed" ? "✅ Erledigt" : task.status === "in_progress" ? "🟡 In Arbeit" : task.status === "stopped" ? "⛔ Gestoppt" : "⬜ Offen";
-        const lines = [`${statusText}: ${task.task_text}`];
-        if (task.note) lines.push(`   📝 Rückmeldung: ${task.note}`);
-        if (task.employee_comment) lines.push(`   💬 Kommentar: ${task.employee_comment}`);
+        const statusText = task.status === "completed" ? t.statusCompleted : task.status === "in_progress" ? t.statusInProgress : task.status === "stopped" ? t.statusStopped : t.statusOpen;
+        const taskText = getTranslatedTask(instruction.id, task.id, task.task_text);
+        const lines = [`${statusText}: ${taskText}`];
+        if (task.note) lines.push(`   📝 ${t.feedbackLabel}: ${task.note}`);
+        if (task.employee_comment) {
+          const translatedComment = getTranslatedComment(instruction.id, task.id, task.employee_comment);
+          lines.push(`   💬 Kommentar: ${translatedComment}`);
+        }
         return lines.join("\n");
       });
-    const description = [...completedTasks, 
-      instruction.problems_text ? "─────\nProbleme / Hinweise: " + instruction.problems_text : "", 
-      instruction.employee_note ? "Rückmeldung Mitarbeiter: " + instruction.employee_note : ""
+    const titleTranslated = getTranslated(instruction.id, "title", instruction.title);
+    const problemsTranslated = getTranslated(instruction.id, "problems_text", instruction.problems_text || "");
+    const description = [
+      titleTranslated !== instruction.title ? `📋 ${titleTranslated}` : "",
+      ...completedTasks,
+      problemsTranslated ? `─────\n⚠️ ${t.problemsHints}: ${problemsTranslated}` : "",
+      instruction.employee_note ? `${t.feedbackLabel}: ${instruction.employee_note}` : ""
     ].filter(Boolean).join("\n─────\n");
     const copy = [...days];
     const targetDate = instruction.work_date || "";
@@ -1555,6 +1574,11 @@ export default function Home() {
                   const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: task.task_text, fromLanguage: "Deutsch", toLanguage: newLang }) });
                   const data = await res.json();
                   translatedTasks[task.id] = data.error ? task.task_text : data.translation;
+                  if (task.employee_comment?.trim()) {
+                    const resC = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: task.employee_comment, fromLanguage: "Deutsch", toLanguage: newLang }) });
+                    const dataC = await resC.json();
+                    translatedTasks[`comment_${task.id}`] = dataC.error ? task.employee_comment : dataC.translation;
+                  }
                 }
                 newTranslations[instruction.id] = { ...translatedFields, tasks: translatedTasks, language: newLang };
               }
@@ -2028,3 +2052,4 @@ export default function Home() {
     </main>
   );
 }
+
