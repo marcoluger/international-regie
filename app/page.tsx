@@ -1640,12 +1640,22 @@ export default function Home() {
 
       <nav className="flex flex-wrap gap-2">
         <TabButton label={t.dashboard}          tabName="dashboard"          activeTab={activeTab} onClick={() => setActiveTab("dashboard")} />
-        <TabButton label={t.tabReport}          tabName="regiebericht"       activeTab={activeTab} onClick={() => setActiveTab("regiebericht")} />
-        <TabButton label={t.saveLoad}           tabName="berichte"           activeTab={activeTab} onClick={() => setActiveTab("berichte")} />
-        <TabButton label={t.projectsTab}        tabName="projekte"           activeTab={activeTab} onClick={() => { setActiveTab("projekte"); loadProjects(); }} />
+        {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
+          <TabButton label={t.tabReport}        tabName="regiebericht"       activeTab={activeTab} onClick={() => setActiveTab("regiebericht")} />
+        )}
+        {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
+          <TabButton label={t.saveLoad}         tabName="berichte"           activeTab={activeTab} onClick={() => setActiveTab("berichte")} />
+        )}
+        {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
+          <TabButton label={t.projectsTab}      tabName="projekte"           activeTab={activeTab} onClick={() => { setActiveTab("projekte"); loadProjects(); }} />
+        )}
         <TabButton label={t.workInstructions}   tabName="arbeitsanweisungen" activeTab={activeTab} onClick={() => setActiveTab("arbeitsanweisungen")} />
-        <TabButton label={t.employeeManagement} tabName="mitarbeiter"        activeTab={activeTab} onClick={() => setActiveTab("mitarbeiter")} />
-        <TabButton label={t.companyData}        tabName="firmendaten"        activeTab={activeTab} onClick={() => setActiveTab("firmendaten")} />
+        {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
+          <TabButton label={t.employeeManagement} tabName="mitarbeiter"      activeTab={activeTab} onClick={() => setActiveTab("mitarbeiter")} />
+        )}
+        {(currentCompany?.role === "owner" || currentCompany?.role === "admin") && (
+          <TabButton label={t.companyData}      tabName="firmendaten"        activeTab={activeTab} onClick={() => setActiveTab("firmendaten")} />
+        )}
         <TabButton label={t.tabDay}             tabName="tag"                activeTab={activeTab} onClick={() => setActiveTab("tag")} />
         <TabButton label={t.tabWeek}            tabName="woche"              activeTab={activeTab} onClick={() => setActiveTab("woche")} />
         <TabButton label={t.tabMonth}           tabName="monat"              activeTab={activeTab} onClick={() => setActiveTab("monat")} />
