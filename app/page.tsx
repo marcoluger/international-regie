@@ -1262,13 +1262,15 @@ export default function Home() {
       const { data } = await supabase.from("work_instructions").select("*, work_instruction_tasks (*)").eq("id", instruction.id).single();
       if (data) instruction = data;
     }
-    const completedTasks = (instruction.work_instruction_tasks || []).map((task: any) => {
-      const statusText = task.status === "completed" ? "✅ Erledigt" : task.status === "in_progress" ? "🟡 In Arbeit" : task.status === "stopped" ? "⛔ Gestoppt" : "⬜ Offen";
-      const lines = [`${statusText}: ${task.task_text}`];
-      if (task.note) lines.push(`   📝 Rückmeldung: ${task.note}`);
-      if (task.employee_comment) lines.push(`   💬 Kommentar: ${task.employee_comment}`);
-      return lines.join("\n");
-    });
+    const completedTasks = (instruction.work_instruction_tasks || [])
+      .sort((a: any, b: any) => a.sort_order - b.sort_order)
+      .map((task: any) => {
+        const statusText = task.status === "completed" ? "✅ Erledigt" : task.status === "in_progress" ? "🟡 In Arbeit" : task.status === "stopped" ? "⛔ Gestoppt" : "⬜ Offen";
+        const lines = [`${statusText}: ${task.task_text}`];
+        if (task.note) lines.push(`   📝 Rückmeldung: ${task.note}`);
+        if (task.employee_comment) lines.push(`   💬 Kommentar: ${task.employee_comment}`);
+        return lines.join("\n");
+      });
     const description = [...completedTasks, 
       instruction.problems_text ? "─────\nProbleme / Hinweise: " + instruction.problems_text : "", 
       instruction.employee_note ? "Rückmeldung Mitarbeiter: " + instruction.employee_note : ""
