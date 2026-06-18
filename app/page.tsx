@@ -238,6 +238,7 @@ const texts = {
     roleEmployee: "Mitarbeiter",
     roleProjectManager: "Projektleiter",
     roleAdmin: "Admin",
+    commentLabel: "Kommentar",
   },
   Kroatisch: {
     title: "Tjedni režijski izvještaj",
@@ -398,6 +399,7 @@ const texts = {
     roleEmployee: "Radnik",
     roleProjectManager: "Voditelj projekta",
     roleAdmin: "Administrator",
+    commentLabel: "Komentar",
   },
   Slowenisch: {
     title: "Tedensko poročilo",
@@ -558,6 +560,7 @@ const texts = {
     roleEmployee: "Zaposleni",
     roleProjectManager: "Vodja projekta",
     roleAdmin: "Administrator",
+    commentLabel: "Komentar",
   },
   Polnisch: {
     title: "Tygodniowy raport roboczy",
@@ -718,6 +721,7 @@ const texts = {
     roleEmployee: "Pracownik",
     roleProjectManager: "Kierownik projektu",
     roleAdmin: "Administrator",
+    commentLabel: "Komentarz",
   },
 };
 
@@ -1346,7 +1350,7 @@ export default function Home() {
         if (task.note) lines.push(`   📝 ${currentTexts.feedbackLabel}: ${task.note}`);
         if (task.employee_comment) {
           const comment = getCommentText(task.id, task.employee_comment);
-          lines.push(`   💬 Kommentar: ${comment}`);
+          lines.push(`   💬 ${currentTexts.commentLabel}: ${comment}`);
         }
         return lines.join("\n");
       });
@@ -1926,7 +1930,7 @@ export default function Home() {
                       {(task.photos || []).length > 0 && companyFeatures?.photos_enabled && (<div className="grid grid-cols-3 gap-1">{(task.photos || []).map((photo: string, pi: number) => (<img key={pi} src={photo} alt="Foto" className="w-full h-16 object-cover rounded" />))}</div>)}
                       {/* Mitarbeiter-Kommentar */}
                       <div className="border-t pt-2 space-y-2">
-                        <p className="text-sm font-medium text-gray-700">💬 Kommentar (max. 1000 Zeichen):</p>
+                        <p className="text-sm font-medium text-gray-700">💬 {t.commentLabel} (max. 1000 Zeichen):</p>
                         <textarea
                           className="border p-2 w-full rounded text-sm text-black bg-white"
                           rows={5}
