@@ -799,6 +799,7 @@ export default function Home() {
   const [newUserRole, setNewUserRole] = useState("employee");
   const [creatingEmployee, setCreatingEmployee] = useState(false);
   const [taskComments, setTaskComments] = useState<Record<string, string>>({});
+  const [reportInstruction, setReportInstruction] = useState<any>(null);
   const [instructionProblems, setInstructionProblems] = useState("");
   const [instructionTitle, setInstructionTitle] = useState("");
   const [instructionProject, setInstructionProject] = useState("");
@@ -1273,21 +1274,63 @@ export default function Home() {
       const { data } = await supabase.from("work_instructions").select("*, work_instruction_tasks (*)").eq("id", instruction.id).single();
       if (data) instruction = data;
     }
+
+    // Übersetzungen zusammenführen
+    const currentTranslations = instructionTranslations[instruction.id] || {};
+    const mergedTasks = { ...currentTranslations.tasks };
+    
+    // Automatisch übersetzen wenn Sprache nicht Deutsch und noch keine Übersetzung
+    if (uiLanguage !== "Deutsch" && currentTranslations.language !== uiLanguage) {
+      setMessage("Übersetze...");
+      const targetLang = uiLanguage;
+      const translatedFields: Record<string, string> = {};
+      for (const item of [
+        { key: "title", text: instruction.title || "" },
+        { key: "problems_text", text: instruction.problems_text || "" },
+      ]) {
+        if (!item.text.trim()) continue;
+        const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: item.text, fromLanguage: "Deutsch", toLanguage: targetLang }) });
+        const data = await res.json();
+        translatedFields[item.key] = data.error ? item.text : data.translation;
+      }
+      for (const task of instruction.work_instruction_tasks || []) {
+        if (task.task_text?.trim()) {
+          const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: task.task_text, fromLanguage: "Deutsch", toLanguage: targetLang }) });
+          const data = await res.json();
+          mergedTasks[task.id] = data.error ? task.task_text : data.translation;
+        }
+        if (task.employee_comment?.trim()) {
+          const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: task.employee_comment, fromLanguage: "Deutsch", toLanguage: targetLang }) });
+          const data = await res.json();
+          mergedTasks[`comment_${task.id}`] = data.error ? task.employee_comment : data.translation;
+        }
+      }
+      setInstructionTranslations(prev => ({ ...prev, [instruction.id]: { ...translatedFields, tasks: mergedTasks, language: targetLang } }));
+      setMessage("");
+      // Direkt die frischen Übersetzungen verwenden
+      Object.assign(currentTranslations, translatedFields);
+    }
+
+    const getTaskText = (taskId: string, fallback: string) => mergedTasks[taskId] || fallback;
+    const getCommentText = (taskId: string, fallback: string) => mergedTasks[`comment_${taskId}`] || fallback;
+    const getTitleText = () => currentTranslations.title || instruction.title;
+    const getProblemsText = () => currentTranslations.problems_text || instruction.problems_text || "";
+
     const completedTasks = (instruction.work_instruction_tasks || [])
       .sort((a: any, b: any) => a.sort_order - b.sort_order)
       .map((task: any) => {
         const statusText = task.status === "completed" ? t.statusCompleted : task.status === "in_progress" ? t.statusInProgress : task.status === "stopped" ? t.statusStopped : t.statusOpen;
-        const taskText = getTranslatedTask(instruction.id, task.id, task.task_text);
+        const taskText = getTaskText(task.id, task.task_text);
         const lines = [`${statusText}: ${taskText}`];
         if (task.note) lines.push(`   📝 ${t.feedbackLabel}: ${task.note}`);
         if (task.employee_comment) {
-          const translatedComment = getTranslatedComment(instruction.id, task.id, task.employee_comment);
-          lines.push(`   💬 Kommentar: ${translatedComment}`);
+          const comment = getCommentText(task.id, task.employee_comment);
+          lines.push(`   💬 Kommentar: ${comment}`);
         }
         return lines.join("\n");
       });
-    const titleTranslated = getTranslated(instruction.id, "title", instruction.title);
-    const problemsTranslated = getTranslated(instruction.id, "problems_text", instruction.problems_text || "");
+    const titleTranslated = getTitleText();
+    const problemsTranslated = getProblemsText();
     const description = [
       titleTranslated !== instruction.title ? `📋 ${titleTranslated}` : "",
       ...completedTasks,
@@ -1307,7 +1350,7 @@ export default function Home() {
     const targetIndex = targetDate ? copy.findIndex((day) => day.date === targetDate) : 0;
     const indexToUse = targetIndex >= 0 ? targetIndex : 0;
     copy[indexToUse] = { ...copy[indexToUse], customer: instruction.customer || "", projectNumber: instruction.project || "", site: instruction.site || "", description, photos: [] };
-    setDays(copy); setActiveTab("regiebericht"); setMessage("Regiebericht wurde aus Arbeitsanweisung vorbereitet.");
+    setDays(copy); setReportInstruction(instruction); setActiveTab("regiebericht"); setMessage("Regiebericht wurde aus Arbeitsanweisung vorbereitet.");
   }
 
   // ── FIXED: kein window.location.reload() ──
