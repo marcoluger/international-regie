@@ -973,15 +973,21 @@ export default function Home() {
   async function updateTaskComment(taskId: string, comment: string) {
     setCommentSaveState(prev => ({ ...prev, [taskId]: "saving" }));
     try {
-      // 1) Kommentar speichern – diese Spalte existiert sicher (Pflicht).
-      const { error } = await withTimeout(
-        supabase.from("work_instruction_tasks").update({ employee_comment: comment }).eq("id", taskId),
+      // Speichern über Server-Route (Service-Role-Key) -> umgeht RLS, geht für jeden Benutzer.
+      const res = await withTimeout(
+        fetch("/api/update-task-comment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ taskId, comment, lang: uiLanguage }),
+        }),
         15000,
-        "Zeitüberschreitung beim Speichern (15s). Bitte Internetverbindung prüfen und erneut versuchen."
+        "Zeitüberschreitung beim Speichern (15s). Bitte erneut versuchen."
       );
-      if (error) {
-        setCommentSaveState(prev => ({ ...prev, [taskId]: "error:" + error.message }));
-        setMessage("Fehler beim Speichern des Kommentars: " + error.message);
+      const data = await res.json();
+      if (!res.ok || data?.error) {
+        const msg = data?.error || `HTTP ${res.status}`;
+        setCommentSaveState(prev => ({ ...prev, [taskId]: "error:" + msg }));
+        setMessage("Fehler beim Speichern des Kommentars: " + msg);
         return;
       }
       setCommentSaveState(prev => ({ ...prev, [taskId]: "saved" }));
@@ -992,16 +998,7 @@ export default function Home() {
       setMessage("Fehler beim Speichern: " + String(err?.message || err));
       return;
     }
-    // 2) Ursprungssprache nur OPTIONAL merken. Wenn die Spalte fehlt/hängt -> einfach überspringen.
-    //    Die Übersetzung klappt auch ohne, da sie die Sprache automatisch erkennt.
-    try {
-      await withTimeout(
-        supabase.from("work_instruction_tasks").update({ comment_lang: uiLanguage }).eq("id", taskId),
-        8000,
-        "lang-timeout"
-      );
-    } catch { /* nicht kritisch - ignorieren */ }
-    // 3) Neu laden + Kommentare in die Anzeige-Sprache übersetzen
+    // Neu laden + Kommentare in die Anzeige-Sprache übersetzen
     try { if (currentCompany) await loadWorkInstructions(currentCompany.company_id); } catch { /* ignorieren */ }
   }
 
