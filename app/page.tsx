@@ -1149,30 +1149,50 @@ export default function Home() {
     return fallback;
   }
 
+  // Übersetzt mehrere Texte PARALLEL (statt nacheinander) -> deutlich schneller.
+  async function translateBatch(items: { key: string; text: string }[], fromLanguage: string, toLanguage: string): Promise<Record<string, string>> {
+    const result: Record<string, string> = {};
+    await Promise.all(items.map(async (item) => {
+      if (!item.text || !item.text.trim()) return;
+      try {
+        const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: item.text, fromLanguage, toLanguage }) });
+        const data = await res.json();
+        result[item.key] = data.error ? item.text : data.translation;
+      } catch { result[item.key] = item.text; }
+    }));
+    return result;
+  }
+
   // Kommentare in die Anzeige-Sprache übersetzen.
   // Übersetzt JEDEN Kommentar in die Sprache des Betrachters – mit Auto-Spracherkennung,
   // damit es auch funktioniert, wenn comment_lang fehlt oder falsch gespeichert wurde.
   async function refreshCommentTranslations(targetLang: string, instructions: any[]) {
-    const updates: Record<string, Record<string, string>> = {};
+    // Alle zu übersetzenden Kommentare sammeln
+    const jobs: { instId: string; taskId: string; text: string; sourceLang: string }[] = [];
     for (const inst of instructions) {
       for (const task of inst.work_instruction_tasks || []) {
         const c = (task.employee_comment || "").trim();
         if (!c) continue;
         const existing = instructionTranslations[inst.id];
         if (existing?.language === targetLang && existing.tasks?.[`comment_${task.id}`]) continue; // schon übersetzt
-        // Bekannte Ursprungssprache nutzen, sonst automatisch erkennen lassen
         const declared = task.comment_lang;
         const sourceLang = declared && declared !== targetLang ? declared : "automatisch";
-        try {
-          const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: c, fromLanguage: sourceLang, toLanguage: targetLang }) });
-          const data = await res.json();
-          if (!data.error && data.translation) {
-            if (!updates[inst.id]) updates[inst.id] = {};
-            updates[inst.id][`comment_${task.id}`] = data.translation;
-          }
-        } catch { /* Übersetzung übersprungen */ }
+        jobs.push({ instId: inst.id, taskId: task.id, text: c, sourceLang });
       }
     }
+    if (jobs.length === 0) return;
+    const updates: Record<string, Record<string, string>> = {};
+    // PARALLEL übersetzen (statt nacheinander)
+    await Promise.all(jobs.map(async (job) => {
+      try {
+        const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: job.text, fromLanguage: job.sourceLang, toLanguage: targetLang }) });
+        const data = await res.json();
+        if (!data.error && data.translation) {
+          if (!updates[job.instId]) updates[job.instId] = {};
+          updates[job.instId][`comment_${job.taskId}`] = data.translation;
+        }
+      } catch { /* Übersetzung übersprungen */ }
+    }));
     if (Object.keys(updates).length > 0) {
       setInstructionTranslations((prev) => {
         const next: Record<string, any> = { ...prev };
@@ -1431,30 +1451,27 @@ export default function Home() {
   async function translateInstruction(instruction: any) {
     setTranslatingInstructionId(instruction.id); setMessage("");
     try {
-      const textsToTranslate = [{ key: "title", text: instruction.title || "" }, { key: "problems_text", text: instruction.problems_text || "" }, { key: "description", text: instruction.description || "" }];
-      const translatedFields: Record<string, string> = {};
-      for (const item of textsToTranslate) {
-        if (!item.text.trim()) continue;
-        const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: item.text, fromLanguage: "Deutsch", toLanguage: instructionToLanguage }) });
-        const data = await res.json();
-        translatedFields[item.key] = data.error ? item.text : data.translation;
+      // Alle Texte sammeln und PARALLEL übersetzen
+      const items: { key: string; text: string }[] = [
+        { key: "title", text: instruction.title || "" },
+        { key: "problems_text", text: instruction.problems_text || "" },
+        { key: "description", text: instruction.description || "" },
+      ];
+      for (const task of instruction.work_instruction_tasks || []) {
+        if (task.task_text?.trim()) items.push({ key: `task_${task.id}`, text: task.task_text });
+        if (task.note?.trim()) items.push({ key: `note_${task.id}`, text: task.note });
+        if (task.employee_comment?.trim()) items.push({ key: `comment_${task.id}`, text: task.employee_comment });
       }
+      const out = await translateBatch(items, "Deutsch", instructionToLanguage);
+      const translatedFields: Record<string, string> = {};
+      if (out["title"]) translatedFields.title = out["title"];
+      if (out["problems_text"]) translatedFields.problems_text = out["problems_text"];
+      if (out["description"]) translatedFields.description = out["description"];
       const translatedTasks: Record<string, string> = {};
       for (const task of instruction.work_instruction_tasks || []) {
-        if (!task.task_text?.trim()) continue;
-        const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: task.task_text, fromLanguage: "Deutsch", toLanguage: instructionToLanguage }) });
-        const data = await res.json();
-        translatedTasks[task.id] = data.error ? task.task_text : data.translation;
-        if (task.note?.trim()) {
-          const resNote = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: task.note, fromLanguage: "Deutsch", toLanguage: instructionToLanguage }) });
-          const dataNote = await resNote.json();
-          translatedTasks[`note_${task.id}`] = dataNote.error ? task.note : dataNote.translation;
-        }
-        if (task.employee_comment?.trim()) {
-          const resComment = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: task.employee_comment, fromLanguage: "Deutsch", toLanguage: instructionToLanguage }) });
-          const dataComment = await resComment.json();
-          translatedTasks[`comment_${task.id}`] = dataComment.error ? task.employee_comment : dataComment.translation;
-        }
+        if (out[`task_${task.id}`]) translatedTasks[task.id] = out[`task_${task.id}`];
+        if (out[`note_${task.id}`]) translatedTasks[`note_${task.id}`] = out[`note_${task.id}`];
+        if (out[`comment_${task.id}`]) translatedTasks[`comment_${task.id}`] = out[`comment_${task.id}`];
       }
       setInstructionTranslations((prev) => ({ ...prev, [instruction.id]: { ...translatedFields, tasks: translatedTasks, language: instructionToLanguage } }));
       setMessage(t.msgInstructionTranslated);
@@ -1792,28 +1809,31 @@ export default function Home() {
             if (newLang !== "Deutsch") {
               setMessage("Übersetze Arbeitsanweisungen...");
               const newTranslations: Record<string, any> = { ...instructionTranslations };
+              // Alle Texte aller Anweisungen sammeln und PARALLEL übersetzen
+              const items: { key: string; text: string }[] = [];
               for (const instruction of workInstructions) {
                 if (newTranslations[instruction.id]?.language === newLang) continue;
-                const textsToTranslate = [
-                  { key: "title", text: instruction.title || "" },
-                  { key: "problems_text", text: instruction.problems_text || "" },
-                  { key: "description", text: instruction.description || "" },
-                ];
-                const translatedFields: Record<string, string> = {};
-                for (const item of textsToTranslate) {
-                  if (!item.text.trim()) continue;
-                  const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: item.text, fromLanguage: "Deutsch", toLanguage: newLang }) });
-                  const data = await res.json();
-                  translatedFields[item.key] = data.error ? item.text : data.translation;
-                }
-                const translatedTasks: Record<string, string> = {};
+                items.push({ key: `${instruction.id}::title`, text: instruction.title || "" });
+                items.push({ key: `${instruction.id}::problems_text`, text: instruction.problems_text || "" });
+                items.push({ key: `${instruction.id}::description`, text: instruction.description || "" });
                 for (const task of instruction.work_instruction_tasks || []) {
-                  if (!task.task_text?.trim()) continue;
-                  const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: task.task_text, fromLanguage: "Deutsch", toLanguage: newLang }) });
-                  const data = await res.json();
-                  translatedTasks[task.id] = data.error ? task.task_text : data.translation;
+                  if (task.task_text?.trim()) items.push({ key: `${instruction.id}::task::${task.id}`, text: task.task_text });
                 }
-                newTranslations[instruction.id] = { ...translatedFields, tasks: translatedTasks, language: newLang };
+              }
+              if (items.length > 0) {
+                const out = await translateBatch(items, "Deutsch", newLang);
+                for (const instruction of workInstructions) {
+                  if (newTranslations[instruction.id]?.language === newLang) continue;
+                  const translatedFields: Record<string, string> = {};
+                  if (out[`${instruction.id}::title`]) translatedFields.title = out[`${instruction.id}::title`];
+                  if (out[`${instruction.id}::problems_text`]) translatedFields.problems_text = out[`${instruction.id}::problems_text`];
+                  if (out[`${instruction.id}::description`]) translatedFields.description = out[`${instruction.id}::description`];
+                  const translatedTasks: Record<string, string> = {};
+                  for (const task of instruction.work_instruction_tasks || []) {
+                    if (out[`${instruction.id}::task::${task.id}`]) translatedTasks[task.id] = out[`${instruction.id}::task::${task.id}`];
+                  }
+                  newTranslations[instruction.id] = { ...translatedFields, tasks: translatedTasks, language: newLang };
+                }
               }
               setInstructionTranslations(newTranslations);
               setMessage("");
