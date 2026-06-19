@@ -1005,7 +1005,24 @@ export default function Home() {
       }
       setCommentSaveState(prev => ({ ...prev, [taskId]: "saved" }));
       setMessage("✅ Kommentar gespeichert.");
-      setTaskComments(prev => ({ ...prev, [taskId]: comment }));
+      // Sofort in die Anzeige-Sprache übersetzen, damit es ohne Neuladen erscheint
+      const instructionId = workInstructions.find(i => (i.work_instruction_tasks || []).some((tk: any) => tk.id === taskId))?.id;
+      let translated = "";
+      try {
+        const tr = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: comment, fromLanguage: "automatisch", toLanguage: uiLanguage }) });
+        const trData = await tr.json();
+        if (!trData.error && trData.translation) translated = trData.translation;
+      } catch { /* Übersetzung übersprungen */ }
+      if (instructionId && translated) {
+        setInstructionTranslations(prev => ({
+          ...prev,
+          [instructionId]: { ...prev[instructionId], language: uiLanguage, tasks: { ...prev[instructionId]?.tasks, [`comment_${taskId}`]: translated } },
+        }));
+        // Eingabefeld auf die Übersetzung umstellen
+        setTaskComments(prev => { const n = { ...prev }; delete n[taskId]; return n; });
+      } else {
+        setTaskComments(prev => ({ ...prev, [taskId]: comment }));
+      }
     } catch (err: any) {
       setCommentSaveState(prev => ({ ...prev, [taskId]: "error:" + String(err?.message || err) }));
       setMessage("Fehler beim Speichern: " + String(err?.message || err));
