@@ -1824,9 +1824,9 @@ export default function Home() {
         {(currentCompany?.role === "owner" || currentCompany?.role === "admin") && (
           <TabButton label={t.companyData}      tabName="firmendaten"        activeTab={activeTab} onClick={() => setActiveTab("firmendaten")} />
         )}
-        <TabButton label={t.tabDay}             tabName="tag"                activeTab={activeTab} onClick={() => setActiveTab("tag")} />
-        <TabButton label={t.tabWeek}            tabName="woche"              activeTab={activeTab} onClick={() => setActiveTab("woche")} />
-        <TabButton label={t.tabMonth}           tabName="monat"              activeTab={activeTab} onClick={() => setActiveTab("monat")} />
+        <TabButton label={t.tabDay}             tabName="tag"                activeTab={activeTab} onClick={() => { setActiveTab("tag"); if (currentCompany) loadWorkInstructions(currentCompany.company_id); }} />
+        <TabButton label={t.tabWeek}            tabName="woche"              activeTab={activeTab} onClick={() => { setActiveTab("woche"); if (currentCompany) loadWorkInstructions(currentCompany.company_id); }} />
+        <TabButton label={t.tabMonth}           tabName="monat"              activeTab={activeTab} onClick={() => { setActiveTab("monat"); if (currentCompany) loadWorkInstructions(currentCompany.company_id); }} />
       </nav>
 
       {message && <div className="border rounded p-3 bg-yellow-100 text-black">{message}</div>}
