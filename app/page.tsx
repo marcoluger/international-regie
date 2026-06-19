@@ -843,6 +843,7 @@ export default function Home() {
   const [newUserRole, setNewUserRole] = useState("employee");
   const [creatingEmployee, setCreatingEmployee] = useState(false);
   const [taskComments, setTaskComments] = useState<Record<string, string>>({});
+  const [commentSaveState, setCommentSaveState] = useState<Record<string, string>>({});
   const [reportInstruction, setReportInstruction] = useState<any>(null);
   const [instructionProblems, setInstructionProblems] = useState("");
   const [instructionTitle, setInstructionTitle] = useState("");
@@ -964,12 +965,18 @@ export default function Home() {
   async function updateTaskComment(taskId: string, comment: string) {
     // Kommentar im Original speichern und die Sprache des Mitarbeiters merken (comment_lang).
     // So kann er später für jeden Betrachter in dessen Sprache übersetzt werden.
+    setCommentSaveState(prev => ({ ...prev, [taskId]: "saving" }));
     let { error } = await supabase.from("work_instruction_tasks").update({ employee_comment: comment, comment_lang: uiLanguage }).eq("id", taskId);
     if (error && /comment_lang/i.test(error.message)) {
       // Spalte comment_lang existiert noch nicht -> ohne sie speichern (Fallback)
       ({ error } = await supabase.from("work_instruction_tasks").update({ employee_comment: comment }).eq("id", taskId));
     }
-    if (error) { setMessage("Fehler beim Speichern des Kommentars: " + error.message); return; }
+    if (error) {
+      setCommentSaveState(prev => ({ ...prev, [taskId]: "error:" + error!.message }));
+      setMessage("Fehler beim Speichern des Kommentars: " + error.message);
+      return;
+    }
+    setCommentSaveState(prev => ({ ...prev, [taskId]: "saved" }));
     setMessage("✅ Kommentar gespeichert.");
     // Lokalen State aktualisieren, damit der Mitarbeiter seinen eigenen Text sieht
     setTaskComments(prev => ({ ...prev, [taskId]: comment }));
@@ -2051,19 +2058,28 @@ export default function Home() {
                           maxLength={1000}
                           placeholder="Kommentar eingeben..."
                           value={taskComments[task.id] !== undefined ? taskComments[task.id] : (getTranslatedComment(instruction.id, task.id, task.employee_comment || ""))}
-                          onChange={(e) => setTaskComments(prev => ({ ...prev, [task.id]: e.target.value.slice(0, 1000) }))}
+                          onChange={(e) => { setTaskComments(prev => ({ ...prev, [task.id]: e.target.value.slice(0, 1000) })); setCommentSaveState(prev => ({ ...prev, [task.id]: "" })); }}
                         />
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between gap-2">
                           <span className="text-xs text-gray-500">
                             {((taskComments[task.id] !== undefined ? taskComments[task.id] : getTranslatedComment(instruction.id, task.id, task.employee_comment || "")) || "").length} / 1000 Zeichen
                           </span>
-                          <button
-                            type="button"
-                            onClick={() => updateTaskComment(task.id, taskComments[task.id] || "")}
-                            className="bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium"
-                          >
-                            💾 Speichern
-                          </button>
+                          <div className="flex items-center gap-2">
+                            {commentSaveState[task.id] === "saving" && <span className="text-xs text-gray-500">⏳ Speichere…</span>}
+                            {commentSaveState[task.id] === "saved" && <span className="text-xs text-green-700 font-medium">✓ Gespeichert</span>}
+                            {commentSaveState[task.id]?.startsWith("error:") && <span className="text-xs text-red-600">Fehler: {commentSaveState[task.id].slice(6)}</span>}
+                            <button
+                              type="button"
+                              disabled={commentSaveState[task.id] === "saving"}
+                              onClick={() => {
+                                const val = taskComments[task.id] !== undefined ? taskComments[task.id] : getTranslatedComment(instruction.id, task.id, task.employee_comment || "");
+                                updateTaskComment(task.id, val);
+                              }}
+                              className="bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium disabled:opacity-50"
+                            >
+                              💾 Speichern
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </li>
