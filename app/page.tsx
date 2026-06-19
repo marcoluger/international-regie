@@ -853,6 +853,7 @@ export default function Home() {
   const [instructionTasks, setInstructionTasks] = useState<string[]>([""]);
   const [instructionPhotos, setInstructionPhotos] = useState<string[]>([]);
   const [instructionTaskPhotos, setInstructionTaskPhotos] = useState<Record<number, string[]>>({});
+  const [instructionTaskStatuses, setInstructionTaskStatuses] = useState<Record<number, string>>({});
   const [workInstructions, setWorkInstructions] = useState<any[]>([]);
   const [instructionTranslations, setInstructionTranslations] = useState<Record<string, any>>({});
   const [translatingInstructionId, setTranslatingInstructionId] = useState<string | null>(null);
@@ -1108,12 +1109,21 @@ export default function Home() {
     if (!instructionTitle.trim()) { setMessage(t.msgNoTitle); return; }
     const { data: instruction, error } = await supabase.from("work_instructions").insert({ company_id: currentCompany.company_id, project_id: selectedProjectId || null, work_date: instructionDate || null, created_by: user?.id, assigned_user_ids: assignedUserIds, title: instructionTitle, project: instructionProject, customer: instructionCustomer, site: instructionSite, description: instructionDescription, problems_text: instructionProblems, photos: instructionPhotos }).select().single();
     if (error) { setMessage("Fehler: " + error.message); return; }
-    const taskRows = instructionTasks.filter((task) => task.trim() !== "").map((task, index) => ({ work_instruction_id: instruction.id, task_text: task, sort_order: index, photos: instructionTaskPhotos[index] || [] }));
+    const taskRows = instructionTasks
+      .map((task, originalIndex) => ({ task, originalIndex }))
+      .filter((entry) => entry.task.trim() !== "")
+      .map((entry, sortOrder) => ({
+        work_instruction_id: instruction.id,
+        task_text: entry.task,
+        sort_order: sortOrder,
+        photos: instructionTaskPhotos[entry.originalIndex] || [],
+        status: instructionTaskStatuses[entry.originalIndex] || "open",
+      }));
     if (taskRows.length > 0) {
       const { error: taskError } = await supabase.from("work_instruction_tasks").insert(taskRows);
       if (taskError) { setMessage("Arbeitsanweisung gespeichert, aber Schritte nicht: " + taskError.message); return; }
     }
-    setInstructionTitle(""); setInstructionProject(""); setInstructionCustomer(""); setInstructionSite(""); setInstructionDescription(""); setInstructionTasks([""]); setInstructionProblems(""); setInstructionPhotos([]); setInstructionTaskPhotos({}); setAssignedUserIds([]);
+    setInstructionTitle(""); setInstructionProject(""); setInstructionCustomer(""); setInstructionSite(""); setInstructionDescription(""); setInstructionTasks([""]); setInstructionProblems(""); setInstructionPhotos([]); setInstructionTaskPhotos({}); setInstructionTaskStatuses({}); setAssignedUserIds([]);
     await loadWorkInstructions(currentCompany.company_id);
     setMessage(t.msgInstructionSaved);
   }
@@ -1140,20 +1150,21 @@ export default function Home() {
     setCopySelectedTaskIds(src ? (src.work_instruction_tasks || []).map((task: any) => task.id) : []);
   }
 
-  // ── NEU: ausgewählte Arbeitsschritte in das "Neue Arbeitsanweisung"-Formular übernehmen ──
+  // ── NEU: ausgewählte Arbeitsschritte (inkl. Status) in das "Neue Arbeitsanweisung"-Formular übernehmen ──
   function applyCopiedSteps() {
     if (!copyModalInstruction) { setMessage(t.copySelectSource); return; }
-    const tasksToCopy = (copyModalInstruction.work_instruction_tasks || [])
+    const tasks = (copyModalInstruction.work_instruction_tasks || [])
       .filter((task: any) => copySelectedTaskIds.includes(task.id))
       .sort((a: any, b: any) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
-      .map((task: any) => task.task_text)
-      .filter((txt: string) => (txt || "").trim() !== "");
-    if (tasksToCopy.length === 0) { setMessage(t.copyNoSteps); return; }
-    // Schritte ans Formular anhängen (leere Platzhalter-Felder entfernen)
-    setInstructionTasks((prev) => {
-      const existing = prev.filter((x) => x.trim() !== "");
-      return [...existing, ...tasksToCopy];
-    });
+      .filter((task: any) => (task.task_text || "").trim() !== "");
+    if (tasks.length === 0) { setMessage(t.copyNoSteps); return; }
+    // Bestehende (nicht-leere) Schritte behalten, kopierte anhängen
+    const existing = instructionTasks.filter((x) => x.trim() !== "");
+    const startIndex = existing.length;
+    const newStatuses = { ...instructionTaskStatuses };
+    tasks.forEach((task: any, i: number) => { newStatuses[startIndex + i] = task.status || "open"; });
+    setInstructionTasks([...existing, ...tasks.map((task: any) => task.task_text)]);
+    setInstructionTaskStatuses(newStatuses);
     setCopyModalOpen(false);
     setCopyModalInstruction(null);
     setCopySelectedTaskIds([]);
@@ -2235,7 +2246,8 @@ export default function Home() {
                       if (e.target.checked) setCopySelectedTaskIds((prev) => [...prev, task.id]);
                       else setCopySelectedTaskIds((prev) => prev.filter((id) => id !== task.id));
                     }} />
-                    <span className="text-sm">{task.task_text}</span>
+                    <span className="text-sm flex-1">{task.task_text}</span>
+                    <span className="text-xs text-gray-500 whitespace-nowrap">{task.status === "completed" ? t.statusCompleted : task.status === "in_progress" ? t.statusInProgress : task.status === "stopped" ? t.statusStopped : t.statusOpen}</span>
                   </label>
                 ))}
                 {(copyModalInstruction.work_instruction_tasks || []).length === 0 && (<p className="text-sm text-gray-500">{t.copyNoSteps}</p>)}
