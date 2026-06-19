@@ -957,39 +957,23 @@ export default function Home() {
     const { data, error } = await supabase.from("work_instructions").select(`*, work_instruction_tasks (*)`).eq("company_id", companyId).order("created_at", { ascending: false });
     if (error) { setMessage("Fehler beim Laden der Arbeitsanweisungen: " + error.message); return; }
     setWorkInstructions(data || []);
+    // Kommentare in die aktuelle Anzeige-Sprache übersetzen (z. B. Kroatisch -> Deutsch für den Owner)
+    refreshCommentTranslations(uiLanguage, data || []);
   }
 
   async function updateTaskComment(taskId: string, comment: string) {
-    const trimmed = comment.trim();
-    // Kommentare werden immer auf Deutsch gespeichert (Basissprache).
-    // Tippt ein Mitarbeiter in einer anderen Sprache, wird sein Text ins Deutsche übersetzt.
-    let commentDe = comment;
-    if (uiLanguage !== "Deutsch" && trimmed) {
-      const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: comment, fromLanguage: uiLanguage, toLanguage: "Deutsch" }) });
-      const data = await res.json();
-      if (!data.error && data.translation) commentDe = data.translation;
+    // Kommentar im Original speichern und die Sprache des Mitarbeiters merken (comment_lang).
+    // So kann er später für jeden Betrachter in dessen Sprache übersetzt werden.
+    let { error } = await supabase.from("work_instruction_tasks").update({ employee_comment: comment, comment_lang: uiLanguage }).eq("id", taskId);
+    if (error && /comment_lang/i.test(error.message)) {
+      // Spalte comment_lang existiert noch nicht -> ohne sie speichern (Fallback)
+      ({ error } = await supabase.from("work_instruction_tasks").update({ employee_comment: comment }).eq("id", taskId));
     }
-    const { error } = await supabase.from("work_instruction_tasks").update({ employee_comment: commentDe }).eq("id", taskId);
     if (error) { setMessage("Fehler beim Speichern des Kommentars: " + error.message); return; }
-    if (currentCompany) await loadWorkInstructions(currentCompany.company_id);
     setMessage("✅ Kommentar gespeichert.");
-    // Originaltext in der Sprache des Mitarbeiters zwischenspeichern,
-    // damit der Mitarbeiter weiterhin seinen eigenen Text sieht.
-    if (uiLanguage !== "Deutsch" && trimmed) {
-      const instructionId = workInstructions.find(i => (i.work_instruction_tasks || []).some((t: any) => t.id === taskId))?.id;
-      if (instructionId) {
-        setInstructionTranslations(prev => ({
-          ...prev,
-          [instructionId]: {
-            ...prev[instructionId],
-            tasks: { ...prev[instructionId]?.tasks, [`comment_${taskId}`]: comment },
-            language: uiLanguage,
-          }
-        }));
-      }
-    }
-    // Lokalen State aktualisieren
+    // Lokalen State aktualisieren, damit der Mitarbeiter seinen eigenen Text sieht
     setTaskComments(prev => ({ ...prev, [taskId]: comment }));
+    if (currentCompany) await loadWorkInstructions(currentCompany.company_id);
   }
 
   async function updateTaskNote(taskId: string, note: string) {
@@ -1107,6 +1091,45 @@ export default function Home() {
     const trans = instructionTranslations[instructionId];
     if (trans && trans.language === uiLanguage && trans.tasks?.[taskId]) return trans.tasks[taskId];
     return fallback;
+  }
+
+  // Erste Fremdsprache der Firma (Quelle-Schätzung, falls comment_lang fehlt)
+  function getFirstForeignLang(): string {
+    const allowed = getAllowedLanguages(companyFeatures).filter((l) => l !== "Deutsch");
+    return allowed[0] || "Kroatisch";
+  }
+
+  // Kommentare in die Anzeige-Sprache übersetzen.
+  // Quelle = task.comment_lang (sonst geschätzt). Ziel = Sprache des Betrachters.
+  async function refreshCommentTranslations(targetLang: string, instructions: any[]) {
+    const updates: Record<string, Record<string, string>> = {};
+    for (const inst of instructions) {
+      for (const task of inst.work_instruction_tasks || []) {
+        const c = (task.employee_comment || "").trim();
+        if (!c) continue;
+        const sourceLang = task.comment_lang || getFirstForeignLang();
+        if (sourceLang === targetLang) continue; // Original bereits in Zielsprache
+        const existing = instructionTranslations[inst.id];
+        if (existing?.language === targetLang && existing.tasks?.[`comment_${task.id}`]) continue; // schon übersetzt
+        try {
+          const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: c, fromLanguage: sourceLang, toLanguage: targetLang }) });
+          const data = await res.json();
+          if (!data.error && data.translation) {
+            if (!updates[inst.id]) updates[inst.id] = {};
+            updates[inst.id][`comment_${task.id}`] = data.translation;
+          }
+        } catch { /* Übersetzung übersprungen */ }
+      }
+    }
+    if (Object.keys(updates).length > 0) {
+      setInstructionTranslations((prev) => {
+        const next: Record<string, any> = { ...prev };
+        for (const id of Object.keys(updates)) {
+          next[id] = { ...next[id], language: targetLang, tasks: { ...next[id]?.tasks, ...updates[id] } };
+        }
+        return next;
+      });
+    }
   }
 
   async function saveWorkInstruction() {
@@ -1737,17 +1760,14 @@ export default function Home() {
                   const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: task.task_text, fromLanguage: "Deutsch", toLanguage: newLang }) });
                   const data = await res.json();
                   translatedTasks[task.id] = data.error ? task.task_text : data.translation;
-                  if (task.employee_comment?.trim()) {
-                    const resC = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: task.employee_comment, fromLanguage: "Deutsch", toLanguage: newLang }) });
-                    const dataC = await resC.json();
-                    translatedTasks[`comment_${task.id}`] = dataC.error ? task.employee_comment : dataC.translation;
-                  }
                 }
                 newTranslations[instruction.id] = { ...translatedFields, tasks: translatedTasks, language: newLang };
               }
               setInstructionTranslations(newTranslations);
               setMessage("");
             }
+            // Kommentare immer passend zur neuen Anzeige-Sprache übersetzen (Quelle = comment_lang)
+            await refreshCommentTranslations(newLang, workInstructions);
           }}>
             {getAllowedLanguages(companyFeatures).filter(l => languages.includes(l as Language)).map((lang) => (<option key={lang} value={lang}>🌐 {lang}</option>))}
           </select>
