@@ -911,6 +911,15 @@ export default function Home() {
     return () => { authListener.subscription.unsubscribe(); };
   }, []);
 
+  // Übersetzt Kommentare automatisch in die Anzeige-Sprache,
+  // sobald Arbeitsanweisungen geladen sind ODER die Sprache gewechselt wird.
+  useEffect(() => {
+    if (workInstructions.length > 0) {
+      refreshCommentTranslations(uiLanguage, workInstructions);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [workInstructions, uiLanguage]);
+
   async function signUp() {
     setMessage("");
     const { error } = await supabase.auth.signUp({ email, password });
