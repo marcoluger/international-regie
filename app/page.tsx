@@ -777,6 +777,14 @@ function createEmptyDays(): DayEntry[] {
   return weekdays.map((day) => ({ weekday: day, date: "", customer: "", projectNumber: "", site: "", hours: "", description: "", translation: "", photos: [] }));
 }
 
+// Bricht ein hängendes Promise nach ms Millisekunden mit Fehler ab (verhindert "ewiges Laden")
+function withTimeout<T>(promise: Promise<T> | PromiseLike<T>, ms: number, label: string): Promise<T> {
+  return Promise.race([
+    Promise.resolve(promise),
+    new Promise<T>((_, reject) => setTimeout(() => reject(new Error(label)), ms)),
+  ]);
+}
+
 function getCalendarWeek(dateString: string) {
   if (!dateString) return "";
   const [yearText, monthText, dayText] = dateString.split("-");
@@ -964,23 +972,36 @@ export default function Home() {
 
   async function updateTaskComment(taskId: string, comment: string) {
     // Kommentar im Original speichern und die Sprache des Mitarbeiters merken (comment_lang).
-    // So kann er später für jeden Betrachter in dessen Sprache übersetzt werden.
     setCommentSaveState(prev => ({ ...prev, [taskId]: "saving" }));
-    let { error } = await supabase.from("work_instruction_tasks").update({ employee_comment: comment, comment_lang: uiLanguage }).eq("id", taskId);
-    if (error && /comment_lang/i.test(error.message)) {
-      // Spalte comment_lang existiert noch nicht -> ohne sie speichern (Fallback)
-      ({ error } = await supabase.from("work_instruction_tasks").update({ employee_comment: comment }).eq("id", taskId));
-    }
-    if (error) {
-      setCommentSaveState(prev => ({ ...prev, [taskId]: "error:" + error!.message }));
-      setMessage("Fehler beim Speichern des Kommentars: " + error.message);
+    try {
+      let { error } = await withTimeout(
+        supabase.from("work_instruction_tasks").update({ employee_comment: comment, comment_lang: uiLanguage }).eq("id", taskId),
+        15000,
+        "Zeitüberschreitung beim Speichern (15s). Bitte Internetverbindung prüfen und erneut versuchen."
+      );
+      if (error && /comment_lang/i.test(error.message)) {
+        // Spalte comment_lang existiert noch nicht -> ohne sie speichern (Fallback)
+        ({ error } = await withTimeout(
+          supabase.from("work_instruction_tasks").update({ employee_comment: comment }).eq("id", taskId),
+          15000,
+          "Zeitüberschreitung beim Speichern (15s). Bitte Internetverbindung prüfen und erneut versuchen."
+        ));
+      }
+      if (error) {
+        setCommentSaveState(prev => ({ ...prev, [taskId]: "error:" + error!.message }));
+        setMessage("Fehler beim Speichern des Kommentars: " + error.message);
+        return;
+      }
+      setCommentSaveState(prev => ({ ...prev, [taskId]: "saved" }));
+      setMessage("✅ Kommentar gespeichert.");
+      setTaskComments(prev => ({ ...prev, [taskId]: comment }));
+    } catch (err: any) {
+      setCommentSaveState(prev => ({ ...prev, [taskId]: "error:" + String(err?.message || err) }));
+      setMessage("Fehler beim Speichern: " + String(err?.message || err));
       return;
     }
-    setCommentSaveState(prev => ({ ...prev, [taskId]: "saved" }));
-    setMessage("✅ Kommentar gespeichert.");
-    // Lokalen State aktualisieren, damit der Mitarbeiter seinen eigenen Text sieht
-    setTaskComments(prev => ({ ...prev, [taskId]: comment }));
-    if (currentCompany) await loadWorkInstructions(currentCompany.company_id);
+    // Nachladen separat – ein Fehler hier soll das erfolgreiche Speichern nicht überschreiben
+    try { if (currentCompany) await loadWorkInstructions(currentCompany.company_id); } catch { /* ignorieren */ }
   }
 
   async function updateTaskNote(taskId: string, note: string) {
