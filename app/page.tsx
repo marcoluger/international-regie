@@ -239,17 +239,16 @@ const texts = {
     roleProjectManager: "Projektleiter",
     roleAdmin: "Admin",
     commentLabel: "Kommentar",
-    copyInstruction: "Kopieren",
-    copyTitle: "Arbeitsanweisung kopieren",
-    copyTargetDate: "Neuer Tag (Datum)",
+    copyInstruction: "Schritte kopieren",
+    copyTitle: "Schritte aus Anweisung übernehmen",
+    copySource: "Anweisung auswählen",
     copyWhichSteps: "Welche Arbeitsschritte übernehmen?",
     copyAllNone: "Alle / Keine",
     copyNoSteps: "Keine Arbeitsschritte vorhanden.",
     copyCancel: "Abbrechen",
-    copyConfirm: "Kopieren",
-    copyRunning: "Kopiere…",
-    copySelectDate: "Bitte Zieldatum wählen.",
-    copyDone: "Arbeitsanweisung wurde kopiert auf den ",
+    copyConfirm: "Übernehmen",
+    copySelectSource: "Bitte Anweisung wählen.",
+    copyDone: "Arbeitsschritte wurden übernommen.",
   },
   Kroatisch: {
     title: "Tjedni režijski izvještaj",
@@ -411,17 +410,16 @@ const texts = {
     roleProjectManager: "Voditelj projekta",
     roleAdmin: "Administrator",
     commentLabel: "Komentar",
-    copyInstruction: "Kopiraj",
-    copyTitle: "Kopiraj radnu uputu",
-    copyTargetDate: "Novi dan (datum)",
+    copyInstruction: "Kopiraj korake",
+    copyTitle: "Preuzmi korake iz upute",
+    copySource: "Odaberi uputu",
     copyWhichSteps: "Koje radne korake preuzeti?",
     copyAllNone: "Sve / Ništa",
     copyNoSteps: "Nema radnih koraka.",
     copyCancel: "Odustani",
-    copyConfirm: "Kopiraj",
-    copyRunning: "Kopiranje…",
-    copySelectDate: "Odaberite ciljni datum.",
-    copyDone: "Radna uputa je kopirana na ",
+    copyConfirm: "Preuzmi",
+    copySelectSource: "Odaberite uputu.",
+    copyDone: "Radni koraci su preuzeti.",
   },
   Slowenisch: {
     title: "Tedensko poročilo",
@@ -583,17 +581,16 @@ const texts = {
     roleProjectManager: "Vodja projekta",
     roleAdmin: "Administrator",
     commentLabel: "Komentar",
-    copyInstruction: "Kopiraj",
-    copyTitle: "Kopiraj delovno navodilo",
-    copyTargetDate: "Nov dan (datum)",
+    copyInstruction: "Kopiraj korake",
+    copyTitle: "Prevzemi korake iz navodila",
+    copySource: "Izberi navodilo",
     copyWhichSteps: "Katere delovne korake prevzeti?",
     copyAllNone: "Vse / Nič",
     copyNoSteps: "Ni delovnih korakov.",
     copyCancel: "Prekliči",
-    copyConfirm: "Kopiraj",
-    copyRunning: "Kopiranje…",
-    copySelectDate: "Izberite ciljni datum.",
-    copyDone: "Delovno navodilo je kopirano na ",
+    copyConfirm: "Prevzemi",
+    copySelectSource: "Izberite navodilo.",
+    copyDone: "Delovni koraki so prevzeti.",
   },
   Polnisch: {
     title: "Tygodniowy raport roboczy",
@@ -755,17 +752,16 @@ const texts = {
     roleProjectManager: "Kierownik projektu",
     roleAdmin: "Administrator",
     commentLabel: "Komentarz",
-    copyInstruction: "Kopiuj",
-    copyTitle: "Kopiuj instrukcję pracy",
-    copyTargetDate: "Nowy dzień (data)",
+    copyInstruction: "Kopiuj kroki",
+    copyTitle: "Przejmij kroki z instrukcji",
+    copySource: "Wybierz instrukcję",
     copyWhichSteps: "Które kroki przejąć?",
     copyAllNone: "Wszystkie / Żadne",
     copyNoSteps: "Brak kroków pracy.",
     copyCancel: "Anuluj",
-    copyConfirm: "Kopiuj",
-    copyRunning: "Kopiowanie…",
-    copySelectDate: "Wybierz datę docelową.",
-    copyDone: "Instrukcja pracy została skopiowana na ",
+    copyConfirm: "Przejmij",
+    copySelectSource: "Wybierz instrukcję.",
+    copyDone: "Kroki pracy zostały przejęte.",
   },
 };
 
@@ -875,10 +871,9 @@ export default function Home() {
   const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
   const [selectedWeek, setSelectedWeek] = useState(new Date().toISOString().split("T")[0]);
   // ── NEU: Kopier-Dialog für Arbeitsanweisungen ──
+  const [copyModalOpen, setCopyModalOpen] = useState(false);
   const [copyModalInstruction, setCopyModalInstruction] = useState<any>(null);
-  const [copyTargetDate, setCopyTargetDate] = useState("");
   const [copySelectedTaskIds, setCopySelectedTaskIds] = useState<string[]>([]);
-  const [copying, setCopying] = useState(false);
 
   useEffect(() => {
     async function loadUser() {
@@ -1131,64 +1126,38 @@ export default function Home() {
     setMessage(t.msgInstructionDeleted);
   }
 
-  // ── NEU: Kopier-Dialog öffnen (alle Schritte vorausgewählt) ──
-  function openCopyModal(instruction: any) {
-    setCopyModalInstruction(instruction);
-    setCopyTargetDate("");
-    setCopySelectedTaskIds((instruction.work_instruction_tasks || []).map((task: any) => task.id));
+  // ── NEU: Kopier-Dialog öffnen (im "Neue Arbeitsanweisung"-Formular) ──
+  function openCopyModal() {
+    setCopyModalInstruction(null);
+    setCopySelectedTaskIds([]);
+    setCopyModalOpen(true);
   }
 
-  // ── NEU: Arbeitsanweisung auf neuen Tag kopieren (ausgewählte Schritte, zurückgesetzt) ──
-  async function copyWorkInstruction() {
-    if (!currentCompany || !copyModalInstruction) return;
-    if (!copyTargetDate) { setMessage(t.copySelectDate); return; }
-    setCopying(true);
-    const src = copyModalInstruction;
+  // Quelle (bestehende Anweisung) im Dialog auswählen – alle Schritte vorauswählen
+  function selectCopySource(instructionId: string) {
+    const src = workInstructions.find((i) => i.id === instructionId) || null;
+    setCopyModalInstruction(src);
+    setCopySelectedTaskIds(src ? (src.work_instruction_tasks || []).map((task: any) => task.id) : []);
+  }
 
-    // 1. Neue Arbeitsanweisung für den neuen Tag anlegen
-    const { data: newInstruction, error } = await supabase
-      .from("work_instructions")
-      .insert({
-        company_id: src.company_id,
-        project_id: src.project_id || null,
-        work_date: copyTargetDate,
-        created_by: user?.id,
-        assigned_user_ids: src.assigned_user_ids || [],
-        title: src.title,
-        project: src.project,
-        customer: src.customer,
-        site: src.site,
-        description: src.description,
-        problems_text: src.problems_text,
-        photos: src.photos || [], // Anweisungs-Fotos übernehmen; auf [] ändern, falls nicht gewünscht
-      })
-      .select()
-      .single();
-    if (error) { setMessage("Fehler beim Kopieren: " + error.message); setCopying(false); return; }
-
-    // 2. Nur ausgewählte Arbeitsschritte kopieren – zurückgesetzt für den neuen Tag
-    const tasksToCopy = (src.work_instruction_tasks || [])
+  // ── NEU: ausgewählte Arbeitsschritte in das "Neue Arbeitsanweisung"-Formular übernehmen ──
+  function applyCopiedSteps() {
+    if (!copyModalInstruction) { setMessage(t.copySelectSource); return; }
+    const tasksToCopy = (copyModalInstruction.work_instruction_tasks || [])
       .filter((task: any) => copySelectedTaskIds.includes(task.id))
-      .sort((a: any, b: any) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
-
-    if (tasksToCopy.length > 0) {
-      const newTasks = tasksToCopy.map((task: any, index: number) => ({
-        work_instruction_id: newInstruction.id,
-        task_text: task.task_text,
-        sort_order: task.sort_order ?? index,
-        status: "open",         // Status zurücksetzen
-        employee_comment: null, // Kommentar gehört zum alten Tag
-        note: null,             // Rückmeldung gehört zum alten Tag
-        photos: [],             // Fotos gehören zum alten Tag
-      }));
-      const { error: taskError } = await supabase.from("work_instruction_tasks").insert(newTasks);
-      if (taskError) { setMessage("Anweisung kopiert, aber Schritte nicht: " + taskError.message); setCopying(false); return; }
-    }
-
-    await loadWorkInstructions(currentCompany.company_id);
-    setCopying(false);
+      .sort((a: any, b: any) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+      .map((task: any) => task.task_text)
+      .filter((txt: string) => (txt || "").trim() !== "");
+    if (tasksToCopy.length === 0) { setMessage(t.copyNoSteps); return; }
+    // Schritte ans Formular anhängen (leere Platzhalter-Felder entfernen)
+    setInstructionTasks((prev) => {
+      const existing = prev.filter((x) => x.trim() !== "");
+      return [...existing, ...tasksToCopy];
+    });
+    setCopyModalOpen(false);
     setCopyModalInstruction(null);
-    setMessage("✅ " + t.copyDone + copyTargetDate + ".");
+    setCopySelectedTaskIds([]);
+    setMessage("✅ " + t.copyDone);
   }
 
   function updateFullWeekFromMonday(selectedValue: string) {
@@ -1922,10 +1891,7 @@ export default function Home() {
                         <p><strong>{t.site}:</strong> {instruction.site || "-"}</p>
                         {instruction.problems_text && <p><strong>{t.problems}:</strong> {getTranslated(instruction.id, "problems_text", instruction.problems_text)}</p>}
                         {(instruction.work_instruction_tasks || []).length > 0 && (<ul className="list-disc pl-6 space-y-1">{instruction.work_instruction_tasks.map((task: any) => (<li key={task.id}>{task.status === "completed" ? t.statusCompleted : task.status === "in_progress" ? t.statusInProgress : task.status === "stopped" ? t.statusStopped : t.statusOpen}{" "}{getTranslatedTask(instruction.id, task.id, task.task_text)}{task.note && <div className="text-sm text-gray-600 ml-2">{t.feedbackLabel}: {task.note}</div>}</li>))}</ul>)}
-                        <div className="flex gap-2 flex-wrap">
-                          {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => openCopyModal(instruction)} className="bg-indigo-600 text-white px-3 py-2 rounded text-sm">📋 {t.copyInstruction}</button>)}
-                          {companyFeatures?.module_auto_reports ? (<button type="button" onClick={() => createReportFromInstruction(instruction)} className="bg-green-700 text-white px-3 py-2 rounded">{t.toReport}</button>) : (<p className="text-sm text-gray-500">{t.autoReportLocked}</p>)}
-                        </div>
+                        {companyFeatures?.module_auto_reports ? (<button type="button" onClick={() => createReportFromInstruction(instruction)} className="bg-green-700 text-white px-3 py-2 rounded">{t.toReport}</button>) : (<p className="text-sm text-gray-500">{t.autoReportLocked}</p>)}
                       </div>
                     ))}
                     {workInstructions.filter((i) => i.project_id === project.id).length === 0 && <p className="text-gray-600">{t.noInstructions}</p>}
@@ -1987,7 +1953,10 @@ export default function Home() {
                 {instructionPhotos.length > 0 && (<div className="grid grid-cols-3 gap-2 mt-2">{instructionPhotos.map((photo, i) => (<div key={i} className="relative"><img src={photo} alt="Foto" className="w-full h-24 object-cover rounded" /><button type="button" onClick={() => setInstructionPhotos((prev) => prev.filter((_, idx) => idx !== i))} className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 text-xs">✕</button></div>))}</div>)}
               </div>
             )}
-            <h3 className="font-bold">{t.workSteps}</h3>
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <h3 className="font-bold">{t.workSteps}</h3>
+              <button type="button" onClick={openCopyModal} className="bg-indigo-600 text-white px-3 py-2 rounded text-sm">📋 {t.copyInstruction}</button>
+            </div>
             {instructionTasks.map((task, index) => (
               <div key={index} className="border rounded p-3 space-y-2 bg-gray-50">
                 <input className="border p-3 w-full text-black bg-white" placeholder={`${t.workSteps} ${index + 1}`} value={task} onChange={(e) => { const copy = [...instructionTasks]; copy[index] = e.target.value; setInstructionTasks(copy); }} />
@@ -2069,7 +2038,6 @@ export default function Home() {
                 </ul>
                 <div className="flex gap-2 pt-2 border-t flex-wrap">
                   {companyFeatures?.module_auto_reports && (<button type="button" onClick={() => createReportFromInstruction(instruction)} className="bg-green-700 text-white px-3 py-2 rounded text-sm">📋 {t.toReport}</button>)}
-                  {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => openCopyModal(instruction)} className="bg-indigo-600 text-white px-3 py-2 rounded text-sm">📋 {t.copyInstruction}</button>)}
                   {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => deleteWorkInstruction(instruction.id)} className="bg-red-600 text-white px-3 py-2 rounded text-sm">{t.deleteInstruction}</button>)}
                 </div>
               </section>
@@ -2124,10 +2092,7 @@ export default function Home() {
                           </li>
                         ))}
                       </ul>
-                      <div className="flex gap-2 flex-wrap">
-                        {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => openCopyModal(instruction)} className="bg-indigo-600 text-white px-3 py-1 rounded text-sm">📋 {t.copyInstruction}</button>)}
-                        {companyFeatures?.module_auto_reports && (<button type="button" onClick={() => createReportFromInstruction(instruction)} className="bg-green-700 text-white px-3 py-1 rounded text-sm">📋 {t.toReport}</button>)}
-                      </div>
+                      {companyFeatures?.module_auto_reports && (<button type="button" onClick={() => createReportFromInstruction(instruction)} className="bg-green-700 text-white px-3 py-1 rounded text-sm">📋 {t.toReport}</button>)}
                     </div>
                   ))}
                 </section>
@@ -2241,38 +2206,44 @@ export default function Home() {
         </section>
       )}
 
-      {/* ── NEU: Kopier-Dialog für Arbeitsanweisungen ── */}
-      {copyModalInstruction && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setCopyModalInstruction(null)}>
+      {/* ── NEU: Kopier-Dialog – Schritte aus bestehender Anweisung ins Formular übernehmen ── */}
+      {copyModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setCopyModalOpen(false)}>
           <div className="bg-white rounded-xl p-5 w-full max-w-md space-y-4 max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-xl font-bold">📋 {t.copyTitle}</h3>
-            <p className="text-sm text-gray-600">{copyModalInstruction.title}</p>
             <div>
-              <label className="block text-sm font-medium mb-1">{t.copyTargetDate}</label>
-              <input type="date" className="border p-3 w-full rounded text-black bg-white" value={copyTargetDate} onChange={(e) => setCopyTargetDate(e.target.value)} />
+              <label className="block text-sm font-medium mb-1">{t.copySource}</label>
+              <select className="border p-3 w-full rounded text-black bg-white" value={copyModalInstruction?.id || ""} onChange={(e) => selectCopySource(e.target.value)}>
+                <option value="">{t.copySource}</option>
+                {workInstructions.map((inst) => (
+                  <option key={inst.id} value={inst.id}>{inst.title}{inst.work_date ? ` (${inst.work_date})` : ""}</option>
+                ))}
+              </select>
             </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium">{t.copyWhichSteps}</p>
-                <button type="button" className="text-xs text-blue-600 underline" onClick={() => {
-                  const all = (copyModalInstruction.work_instruction_tasks || []).map((task: any) => task.id);
-                  setCopySelectedTaskIds((prev) => prev.length === all.length ? [] : all);
-                }}>{t.copyAllNone}</button>
+            {copyModalInstruction && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium">{t.copyWhichSteps}</p>
+                  <button type="button" className="text-xs text-blue-600 underline" onClick={() => {
+                    const all = (copyModalInstruction.work_instruction_tasks || []).map((task: any) => task.id);
+                    setCopySelectedTaskIds((prev) => prev.length === all.length ? [] : all);
+                  }}>{t.copyAllNone}</button>
+                </div>
+                {(copyModalInstruction.work_instruction_tasks || []).sort((a: any, b: any) => (a.sort_order ?? 0) - (b.sort_order ?? 0)).map((task: any) => (
+                  <label key={task.id} className="flex items-start gap-2 border rounded p-2 cursor-pointer bg-gray-50">
+                    <input type="checkbox" className="w-4 h-4 mt-1" checked={copySelectedTaskIds.includes(task.id)} onChange={(e) => {
+                      if (e.target.checked) setCopySelectedTaskIds((prev) => [...prev, task.id]);
+                      else setCopySelectedTaskIds((prev) => prev.filter((id) => id !== task.id));
+                    }} />
+                    <span className="text-sm">{task.task_text}</span>
+                  </label>
+                ))}
+                {(copyModalInstruction.work_instruction_tasks || []).length === 0 && (<p className="text-sm text-gray-500">{t.copyNoSteps}</p>)}
               </div>
-              {(copyModalInstruction.work_instruction_tasks || []).sort((a: any, b: any) => (a.sort_order ?? 0) - (b.sort_order ?? 0)).map((task: any) => (
-                <label key={task.id} className="flex items-start gap-2 border rounded p-2 cursor-pointer bg-gray-50">
-                  <input type="checkbox" className="w-4 h-4 mt-1" checked={copySelectedTaskIds.includes(task.id)} onChange={(e) => {
-                    if (e.target.checked) setCopySelectedTaskIds((prev) => [...prev, task.id]);
-                    else setCopySelectedTaskIds((prev) => prev.filter((id) => id !== task.id));
-                  }} />
-                  <span className="text-sm">{task.task_text}</span>
-                </label>
-              ))}
-              {(copyModalInstruction.work_instruction_tasks || []).length === 0 && (<p className="text-sm text-gray-500">{t.copyNoSteps}</p>)}
-            </div>
+            )}
             <div className="flex gap-2 pt-2">
-              <button type="button" onClick={() => setCopyModalInstruction(null)} className="flex-1 bg-gray-200 text-gray-800 py-3 rounded font-medium">{t.copyCancel}</button>
-              <button type="button" disabled={!copyTargetDate || copying} onClick={copyWorkInstruction} className="flex-1 bg-indigo-600 text-white py-3 rounded font-bold disabled:opacity-50">{copying ? t.copyRunning : t.copyConfirm}</button>
+              <button type="button" onClick={() => setCopyModalOpen(false)} className="flex-1 bg-gray-200 text-gray-800 py-3 rounded font-medium">{t.copyCancel}</button>
+              <button type="button" disabled={!copyModalInstruction || copySelectedTaskIds.length === 0} onClick={applyCopiedSteps} className="flex-1 bg-indigo-600 text-white py-3 rounded font-bold disabled:opacity-50">{t.copyConfirm}</button>
             </div>
           </div>
         </div>
