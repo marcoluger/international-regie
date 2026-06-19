@@ -960,26 +960,32 @@ export default function Home() {
   }
 
   async function updateTaskComment(taskId: string, comment: string) {
-    const { error } = await supabase.from("work_instruction_tasks").update({ employee_comment: comment }).eq("id", taskId);
+    const trimmed = comment.trim();
+    // Kommentare werden immer auf Deutsch gespeichert (Basissprache).
+    // Tippt ein Mitarbeiter in einer anderen Sprache, wird sein Text ins Deutsche übersetzt.
+    let commentDe = comment;
+    if (uiLanguage !== "Deutsch" && trimmed) {
+      const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: comment, fromLanguage: uiLanguage, toLanguage: "Deutsch" }) });
+      const data = await res.json();
+      if (!data.error && data.translation) commentDe = data.translation;
+    }
+    const { error } = await supabase.from("work_instruction_tasks").update({ employee_comment: commentDe }).eq("id", taskId);
     if (error) { setMessage("Fehler beim Speichern des Kommentars: " + error.message); return; }
     if (currentCompany) await loadWorkInstructions(currentCompany.company_id);
     setMessage("✅ Kommentar gespeichert.");
-    // Wenn Sprache nicht Deutsch: Kommentar sofort übersetzen
-    if (uiLanguage !== "Deutsch" && comment.trim()) {
+    // Originaltext in der Sprache des Mitarbeiters zwischenspeichern,
+    // damit der Mitarbeiter weiterhin seinen eigenen Text sieht.
+    if (uiLanguage !== "Deutsch" && trimmed) {
       const instructionId = workInstructions.find(i => (i.work_instruction_tasks || []).some((t: any) => t.id === taskId))?.id;
       if (instructionId) {
-        const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: comment, fromLanguage: "Deutsch", toLanguage: uiLanguage }) });
-        const data = await res.json();
-        if (!data.error) {
-          setInstructionTranslations(prev => ({
-            ...prev,
-            [instructionId]: {
-              ...prev[instructionId],
-              tasks: { ...prev[instructionId]?.tasks, [`comment_${taskId}`]: data.translation },
-              language: uiLanguage,
-            }
-          }));
-        }
+        setInstructionTranslations(prev => ({
+          ...prev,
+          [instructionId]: {
+            ...prev[instructionId],
+            tasks: { ...prev[instructionId]?.tasks, [`comment_${taskId}`]: comment },
+            language: uiLanguage,
+          }
+        }));
       }
     }
     // Lokalen State aktualisieren
