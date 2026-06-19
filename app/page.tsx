@@ -915,7 +915,7 @@ export default function Home() {
   // Reagiert auf die Sprache UND auf den Inhalt der Kommentare (Signatur),
   // damit es auch direkt beim ersten Laden greift – ohne Seiten-Neuladen.
   const commentSignature = workInstructions
-    .flatMap((i: any) => (i.work_instruction_tasks || []).map((task: any) => `${task.id}:${(task.employee_comment || "").length}`))
+    .map((i: any) => `${i.id}.${(i.title || "").length}.${(i.problems_text || "").length}.${(i.work_instruction_tasks || []).map((task: any) => `${task.id}:${(task.task_text || "").length}:${(task.employee_comment || "").length}`).join(",")}`)
     .join("|");
   useEffect(() => {
     if (workInstructions.length > 0) {
@@ -1167,37 +1167,68 @@ export default function Home() {
   // Übersetzt JEDEN Kommentar in die Sprache des Betrachters – mit Auto-Spracherkennung,
   // damit es auch funktioniert, wenn comment_lang fehlt oder falsch gespeichert wurde.
   async function refreshCommentTranslations(targetLang: string, instructions: any[]) {
-    // Alle zu übersetzenden Kommentare sammeln
-    const jobs: { instId: string; taskId: string; text: string; sourceLang: string }[] = [];
+    // Sammelt ALLE zu übersetzenden Texte (Titel, Probleme, Beschreibung, Arbeitsschritte, Kommentare)
+    // und übersetzt sie PARALLEL in die Anzeige-Sprache – mit automatischer Spracherkennung.
+    type Job = { instId: string; storeKey: string; inTasks: boolean; text: string; sourceLang: string };
+    const jobs: Job[] = [];
     for (const inst of instructions) {
+      const existing = instructionTranslations[inst.id];
+      const sameLang = existing?.language === targetLang;
+      // Felder der Anweisung
+      const fields: { key: string; text: string }[] = [
+        { key: "title", text: inst.title || "" },
+        { key: "problems_text", text: inst.problems_text || "" },
+        { key: "description", text: inst.description || "" },
+      ];
+      for (const f of fields) {
+        if (!f.text.trim()) continue;
+        if (sameLang && existing?.[f.key]) continue; // schon übersetzt
+        jobs.push({ instId: inst.id, storeKey: f.key, inTasks: false, text: f.text, sourceLang: "automatisch" });
+      }
+      // Arbeitsschritte + Kommentare
       for (const task of inst.work_instruction_tasks || []) {
+        const taskText = (task.task_text || "").trim();
+        if (taskText && !(sameLang && existing?.tasks?.[task.id])) {
+          jobs.push({ instId: inst.id, storeKey: task.id, inTasks: true, text: taskText, sourceLang: "automatisch" });
+        }
         const c = (task.employee_comment || "").trim();
-        if (!c) continue;
-        const existing = instructionTranslations[inst.id];
-        if (existing?.language === targetLang && existing.tasks?.[`comment_${task.id}`]) continue; // schon übersetzt
-        const declared = task.comment_lang;
-        const sourceLang = declared && declared !== targetLang ? declared : "automatisch";
-        jobs.push({ instId: inst.id, taskId: task.id, text: c, sourceLang });
+        if (c && !(sameLang && existing?.tasks?.[`comment_${task.id}`])) {
+          const declared = task.comment_lang;
+          const sourceLang = declared && declared !== targetLang ? declared : "automatisch";
+          jobs.push({ instId: inst.id, storeKey: `comment_${task.id}`, inTasks: true, text: c, sourceLang });
+        }
       }
     }
     if (jobs.length === 0) return;
-    const updates: Record<string, Record<string, string>> = {};
+    const fieldUpdates: Record<string, Record<string, string>> = {};
+    const taskUpdates: Record<string, Record<string, string>> = {};
     // PARALLEL übersetzen (statt nacheinander)
     await Promise.all(jobs.map(async (job) => {
       try {
         const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: job.text, fromLanguage: job.sourceLang, toLanguage: targetLang }) });
         const data = await res.json();
         if (!data.error && data.translation) {
-          if (!updates[job.instId]) updates[job.instId] = {};
-          updates[job.instId][`comment_${job.taskId}`] = data.translation;
+          if (job.inTasks) {
+            if (!taskUpdates[job.instId]) taskUpdates[job.instId] = {};
+            taskUpdates[job.instId][job.storeKey] = data.translation;
+          } else {
+            if (!fieldUpdates[job.instId]) fieldUpdates[job.instId] = {};
+            fieldUpdates[job.instId][job.storeKey] = data.translation;
+          }
         }
       } catch { /* Übersetzung übersprungen */ }
     }));
-    if (Object.keys(updates).length > 0) {
+    const ids = new Set([...Object.keys(fieldUpdates), ...Object.keys(taskUpdates)]);
+    if (ids.size > 0) {
       setInstructionTranslations((prev) => {
         const next: Record<string, any> = { ...prev };
-        for (const id of Object.keys(updates)) {
-          next[id] = { ...next[id], language: targetLang, tasks: { ...next[id]?.tasks, ...updates[id] } };
+        for (const id of ids) {
+          next[id] = {
+            ...next[id],
+            ...(fieldUpdates[id] || {}),
+            language: targetLang,
+            tasks: { ...next[id]?.tasks, ...(taskUpdates[id] || {}) },
+          };
         }
         return next;
       });
@@ -1462,7 +1493,7 @@ export default function Home() {
         if (task.note?.trim()) items.push({ key: `note_${task.id}`, text: task.note });
         if (task.employee_comment?.trim()) items.push({ key: `comment_${task.id}`, text: task.employee_comment });
       }
-      const out = await translateBatch(items, "Deutsch", instructionToLanguage);
+      const out = await translateBatch(items, "automatisch", instructionToLanguage);
       const translatedFields: Record<string, string> = {};
       if (out["title"]) translatedFields.title = out["title"];
       if (out["problems_text"]) translatedFields.problems_text = out["problems_text"];
@@ -1802,44 +1833,10 @@ export default function Home() {
         {currentCompany && (<p className="text-gray-700">{t.firma}: <strong>{currentCompany.companies.name}</strong> | {t.role}: <strong>{currentCompany.role === "owner" ? "Owner" : currentCompany.role === "admin" ? t.roleAdmin : currentCompany.role === "project_manager" ? t.roleProjectManager : t.roleEmployee}</strong></p>)}
         <div className="flex items-center gap-3 mt-2">
           <button type="button" onClick={signOut} className="bg-gray-800 text-white px-4 py-2 rounded">{t.logout}</button>
-          <select className="border p-2 rounded text-black bg-white text-sm" value={uiLanguage} onChange={async (e) => {
-            const newLang = e.target.value as Language;
-            setUiLanguage(newLang);
-            // Automatisch alle Arbeitsanweisungen übersetzen wenn nicht Deutsch
-            if (newLang !== "Deutsch") {
-              setMessage("Übersetze Arbeitsanweisungen...");
-              const newTranslations: Record<string, any> = { ...instructionTranslations };
-              // Alle Texte aller Anweisungen sammeln und PARALLEL übersetzen
-              const items: { key: string; text: string }[] = [];
-              for (const instruction of workInstructions) {
-                if (newTranslations[instruction.id]?.language === newLang) continue;
-                items.push({ key: `${instruction.id}::title`, text: instruction.title || "" });
-                items.push({ key: `${instruction.id}::problems_text`, text: instruction.problems_text || "" });
-                items.push({ key: `${instruction.id}::description`, text: instruction.description || "" });
-                for (const task of instruction.work_instruction_tasks || []) {
-                  if (task.task_text?.trim()) items.push({ key: `${instruction.id}::task::${task.id}`, text: task.task_text });
-                }
-              }
-              if (items.length > 0) {
-                const out = await translateBatch(items, "Deutsch", newLang);
-                for (const instruction of workInstructions) {
-                  if (newTranslations[instruction.id]?.language === newLang) continue;
-                  const translatedFields: Record<string, string> = {};
-                  if (out[`${instruction.id}::title`]) translatedFields.title = out[`${instruction.id}::title`];
-                  if (out[`${instruction.id}::problems_text`]) translatedFields.problems_text = out[`${instruction.id}::problems_text`];
-                  if (out[`${instruction.id}::description`]) translatedFields.description = out[`${instruction.id}::description`];
-                  const translatedTasks: Record<string, string> = {};
-                  for (const task of instruction.work_instruction_tasks || []) {
-                    if (out[`${instruction.id}::task::${task.id}`]) translatedTasks[task.id] = out[`${instruction.id}::task::${task.id}`];
-                  }
-                  newTranslations[instruction.id] = { ...translatedFields, tasks: translatedTasks, language: newLang };
-                }
-              }
-              setInstructionTranslations(newTranslations);
-              setMessage("");
-            }
-            // Kommentare immer passend zur neuen Anzeige-Sprache übersetzen (Quelle = comment_lang)
-            await refreshCommentTranslations(newLang, workInstructions);
+          <select className="border p-2 rounded text-black bg-white text-sm" value={uiLanguage} onChange={(e) => {
+            // Nur Sprache umschalten – die Übersetzung aller Felder läuft automatisch
+            // über den useEffect (refreshCommentTranslations) in die neue Sprache.
+            setUiLanguage(e.target.value as Language);
           }}>
             {getAllowedLanguages(companyFeatures).filter(l => languages.includes(l as Language)).map((lang) => (<option key={lang} value={lang}>🌐 {lang}</option>))}
           </select>
