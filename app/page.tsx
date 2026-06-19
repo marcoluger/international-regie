@@ -971,24 +971,16 @@ export default function Home() {
   }
 
   async function updateTaskComment(taskId: string, comment: string) {
-    // Kommentar im Original speichern und die Sprache des Mitarbeiters merken (comment_lang).
     setCommentSaveState(prev => ({ ...prev, [taskId]: "saving" }));
     try {
-      let { error } = await withTimeout(
-        supabase.from("work_instruction_tasks").update({ employee_comment: comment, comment_lang: uiLanguage }).eq("id", taskId),
+      // 1) Kommentar speichern – diese Spalte existiert sicher (Pflicht).
+      const { error } = await withTimeout(
+        supabase.from("work_instruction_tasks").update({ employee_comment: comment }).eq("id", taskId),
         15000,
         "Zeitüberschreitung beim Speichern (15s). Bitte Internetverbindung prüfen und erneut versuchen."
       );
-      if (error && /comment_lang/i.test(error.message)) {
-        // Spalte comment_lang existiert noch nicht -> ohne sie speichern (Fallback)
-        ({ error } = await withTimeout(
-          supabase.from("work_instruction_tasks").update({ employee_comment: comment }).eq("id", taskId),
-          15000,
-          "Zeitüberschreitung beim Speichern (15s). Bitte Internetverbindung prüfen und erneut versuchen."
-        ));
-      }
       if (error) {
-        setCommentSaveState(prev => ({ ...prev, [taskId]: "error:" + error!.message }));
+        setCommentSaveState(prev => ({ ...prev, [taskId]: "error:" + error.message }));
         setMessage("Fehler beim Speichern des Kommentars: " + error.message);
         return;
       }
@@ -1000,7 +992,16 @@ export default function Home() {
       setMessage("Fehler beim Speichern: " + String(err?.message || err));
       return;
     }
-    // Nachladen separat – ein Fehler hier soll das erfolgreiche Speichern nicht überschreiben
+    // 2) Ursprungssprache nur OPTIONAL merken. Wenn die Spalte fehlt/hängt -> einfach überspringen.
+    //    Die Übersetzung klappt auch ohne, da sie die Sprache automatisch erkennt.
+    try {
+      await withTimeout(
+        supabase.from("work_instruction_tasks").update({ comment_lang: uiLanguage }).eq("id", taskId),
+        8000,
+        "lang-timeout"
+      );
+    } catch { /* nicht kritisch - ignorieren */ }
+    // 3) Neu laden + Kommentare in die Anzeige-Sprache übersetzen
     try { if (currentCompany) await loadWorkInstructions(currentCompany.company_id); } catch { /* ignorieren */ }
   }
 
