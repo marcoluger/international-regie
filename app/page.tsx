@@ -911,14 +911,18 @@ export default function Home() {
     return () => { authListener.subscription.unsubscribe(); };
   }, []);
 
-  // Übersetzt Kommentare automatisch in die Anzeige-Sprache,
-  // sobald Arbeitsanweisungen geladen sind ODER die Sprache gewechselt wird.
+  // Übersetzt Kommentare automatisch in die Anzeige-Sprache.
+  // Reagiert auf die Sprache UND auf den Inhalt der Kommentare (Signatur),
+  // damit es auch direkt beim ersten Laden greift – ohne Seiten-Neuladen.
+  const commentSignature = workInstructions
+    .flatMap((i: any) => (i.work_instruction_tasks || []).map((task: any) => `${task.id}:${(task.employee_comment || "").length}`))
+    .join("|");
   useEffect(() => {
     if (workInstructions.length > 0) {
       refreshCommentTranslations(uiLanguage, workInstructions);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [workInstructions, uiLanguage]);
+  }, [commentSignature, uiLanguage]);
 
   async function signUp() {
     setMessage("");
