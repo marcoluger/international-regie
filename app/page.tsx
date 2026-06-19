@@ -239,6 +239,17 @@ const texts = {
     roleProjectManager: "Projektleiter",
     roleAdmin: "Admin",
     commentLabel: "Kommentar",
+    copyInstruction: "Kopieren",
+    copyTitle: "Arbeitsanweisung kopieren",
+    copyTargetDate: "Neuer Tag (Datum)",
+    copyWhichSteps: "Welche Arbeitsschritte übernehmen?",
+    copyAllNone: "Alle / Keine",
+    copyNoSteps: "Keine Arbeitsschritte vorhanden.",
+    copyCancel: "Abbrechen",
+    copyConfirm: "Kopieren",
+    copyRunning: "Kopiere…",
+    copySelectDate: "Bitte Zieldatum wählen.",
+    copyDone: "Arbeitsanweisung wurde kopiert auf den ",
   },
   Kroatisch: {
     title: "Tjedni režijski izvještaj",
@@ -400,6 +411,17 @@ const texts = {
     roleProjectManager: "Voditelj projekta",
     roleAdmin: "Administrator",
     commentLabel: "Komentar",
+    copyInstruction: "Kopiraj",
+    copyTitle: "Kopiraj radnu uputu",
+    copyTargetDate: "Novi dan (datum)",
+    copyWhichSteps: "Koje radne korake preuzeti?",
+    copyAllNone: "Sve / Ništa",
+    copyNoSteps: "Nema radnih koraka.",
+    copyCancel: "Odustani",
+    copyConfirm: "Kopiraj",
+    copyRunning: "Kopiranje…",
+    copySelectDate: "Odaberite ciljni datum.",
+    copyDone: "Radna uputa je kopirana na ",
   },
   Slowenisch: {
     title: "Tedensko poročilo",
@@ -561,6 +583,17 @@ const texts = {
     roleProjectManager: "Vodja projekta",
     roleAdmin: "Administrator",
     commentLabel: "Komentar",
+    copyInstruction: "Kopiraj",
+    copyTitle: "Kopiraj delovno navodilo",
+    copyTargetDate: "Nov dan (datum)",
+    copyWhichSteps: "Katere delovne korake prevzeti?",
+    copyAllNone: "Vse / Nič",
+    copyNoSteps: "Ni delovnih korakov.",
+    copyCancel: "Prekliči",
+    copyConfirm: "Kopiraj",
+    copyRunning: "Kopiranje…",
+    copySelectDate: "Izberite ciljni datum.",
+    copyDone: "Delovno navodilo je kopirano na ",
   },
   Polnisch: {
     title: "Tygodniowy raport roboczy",
@@ -722,6 +755,17 @@ const texts = {
     roleProjectManager: "Kierownik projektu",
     roleAdmin: "Administrator",
     commentLabel: "Komentarz",
+    copyInstruction: "Kopiuj",
+    copyTitle: "Kopiuj instrukcję pracy",
+    copyTargetDate: "Nowy dzień (data)",
+    copyWhichSteps: "Które kroki przejąć?",
+    copyAllNone: "Wszystkie / Żadne",
+    copyNoSteps: "Brak kroków pracy.",
+    copyCancel: "Anuluj",
+    copyConfirm: "Kopiuj",
+    copyRunning: "Kopiowanie…",
+    copySelectDate: "Wybierz datę docelową.",
+    copyDone: "Instrukcja pracy została skopiowana na ",
   },
 };
 
@@ -830,6 +874,11 @@ export default function Home() {
   const [selectedDayDate, setSelectedDayDate] = useState(new Date().toISOString().split("T")[0]);
   const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
   const [selectedWeek, setSelectedWeek] = useState(new Date().toISOString().split("T")[0]);
+  // ── NEU: Kopier-Dialog für Arbeitsanweisungen ──
+  const [copyModalInstruction, setCopyModalInstruction] = useState<any>(null);
+  const [copyTargetDate, setCopyTargetDate] = useState("");
+  const [copySelectedTaskIds, setCopySelectedTaskIds] = useState<string[]>([]);
+  const [copying, setCopying] = useState(false);
 
   useEffect(() => {
     async function loadUser() {
@@ -1080,6 +1129,66 @@ export default function Home() {
     if (error) { setMessage("Fehler beim Löschen: " + error.message); return; }
     await loadWorkInstructions(currentCompany.company_id);
     setMessage(t.msgInstructionDeleted);
+  }
+
+  // ── NEU: Kopier-Dialog öffnen (alle Schritte vorausgewählt) ──
+  function openCopyModal(instruction: any) {
+    setCopyModalInstruction(instruction);
+    setCopyTargetDate("");
+    setCopySelectedTaskIds((instruction.work_instruction_tasks || []).map((task: any) => task.id));
+  }
+
+  // ── NEU: Arbeitsanweisung auf neuen Tag kopieren (ausgewählte Schritte, zurückgesetzt) ──
+  async function copyWorkInstruction() {
+    if (!currentCompany || !copyModalInstruction) return;
+    if (!copyTargetDate) { setMessage(t.copySelectDate); return; }
+    setCopying(true);
+    const src = copyModalInstruction;
+
+    // 1. Neue Arbeitsanweisung für den neuen Tag anlegen
+    const { data: newInstruction, error } = await supabase
+      .from("work_instructions")
+      .insert({
+        company_id: src.company_id,
+        project_id: src.project_id || null,
+        work_date: copyTargetDate,
+        created_by: user?.id,
+        assigned_user_ids: src.assigned_user_ids || [],
+        title: src.title,
+        project: src.project,
+        customer: src.customer,
+        site: src.site,
+        description: src.description,
+        problems_text: src.problems_text,
+        photos: src.photos || [], // Anweisungs-Fotos übernehmen; auf [] ändern, falls nicht gewünscht
+      })
+      .select()
+      .single();
+    if (error) { setMessage("Fehler beim Kopieren: " + error.message); setCopying(false); return; }
+
+    // 2. Nur ausgewählte Arbeitsschritte kopieren – zurückgesetzt für den neuen Tag
+    const tasksToCopy = (src.work_instruction_tasks || [])
+      .filter((task: any) => copySelectedTaskIds.includes(task.id))
+      .sort((a: any, b: any) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+
+    if (tasksToCopy.length > 0) {
+      const newTasks = tasksToCopy.map((task: any, index: number) => ({
+        work_instruction_id: newInstruction.id,
+        task_text: task.task_text,
+        sort_order: task.sort_order ?? index,
+        status: "open",         // Status zurücksetzen
+        employee_comment: null, // Kommentar gehört zum alten Tag
+        note: null,             // Rückmeldung gehört zum alten Tag
+        photos: [],             // Fotos gehören zum alten Tag
+      }));
+      const { error: taskError } = await supabase.from("work_instruction_tasks").insert(newTasks);
+      if (taskError) { setMessage("Anweisung kopiert, aber Schritte nicht: " + taskError.message); setCopying(false); return; }
+    }
+
+    await loadWorkInstructions(currentCompany.company_id);
+    setCopying(false);
+    setCopyModalInstruction(null);
+    setMessage("✅ " + t.copyDone + copyTargetDate + ".");
   }
 
   function updateFullWeekFromMonday(selectedValue: string) {
@@ -1813,7 +1922,10 @@ export default function Home() {
                         <p><strong>{t.site}:</strong> {instruction.site || "-"}</p>
                         {instruction.problems_text && <p><strong>{t.problems}:</strong> {getTranslated(instruction.id, "problems_text", instruction.problems_text)}</p>}
                         {(instruction.work_instruction_tasks || []).length > 0 && (<ul className="list-disc pl-6 space-y-1">{instruction.work_instruction_tasks.map((task: any) => (<li key={task.id}>{task.status === "completed" ? t.statusCompleted : task.status === "in_progress" ? t.statusInProgress : task.status === "stopped" ? t.statusStopped : t.statusOpen}{" "}{getTranslatedTask(instruction.id, task.id, task.task_text)}{task.note && <div className="text-sm text-gray-600 ml-2">{t.feedbackLabel}: {task.note}</div>}</li>))}</ul>)}
-                        {companyFeatures?.module_auto_reports ? (<button type="button" onClick={() => createReportFromInstruction(instruction)} className="bg-green-700 text-white px-3 py-2 rounded">{t.toReport}</button>) : (<p className="text-sm text-gray-500">{t.autoReportLocked}</p>)}
+                        <div className="flex gap-2 flex-wrap">
+                          {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => openCopyModal(instruction)} className="bg-indigo-600 text-white px-3 py-2 rounded text-sm">📋 {t.copyInstruction}</button>)}
+                          {companyFeatures?.module_auto_reports ? (<button type="button" onClick={() => createReportFromInstruction(instruction)} className="bg-green-700 text-white px-3 py-2 rounded">{t.toReport}</button>) : (<p className="text-sm text-gray-500">{t.autoReportLocked}</p>)}
+                        </div>
                       </div>
                     ))}
                     {workInstructions.filter((i) => i.project_id === project.id).length === 0 && <p className="text-gray-600">{t.noInstructions}</p>}
@@ -1955,8 +2067,9 @@ export default function Home() {
                     </li>
                   ))}
                 </ul>
-                <div className="flex gap-2 pt-2 border-t">
+                <div className="flex gap-2 pt-2 border-t flex-wrap">
                   {companyFeatures?.module_auto_reports && (<button type="button" onClick={() => createReportFromInstruction(instruction)} className="bg-green-700 text-white px-3 py-2 rounded text-sm">📋 {t.toReport}</button>)}
+                  {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => openCopyModal(instruction)} className="bg-indigo-600 text-white px-3 py-2 rounded text-sm">📋 {t.copyInstruction}</button>)}
                   {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => deleteWorkInstruction(instruction.id)} className="bg-red-600 text-white px-3 py-2 rounded text-sm">{t.deleteInstruction}</button>)}
                 </div>
               </section>
@@ -2011,7 +2124,10 @@ export default function Home() {
                           </li>
                         ))}
                       </ul>
-                      {companyFeatures?.module_auto_reports && (<button type="button" onClick={() => createReportFromInstruction(instruction)} className="bg-green-700 text-white px-3 py-1 rounded text-sm">📋 {t.toReport}</button>)}
+                      <div className="flex gap-2 flex-wrap">
+                        {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => openCopyModal(instruction)} className="bg-indigo-600 text-white px-3 py-1 rounded text-sm">📋 {t.copyInstruction}</button>)}
+                        {companyFeatures?.module_auto_reports && (<button type="button" onClick={() => createReportFromInstruction(instruction)} className="bg-green-700 text-white px-3 py-1 rounded text-sm">📋 {t.toReport}</button>)}
+                      </div>
                     </div>
                   ))}
                 </section>
@@ -2125,7 +2241,43 @@ export default function Home() {
         </section>
       )}
 
+      {/* ── NEU: Kopier-Dialog für Arbeitsanweisungen ── */}
+      {copyModalInstruction && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setCopyModalInstruction(null)}>
+          <div className="bg-white rounded-xl p-5 w-full max-w-md space-y-4 max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-xl font-bold">📋 {t.copyTitle}</h3>
+            <p className="text-sm text-gray-600">{copyModalInstruction.title}</p>
+            <div>
+              <label className="block text-sm font-medium mb-1">{t.copyTargetDate}</label>
+              <input type="date" className="border p-3 w-full rounded text-black bg-white" value={copyTargetDate} onChange={(e) => setCopyTargetDate(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium">{t.copyWhichSteps}</p>
+                <button type="button" className="text-xs text-blue-600 underline" onClick={() => {
+                  const all = (copyModalInstruction.work_instruction_tasks || []).map((task: any) => task.id);
+                  setCopySelectedTaskIds((prev) => prev.length === all.length ? [] : all);
+                }}>{t.copyAllNone}</button>
+              </div>
+              {(copyModalInstruction.work_instruction_tasks || []).sort((a: any, b: any) => (a.sort_order ?? 0) - (b.sort_order ?? 0)).map((task: any) => (
+                <label key={task.id} className="flex items-start gap-2 border rounded p-2 cursor-pointer bg-gray-50">
+                  <input type="checkbox" className="w-4 h-4 mt-1" checked={copySelectedTaskIds.includes(task.id)} onChange={(e) => {
+                    if (e.target.checked) setCopySelectedTaskIds((prev) => [...prev, task.id]);
+                    else setCopySelectedTaskIds((prev) => prev.filter((id) => id !== task.id));
+                  }} />
+                  <span className="text-sm">{task.task_text}</span>
+                </label>
+              ))}
+              {(copyModalInstruction.work_instruction_tasks || []).length === 0 && (<p className="text-sm text-gray-500">{t.copyNoSteps}</p>)}
+            </div>
+            <div className="flex gap-2 pt-2">
+              <button type="button" onClick={() => setCopyModalInstruction(null)} className="flex-1 bg-gray-200 text-gray-800 py-3 rounded font-medium">{t.copyCancel}</button>
+              <button type="button" disabled={!copyTargetDate || copying} onClick={copyWorkInstruction} className="flex-1 bg-indigo-600 text-white py-3 rounded font-bold disabled:opacity-50">{copying ? t.copyRunning : t.copyConfirm}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </main>
   );
 }
-
