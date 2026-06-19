@@ -1093,24 +1093,20 @@ export default function Home() {
     return fallback;
   }
 
-  // Erste Fremdsprache der Firma (Quelle-Schätzung, falls comment_lang fehlt)
-  function getFirstForeignLang(): string {
-    const allowed = getAllowedLanguages(companyFeatures).filter((l) => l !== "Deutsch");
-    return allowed[0] || "Kroatisch";
-  }
-
   // Kommentare in die Anzeige-Sprache übersetzen.
-  // Quelle = task.comment_lang (sonst geschätzt). Ziel = Sprache des Betrachters.
+  // Übersetzt JEDEN Kommentar in die Sprache des Betrachters – mit Auto-Spracherkennung,
+  // damit es auch funktioniert, wenn comment_lang fehlt oder falsch gespeichert wurde.
   async function refreshCommentTranslations(targetLang: string, instructions: any[]) {
     const updates: Record<string, Record<string, string>> = {};
     for (const inst of instructions) {
       for (const task of inst.work_instruction_tasks || []) {
         const c = (task.employee_comment || "").trim();
         if (!c) continue;
-        const sourceLang = task.comment_lang || getFirstForeignLang();
-        if (sourceLang === targetLang) continue; // Original bereits in Zielsprache
         const existing = instructionTranslations[inst.id];
         if (existing?.language === targetLang && existing.tasks?.[`comment_${task.id}`]) continue; // schon übersetzt
+        // Bekannte Ursprungssprache nutzen, sonst automatisch erkennen lassen
+        const declared = task.comment_lang;
+        const sourceLang = declared && declared !== targetLang ? declared : "automatisch";
         try {
           const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: c, fromLanguage: sourceLang, toLanguage: targetLang }) });
           const data = await res.json();
