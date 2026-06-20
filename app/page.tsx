@@ -80,8 +80,8 @@ type CompanyFeatures = {
 
 const texts = {
   Deutsch: {
-    title: "Wochen-Regiebericht",
-    subtitle: "Regieberichte erfassen, übersetzen, speichern und versenden.",
+    title: "Regie International",
+    subtitle: "Arbeitsanweisungen und Regieberichte erfassen, übersetzen, speichern und versenden.",
     loginTitle: "Regiebericht Login",
     email: "E-Mail",
     password: "Passwort",
@@ -251,8 +251,8 @@ const texts = {
     copyDone: "Arbeitsschritte wurden übernommen.",
   },
   Kroatisch: {
-    title: "Tjedni režijski izvještaj",
-    subtitle: "Unos, prijevod, spremanje i slanje izvještaja.",
+    title: "Regie International",
+    subtitle: "Unos, prijevod, spremanje i slanje radnih uputa i izvještaja.",
     loginTitle: "Prijava",
     email: "E-pošta",
     password: "Lozinka",
@@ -422,8 +422,8 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Slowenisch: {
-    title: "Tedensko poročilo",
-    subtitle: "Vnos, prevod, shranjevanje in pošiljanje poročil.",
+    title: "Regie International",
+    subtitle: "Vnos, prevod, shranjevanje in pošiljanje delovnih navodil in poročil.",
     loginTitle: "Prijava",
     email: "E-pošta",
     password: "Geslo",
@@ -593,8 +593,8 @@ const texts = {
     copyDone: "Delovni koraki so prevzeti.",
   },
   Polnisch: {
-    title: "Tygodniowy raport roboczy",
-    subtitle: "Wprowadzanie, tłumaczenie, zapisywanie i wysyłanie raportów.",
+    title: "Regie International",
+    subtitle: "Wprowadzanie, tłumaczenie, zapisywanie i wysyłanie instrukcji pracy i raportów.",
     loginTitle: "Logowanie",
     email: "E-mail",
     password: "Hasło",
