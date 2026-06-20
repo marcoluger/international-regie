@@ -986,11 +986,14 @@ export default function Home() {
   async function updateTaskComment(taskId: string, comment: string) {
     setCommentSaveState(prev => ({ ...prev, [taskId]: "saving" }));
     try {
-      // Speichern über Server-Route (Service-Role-Key) -> umgeht RLS, geht für jeden Benutzer.
+      // Anmelde-Token holen, damit die Server-Route den Aufrufer prüfen kann
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token || "";
+      // Speichern über Server-Route (Service-Role-Key) -> umgeht RLS, prüft aber Anmeldung + Rolle.
       const res = await withTimeout(
         fetch("/api/update-task-comment", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
           body: JSON.stringify({ taskId, comment, lang: uiLanguage }),
         }),
         15000,
