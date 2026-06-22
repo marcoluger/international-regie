@@ -19,6 +19,13 @@ const PACKAGES: Record<string, { label: string; color: string; defaults: any }> 
 
 const ALL_LANGUAGES = ["Deutsch", "Kroatisch", "Slowenisch", "Polnisch", "Englisch"];
 
+// Holt den aktuellen Anmelde-Token, damit die Server-Route den Aufrufer prüfen kann.
+async function authHeaders(): Promise<Record<string, string>> {
+  const { data } = await supabase.auth.getSession();
+  const token = data?.session?.access_token || "";
+  return { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
+}
+
 function Toggle({ label, value, onChange }: { label: string; value: boolean; onChange: (v: boolean) => void }) {
   return (
     <label className="flex items-center gap-3 cursor-pointer select-none">
@@ -74,7 +81,7 @@ export default function AdminPage() {
 
   async function loadAll() {
     setMessage("Lade Daten...");
-    const res = await fetch("/api/admin-data");
+    const res = await fetch("/api/admin-data", { headers: await authHeaders() });
     const data = await res.json();
     if (data.error) { setMessage("Fehler: " + data.error); return; }
     setCompanies(data.companies || []);
@@ -108,7 +115,7 @@ export default function AdminPage() {
     features.valid_until = features.valid_until || null; // Leerer String → null
     const res = await fetch("/api/admin-data", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: await authHeaders(),
       body: JSON.stringify({ action: "saveFeatures", companyId, features }),
     });
     const data = await res.json();
@@ -126,7 +133,7 @@ export default function AdminPage() {
     const slug = newCompanySlug.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
     const res = await fetch("/api/admin-data", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: await authHeaders(),
       body: JSON.stringify({ action: "createCompany", name: newCompanyName.trim(), slug, ownerUsername: newOwnerUsername, ownerFullName: newOwnerFullName || newOwnerUsername, ownerPassword: newOwnerPassword, packageName: newOwnerPackage }),
     });
     const data = await res.json();
@@ -142,7 +149,7 @@ export default function AdminPage() {
     if (!confirm(`Firma "${companyName}" wirklich löschen?`)) return;
     const res = await fetch("/api/admin-data", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: await authHeaders(),
       body: JSON.stringify({ action: "deleteCompany", companyId }),
     });
     const data = await res.json();
@@ -154,7 +161,7 @@ export default function AdminPage() {
   async function updateSlug(companyId: string, newSlug: string) {
     const res = await fetch("/api/admin-data", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: await authHeaders(),
       body: JSON.stringify({ action: "updateSlug", companyId, slug: newSlug }),
     });
     const data = await res.json();

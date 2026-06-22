@@ -14,7 +14,42 @@ const PACKAGES: Record<string, any> = {
   enterprise: { max_employees: 9999, module_reports: true,  module_work_orders: true,  module_auto_reports: true,  photos_enabled: true,  email_enabled: true,  signature_enabled: true,  ai_enabled: true,  allowed_languages: ["Deutsch", "Kroatisch", "Slowenisch", "Polnisch", "Englisch"] },
 };
 
-export async function GET() {
+// Liste erlaubter Super-Admin User-IDs aus der Umgebungsvariable SUPER_ADMIN_IDS
+// (kommagetrennt in Vercel hinterlegen).
+function getSuperAdminIds(): string[] {
+  return (process.env.SUPER_ADMIN_IDS || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+// Prüft Anmeldung + Super-Admin-Berechtigung. Gibt bei Erfolg null zurück,
+// sonst eine fertige Fehler-Response.
+async function requireSuperAdmin(request: Request): Promise<Response | null> {
+  const allowed = getSuperAdminIds();
+  if (allowed.length === 0) {
+    return Response.json({ error: "Super-Admin ist nicht konfiguriert (SUPER_ADMIN_IDS fehlt)." }, { status: 500 });
+  }
+  const authHeader = request.headers.get("authorization") || "";
+  const token = authHeader.replace(/^Bearer\s+/i, "").trim();
+  if (!token) {
+    return Response.json({ error: "Nicht angemeldet." }, { status: 401 });
+  }
+  const { data: userData, error: userErr } = await supabaseAdmin.auth.getUser(token);
+  const caller = userData?.user;
+  if (userErr || !caller) {
+    return Response.json({ error: "Ungültige oder abgelaufene Sitzung." }, { status: 401 });
+  }
+  if (!allowed.includes(caller.id)) {
+    return Response.json({ error: "Kein Zugriff (nur Plattform-Administrator)." }, { status: 403 });
+  }
+  return null; // berechtigt
+}
+
+export async function GET(request: Request) {
+  const denied = await requireSuperAdmin(request);
+  if (denied) return denied;
+
   const { data: companies, error } = await supabaseAdmin.from("companies").select("*").order("created_at", { ascending: false });
   if (error) return Response.json({ error: error.message }, { status: 500 });
 
@@ -28,6 +63,9 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const denied = await requireSuperAdmin(request);
+  if (denied) return denied;
+
   const body = await request.json();
   const { action } = body;
 
