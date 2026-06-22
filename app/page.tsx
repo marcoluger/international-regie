@@ -2118,11 +2118,15 @@ export default function Home() {
             if (dayInstructions.length === 0) return (<section className="border rounded p-4 bg-white text-black"><p className="text-gray-500">{t.noInstructionsDay}</p></section>);
             return dayInstructions.map((instruction) => (
               <section key={instruction.id} className="border rounded p-4 bg-white text-black space-y-2">
-                <div className="flex justify-between items-start cursor-pointer select-none" onClick={() => setOpenDayCards(prev => ({ ...prev, [instruction.id]: !prev[instruction.id] }))}><h3 className="font-bold text-lg">{openDayCards[instruction.id] ? "▾" : "▸"} {getTranslated(instruction.id, "title", instruction.title)}</h3><span className="text-sm text-gray-500">{instruction.work_date}</span></div>
+                <div className="flex justify-between items-start cursor-pointer select-none" onClick={() => setOpenDayCards(prev => ({ ...prev, [instruction.id]: !prev[instruction.id] }))}>
+                  <div>
+                    <h3 className="font-bold text-lg">{openDayCards[instruction.id] ? "▾" : "▸"} {getTranslated(instruction.id, "title", instruction.title)}</h3>
+                    <p className="text-sm text-gray-600 ml-5"><strong>{t.project}:</strong> {instruction.project || "-"} &nbsp;·&nbsp; <strong>{t.site}:</strong> {instruction.site || "-"}</p>
+                  </div>
+                  <span className="text-sm text-gray-500">{instruction.work_date}</span>
+                </div>
                 {openDayCards[instruction.id] && (<>
-                <p><strong>{t.project}:</strong> {instruction.project || "-"}</p>
                 <p><strong>{t.customer}:</strong> {instruction.customer || "-"}</p>
-                <p><strong>{t.site}:</strong> {instruction.site || "-"}</p>
                 {instruction.problems_text && (<div className="bg-yellow-50 border rounded p-2"><strong>{t.problemsHints}:</strong> {getTranslated(instruction.id, "problems_text", instruction.problems_text)}</div>)}
                 {(instruction.photos || []).length > 0 && companyFeatures?.photos_enabled && (<div className="grid grid-cols-3 gap-2">{(instruction.photos || []).map((photo: string, i: number) => (<img key={i} src={photo} alt="Foto" className="w-full h-24 object-cover rounded border" />))}</div>)}
                 <ul className="space-y-4 mt-2">
