@@ -2104,6 +2104,29 @@ export default function Home() {
                 ))}
               </div>
             )}
+            {/* Projektleiter zuweisen – Mehrfachauswahl */}
+            {companyUsers.filter(m => m.role === "project_manager").length > 0 && (
+              <div className="border rounded p-3 bg-gray-50 space-y-2">
+                <h3 className="font-bold text-sm">👷 Projektleiter zuweisen</h3>
+                {companyUsers.filter(m => m.role === "project_manager").map((m) => (
+                  <label key={m.user_id} className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={assignedUserIds.includes(m.user_id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setAssignedUserIds(prev => [...prev, m.user_id]);
+                        } else {
+                          setAssignedUserIds(prev => prev.filter(id => id !== m.user_id));
+                        }
+                      }}
+                      className="w-4 h-4"
+                    />
+                    <span>{m.full_name || m.email}</span>
+                  </label>
+                ))}
+              </div>
+            )}
             <input className="border p-3 w-full text-black bg-white" placeholder={t.problems} value={instructionProblems} onChange={(e) => setInstructionProblems(e.target.value)} />
             {companyFeatures?.photos_enabled && (
               <div>
