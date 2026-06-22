@@ -5,52 +5,87 @@ export const runtime = "nodejs";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { username, password, fullName, role, companyId } = body;
 
-    if (!username || !password || !companyId) {
-      return Response.json({ error: "Benutzername, Passwort und Firma fehlen." }, { status: 400 });
+    const to = body.to;
+    const subject = body.subject || "Regiebericht";
+    const pdfBase64 = body.pdfBase64;
+    const filename = body.filename || "regiebericht.pdf";
+
+    if (!to || !pdfBase64) {
+      return Response.json({ error: "Empfänger oder PDF fehlt." }, { status: 400 });
     }
 
-    // Fake-E-Mail aus Benutzername generieren
-    const email = `${username.toLowerCase().replace(/\s+/g, ".")}@regie-internal.app`;
+    // Einfache Empfänger-Prüfung (eine oder mehrere E-Mail-Adressen)
+    const recipients: string[] = Array.isArray(to) ? to : [to];
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    for (const r of recipients) {
+      if (typeof r !== "string" || !emailRegex.test(r.trim())) {
+        return Response.json({ error: "Ungültige E-Mail-Adresse." }, { status: 400 });
+      }
+    }
 
-    // Supabase Admin Client mit Service Role
-    const supabaseAdmin = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-      process.env.SUPABASE_SERVICE_ROLE_KEY || ""
-    );
-
-    // User in auth.users anlegen
-    const { data: newUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true, // Keine E-Mail-Bestätigung nötig
-      user_metadata: {
-        full_name: fullName,
-        username,
-      },
+    // ── AUTHENTIFIZIERUNG: nur angemeldete Benutzer dürfen senden ──
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+    if (!url || !serviceKey) {
+      return Response.json({ error: "Server-Konfiguration fehlt." }, { status: 500 });
+    }
+    const supabaseAdmin = createClient(url, serviceKey, {
+      auth: { autoRefreshToken: false, persistSession: false },
     });
 
-    if (authError) {
-      return Response.json({ error: authError.message }, { status: 500 });
+    const authHeader = request.headers.get("authorization") || "";
+    const token = authHeader.replace(/^Bearer\s+/i, "").trim();
+    if (!token) {
+      return Response.json({ error: "Nicht angemeldet." }, { status: 401 });
     }
-
-    // User in company_users eintragen
-    const { error: companyUserError } = await supabaseAdmin
+    const { data: userData, error: userErr } = await supabaseAdmin.auth.getUser(token);
+    const caller = userData?.user;
+    if (userErr || !caller) {
+      return Response.json({ error: "Ungültige oder abgelaufene Sitzung." }, { status: 401 });
+    }
+    // Muss zu einer Firma gehören (kein anonymer Versand)
+    const { data: member } = await supabaseAdmin
       .from("company_users")
-      .insert({
-        company_id: companyId,
-        user_id: newUser.user.id,
-        email,
-        full_name: fullName,
-        role: role || "employee",
-      });
-
-    if (companyUserError) {
-      return Response.json({ error: companyUserError.message }, { status: 500 });
+      .select("company_id")
+      .eq("user_id", caller.id)
+      .maybeSingle();
+    if (!member) {
+      return Response.json({ error: "Keine Berechtigung." }, { status: 403 });
     }
 
-    return Response.json({ success: true, email });
+    // ── VERSAND über Resend ──
+    const resendKey = process.env.RESEND_API_KEY;
+    if (!resendKey) {
+      return Response.json({ error: "E-Mail-Konfiguration fehlt (RESEND_API_KEY)." }, { status: 500 });
+    }
+
+    const resendResponse = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${resendKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: process.env.EMAIL_FROM || "Regiebericht <onboarding@resend.dev>",
+        to: recipients,
+        subject,
+        html: "<p>Anbei der Regiebericht als PDF.</p>",
+        attachments: [
+          {
+            filename,
+            content: pdfBase64,
+          },
+        ],
+      }),
+    });
+
+    const data = await resendResponse.json();
+    if (!resendResponse.ok) {
+      return Response.json({ error: data?.message || "E-Mail-Versand fehlgeschlagen." }, { status: 500 });
+    }
+
+    return Response.json({ success: true, id: data?.id ?? null });
   } catch (error) {
     return Response.json({ error: String(error) }, { status: 500 });
   }

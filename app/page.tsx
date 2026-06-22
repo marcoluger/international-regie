@@ -1613,7 +1613,9 @@ export default function Home() {
     if (newPassword !== newPasswordConfirm) { setMessage("Passwörter stimmen nicht überein."); return; }
     setChangingPassword(true); setMessage("Speichere...");
     try {
-      const res = await fetch("/api/change-password", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId: user?.id, newPassword }) });
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token || "";
+      const res = await fetch("/api/change-password", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ userId: user?.id, newPassword }) });
       const data = await res.json();
       if (data.error) { setMessage("Fehler: " + data.error); setChangingPassword(false); return; }
       const { error: dbError } = await supabase.from("company_users").update({ must_change_password: false }).eq("user_id", user?.id);
@@ -1725,7 +1727,9 @@ export default function Home() {
       if (!emailTo.trim()) { setMessage(t.msgEmailRequired); return; }
       setMessage(t.msgEmailSending);
       const pdfBase64 = doc.output("datauristring").split(",")[1];
-      const res = await fetch("/api/send-report", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ to: emailTo, subject: `${p.title} ${calendarWeek || ""}`, pdfBase64, filename }) });
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token || "";
+      const res = await fetch("/api/send-report", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ to: emailTo, subject: `${p.title} ${calendarWeek || ""}`, pdfBase64, filename }) });
       const data = await res.json();
       if (data.error) { setMessage("Fehler beim E-Mail-Versand: " + data.error); return; }
       setMessage(t.msgEmailSent); return;
