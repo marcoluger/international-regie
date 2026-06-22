@@ -887,6 +887,7 @@ export default function Home() {
   // ── Aufklappbare Karten (Tagesansicht) und Tage (Regiebericht) ──
   const [openDayCards, setOpenDayCards] = useState<Record<string, boolean>>({});
   const [openReportDays, setOpenReportDays] = useState<Record<string, boolean>>({});
+  const [openWeekDays, setOpenWeekDays] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     async function loadUser() {
@@ -2215,9 +2216,10 @@ export default function Home() {
               return (
                 <section key={dateStr} className="border rounded p-4 bg-white text-black space-y-3">
                   <div className="flex justify-between items-center bg-gray-100 rounded p-2">
-                    <h3 className="font-bold">{t.weekdays[di]} — {dateStr}</h3>
+                    <h3 className="font-bold cursor-pointer select-none" onClick={() => setOpenWeekDays(prev => ({ ...prev, [dateStr]: !prev[dateStr] }))}>{openWeekDays[dateStr] ? "▾" : "▸"} {t.weekdays[di]} — {dateStr}</h3>
                     <button type="button" onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }} className="text-blue-600 text-sm hover:underline">→ {t.dayView}</button>
                   </div>
+                  {openWeekDays[dateStr] && (<>
                   {dayInstructions.map((instruction) => (
                     <div key={instruction.id} className="border rounded p-3 space-y-2">
                       <div className="flex justify-between"><strong>{getTranslated(instruction.id, "title", instruction.title)}</strong><span className="text-sm text-gray-500">{instruction.project || "-"}</span></div>
@@ -2236,6 +2238,7 @@ export default function Home() {
                       {companyFeatures?.module_auto_reports && (<button type="button" onClick={() => createReportFromInstruction(instruction)} className="bg-green-700 text-white px-3 py-1 rounded text-sm">📋 {t.toReport}</button>)}
                     </div>
                   ))}
+                  </>)}
                 </section>
               );
             });
