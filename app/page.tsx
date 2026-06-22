@@ -1052,7 +1052,9 @@ export default function Home() {
     if (!currentCompany) return;
     if (!newUserName.trim() || !newUserUsername.trim() || !newUserPassword.trim()) { setMessage("Bitte alle Pflichtfelder ausfüllen."); return; }
     setCreatingEmployee(true);
-    const res = await fetch("/api/create-employee", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: newUserUsername, password: newUserPassword, fullName: newUserName, role: newUserRole, companyId: currentCompany.company_id, companySlug: currentCompany.companies.slug }) });
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData?.session?.access_token || "";
+    const res = await fetch("/api/create-employee", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ username: newUserUsername, password: newUserPassword, fullName: newUserName, role: newUserRole, companyId: currentCompany.company_id, companySlug: currentCompany.companies.slug }) });
     const data = await res.json();
     setCreatingEmployee(false);
     if (data.error) { setMessage("Fehler: " + data.error); return; }
