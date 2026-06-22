@@ -884,6 +884,9 @@ export default function Home() {
   const [copyModalOpen, setCopyModalOpen] = useState(false);
   const [copyModalInstruction, setCopyModalInstruction] = useState<any>(null);
   const [copySelectedTaskIds, setCopySelectedTaskIds] = useState<string[]>([]);
+  // ── Aufklappbare Karten (Tagesansicht) und Tage (Regiebericht) ──
+  const [openDayCards, setOpenDayCards] = useState<Record<string, boolean>>({});
+  const [openReportDays, setOpenReportDays] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     async function loadUser() {
@@ -1934,7 +1937,8 @@ export default function Home() {
           </section>
           {days.map((day, index) => (
             <section key={day.weekday} className="border rounded p-4 space-y-3 bg-white text-black">
-              <h2 className="text-xl font-bold">{t.weekdays[index] || day.weekday}</h2>
+              <h2 className="text-xl font-bold cursor-pointer select-none" onClick={() => setOpenReportDays(prev => ({ ...prev, [day.weekday]: !prev[day.weekday] }))}>{openReportDays[day.weekday] ? "▾" : "▸"} {t.weekdays[index] || day.weekday}</h2>
+              {openReportDays[day.weekday] && (<>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <input type="date" className="border p-3 text-black bg-white" value={day.date} onChange={(e) => { if (index === 0) updateFullWeekFromMonday(e.target.value); else updateDay(index, "date", e.target.value); }} />
                 <input className="border p-3 text-black bg-white" placeholder={t.customer} value={day.customer} onChange={(e) => updateDay(index, "customer", e.target.value)} />
@@ -1946,6 +1950,7 @@ export default function Home() {
               {companyFeatures?.photos_enabled ? <input type="file" accept="image/*" multiple className="border p-3 w-full text-black bg-white" onChange={(e) => handlePhotos(index, e.target.files)} /> : <div className="border rounded p-3 bg-gray-50 text-sm text-gray-400">🔒 Foto-Upload ist in deinem Paket nicht aktiviert.</div>}
               {day.photos.length > 0 && (<div className="grid grid-cols-2 gap-3">{day.photos.map((photo, photoIndex) => (<div key={photoIndex} className="border rounded p-2"><img src={photo} alt="Foto" className="w-full h-32 object-cover" /><button type="button" onClick={() => deletePhoto(index, photoIndex)} className="mt-2 bg-red-600 text-white px-2 py-2 rounded w-full">{t.deletePhoto}</button></div>))}</div>)}
               {day.translation && (<div className="border p-3 rounded bg-gray-100 text-black"><strong>{t.translation}:</strong><p>{day.translation}</p></div>)}
+              </>)}
             </section>
           ))}
           <section className="border rounded p-4 space-y-2 bg-white text-black">
@@ -2113,7 +2118,8 @@ export default function Home() {
             if (dayInstructions.length === 0) return (<section className="border rounded p-4 bg-white text-black"><p className="text-gray-500">{t.noInstructionsDay}</p></section>);
             return dayInstructions.map((instruction) => (
               <section key={instruction.id} className="border rounded p-4 bg-white text-black space-y-2">
-                <div className="flex justify-between items-start"><h3 className="font-bold text-lg">{getTranslated(instruction.id, "title", instruction.title)}</h3><span className="text-sm text-gray-500">{instruction.work_date}</span></div>
+                <div className="flex justify-between items-start cursor-pointer select-none" onClick={() => setOpenDayCards(prev => ({ ...prev, [instruction.id]: !prev[instruction.id] }))}><h3 className="font-bold text-lg">{openDayCards[instruction.id] ? "▾" : "▸"} {getTranslated(instruction.id, "title", instruction.title)}</h3><span className="text-sm text-gray-500">{instruction.work_date}</span></div>
+                {openDayCards[instruction.id] && (<>
                 <p><strong>{t.project}:</strong> {instruction.project || "-"}</p>
                 <p><strong>{t.customer}:</strong> {instruction.customer || "-"}</p>
                 <p><strong>{t.site}:</strong> {instruction.site || "-"}</p>
@@ -2170,6 +2176,7 @@ export default function Home() {
                   {companyFeatures?.module_auto_reports && (<button type="button" onClick={() => createReportFromInstruction(instruction)} className="bg-green-700 text-white px-3 py-2 rounded text-sm">📋 {t.toReport}</button>)}
                   {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => deleteWorkInstruction(instruction.id)} className="bg-red-600 text-white px-3 py-2 rounded text-sm">{t.deleteInstruction}</button>)}
                 </div>
+                </>)}
               </section>
             ));
           })()}
