@@ -827,34 +827,6 @@ function sanitizePdfText(s: string): string {
     .replace(/─/g, "-");
 }
 
-// Laedt eine Unicode-Schrift (Noto Sans) fuer korrekte poln./kroat./slowen. Zeichen.
-// Faellt still auf die Standardschrift zurueck, wenn die Dateien fehlen -> nichts geht kaputt.
-async function loadPdfFont(doc: any): Promise<boolean> {
-  try {
-    const [reg, bold] = await Promise.all([
-      fetch("/fonts/NotoSans-Regular.ttf"),
-      fetch("/fonts/NotoSans-Bold.ttf"),
-    ]);
-    if (!reg.ok || !bold.ok) return false;
-    const toBase64 = async (resp: Response): Promise<string> => {
-      const bytes = new Uint8Array(await resp.arrayBuffer());
-      let binary = "";
-      const chunk = 0x8000;
-      for (let i = 0; i < bytes.length; i += chunk) {
-        binary += String.fromCharCode(...Array.from(bytes.subarray(i, i + chunk)));
-      }
-      return btoa(binary);
-    };
-    doc.addFileToVFS("NotoSans-Regular.ttf", await toBase64(reg));
-    doc.addFont("NotoSans-Regular.ttf", "NotoSans", "normal");
-    doc.addFileToVFS("NotoSans-Bold.ttf", await toBase64(bold));
-    doc.addFont("NotoSans-Bold.ttf", "NotoSans", "bold");
-    return true;
-  } catch {
-    return false;
-  }
-}
-
 function getCalendarWeek(dateString: string) {
   if (!dateString) return "";
   const [yearText, monthText, dayText] = dateString.split("-");
@@ -1732,8 +1704,7 @@ export default function Home() {
   async function createPDF(sendByEmail = false) {
     const p = pdfTexts[pdfLanguage as keyof typeof pdfTexts];
     const doc = new jsPDF("p", "mm", "a4");
-    const useUnicodeFont = await loadPdfFont(doc);
-    const FONT = useUnicodeFont ? "NotoSans" : "helvetica";
+    const FONT = "helvetica";
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
     const marginLeft = 15; const marginRight = 15;
