@@ -809,6 +809,52 @@ function withTimeout<T>(promise: Promise<T> | PromiseLike<T>, ms: number, label:
   ]);
 }
 
+// Ersetzt Emojis und Sonderlinien fuer das PDF durch klare Zeichen,
+// weil die PDF-Standardschrift keine Emojis darstellen kann.
+function sanitizePdfText(s: string): string {
+  if (!s) return s;
+  return s
+    .replace(/⬜/g, "[ ]")
+    .replace(/🟡/g, "[~]")
+    .replace(/⛔/g, "[X]")
+    .replace(/✅/g, "[v]")
+    .replace(/📋/g, "")
+    .replace(/📝/g, "")
+    .replace(/💬/g, "")
+    .replace(/⚠️/g, "")
+    .replace(/⚠/g, "")
+    .replace(/️/g, "")
+    .replace(/─/g, "-");
+}
+
+// Laedt eine Unicode-Schrift (Noto Sans) fuer korrekte poln./kroat./slowen. Zeichen.
+// Faellt still auf die Standardschrift zurueck, wenn die Dateien fehlen -> nichts geht kaputt.
+async function loadPdfFont(doc: any): Promise<boolean> {
+  try {
+    const [reg, bold] = await Promise.all([
+      fetch("/fonts/NotoSans-Regular.ttf"),
+      fetch("/fonts/NotoSans-Bold.ttf"),
+    ]);
+    if (!reg.ok || !bold.ok) return false;
+    const toBase64 = async (resp: Response): Promise<string> => {
+      const bytes = new Uint8Array(await resp.arrayBuffer());
+      let binary = "";
+      const chunk = 0x8000;
+      for (let i = 0; i < bytes.length; i += chunk) {
+        binary += String.fromCharCode(...Array.from(bytes.subarray(i, i + chunk)));
+      }
+      return btoa(binary);
+    };
+    doc.addFileToVFS("NotoSans-Regular.ttf", await toBase64(reg));
+    doc.addFont("NotoSans-Regular.ttf", "NotoSans", "normal");
+    doc.addFileToVFS("NotoSans-Bold.ttf", await toBase64(bold));
+    doc.addFont("NotoSans-Bold.ttf", "NotoSans", "bold");
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function getCalendarWeek(dateString: string) {
   if (!dateString) return "";
   const [yearText, monthText, dayText] = dateString.split("-");
@@ -1686,6 +1732,8 @@ export default function Home() {
   async function createPDF(sendByEmail = false) {
     const p = pdfTexts[pdfLanguage as keyof typeof pdfTexts];
     const doc = new jsPDF("p", "mm", "a4");
+    const useUnicodeFont = await loadPdfFont(doc);
+    const FONT = useUnicodeFont ? "NotoSans" : "helvetica";
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
     const marginLeft = 15; const marginRight = 15;
@@ -1704,8 +1752,8 @@ export default function Home() {
       } catch (error) { console.error("Logo konnte nicht geladen werden:", error); }
     }
     doc.setFillColor(240, 240, 240); doc.rect(0, 0, pageWidth, 70, "F");
-    doc.setFontSize(20); doc.setFont("helvetica", "bold"); doc.text(p.title, marginLeft, y);
-    doc.setFontSize(11); doc.setFont("helvetica", "normal"); y += 8;
+    doc.setFontSize(20); doc.setFont(FONT, "bold"); doc.text(p.title, marginLeft, y);
+    doc.setFontSize(11); doc.setFont(FONT, "normal"); y += 8;
     doc.text(companySettings?.company_name || currentCompany?.companies?.name || "Regie International", marginLeft, y); y += 6;
     if (companySettings?.street) { doc.text(companySettings.street, marginLeft, y); y += 5; }
     if (companySettings?.zip_code || companySettings?.city) { doc.text(`${companySettings?.zip_code || ""} ${companySettings?.city || ""}`, marginLeft, y); y += 5; }
@@ -1719,24 +1767,24 @@ export default function Home() {
     doc.text(`${p.employee}: ${employee || "-"}`, marginLeft, y);
     if (logoBase64) { doc.addImage(logoBase64, "PNG", pageWidth - 45, 8, 30, 30); } else { doc.addImage(qrImage, "PNG", pageWidth - 42, 8, 28, 28); }
     y += 10; if (y < 75) y = 75;
-    doc.setFontSize(12); doc.setFont("helvetica", "bold"); doc.text(p.dailyReports, marginLeft, y); y += 8;
+    doc.setFontSize(12); doc.setFont(FONT, "bold"); doc.text(p.dailyReports, marginLeft, y); y += 8;
     for (const day of days) {
       const hasContent = day.description || day.hours || day.customer || day.projectNumber || day.site || day.photos.length > 0;
       if (!hasContent) continue;
-      const descriptionText = day.translation || day.description || "-";
+      const descriptionText = sanitizePdfText(day.translation || day.description || "-");
       const splitDescription = doc.splitTextToSize(descriptionText, contentWidth - 8);
       const estimatedHeight = 45 + splitDescription.length * 5 + day.photos.length * 10;
       addNewPageIfNeeded(estimatedHeight);
       doc.setFillColor(230, 230, 230); doc.rect(marginLeft, y, contentWidth, 9, "F");
-      doc.setFontSize(11); doc.setFont("helvetica", "bold"); doc.text(`${day.weekday} - ${day.date || "-"}`, marginLeft + 3, y + 6); y += 13;
-      doc.setFont("helvetica", "normal"); doc.setFontSize(9);
+      doc.setFontSize(11); doc.setFont(FONT, "bold"); doc.text(`${day.weekday} - ${day.date || "-"}`, marginLeft + 3, y + 6); y += 13;
+      doc.setFont(FONT, "normal"); doc.setFontSize(9);
       doc.text(`${p.customer}: ${day.customer || "-"}`, marginLeft + 3, y); doc.text(`${p.project}: ${day.projectNumber || "-"}`, marginLeft + 80, y); y += 6;
       doc.text(`${p.site}: ${day.site || "-"}`, marginLeft + 3, y); doc.text(`${p.hours}: ${day.hours || "-"}`, marginLeft + 80, y); y += 8;
-      doc.setFont("helvetica", "bold"); doc.text(`${p.description}:`, marginLeft + 3, y); y += 6;
-      doc.setFont("helvetica", "normal"); doc.text(splitDescription, marginLeft + 3, y); y += splitDescription.length * 5 + 5;
+      doc.setFont(FONT, "bold"); doc.text(`${p.description}:`, marginLeft + 3, y); y += 6;
+      doc.setFont(FONT, "normal"); doc.text(splitDescription, marginLeft + 3, y); y += splitDescription.length * 5 + 5;
       if (day.photos.length > 0) {
-        doc.setFont("helvetica", "bold"); doc.text(`${p.photos}:`, marginLeft + 3, y); y += 6;
-        doc.setFont("helvetica", "normal"); doc.setFontSize(8);
+        doc.setFont(FONT, "bold"); doc.text(`${p.photos}:`, marginLeft + 3, y); y += 6;
+        doc.setFont(FONT, "normal"); doc.setFontSize(8);
         for (let photoIndex = 0; photoIndex < day.photos.length; photoIndex++) {
           try {
             const response = await fetch(day.photos[photoIndex]);
@@ -1752,8 +1800,8 @@ export default function Home() {
       doc.setDrawColor(200); doc.line(marginLeft, y, pageWidth - marginRight, y); y += 10; doc.setDrawColor(0);
     }
     addNewPageIfNeeded(65);
-    doc.setFontSize(12); doc.setFont("helvetica", "bold"); doc.text(p.summary, marginLeft, y); y += 8;
-    doc.setFontSize(10); doc.setFont("helvetica", "normal");
+    doc.setFontSize(12); doc.setFont(FONT, "bold"); doc.text(p.summary, marginLeft, y); y += 8;
+    doc.setFontSize(10); doc.setFont(FONT, "normal");
     doc.text(`${p.totalHours}: ${totalHours.toString().replace(".", ",")} ${p.hours}`, marginLeft, y); y += 8;
     Object.entries(projectTotals).forEach(([project, total]) => { doc.text(`${p.project} ${project}: ${total.toString().replace(".", ",")} ${p.hours}`, marginLeft, y); y += 6; });
     y += 18;
