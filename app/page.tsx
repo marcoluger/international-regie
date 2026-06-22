@@ -1361,6 +1361,15 @@ export default function Home() {
     setMessage("Notiz wurde gespeichert.");
   }
 
+  // Sichtbarkeit einer Arbeitsanweisung je nach Rolle:
+  // owner/admin sehen alles; employee nur zugewiesene; project_manager zugewiesene ODER selbst erstellte.
+  function canSeeInstruction(i: any): boolean {
+    const role = currentCompany?.role;
+    if (role === "owner" || role === "admin") return true;
+    if (role === "employee") return (i.assigned_user_ids || []).includes(user?.id);
+    if (role === "project_manager") return (i.assigned_user_ids || []).includes(user?.id) || i.created_by === user?.id;
+    return true;
+  }
   function parseHours(value: string) { return Number(value.replace(",", ".")) || 0; }
   const totalHours = days.reduce((sum, day) => sum + parseHours(day.hours), 0);
   const projectTotals = days.reduce<Record<string, number>>((acc, day) => {
@@ -1917,7 +1926,10 @@ export default function Home() {
         <section className="border rounded p-4 space-y-4 bg-white text-black">
           <h2 className="text-xl font-bold">{t.dashboard}</h2>
           {(() => {
-            const allTasks = workInstructions.flatMap((i) => i.work_instruction_tasks || []);
+            const visibleInstructions = workInstructions.filter(canSeeInstruction);
+            const visibleProjectIds = new Set(visibleInstructions.map((i: any) => i.project_id).filter(Boolean));
+            const visibleProjectsCount = (currentCompany?.role === "owner" || currentCompany?.role === "admin") ? projects.length : visibleProjectIds.size;
+            const allTasks = visibleInstructions.flatMap((i) => i.work_instruction_tasks || []);
             const openCount = allTasks.filter((t: any) => (t.status || "open") === "open").length;
             const progressCount = allTasks.filter((t: any) => t.status === "in_progress").length;
             const stoppedCount = allTasks.filter((t: any) => t.status === "stopped").length;
@@ -1925,11 +1937,11 @@ export default function Home() {
             const totalTasks = allTasks.length;
             const progressPercent = totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0;
             const today = new Date().toISOString().split("T")[0];
-            const todayInstructions = workInstructions.filter((i: any) => i.work_date === today);
+            const todayInstructions = visibleInstructions.filter((i: any) => i.work_date === today);
             return (
               <div className="space-y-3">
-                <p>{t.projects}: <strong>{projects.length}</strong></p>
-                <p>{t.workInstructions}: <strong>{workInstructions.length}</strong></p>
+                <p>{t.projects}: <strong>{visibleProjectsCount}</strong></p>
+                <p>{t.workInstructions}: <strong>{visibleInstructions.length}</strong></p>
                 <p>{t.dueToday}: <strong>{todayInstructions.length}</strong></p>
                 <div className="border rounded p-3 bg-gray-100">
                   <p>{t.statusOpen}: {openCount}</p><p>{t.statusInProgress}: {progressCount}</p>
@@ -1937,8 +1949,8 @@ export default function Home() {
                   <p className="font-bold mt-3">{t.totalProgress}: {progressPercent}%</p>
                   <div className="w-full bg-gray-300 rounded h-4 mt-1"><div className="bg-green-600 h-4 rounded" style={{ width: `${progressPercent}%` }} /></div>
                 </div>
-                {stoppedCount > 0 && (<div className="border rounded p-3 bg-red-50"><h3 className="font-bold mb-2">{t.stoppedSteps}</h3>{allTasks.filter((t: any) => t.status === "stopped").map((task: any) => (<p key={task.id}><strong>{workInstructions.find((i) => (i.work_instruction_tasks || []).some((t: any) => t.id === task.id))?.project || t.noProject}</strong>{" — "}⛔ {task.task_text}{task.note ? ` — ${task.note}` : ""}</p>))}</div>)}
-                {progressCount > 0 && (<div className="border rounded p-3 bg-yellow-50"><h3 className="font-bold mb-2">{t.stepsInProgress}</h3>{allTasks.filter((t: any) => t.status === "in_progress").map((task: any) => (<p key={task.id}><strong>{workInstructions.find((i) => (i.work_instruction_tasks || []).some((t: any) => t.id === task.id))?.project || t.noProject}</strong>{" — "}🟡 {task.task_text}{task.note ? ` — ${task.note}` : ""}</p>))}</div>)}
+                {stoppedCount > 0 && (<div className="border rounded p-3 bg-red-50"><h3 className="font-bold mb-2">{t.stoppedSteps}</h3>{allTasks.filter((t: any) => t.status === "stopped").map((task: any) => (<p key={task.id}><strong>{visibleInstructions.find((i) => (i.work_instruction_tasks || []).some((t: any) => t.id === task.id))?.project || t.noProject}</strong>{" — "}⛔ {task.task_text}{task.note ? ` — ${task.note}` : ""}</p>))}</div>)}
+                {progressCount > 0 && (<div className="border rounded p-3 bg-yellow-50"><h3 className="font-bold mb-2">{t.stepsInProgress}</h3>{allTasks.filter((t: any) => t.status === "in_progress").map((task: any) => (<p key={task.id}><strong>{visibleInstructions.find((i) => (i.work_instruction_tasks || []).some((t: any) => t.id === task.id))?.project || t.noProject}</strong>{" — "}🟡 {task.task_text}{task.note ? ` — ${task.note}` : ""}</p>))}</div>)}
               </div>
             );
           })()}
@@ -2166,10 +2178,7 @@ export default function Home() {
           {(() => {
             const dayInstructions = workInstructions.filter((i) => {
               if (i.work_date !== selectedDayDate) return false;
-              if (currentCompany?.role === "employee") {
-                return (i.assigned_user_ids || []).includes(user?.id);
-              }
-              return true;
+              return canSeeInstruction(i);
             });
             if (dayInstructions.length === 0) return (<section className="border rounded p-4 bg-white text-black"><p className="text-gray-500">{t.noInstructionsDay}</p></section>);
             return dayInstructions.map((instruction) => (
@@ -2259,10 +2268,7 @@ export default function Home() {
             const weekDates = Array.from({ length: 7 }, (_, i) => { const nd = new Date(monday); nd.setUTCDate(monday.getUTCDate() + i); return nd.toISOString().split("T")[0]; });
             const weekInstructions = workInstructions.filter((i) => {
               if (!weekDates.includes(i.work_date)) return false;
-              if (currentCompany?.role === "employee") {
-                return (i.assigned_user_ids || []).includes(user?.id);
-              }
-              return true;
+              return canSeeInstruction(i);
             });
             if (weekInstructions.length === 0) return (<section className="border rounded p-4 bg-white text-black"><p className="text-gray-500">{t.noInstructionsWeek}</p></section>);
             return weekDates.map((dateStr, di) => {
@@ -2310,10 +2316,7 @@ export default function Home() {
           {(() => {
             const monthInstructions = workInstructions.filter((i) => {
               if (!i.work_date?.startsWith(selectedMonth)) return false;
-              if (currentCompany?.role === "employee") {
-                return (i.assigned_user_ids || []).includes(user?.id);
-              }
-              return true;
+              return canSeeInstruction(i);
             });
             const [year, month] = selectedMonth.split("-").map(Number);
             const daysInMonth = new Date(year, month, 0).getDate();
