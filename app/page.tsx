@@ -1066,13 +1066,19 @@ export default function Home() {
   async function deleteCompanyUser(memberId: string, memberUserId: string) {
     if (!currentCompany) return;
     if (!window.confirm("Mitarbeiter wirklich löschen?")) return;
-    const { error } = await supabase.from("company_users").delete().eq("id", memberId);
-    if (error) { setMessage("Fehler beim Löschen: " + error.message); return; }
-    await fetch("/api/delete-employee", {
+    // Löschen läuft komplett über die abgesicherte Route (prüft Anmeldung, Firma, Rolle)
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData?.session?.access_token || "";
+    const res = await fetch("/api/delete-employee", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({ userId: memberUserId }),
     });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || data?.error) {
+      setMessage("Fehler beim Löschen: " + (data?.error || `HTTP ${res.status}`));
+      return;
+    }
     // Direkt aus State entfernen
     setCompanyUsers(prev => prev.filter(u => u.id !== memberId));
     setMessage("Mitarbeiter wurde gelöscht.");
