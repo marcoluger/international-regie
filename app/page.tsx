@@ -888,6 +888,7 @@ export default function Home() {
   const [openDayCards, setOpenDayCards] = useState<Record<string, boolean>>({});
   const [openReportDays, setOpenReportDays] = useState<Record<string, boolean>>({});
   const [openWeekDays, setOpenWeekDays] = useState<Record<string, boolean>>({});
+  const [reportExpanded, setReportExpanded] = useState(false);
 
   useEffect(() => {
     async function loadUser() {
@@ -1936,6 +1937,12 @@ export default function Home() {
               <input className="border p-3 text-black bg-white md:col-span-2" placeholder={t.recipientEmail} value={emailTo} onChange={(e) => setEmailTo(e.target.value)} />
             </div>
           </section>
+          <section className="border rounded bg-white text-black">
+            <div className="p-4 cursor-pointer select-none flex justify-between items-center" onClick={() => setReportExpanded(v => !v)}>
+              <h2 className="text-xl font-bold">{reportExpanded ? "▾" : "▸"} {t.tabReport}{calendarWeek ? ` — ${t.calendarWeek}: ${calendarWeek}` : ""}{employee ? ` — ${employee}` : ""}</h2>
+            </div>
+          </section>
+          {reportExpanded && (<>
           {days.map((day, index) => (
             <section key={day.weekday} className="border rounded p-4 space-y-3 bg-white text-black">
               <h2 className="text-xl font-bold cursor-pointer select-none" onClick={() => setOpenReportDays(prev => ({ ...prev, [day.weekday]: !prev[day.weekday] }))}>{openReportDays[day.weekday] ? "▾" : "▸"} {t.weekdays[index] || day.weekday}</h2>
@@ -1959,6 +1966,7 @@ export default function Home() {
             <p><strong>{t.total}:</strong> {totalHours.toString().replace(".", ",")} {t.hours}</p>
             {Object.entries(projectTotals).map(([project, total]) => (<p key={project}><strong>{t.projectNumber} {project}:</strong> {total.toString().replace(".", ",")} {t.hours}</p>))}
           </section>
+          </>)}
           <div className="flex flex-wrap gap-4">
             <button type="button" onClick={translateAll} className="bg-black text-white px-4 py-3 rounded">{loading ? t.translating : t.translateWeek}</button>
             <button type="button" onClick={saveReport} className="bg-orange-600 text-white px-4 py-3 rounded">{currentReportId ? t.update : t.save}</button>
