@@ -2117,7 +2117,7 @@ export default function Home() {
                 <p><strong>{t.project}:</strong> {instruction.project || "-"}</p>
                 <p><strong>{t.customer}:</strong> {instruction.customer || "-"}</p>
                 <p><strong>{t.site}:</strong> {instruction.site || "-"}</p>
-                {instruction.problems_text && (<div className="bg-yellow-50 border rounded p-2"><strong>{t.problemsHints}:</strong> {instruction.problems_text}</div>)}
+                {instruction.problems_text && (<div className="bg-yellow-50 border rounded p-2"><strong>{t.problemsHints}:</strong> {getTranslated(instruction.id, "problems_text", instruction.problems_text)}</div>)}
                 {(instruction.photos || []).length > 0 && companyFeatures?.photos_enabled && (<div className="grid grid-cols-3 gap-2">{(instruction.photos || []).map((photo: string, i: number) => (<img key={i} src={photo} alt="Foto" className="w-full h-24 object-cover rounded border" />))}</div>)}
                 <ul className="space-y-4 mt-2">
                   {(instruction.work_instruction_tasks || []).sort((a: any, b: any) => a.sort_order - b.sort_order).map((task: any) => (
@@ -2211,7 +2211,7 @@ export default function Home() {
                     <div key={instruction.id} className="border rounded p-3 space-y-2">
                       <div className="flex justify-between"><strong>{getTranslated(instruction.id, "title", instruction.title)}</strong><span className="text-sm text-gray-500">{instruction.project || "-"}</span></div>
                       <p className="text-sm"><strong>{t.customer}:</strong> {instruction.customer || "-"} | <strong>{t.site}:</strong> {instruction.site || "-"}</p>
-                      {instruction.problems_text && (<div className="bg-yellow-50 border rounded p-2 text-sm"><strong>{t.problemsHints}:</strong> {instruction.problems_text}</div>)}
+                      {instruction.problems_text && (<div className="bg-yellow-50 border rounded p-2 text-sm"><strong>{t.problemsHints}:</strong> {getTranslated(instruction.id, "problems_text", instruction.problems_text)}</div>)}
                       <ul className="space-y-1">
                         {(instruction.work_instruction_tasks || []).sort((a: any, b: any) => a.sort_order - b.sort_order).map((task: any) => (
                           <li key={task.id} className="flex items-center gap-2 text-sm">
