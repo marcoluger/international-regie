@@ -239,6 +239,12 @@ const texts = {
     roleProjectManager: "Projektleiter",
     roleAdmin: "Admin",
     commentLabel: "Kommentar",
+    commentPlaceholder: "Kommentar eingeben...",
+    commentSaveBtn: "Speichern",
+    commentSaving: "Speichere…",
+    commentSaved: "Gespeichert",
+    commentErrorLabel: "Fehler",
+    charsLabel: "Zeichen",
     copyInstruction: "Schritte kopieren",
     copyTitle: "Schritte aus Anweisung übernehmen",
     copySource: "Anweisung auswählen",
@@ -410,6 +416,12 @@ const texts = {
     roleProjectManager: "Voditelj projekta",
     roleAdmin: "Administrator",
     commentLabel: "Komentar",
+    commentPlaceholder: "Unesite komentar...",
+    commentSaveBtn: "Spremi",
+    commentSaving: "Spremam…",
+    commentSaved: "Spremljeno",
+    commentErrorLabel: "Greška",
+    charsLabel: "znakova",
     copyInstruction: "Kopiraj korake",
     copyTitle: "Preuzmi korake iz upute",
     copySource: "Odaberi uputu",
@@ -581,6 +593,12 @@ const texts = {
     roleProjectManager: "Vodja projekta",
     roleAdmin: "Administrator",
     commentLabel: "Komentar",
+    commentPlaceholder: "Vnesite komentar...",
+    commentSaveBtn: "Shrani",
+    commentSaving: "Shranjujem…",
+    commentSaved: "Shranjeno",
+    commentErrorLabel: "Napaka",
+    charsLabel: "znakov",
     copyInstruction: "Kopiraj korake",
     copyTitle: "Prevzemi korake iz navodila",
     copySource: "Izberi navodilo",
@@ -752,6 +770,12 @@ const texts = {
     roleProjectManager: "Kierownik projektu",
     roleAdmin: "Administrator",
     commentLabel: "Komentarz",
+    commentPlaceholder: "Wpisz komentarz...",
+    commentSaveBtn: "Zapisz",
+    commentSaving: "Zapisuję…",
+    commentSaved: "Zapisano",
+    commentErrorLabel: "Błąd",
+    charsLabel: "znaków",
     copyInstruction: "Kopiuj kroki",
     copyTitle: "Przejmij kroki z instrukcji",
     copySource: "Wybierz instrukcję",
@@ -2151,23 +2175,23 @@ export default function Home() {
                       {(task.photos || []).length > 0 && companyFeatures?.photos_enabled && (<div className="grid grid-cols-3 gap-1">{(task.photos || []).map((photo: string, pi: number) => (<img key={pi} src={photo} alt="Foto" className="w-full h-16 object-cover rounded" />))}</div>)}
                       {/* Mitarbeiter-Kommentar */}
                       <div className="border-t pt-2 space-y-2">
-                        <p className="text-sm font-medium text-gray-700">💬 {t.commentLabel} (max. 1000 Zeichen):</p>
+                        <p className="text-sm font-medium text-gray-700">💬 {t.commentLabel} (max. 1000 {t.charsLabel}):</p>
                         <textarea
                           className="border p-2 w-full rounded text-sm text-black bg-white"
                           rows={5}
                           maxLength={1000}
-                          placeholder="Kommentar eingeben..."
+                          placeholder={t.commentPlaceholder}
                           value={taskComments[task.id] !== undefined ? taskComments[task.id] : (getTranslatedComment(instruction.id, task.id, task.employee_comment || ""))}
                           onChange={(e) => { setTaskComments(prev => ({ ...prev, [task.id]: e.target.value.slice(0, 1000) })); setCommentSaveState(prev => ({ ...prev, [task.id]: "" })); }}
                         />
                         <div className="flex items-center justify-between gap-2">
                           <span className="text-xs text-gray-500">
-                            {((taskComments[task.id] !== undefined ? taskComments[task.id] : getTranslatedComment(instruction.id, task.id, task.employee_comment || "")) || "").length} / 1000 Zeichen
+                            {((taskComments[task.id] !== undefined ? taskComments[task.id] : getTranslatedComment(instruction.id, task.id, task.employee_comment || "")) || "").length} / 1000 {t.charsLabel}
                           </span>
                           <div className="flex items-center gap-2">
-                            {commentSaveState[task.id] === "saving" && <span className="text-xs text-gray-500">⏳ Speichere…</span>}
-                            {commentSaveState[task.id] === "saved" && <span className="text-xs text-green-700 font-medium">✓ Gespeichert</span>}
-                            {commentSaveState[task.id]?.startsWith("error:") && <span className="text-xs text-red-600">Fehler: {commentSaveState[task.id].slice(6)}</span>}
+                            {commentSaveState[task.id] === "saving" && <span className="text-xs text-gray-500">⏳ {t.commentSaving}</span>}
+                            {commentSaveState[task.id] === "saved" && <span className="text-xs text-green-700 font-medium">✓ {t.commentSaved}</span>}
+                            {commentSaveState[task.id]?.startsWith("error:") && <span className="text-xs text-red-600">{t.commentErrorLabel}: {commentSaveState[task.id].slice(6)}</span>}
                             <button
                               type="button"
                               disabled={commentSaveState[task.id] === "saving"}
@@ -2177,7 +2201,7 @@ export default function Home() {
                               }}
                               className="bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium disabled:opacity-50"
                             >
-                              💾 Speichern
+                              💾 {t.commentSaveBtn}
                             </button>
                           </div>
                         </div>
