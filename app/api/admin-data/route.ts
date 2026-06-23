@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { randomBytes } from "crypto";
+import { randomBytes } from "node:crypto";
 
 export const runtime = "nodejs";
 

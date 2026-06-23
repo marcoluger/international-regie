@@ -82,16 +82,25 @@ export default function AdminPage() {
 
   async function loadAll() {
     setMessage("Lade Daten...");
-    const res = await fetch("/api/admin-data", { headers: await authHeaders() });
-    const data = await res.json();
-    if (data.error) { setMessage("Fehler: " + data.error); return; }
-    setCompanies(data.companies || []);
-    const map: Record<string, any> = {};
-    for (const c of data.companies || []) {
-      map[c.id] = c.features || { company_id: c.id, package_name: "starter", max_employees: 5, valid_until: "", module_reports: true, module_work_orders: false, module_auto_reports: false, photos_enabled: false, email_enabled: false, signature_enabled: false, ai_enabled: false, allowed_languages: ["Deutsch"] };
+    try {
+      const res = await fetch("/api/admin-data", { headers: await authHeaders() });
+      if (!res.ok) {
+        const txt = await res.text();
+        setMessage(`Fehler beim Laden (${res.status}): ${txt.slice(0, 300)}`);
+        return;
+      }
+      const data = await res.json();
+      if (data.error) { setMessage("Fehler: " + data.error); return; }
+      setCompanies(data.companies || []);
+      const map: Record<string, any> = {};
+      for (const c of data.companies || []) {
+        map[c.id] = c.features || { company_id: c.id, package_name: "starter", max_employees: 5, valid_until: "", module_reports: true, module_work_orders: false, module_auto_reports: false, photos_enabled: false, email_enabled: false, signature_enabled: false, ai_enabled: false, allowed_languages: ["Deutsch"] };
+      }
+      setFeaturesMap(map);
+      setMessage("");
+    } catch (e: any) {
+      setMessage("Fehler beim Laden: " + (e?.message || String(e)));
     }
-    setFeaturesMap(map);
-    setMessage("");
   }
 
   function updateFeature(companyId: string, field: string, value: any) {
