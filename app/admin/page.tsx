@@ -56,6 +56,7 @@ export default function AdminPage() {
   const [newOwnerPackage, setNewOwnerPackage] = useState("starter");
   const [creatingCompany, setCreatingCompany] = useState(false);
   const [lastCreated, setLastCreated] = useState<{ username: string; password: string; company: string; slug: string } | null>(null);
+  const [resetCreds, setResetCreds] = useState<{ name: string; email: string; password: string } | null>(null);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -178,6 +179,19 @@ export default function AdminPage() {
     setCompanies(prev => prev.map(c => c.id === companyId ? { ...c, slug: newSlug } : c));
   }
 
+  async function resetUserPassword(userId: string, name: string, email: string) {
+    if (!confirm(`Passwort für "${name || email}" wirklich zurücksetzen? Es wird ein neues Passwort erzeugt.`)) return;
+    const res = await fetch("/api/admin-data", {
+      method: "POST",
+      headers: await authHeaders(),
+      body: JSON.stringify({ action: "resetUserPassword", userId }),
+    });
+    const data = await res.json();
+    if (data.error) { setMessage("Fehler: " + data.error); return; }
+    setResetCreds({ name: name || email, email, password: data.password });
+    setMessage(`✅ Passwort für "${name || email}" zurückgesetzt.`);
+  }
+
   if (!isAdmin) {
     return (
       <main className="max-w-sm mx-auto p-8 min-h-screen bg-gray-900 flex flex-col justify-center">
@@ -205,6 +219,17 @@ export default function AdminPage() {
       </header>
 
       {message && <div className="border rounded p-3 bg-yellow-50 text-black">{message}</div>}
+
+      {resetCreds && (
+        <div className="bg-green-50 border-2 border-green-500 rounded-xl p-4 space-y-2">
+          <h3 className="font-bold text-green-700">🔑 Neues Passwort:</h3>
+          <p><strong>Mitarbeiter:</strong> {resetCreds.name}</p>
+          <p><strong>E-Mail/Login:</strong> {resetCreds.email}</p>
+          <p><strong>Neues Passwort:</strong> {resetCreds.password}</p>
+          <p className="text-sm text-orange-600">⚠️ Bitte jetzt notieren und dem Mitarbeiter geben! Er wird beim nächsten Login zum Ändern aufgefordert.</p>
+          <button type="button" onClick={() => setResetCreds(null)} className="bg-gray-200 px-4 py-2 rounded text-sm">Schließen</button>
+        </div>
+      )}
 
       {/* Neue Firma */}
       <section className="bg-white border rounded-xl p-4 space-y-4">
@@ -325,7 +350,10 @@ export default function AdminPage() {
                         {users.map((u: any) => (
                           <div key={u.id} className="flex items-center justify-between border rounded p-2 bg-gray-50">
                             <div><span className="font-medium">{u.full_name || "-"}</span><span className="text-gray-500 text-sm ml-2">{u.email || "-"}</span></div>
-                            <span className={`text-xs px-2 py-1 rounded font-bold ${u.role === "owner" ? "bg-orange-100 text-orange-700" : u.role === "admin" ? "bg-purple-100 text-purple-700" : u.role === "project_manager" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"}`}>{u.role}</span>
+                            <div className="flex items-center gap-2">
+                              <span className={`text-xs px-2 py-1 rounded font-bold ${u.role === "owner" ? "bg-orange-100 text-orange-700" : u.role === "admin" ? "bg-purple-100 text-purple-700" : u.role === "project_manager" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"}`}>{u.role}</span>
+                              <button type="button" onClick={() => resetUserPassword(u.user_id, u.full_name, u.email)} className="bg-gray-700 text-white px-2 py-1 rounded text-xs">🔑 Passwort</button>
+                            </div>
                           </div>
                         ))}
                       </div>
