@@ -23,6 +23,9 @@ type DayEntry = {
   customer: string;
   projectNumber: string;
   site: string;
+  startTime: string;
+  endTime: string;
+  breakMinutes: string;
   hours: string;
   description: string;
   translation: string;
@@ -107,6 +110,9 @@ const texts = {
     projectNumber: "Projektnummer",
     site: "Baustelle",
     hours: "Stunden",
+    startTime: "Anfang",
+    endTime: "Ende",
+    breakLabel: "Pause (Min.)",
     description: "Arbeitsbeschreibung",
     translation: "Übersetzung",
     deletePhoto: "Foto löschen",
@@ -284,6 +290,9 @@ const texts = {
     projectNumber: "Broj projekta",
     site: "Gradilište",
     hours: "Sati",
+    startTime: "Početak",
+    endTime: "Kraj",
+    breakLabel: "Pauza (min)",
     description: "Opis rada",
     translation: "Prijevod",
     deletePhoto: "Obriši fotografiju",
@@ -461,6 +470,9 @@ const texts = {
     projectNumber: "Številka projekta",
     site: "Gradbišče",
     hours: "Ure",
+    startTime: "Začetek",
+    endTime: "Konec",
+    breakLabel: "Odmor (min)",
     description: "Opis dela",
     translation: "Prevod",
     deletePhoto: "Izbriši fotografijo",
@@ -638,6 +650,9 @@ const texts = {
     projectNumber: "Numer projektu",
     site: "Budowa",
     hours: "Godziny",
+    startTime: "Początek",
+    endTime: "Koniec",
+    breakLabel: "Przerwa (min)",
     description: "Opis pracy",
     translation: "Tłumaczenie",
     deletePhoto: "Usuń zdjęcie",
@@ -790,15 +805,15 @@ const texts = {
 };
 
 const pdfTexts = {
-  Deutsch: { title: "Regie International", company: "Regie International", report: "Bericht", calendarWeek: "Kalenderwoche", employee: "Mitarbeiter", dailyReports: "Tagesberichte", customer: "Kunde", project: "Projekt", site: "Baustelle", hours: "Stunden", description: "Arbeitsbeschreibung", photos: "Fotos", photo: "Foto", summary: "Zusammenfassung", totalHours: "Gesamtstunden", signatureEmployee: "Unterschrift Mitarbeiter", signatureCustomer: "Unterschrift Kunde / Bauleitung", createdAt: "Erstellt am" },
-  Kroatisch: { title: "Regie International", company: "Regie International", report: "Izvještaj", calendarWeek: "Kalendarski tjedan", employee: "Radnik", dailyReports: "Dnevni izvještaji", customer: "Kupac", project: "Projekt", site: "Gradilište", hours: "Sati", description: "Opis rada", photos: "Fotografije", photo: "Fotografija", summary: "Sažetak", totalHours: "Ukupno sati", signatureEmployee: "Potpis radnika", signatureCustomer: "Potpis kupca / voditelja gradilišta", createdAt: "Izrađeno dana" },
-  Slowenisch: { title: "Regie International", company: "Regie International", report: "Poročilo", calendarWeek: "Koledarski teden", employee: "Zaposleni", dailyReports: "Dnevna poročila", customer: "Stranka", project: "Projekt", site: "Gradbišče", hours: "Ure", description: "Opis dela", photos: "Fotografije", photo: "Fotografija", summary: "Povzetek", totalHours: "Skupno število ur", signatureEmployee: "Podpis zaposlenega", signatureCustomer: "Podpis stranke / vodje gradbišča", createdAt: "Ustvarjeno dne" },
-  Polnisch: { title: "Regie International", company: "Regie International", report: "Raport", calendarWeek: "Tydzień kalendarzowy", employee: "Pracownik", dailyReports: "Raporty dzienne", customer: "Klient", project: "Projekt", site: "Budowa", hours: "Godziny", description: "Opis pracy", photos: "Zdjęcia", photo: "Zdjęcie", summary: "Podsumowanie", totalHours: "Łączna liczba godzin", signatureEmployee: "Podpis pracownika", signatureCustomer: "Podpis klienta / kierownika budowy", createdAt: "Utworzono dnia" },
-  Englisch: { title: "Regie International", company: "Regie International", report: "Report", calendarWeek: "Calendar week", employee: "Employee", dailyReports: "Daily reports", customer: "Customer", project: "Project", site: "Site", hours: "Hours", description: "Work description", photos: "Photos", photo: "Photo", summary: "Summary", totalHours: "Total hours", signatureEmployee: "Employee signature", signatureCustomer: "Customer / Site manager signature", createdAt: "Created on" },
+  Deutsch: { title: "Regie International", company: "Regie International", report: "Bericht", calendarWeek: "Kalenderwoche", employee: "Mitarbeiter", dailyReports: "Tagesberichte", customer: "Kunde", project: "Projekt", site: "Baustelle", hours: "Stunden", startLabel: "Anfang", endLabel: "Ende", pauseLabel: "Pause", description: "Arbeitsbeschreibung", photos: "Fotos", photo: "Foto", summary: "Zusammenfassung", totalHours: "Gesamtstunden", signatureEmployee: "Unterschrift Mitarbeiter", signatureCustomer: "Unterschrift Kunde / Bauleitung", createdAt: "Erstellt am" },
+  Kroatisch: { title: "Regie International", company: "Regie International", report: "Izvještaj", calendarWeek: "Kalendarski tjedan", employee: "Radnik", dailyReports: "Dnevni izvještaji", customer: "Kupac", project: "Projekt", site: "Gradilište", hours: "Sati", startLabel: "Početak", endLabel: "Kraj", pauseLabel: "Pauza", description: "Opis rada", photos: "Fotografije", photo: "Fotografija", summary: "Sažetak", totalHours: "Ukupno sati", signatureEmployee: "Potpis radnika", signatureCustomer: "Potpis kupca / voditelja gradilišta", createdAt: "Izrađeno dana" },
+  Slowenisch: { title: "Regie International", company: "Regie International", report: "Poročilo", calendarWeek: "Koledarski teden", employee: "Zaposleni", dailyReports: "Dnevna poročila", customer: "Stranka", project: "Projekt", site: "Gradbišče", hours: "Ure", startLabel: "Začetek", endLabel: "Konec", pauseLabel: "Odmor", description: "Opis dela", photos: "Fotografije", photo: "Fotografija", summary: "Povzetek", totalHours: "Skupno število ur", signatureEmployee: "Podpis zaposlenega", signatureCustomer: "Podpis stranke / vodje gradbišča", createdAt: "Ustvarjeno dne" },
+  Polnisch: { title: "Regie International", company: "Regie International", report: "Raport", calendarWeek: "Tydzień kalendarzowy", employee: "Pracownik", dailyReports: "Raporty dzienne", customer: "Klient", project: "Projekt", site: "Budowa", hours: "Godziny", startLabel: "Początek", endLabel: "Koniec", pauseLabel: "Przerwa", description: "Opis pracy", photos: "Zdjęcia", photo: "Zdjęcie", summary: "Podsumowanie", totalHours: "Łączna liczba godzin", signatureEmployee: "Podpis pracownika", signatureCustomer: "Podpis klienta / kierownika budowy", createdAt: "Utworzono dnia" },
+  Englisch: { title: "Regie International", company: "Regie International", report: "Report", calendarWeek: "Calendar week", employee: "Employee", dailyReports: "Daily reports", customer: "Customer", project: "Project", site: "Site", hours: "Hours", startLabel: "Start", endLabel: "End", pauseLabel: "Break", description: "Work description", photos: "Photos", photo: "Photo", summary: "Summary", totalHours: "Total hours", signatureEmployee: "Employee signature", signatureCustomer: "Customer / Site manager signature", createdAt: "Created on" },
 };
 
 function createEmptyDays(): DayEntry[] {
-  return weekdays.map((day) => ({ weekday: day, date: "", customer: "", projectNumber: "", site: "", hours: "", description: "", translation: "", photos: [] }));
+  return weekdays.map((day) => ({ weekday: day, date: "", customer: "", projectNumber: "", site: "", startTime: "", endTime: "", breakMinutes: "", hours: "", description: "", translation: "", photos: [] }));
 }
 
 // Bricht ein hängendes Promise nach ms Millisekunden mit Fehler ab (verhindert "ewiges Laden")
@@ -1153,6 +1168,28 @@ export default function Home() {
 
   function updateDay(index: number, field: keyof DayEntry, value: string) {
     const copy = [...days]; copy[index] = { ...copy[index], [field]: value }; setDays(copy);
+  }
+
+  // Stunden aus Anfang/Ende/Pause berechnen (inkl. Schicht ueber Mitternacht).
+  function computeDayHours(start: string, end: string, breakMin: string): string {
+    if (!start || !end) return "";
+    const [sh, sm] = start.split(":").map(Number);
+    const [eh, em] = end.split(":").map(Number);
+    if ([sh, sm, eh, em].some((n) => Number.isNaN(n))) return "";
+    let mins = (eh * 60 + em) - (sh * 60 + sm);
+    if (mins <= 0) mins += 24 * 60;
+    mins -= Number(breakMin) || 0;
+    if (mins < 0) mins = 0;
+    return (Math.round((mins / 60) * 100) / 100).toString().replace(".", ",");
+  }
+
+  function updateDayTime(index: number, field: "startTime" | "endTime" | "breakMinutes", value: string) {
+    const copy = [...days];
+    const d: any = { ...copy[index], [field]: value };
+    const computed = computeDayHours(d.startTime, d.endTime, d.breakMinutes);
+    if (computed !== "") d.hours = computed;
+    copy[index] = d;
+    setDays(copy);
   }
 
   async function handleInstructionPhotos(files: FileList | null) {
@@ -1765,7 +1802,9 @@ export default function Home() {
       doc.setFontSize(11); doc.setFont(FONT, "bold"); doc.text(`${day.weekday} - ${day.date || "-"}`, marginLeft + 3, y + 6); y += 13;
       doc.setFont(FONT, "normal"); doc.setFontSize(9);
       doc.text(`${p.customer}: ${day.customer || "-"}`, marginLeft + 3, y); doc.text(`${p.project}: ${day.projectNumber || "-"}`, marginLeft + 80, y); y += 6;
-      doc.text(`${p.site}: ${day.site || "-"}`, marginLeft + 3, y); doc.text(`${p.hours}: ${day.hours || "-"}`, marginLeft + 80, y); y += 8;
+      doc.text(`${p.site}: ${day.site || "-"}`, marginLeft + 3, y); doc.text(`${p.hours}: ${day.hours || "-"}`, marginLeft + 80, y); y += 6;
+      if (day.startTime || day.endTime || day.breakMinutes) { doc.text(`${p.startLabel}: ${day.startTime || "-"}   ${p.endLabel}: ${day.endTime || "-"}   ${p.pauseLabel}: ${day.breakMinutes ? day.breakMinutes + " min" : "-"}`, marginLeft + 3, y); y += 6; }
+      y += 2;
       doc.setFont(FONT, "bold"); doc.text(`${p.description}:`, marginLeft + 3, y); y += 6;
       doc.setFont(FONT, "normal"); doc.text(splitDescription, marginLeft + 3, y); y += splitDescription.length * 5 + 5;
       if (day.photos.length > 0) {
@@ -2028,7 +2067,12 @@ export default function Home() {
                 <input className="border p-3 text-black bg-white" placeholder={t.customer} value={day.customer} onChange={(e) => updateDay(index, "customer", e.target.value)} />
                 <input className="border p-3 text-black bg-white" placeholder={t.projectNumber} value={day.projectNumber} onChange={(e) => updateDay(index, "projectNumber", e.target.value)} />
                 <input className="border p-3 text-black bg-white" placeholder={t.site} value={day.site} onChange={(e) => updateDay(index, "site", e.target.value)} />
-                <input className="border p-3 text-black bg-white" placeholder={t.hours} value={day.hours} onChange={(e) => updateDay(index, "hours", e.target.value)} />
+                <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div><label className="text-xs text-gray-500 block mb-1">{t.startTime}</label><input type="time" className="border p-2 w-full text-black bg-white" value={day.startTime || ""} onChange={(e) => updateDayTime(index, "startTime", e.target.value)} /></div>
+                  <div><label className="text-xs text-gray-500 block mb-1">{t.endTime}</label><input type="time" className="border p-2 w-full text-black bg-white" value={day.endTime || ""} onChange={(e) => updateDayTime(index, "endTime", e.target.value)} /></div>
+                  <div><label className="text-xs text-gray-500 block mb-1">{t.breakLabel}</label><input type="number" min="0" step="5" className="border p-2 w-full text-black bg-white" value={day.breakMinutes || ""} onChange={(e) => updateDayTime(index, "breakMinutes", e.target.value)} /></div>
+                  <div><label className="text-xs text-gray-500 block mb-1">{t.hours}</label><input className="border p-2 w-full text-black bg-white" value={day.hours} onChange={(e) => updateDay(index, "hours", e.target.value)} readOnly={!!(day.startTime && day.endTime)} /></div>
+                </div>
               </div>
               <textarea className="border p-3 w-full text-black bg-white resize-none overflow-hidden" rows={Math.max(4, (day.description || "").split("\n").length + 1)} placeholder={t.description} value={day.description} onChange={(e) => updateDay(index, "description", e.target.value)} />
               {companyFeatures?.photos_enabled ? <input type="file" accept="image/*" multiple className="border p-3 w-full text-black bg-white" onChange={(e) => handlePhotos(index, e.target.files)} /> : <div className="border rounded p-3 bg-gray-50 text-sm text-gray-400">🔒 Foto-Upload ist in deinem Paket nicht aktiviert.</div>}
