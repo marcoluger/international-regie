@@ -1,5 +1,4 @@
 import { createClient } from "@supabase/supabase-js";
-import { randomBytes } from "node:crypto";
 
 export const runtime = "nodejs";
 
@@ -14,15 +13,6 @@ const PACKAGES: Record<string, any> = {
   business:   { max_employees: 100,  max_photos: 30, module_reports: true,  module_work_orders: true,  module_auto_reports: true,  photos_enabled: true,  email_enabled: true,  signature_enabled: true,  ai_enabled: true,  allowed_languages: ["Deutsch", "Kroatisch", "Slowenisch", "Polnisch", "Englisch"] },
   enterprise: { max_employees: 9999, max_photos: 0,  module_reports: true,  module_work_orders: true,  module_auto_reports: true,  photos_enabled: true,  email_enabled: true,  signature_enabled: true,  ai_enabled: true,  allowed_languages: ["Deutsch", "Kroatisch", "Slowenisch", "Polnisch", "Englisch"] },
 };
-
-// Erzeugt ein zufälliges, gut lesbares Temporär-Passwort (mehrdeutige Zeichen vermieden).
-function generatePassword(): string {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
-  const bytes = randomBytes(12);
-  let p = "";
-  for (let i = 0; i < bytes.length; i++) p += chars[bytes[i] % chars.length];
-  return p;
-}
 
 // Liste erlaubter Super-Admin User-IDs aus der Umgebungsvariable SUPER_ADMIN_IDS
 // (kommagetrennt in Vercel hinterlegen).
@@ -96,16 +86,6 @@ export async function POST(request: Request) {
     const { error } = await supabaseAdmin.from("companies").update({ slug }).eq("id", companyId);
     if (error) return Response.json({ error: error.message }, { status: 500 });
     return Response.json({ success: true });
-  }
-
-  if (action === "resetUserPassword") {
-    const { userId } = body;
-    if (!userId) return Response.json({ error: "userId fehlt" }, { status: 400 });
-    const newPassword = generatePassword();
-    const { error } = await supabaseAdmin.auth.admin.updateUserById(userId, { password: newPassword });
-    if (error) return Response.json({ error: error.message }, { status: 500 });
-    await supabaseAdmin.from("company_users").update({ must_change_password: true }).eq("user_id", userId);
-    return Response.json({ success: true, password: newPassword });
   }
 
   if (action === "createCompany") {
