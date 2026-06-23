@@ -968,6 +968,7 @@ export default function Home() {
   const [projectCustomer, setProjectCustomer] = useState("");
   const [projectSite, setProjectSite] = useState("");
   const [projectManager, setProjectManager] = useState("");
+  const [pmEdits, setPmEdits] = useState<Record<string, string>>({});
   const [selectedProjectId, setSelectedProjectId] = useState("");
   const [selectedProjectDetailId, setSelectedProjectDetailId] = useState("");
   const [instructionDate, setInstructionDate] = useState("");
@@ -1592,6 +1593,15 @@ export default function Home() {
     await loadProjects(); setMessage(t.msgProjectSaved);
   }
 
+  async function updateProjectManager(projectId: string, newPm: string) {
+    const project = projects.find((p: any) => p.id === projectId);
+    if (!project) return;
+    if ((project.project_manager || "") === (newPm || "")) { setMessage("Projektleiter unverändert."); return; }
+    const { error } = await supabase.from("projects").update({ project_manager: newPm }).eq("id", projectId);
+    if (error) { setMessage("Fehler beim Ändern des Projektleiters: " + error.message); return; }
+    await loadProjects(); setMessage("Projektleiter geändert.");
+  }
+
   async function deleteProject(id: string) {
     if (!currentCompany) return;
     const { error } = await supabase.from("projects").delete().eq("id", id);
@@ -2165,7 +2175,12 @@ export default function Home() {
                 <strong>{project.name}</strong>
                 <p>{t.customer}: {project.customer || "-"}</p>
                 <p>{t.site}: {project.site || "-"}</p>
-                <p>{t.projectManager}: {project.project_manager || "-"}</p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-sm font-medium">{t.projectManager}:</span>
+                  <input list={`pm-${project.id}`} className="border p-2 rounded text-sm" value={pmEdits[project.id] ?? (project.project_manager || "")} onChange={(e) => setPmEdits((prev) => ({ ...prev, [project.id]: e.target.value }))} placeholder="-" />
+                  <datalist id={`pm-${project.id}`}>{companyUsers.filter((m) => m.role === "project_manager").map((m) => (<option key={m.user_id} value={m.full_name || m.email || ""} />))}</datalist>
+                  <button type="button" onClick={() => updateProjectManager(project.id, pmEdits[project.id] ?? (project.project_manager || ""))} className="bg-blue-700 text-white px-3 py-1 rounded text-sm">{t.save}</button>
+                </div>
                 <div className="flex gap-2">
                   <button type="button" onClick={() => setSelectedProjectDetailId(project.id === selectedProjectDetailId ? "" : project.id)} className="bg-gray-700 text-white px-3 py-2 rounded">{project.id === selectedProjectDetailId ? t.closeProject : t.openProject}</button>
                   <button type="button" onClick={() => deleteProject(project.id)} className="bg-red-600 text-white px-3 py-2 rounded">{t.deleteProject}</button>
