@@ -1794,7 +1794,13 @@ export default function Home() {
     doc.line(marginLeft, y, marginLeft + 70, y); doc.line(pageWidth - marginRight - 70, y, pageWidth - marginRight, y);
     y += 6; doc.setFontSize(9); doc.text(p.signatureEmployee, marginLeft, y); doc.text(p.signatureCustomer, pageWidth - marginRight - 70, y);
     addFooter();
-    const filename = `Regiebericht_${calendarWeek || "Woche"}_${employee || "Mitarbeiter"}.pdf`;
+    // Dateiname: Projekt_KW_Mitarbeiter (z. B. AU2260027_KW26_Max_Mustermann.pdf)
+    const illegal = (s: string) => (s || "").replace(/[\\/:*?"<>|]/g, "");
+    const projectNumbers = Array.from(new Set((days || []).map((d: any) => (d.projectNumber || "").trim()).filter(Boolean)));
+    const projectPart = illegal(projectNumbers.length === 0 ? "Projekt" : projectNumbers.join("-")).replace(/\s+/g, "_");
+    const kwPart = illegal(calendarWeek || "Woche").replace(/\s+/g, "");
+    const employeePart = illegal(employee || "Mitarbeiter").replace(/\s+/g, "_");
+    const filename = `${projectPart}_${kwPart}_${employeePart}.pdf`;
     if (sendByEmail) {
       if (!emailTo.trim()) { setMessage(t.msgEmailRequired); return; }
       setMessage(t.msgEmailSending);
