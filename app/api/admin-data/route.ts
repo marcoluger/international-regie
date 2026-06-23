@@ -65,7 +65,13 @@ export async function GET(request: Request) {
   for (const company of companies || []) {
     const { data: features } = await supabaseAdmin.from("company_features").select("*").eq("company_id", company.id).single();
     const { data: users } = await supabaseAdmin.from("company_users").select("*").eq("company_id", company.id);
-    result.push({ ...company, features: features || null, users: users || [] });
+    const owner = (users || []).find((u: any) => u.role === "owner");
+    let settings: any = null;
+    if (owner?.user_id) {
+      const { data: s } = await supabaseAdmin.from("company_settings").select("*").eq("user_id", owner.user_id).maybeSingle();
+      settings = s || null;
+    }
+    result.push({ ...company, features: features || null, users: users || [], owner_user_id: owner?.user_id || null, settings });
   }
   return Response.json({ companies: result });
 }
@@ -92,6 +98,28 @@ export async function POST(request: Request) {
   if (action === "updateSlug") {
     const { companyId, slug } = body;
     const { error } = await supabaseAdmin.from("companies").update({ slug }).eq("id", companyId);
+    if (error) return Response.json({ error: error.message }, { status: 500 });
+    return Response.json({ success: true });
+  }
+
+  if (action === "updateCompanyName") {
+    const { companyId, name } = body;
+    if (!name || !String(name).trim()) return Response.json({ error: "Firmenname fehlt" }, { status: 400 });
+    const { error } = await supabaseAdmin.from("companies").update({ name: String(name).trim() }).eq("id", companyId);
+    if (error) return Response.json({ error: error.message }, { status: 500 });
+    return Response.json({ success: true });
+  }
+
+  if (action === "saveCompanySettings") {
+    const { ownerUserId, settings } = body;
+    if (!ownerUserId) return Response.json({ error: "Kein Owner für diese Firma gefunden – Firmendaten können nicht gespeichert werden." }, { status: 400 });
+    const allowed = ["company_name", "street", "zip_code", "city", "phone", "email", "website", "tax_number"];
+    const clean: Record<string, any> = { user_id: ownerUserId };
+    for (const k of allowed) {
+      if (settings && k in settings) clean[k] = settings[k] ?? "";
+    }
+    // company_logo wird bewusst NICHT ueberschrieben, damit ein bestehendes Logo erhalten bleibt.
+    const { error } = await supabaseAdmin.from("company_settings").upsert(clean, { onConflict: "user_id" });
     if (error) return Response.json({ error: error.message }, { status: 500 });
     return Response.json({ success: true });
   }

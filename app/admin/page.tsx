@@ -8,7 +8,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
 );
 
-type Company = { id: string; name: string; slug: string; created_at: string; features: any; users: any[] };
+type Company = { id: string; name: string; slug: string; created_at: string; features: any; users: any[]; owner_user_id?: string | null; settings?: any };
 
 const PACKAGES: Record<string, { label: string; color: string; defaults: any }> = {
   starter:    { label: "Starter (bis 5 MA)",      color: "bg-gray-100 border-gray-300",   defaults: { max_employees: 5,    max_photos: 2,  module_reports: true,  module_work_orders: false, module_auto_reports: false, photos_enabled: false, email_enabled: false, signature_enabled: false, ai_enabled: false, allowed_languages: ["Deutsch"] } },
@@ -47,6 +47,9 @@ export default function AdminPage() {
   const [featuresMap, setFeaturesMap] = useState<Record<string, any>>({});
   const [openCompanyId, setOpenCompanyId] = useState<string | null>(null);
   const [saving, setSaving] = useState<string | null>(null);
+  const [savingData, setSavingData] = useState<string | null>(null);
+  const [nameMap, setNameMap] = useState<Record<string, string>>({});
+  const [settingsMap, setSettingsMap] = useState<Record<string, any>>({});
 
   const [newCompanyName, setNewCompanyName] = useState("");
   const [newCompanySlug, setNewCompanySlug] = useState("");
@@ -97,6 +100,14 @@ export default function AdminPage() {
         map[c.id] = c.features || { company_id: c.id, package_name: "starter", max_employees: 5, valid_until: "", module_reports: true, module_work_orders: false, module_auto_reports: false, photos_enabled: false, email_enabled: false, signature_enabled: false, ai_enabled: false, allowed_languages: ["Deutsch"] };
       }
       setFeaturesMap(map);
+      const nmap: Record<string, string> = {};
+      const smap: Record<string, any> = {};
+      for (const c of data.companies || []) {
+        nmap[c.id] = c.name || "";
+        smap[c.id] = c.settings || { company_name: c.name || "", street: "", zip_code: "", city: "", phone: "", email: "", website: "", tax_number: "" };
+      }
+      setNameMap(nmap);
+      setSettingsMap(smap);
       setMessage("");
     } catch (e: any) {
       setMessage("Fehler beim Laden: " + (e?.message || String(e)));
@@ -117,6 +128,47 @@ export default function AdminPage() {
     const current = featuresMap[companyId]?.allowed_languages || [];
     const updated = current.includes(lang) ? current.filter((l: string) => l !== lang) : [...current, lang];
     updateFeature(companyId, "allowed_languages", updated);
+  }
+
+  function updateName(companyId: string, value: string) {
+    setNameMap(prev => ({ ...prev, [companyId]: value }));
+  }
+
+  function updateSettings(companyId: string, field: string, value: string) {
+    setSettingsMap(prev => ({ ...prev, [companyId]: { ...prev[companyId], [field]: value } }));
+  }
+
+  async function saveCompanyData(companyId: string) {
+    setSavingData(companyId);
+    try {
+      const company = companies.find(c => c.id === companyId);
+      const name = (nameMap[companyId] ?? company?.name ?? "").trim();
+      if (!name) { setMessage("Firmenname darf nicht leer sein."); setSavingData(null); return; }
+      const res1 = await fetch("/api/admin-data", {
+        method: "POST",
+        headers: await authHeaders(),
+        body: JSON.stringify({ action: "updateCompanyName", companyId, name }),
+      });
+      const d1 = await res1.json();
+      if (d1.error) { setMessage("Fehler beim Firmennamen: " + d1.error); setSavingData(null); return; }
+      const ownerUserId = company?.owner_user_id || null;
+      if (ownerUserId) {
+        const settings = settingsMap[companyId] || {};
+        const res2 = await fetch("/api/admin-data", {
+          method: "POST",
+          headers: await authHeaders(),
+          body: JSON.stringify({ action: "saveCompanySettings", ownerUserId, settings }),
+        });
+        const d2 = await res2.json();
+        if (d2.error) { setMessage("Fehler bei den PDF-Firmendaten: " + d2.error); setSavingData(null); return; }
+      }
+      setSavingData(null);
+      setMessage("✅ Firmendaten gespeichert.");
+      loadAll();
+    } catch (e: any) {
+      setSavingData(null);
+      setMessage("Fehler beim Speichern der Firmendaten: " + (e?.message || String(e)));
+    }
   }
 
   async function saveFeatures(companyId: string) {
@@ -292,6 +344,53 @@ export default function AdminPage() {
                   <div>
                     <h3 className="font-bold mb-2">🔑 Firmenkürzel</h3>
                     <input className="border p-2 rounded w-full max-w-xs" value={company.slug || ""} onChange={(e) => { const s = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""); updateSlug(company.id, s); }} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold mb-3">🏢 Firmendaten</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-sm text-gray-600 block mb-1">Interner Firmenname (Admin-Liste)</label>
+                        <input className="border p-2 rounded w-full" value={nameMap[company.id] ?? company.name ?? ""} onChange={(e) => updateName(company.id, e.target.value)} />
+                      </div>
+                      <div>
+                        <label className="text-sm text-gray-600 block mb-1">Firmenname für PDF / Berichte</label>
+                        <input className="border p-2 rounded w-full" value={settingsMap[company.id]?.company_name ?? ""} onChange={(e) => updateSettings(company.id, "company_name", e.target.value)} />
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="text-sm text-gray-600 block mb-1">Straße & Hausnummer</label>
+                        <input className="border p-2 rounded w-full" value={settingsMap[company.id]?.street ?? ""} onChange={(e) => updateSettings(company.id, "street", e.target.value)} />
+                      </div>
+                      <div>
+                        <label className="text-sm text-gray-600 block mb-1">PLZ</label>
+                        <input className="border p-2 rounded w-full" value={settingsMap[company.id]?.zip_code ?? ""} onChange={(e) => updateSettings(company.id, "zip_code", e.target.value)} />
+                      </div>
+                      <div>
+                        <label className="text-sm text-gray-600 block mb-1">Ort</label>
+                        <input className="border p-2 rounded w-full" value={settingsMap[company.id]?.city ?? ""} onChange={(e) => updateSettings(company.id, "city", e.target.value)} />
+                      </div>
+                      <div>
+                        <label className="text-sm text-gray-600 block mb-1">Telefon</label>
+                        <input className="border p-2 rounded w-full" value={settingsMap[company.id]?.phone ?? ""} onChange={(e) => updateSettings(company.id, "phone", e.target.value)} />
+                      </div>
+                      <div>
+                        <label className="text-sm text-gray-600 block mb-1">E-Mail</label>
+                        <input className="border p-2 rounded w-full" value={settingsMap[company.id]?.email ?? ""} onChange={(e) => updateSettings(company.id, "email", e.target.value)} />
+                      </div>
+                      <div>
+                        <label className="text-sm text-gray-600 block mb-1">Website</label>
+                        <input className="border p-2 rounded w-full" value={settingsMap[company.id]?.website ?? ""} onChange={(e) => updateSettings(company.id, "website", e.target.value)} />
+                      </div>
+                      <div>
+                        <label className="text-sm text-gray-600 block mb-1">Steuernummer</label>
+                        <input className="border p-2 rounded w-full" value={settingsMap[company.id]?.tax_number ?? ""} onChange={(e) => updateSettings(company.id, "tax_number", e.target.value)} />
+                      </div>
+                    </div>
+                    {!company.owner_user_id && (
+                      <p className="text-sm text-orange-600 mt-2">⚠️ Kein Owner gefunden – die PDF-Firmendaten können nicht gespeichert werden (nur der interne Name).</p>
+                    )}
+                    <button type="button" onClick={() => saveCompanyData(company.id)} disabled={savingData === company.id} className="mt-3 bg-indigo-700 text-white px-5 py-2 rounded font-medium disabled:opacity-50">
+                      {savingData === company.id ? "Speichert..." : "💾 Firmendaten speichern"}
+                    </button>
                   </div>
                   <div>
                     <h3 className="font-bold mb-3">📦 Paket</h3>
