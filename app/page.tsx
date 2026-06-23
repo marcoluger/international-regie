@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import type { User } from "@supabase/supabase-js";
 import { createClient } from "@supabase/supabase-js";
 import jsPDF from "jspdf";
@@ -912,6 +912,51 @@ function getAllowedLanguages(companyFeatures: any): string[] {
   try { const parsed = JSON.parse(raw); return parsed.length > 0 ? parsed : ["Deutsch"]; } catch { return ["Deutsch"]; }
 }
 
+function SignaturePad({ label, value, onChange }: { label: string; value: string; onChange: (dataUrl: string) => void }) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const drawing = useRef(false);
+  const hasDrawn = useRef(false);
+  useEffect(() => {
+    if (value === "") {
+      const c = canvasRef.current; const ctx = c ? c.getContext("2d") : null;
+      if (c && ctx) ctx.clearRect(0, 0, c.width, c.height);
+      hasDrawn.current = false;
+    }
+  }, [value]);
+  function getCtx() { const c = canvasRef.current; return c ? c.getContext("2d") : null; }
+  function pos(e: React.PointerEvent<HTMLCanvasElement>) {
+    const c = canvasRef.current!; const rect = c.getBoundingClientRect();
+    return { x: (e.clientX - rect.left) * (c.width / rect.width), y: (e.clientY - rect.top) * (c.height / rect.height) };
+  }
+  function start(e: React.PointerEvent<HTMLCanvasElement>) {
+    e.preventDefault(); const ctx = getCtx(); if (!ctx) return;
+    drawing.current = true; const { x, y } = pos(e); ctx.beginPath(); ctx.moveTo(x, y);
+    try { canvasRef.current?.setPointerCapture(e.pointerId); } catch {}
+  }
+  function move(e: React.PointerEvent<HTMLCanvasElement>) {
+    if (!drawing.current) return; e.preventDefault(); const ctx = getCtx(); if (!ctx) return;
+    const { x, y } = pos(e); ctx.lineTo(x, y); ctx.strokeStyle = "#111827"; ctx.lineWidth = 2; ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.stroke(); hasDrawn.current = true;
+  }
+  function end() {
+    if (!drawing.current) return; drawing.current = false;
+    if (hasDrawn.current && canvasRef.current) onChange(canvasRef.current.toDataURL("image/png"));
+  }
+  function clear() {
+    const c = canvasRef.current; const ctx = getCtx();
+    if (c && ctx) ctx.clearRect(0, 0, c.width, c.height);
+    hasDrawn.current = false; onChange("");
+  }
+  return (
+    <div className="border rounded p-3 bg-white">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-sm font-medium text-gray-700">{label}{value ? <span className="text-xs text-green-600 ml-2">✓ erfasst</span> : null}</span>
+        <button type="button" onClick={clear} className="text-xs text-red-600 underline">Löschen</button>
+      </div>
+      <canvas ref={canvasRef} width={500} height={150} onPointerDown={start} onPointerMove={move} onPointerUp={end} onPointerLeave={end} className="w-full border rounded bg-gray-50" style={{ touchAction: "none" }} />
+    </div>
+  );
+}
+
 export default function Home() {
   const [uiLanguage, setUiLanguage] = useState<Language>("Deutsch");
   const t = texts[uiLanguage];
@@ -933,6 +978,8 @@ export default function Home() {
   const [employee, setEmployee] = useState("");
   const [reportName, setReportName] = useState("");
   const [emailTo, setEmailTo] = useState("");
+  const [sigEmployee, setSigEmployee] = useState("");
+  const [sigCustomer, setSigCustomer] = useState("");
   const [fromLanguage, setFromLanguage] = useState("Deutsch");
   const [toLanguage, setToLanguage] = useState("Polnisch");
   const [pdfLanguage, setPdfLanguage] = useState("Deutsch");
@@ -1595,7 +1642,7 @@ export default function Home() {
   }
 
   function newReport() {
-    setCurrentReportId(null); setReportName(""); setEmployee(""); setEmailTo("");
+    setCurrentReportId(null); setReportName(""); setEmployee(""); setEmailTo(""); setSigEmployee(""); setSigCustomer("");
     setFromLanguage("Deutsch"); setToLanguage("Polnisch"); setPdfLanguage("Deutsch"); setDays(createEmptyDays());
   }
 
@@ -2196,6 +2243,15 @@ export default function Home() {
             {Object.entries(projectTotals).map(([project, total]) => (<p key={project}><strong>{t.projectNumber} {project}:</strong> {total.toString().replace(".", ",")} {t.hours}</p>))}
           </section>
           </>)}
+          {companyFeatures?.signature_enabled && (
+            <section className="border rounded p-4 space-y-3 bg-white text-black">
+              <h2 className="text-xl font-bold">✍️ Unterschriften</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <SignaturePad label={pdfTexts[uiLanguage as keyof typeof pdfTexts]?.signatureEmployee || "Unterschrift Mitarbeiter"} value={sigEmployee} onChange={setSigEmployee} />
+                <SignaturePad label={pdfTexts[uiLanguage as keyof typeof pdfTexts]?.signatureCustomer || "Unterschrift Kunde / Bauleitung"} value={sigCustomer} onChange={setSigCustomer} />
+              </div>
+            </section>
+          )}
           <div className="flex flex-wrap gap-4">
             <button type="button" onClick={translateAll} className="bg-black text-white px-4 py-3 rounded">{loading ? t.translating : t.translateWeek}</button>
             <button type="button" onClick={saveReport} className="bg-orange-600 text-white px-4 py-3 rounded">{currentReportId ? t.update : t.save}</button>
