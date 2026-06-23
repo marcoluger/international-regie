@@ -183,5 +183,13 @@ export async function POST(request: Request) {
     return Response.json({ success: true });
   }
 
+  if (action === "setCompanyStatus") {
+    const { companyId, status } = body;
+    if (status !== "active" && status !== "blocked") return Response.json({ error: "Ungültiger Status" }, { status: 400 });
+    const { error } = await supabaseAdmin.from("companies").update({ status }).eq("id", companyId);
+    if (error) return Response.json({ error: error.message }, { status: 500 });
+    return Response.json({ success: true });
+  }
+
   return Response.json({ error: "Unbekannte Aktion" }, { status: 400 });
 }

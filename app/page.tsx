@@ -919,6 +919,7 @@ export default function Home() {
   const [onboardingStep, setOnboardingStep] = useState(1);
   const [onboardingDone, setOnboardingDone] = useState(false);
   const [mustChangePassword, setMustChangePassword] = useState(false);
+  const [companyBlocked, setCompanyBlocked] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
   const [changingPassword, setChangingPassword] = useState(false);
@@ -1065,8 +1066,9 @@ export default function Home() {
     const { data: companyUser, error } = await supabase.from("company_users").select("company_id, role").eq("user_id", userId).maybeSingle();
     if (error) { setMessage("Fehler beim Laden der Firma: " + error.message); return; }
     if (!companyUser) { return; } // Kein Onboarding hier – wird in loadCompanySettings entschieden
-    const { data: companyData, error: companyError } = await supabase.from("companies").select("id, name, slug").eq("id", companyUser.company_id).single();
+    const { data: companyData, error: companyError } = await supabase.from("companies").select("id, name, slug, status").eq("id", companyUser.company_id).single();
     if (companyError) { setMessage("Fehler beim Laden der Firmendaten: " + companyError.message); return; }
+    setCompanyBlocked((companyData.status || "active") !== "active");
     const company: CurrentCompany = { company_id: companyUser.company_id, role: companyUser.role, companies: { id: companyData.id, name: companyData.name, slug: companyData.slug || "" } };
     setCurrentCompany(company);
     const { data: features } = await supabase.from("company_features").select("*").eq("company_id", companyUser.company_id).maybeSingle();
@@ -1990,6 +1992,19 @@ export default function Home() {
           <input className="border p-3 w-full rounded text-black" placeholder="Neues Passwort (min. 6 Zeichen)" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
           <input className="border p-3 w-full rounded text-black" placeholder="Passwort bestätigen" type="password" value={newPasswordConfirm} onChange={(e) => setNewPasswordConfirm(e.target.value)} />
           <button type="button" onClick={changePassword} disabled={changingPassword} className="w-full bg-blue-700 text-white py-3 rounded font-bold disabled:opacity-50">{changingPassword ? "Wird gespeichert..." : "Passwort speichern & weiter"}</button>
+        </div>
+      </main>
+    );
+  }
+
+  if (user && companyBlocked) {
+    return (
+      <main className="max-w-md mx-auto p-4 md:p-8 min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="bg-white border rounded-xl p-6 space-y-5 w-full shadow-lg text-center">
+          <div className="text-6xl mb-2">🔒</div>
+          <h2 className="text-2xl font-bold text-red-700">Konto gesperrt</h2>
+          <p className="text-gray-600">Dieses Firmenkonto ist derzeit gesperrt. Bitte kontaktieren Sie Ihren Anbieter, um den Zugang wieder freizuschalten.</p>
+          <button type="button" onClick={signOut} className="w-full bg-gray-800 text-white py-3 rounded font-bold">Abmelden</button>
         </div>
       </main>
     );

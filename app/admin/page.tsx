@@ -8,7 +8,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
 );
 
-type Company = { id: string; name: string; slug: string; created_at: string; features: any; users: any[]; owner_user_id?: string | null; settings?: any };
+type Company = { id: string; name: string; slug: string; created_at: string; features: any; users: any[]; status?: string; owner_user_id?: string | null; settings?: any };
 
 const PACKAGES: Record<string, { label: string; color: string; defaults: any }> = {
   starter:    { label: "Starter (bis 5 MA)",      color: "bg-gray-100 border-gray-300",   defaults: { max_employees: 5,    max_photos: 2,  module_reports: true,  module_work_orders: false, module_auto_reports: false, photos_enabled: false, email_enabled: false, signature_enabled: false, ai_enabled: false, allowed_languages: ["Deutsch"] } },
@@ -208,6 +208,20 @@ export default function AdminPage() {
     loadAll();
   }
 
+  async function setCompanyStatus(companyId: string, status: string) {
+    const labelAktion = status === "blocked" ? "sperren" : "entsperren";
+    if (!confirm(`Firma wirklich ${labelAktion}?`)) return;
+    const res = await fetch("/api/admin-data", {
+      method: "POST",
+      headers: await authHeaders(),
+      body: JSON.stringify({ action: "setCompanyStatus", companyId, status }),
+    });
+    const data = await res.json();
+    if (data.error) { setMessage("Fehler beim Status-Update: " + data.error); return; }
+    setMessage(status === "blocked" ? "🔒 Firma gesperrt." : "🔓 Firma entsperrt.");
+    loadAll();
+  }
+
   async function deleteCompany(companyId: string, companyName: string) {
     if (!confirm(`Firma "${companyName}" wirklich löschen?`)) return;
     const res = await fetch("/api/admin-data", {
@@ -333,7 +347,7 @@ export default function AdminPage() {
                 <div className="flex items-center gap-3">
                   <span>{isOpen ? "▾" : "▸"}</span>
                   <div>
-                    <div className="font-bold text-lg">{company.name}</div>
+                    <div className="font-bold text-lg flex items-center gap-2">{company.name}{company.status === "blocked" && <span className="text-xs font-bold px-2 py-0.5 rounded bg-red-600 text-white">🔒 GESPERRT</span>}</div>
                     <div className="text-sm text-gray-500">Kürzel: <strong>{company.slug || "—"}</strong> | {users.length} Mitarbeiter | {new Date(company.created_at).toLocaleDateString("de-DE")}</div>
                   </div>
                 </div>
@@ -465,6 +479,11 @@ export default function AdminPage() {
                     <button type="button" onClick={() => saveFeatures(company.id)} disabled={saving === company.id} className="bg-blue-700 text-white px-6 py-3 rounded font-bold disabled:opacity-50">
                       {saving === company.id ? "Speichert..." : "💾 Einstellungen speichern"}
                     </button>
+                    {company.status === "blocked" ? (
+                      <button type="button" onClick={() => setCompanyStatus(company.id, "active")} className="bg-green-700 text-white px-4 py-3 rounded font-bold">🔓 Firma entsperren</button>
+                    ) : (
+                      <button type="button" onClick={() => setCompanyStatus(company.id, "blocked")} className="bg-orange-600 text-white px-4 py-3 rounded font-bold">🔒 Firma sperren</button>
+                    )}
                     <button type="button" onClick={() => deleteCompany(company.id, company.name)} className="bg-red-600 text-white px-4 py-3 rounded">🗑 Firma löschen</button>
                   </div>
                 </div>
