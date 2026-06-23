@@ -824,6 +824,44 @@ function withTimeout<T>(promise: Promise<T> | PromiseLike<T>, ms: number, label:
   ]);
 }
 
+// Bild im Browser verkleinern + als JPEG (Qualitaet 0.8) neu speichern, bevor es hochgeladen wird.
+// Max. 1600px laengste Kante; entfernt dabei auch EXIF/GPS-Daten.
+// Faellt bei Nicht-Bildern oder Fehlern auf die Originaldatei zurueck.
+async function compressImage(file: File): Promise<File> {
+  if (!file.type.startsWith("image/")) return file;
+  try {
+    const dataUrl = await new Promise<string>((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result as string);
+      r.onerror = reject;
+      r.readAsDataURL(file);
+    });
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const im = new Image();
+      im.onload = () => resolve(im);
+      im.onerror = reject;
+      im.src = dataUrl;
+    });
+    const maxDim = 1600;
+    let width = img.naturalWidth || img.width;
+    let height = img.naturalHeight || img.height;
+    if (width > maxDim || height > maxDim) {
+      if (width >= height) { height = Math.round(height * (maxDim / width)); width = maxDim; }
+      else { width = Math.round(width * (maxDim / height)); height = maxDim; }
+    }
+    const canvas = document.createElement("canvas");
+    canvas.width = width; canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return file;
+    ctx.drawImage(img, 0, 0, width, height);
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.8));
+    if (!blob || blob.size >= file.size) return file;
+    const baseName = file.name.replace(/\.[^.]+$/, "");
+    return new File([blob], baseName + ".jpg", { type: "image/jpeg" });
+  } catch (e) {
+    return file;
+  }
+}
 // Ersetzt Emojis und Sonderlinien fuer das PDF durch klare Zeichen,
 // weil die PDF-Standardschrift keine Emojis darstellen kann.
 function sanitizePdfText(s: string): string {
@@ -1196,7 +1234,8 @@ export default function Home() {
     if (!files || !user) return;
     setMessage(t.msgPhotoUploading);
     const uploaded: string[] = [];
-    for (const file of Array.from(files)) {
+    for (const original of Array.from(files)) {
+      const file = await compressImage(original);
       const fileExt = file.name.split(".").pop() || "jpg";
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `${user.id}/instructions/${fileName}`;
@@ -1213,7 +1252,8 @@ export default function Home() {
     if (!files || !user) return;
     setMessage(t.msgPhotoUploading);
     const uploaded: string[] = [];
-    for (const file of Array.from(files)) {
+    for (const original of Array.from(files)) {
+      const file = await compressImage(original);
       const fileExt = file.name.split(".").pop() || "jpg";
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `${user.id}/instructions/tasks/${fileName}`;
@@ -1436,7 +1476,8 @@ export default function Home() {
   async function handlePhotos(index: number, files: FileList | null) {
     if (!files || !user) return;
     setMessage(t.msgPhotoUploading);
-    for (const file of Array.from(files)) {
+    for (const original of Array.from(files)) {
+      const file = await compressImage(original);
       const fileExt = file.name.split(".").pop() || "jpg";
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `${user.id}/${calendarWeek || "ohne-kw"}/${fileName}`;
