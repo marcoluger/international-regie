@@ -1736,7 +1736,22 @@ export default function Home() {
     doc.text(`${p.report}: ${reportName || "-"}`, marginLeft, y); y += 6;
     doc.text(`${p.calendarWeek}: ${calendarWeek || "-"}`, marginLeft, y); y += 6;
     doc.text(`${p.employee}: ${employee || "-"}`, marginLeft, y);
-    if (logoBase64) { doc.addImage(logoBase64, "PNG", pageWidth - 45, 8, 30, 30); } else { doc.addImage(qrImage, "PNG", pageWidth - 42, 8, 28, 28); }
+    if (logoBase64) {
+      // Logo seitenverhaeltnis-treu einpassen (max. 55 x 30 mm), rechtsbuendig oben
+      const maxW = 55, maxH = 30, topY = 8, rightEdge = pageWidth - marginRight;
+      let drawW = 30, drawH = 30, fmt = "PNG";
+      try {
+        const props: any = doc.getImageProperties(logoBase64);
+        const ft = (props?.fileType || "").toUpperCase();
+        fmt = (ft === "JPEG" || ft === "JPG") ? "JPEG" : "PNG";
+        const ratio = (props.width || 1) / (props.height || 1);
+        drawW = maxW; drawH = drawW / ratio;
+        if (drawH > maxH) { drawH = maxH; drawW = drawH * ratio; }
+      } catch (e) { drawW = 30; drawH = 30; fmt = "PNG"; }
+      doc.addImage(logoBase64, fmt, rightEdge - drawW, topY, drawW, drawH);
+    } else {
+      doc.addImage(qrImage, "PNG", pageWidth - 42, 8, 28, 28);
+    }
     y += 10; if (y < 75) y = 75;
     doc.setFontSize(12); doc.setFont(FONT, "bold"); doc.text(p.dailyReports, marginLeft, y); y += 8;
     for (const day of days) {
