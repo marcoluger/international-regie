@@ -200,6 +200,7 @@ const texts = {
     msgPhotoUploading: "Fotos werden hochgeladen...",
     msgPhotoOk: "Fotos wurden hochgeladen.",
     msgPhotoErr: "Fehler beim Foto-Upload: ",
+    msgPhotoLimit: "Maximal 2 Fotos erlaubt.",
     msgSaving: "Speichere Arbeitsanweisung...",
     msgNoFirm: "Keine Firma geladen.",
     msgNoTitle: "Bitte Titel der Arbeitsanweisung eintragen.",
@@ -380,6 +381,7 @@ const texts = {
     msgPhotoUploading: "Učitavanje fotografija...",
     msgPhotoOk: "Fotografije su učitane.",
     msgPhotoErr: "Pogreška pri učitavanju fotografije: ",
+    msgPhotoLimit: "Najviše 2 fotografije su dozvoljene.",
     msgSaving: "Sprema se radna uputa...",
     msgNoFirm: "Tvrtka nije učitana.",
     msgNoTitle: "Unesite naslov radne upute.",
@@ -560,6 +562,7 @@ const texts = {
     msgPhotoUploading: "Nalaganje fotografij...",
     msgPhotoOk: "Fotografije so naložene.",
     msgPhotoErr: "Napaka pri nalaganju fotografije: ",
+    msgPhotoLimit: "Dovoljeni sta največ 2 fotografiji.",
     msgSaving: "Shranjevanje delovnega navodila...",
     msgNoFirm: "Podjetje ni naloženo.",
     msgNoTitle: "Vnesite naslov delovnega navodila.",
@@ -740,6 +743,7 @@ const texts = {
     msgPhotoUploading: "Przesyłanie zdjęć...",
     msgPhotoOk: "Zdjęcia zostały przesłane.",
     msgPhotoErr: "Błąd przesyłania zdjęcia: ",
+    msgPhotoLimit: "Maksymalnie 2 zdjęcia.",
     msgSaving: "Zapisywanie instrukcji pracy...",
     msgNoFirm: "Firma nie jest załadowana.",
     msgNoTitle: "Wprowadź tytuł instrukcji pracy.",
@@ -1233,9 +1237,13 @@ export default function Home() {
 
   async function handleInstructionPhotos(files: FileList | null) {
     if (!files || !user) return;
+    const existing = instructionPhotos.length;
+    if (existing >= 2) { setMessage(t.msgPhotoLimit); return; }
+    const selected = Array.from(files).slice(0, 2 - existing);
+    const dropped = Array.from(files).length - selected.length;
     setMessage(t.msgPhotoUploading);
     const uploaded: string[] = [];
-    for (const original of Array.from(files)) {
+    for (const original of selected) {
       const file = await compressImage(original);
       const fileExt = file.name.split(".").pop() || "jpg";
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
@@ -1246,14 +1254,18 @@ export default function Home() {
       uploaded.push(data.publicUrl);
     }
     setInstructionPhotos((prev) => [...prev, ...uploaded]);
-    setMessage(t.msgPhotoOk);
+    setMessage(dropped > 0 ? t.msgPhotoLimit : t.msgPhotoOk);
   }
 
   async function handleInstructionTaskPhotos(taskIndex: number, files: FileList | null) {
     if (!files || !user) return;
+    const existing = (instructionTaskPhotos[taskIndex] || []).length;
+    if (existing >= 2) { setMessage(t.msgPhotoLimit); return; }
+    const selected = Array.from(files).slice(0, 2 - existing);
+    const dropped = Array.from(files).length - selected.length;
     setMessage(t.msgPhotoUploading);
     const uploaded: string[] = [];
-    for (const original of Array.from(files)) {
+    for (const original of selected) {
       const file = await compressImage(original);
       const fileExt = file.name.split(".").pop() || "jpg";
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
@@ -1264,7 +1276,7 @@ export default function Home() {
       uploaded.push(data.publicUrl);
     }
     setInstructionTaskPhotos((prev) => ({ ...prev, [taskIndex]: [...(prev[taskIndex] || []), ...uploaded] }));
-    setMessage(t.msgPhotoOk);
+    setMessage(dropped > 0 ? t.msgPhotoLimit : t.msgPhotoOk);
   }
 
   function getTranslated(instructionId: string, field: string, fallback: string): string {
@@ -1476,8 +1488,12 @@ export default function Home() {
 
   async function handlePhotos(index: number, files: FileList | null) {
     if (!files || !user) return;
+    const existing = days[index]?.photos?.length || 0;
+    if (existing >= 2) { setMessage(t.msgPhotoLimit); return; }
+    const selected = Array.from(files).slice(0, 2 - existing);
+    const dropped = Array.from(files).length - selected.length;
     setMessage(t.msgPhotoUploading);
-    for (const original of Array.from(files)) {
+    for (const original of selected) {
       const file = await compressImage(original);
       const fileExt = file.name.split(".").pop() || "jpg";
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
@@ -1487,7 +1503,7 @@ export default function Home() {
       const { data } = supabase.storage.from("report-photos").getPublicUrl(filePath);
       const copy = [...days]; copy[index] = { ...copy[index], photos: [...copy[index].photos, data.publicUrl] }; setDays(copy);
     }
-    setMessage(t.msgPhotoOk);
+    setMessage(dropped > 0 ? t.msgPhotoLimit : t.msgPhotoOk);
   }
 
   function deletePhoto(dayIndex: number, photoIndex: number) {
