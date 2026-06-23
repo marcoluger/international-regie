@@ -2197,6 +2197,7 @@ export default function Home() {
                 <strong>{project.name}</strong>
                 <p>{t.customer}: {project.customer || "-"}</p>
                 <p>{t.site}: {project.site || "-"}</p>
+                {(currentCompany?.role === "owner" || currentCompany?.role === "admin") ? (
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-sm font-medium">{t.projectManager}:</span>
                   <select className="border p-2 rounded text-sm" value={pmEdits[project.id] ?? (project.project_manager || "")} onChange={(e) => setPmEdits((prev) => ({ ...prev, [project.id]: e.target.value }))}>
@@ -2207,6 +2208,9 @@ export default function Home() {
                   <button type="button" onClick={() => updateProjectManager(project.id, pmEdits[project.id] ?? (project.project_manager || ""))} className="bg-blue-700 text-white px-3 py-1 rounded text-sm">{t.save}</button>
                   <button type="button" onClick={() => assignPmToProjectInstructions(project.id, pmEdits[project.id] ?? (project.project_manager || ""))} className="bg-green-700 text-white px-3 py-1 rounded text-sm">Sichtbarkeit zuweisen</button>
                 </div>
+                ) : (
+                <p>{t.projectManager}: {project.project_manager || "-"}</p>
+                )}
                 <div className="flex gap-2">
                   <button type="button" onClick={() => setSelectedProjectDetailId(project.id === selectedProjectDetailId ? "" : project.id)} className="bg-gray-700 text-white px-3 py-2 rounded">{project.id === selectedProjectDetailId ? t.closeProject : t.openProject}</button>
                   <button type="button" onClick={() => deleteProject(project.id)} className="bg-red-600 text-white px-3 py-2 rounded">{t.deleteProject}</button>
