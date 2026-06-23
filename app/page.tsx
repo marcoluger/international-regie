@@ -78,6 +78,7 @@ type CompanyFeatures = {
   signature_enabled: boolean;
   ai_enabled: boolean;
   max_employees: number;
+  max_photos?: number;
   allowed_languages: string[];
 };
 
@@ -200,7 +201,7 @@ const texts = {
     msgPhotoUploading: "Fotos werden hochgeladen...",
     msgPhotoOk: "Fotos wurden hochgeladen.",
     msgPhotoErr: "Fehler beim Foto-Upload: ",
-    msgPhotoLimit: "Maximal 2 Fotos erlaubt.",
+    msgPhotoLimit: "Maximal {n} Fotos erlaubt.",
     msgSaving: "Speichere Arbeitsanweisung...",
     msgNoFirm: "Keine Firma geladen.",
     msgNoTitle: "Bitte Titel der Arbeitsanweisung eintragen.",
@@ -381,7 +382,7 @@ const texts = {
     msgPhotoUploading: "Učitavanje fotografija...",
     msgPhotoOk: "Fotografije su učitane.",
     msgPhotoErr: "Pogreška pri učitavanju fotografije: ",
-    msgPhotoLimit: "Najviše 2 fotografije su dozvoljene.",
+    msgPhotoLimit: "Najviše {n} fotografija dozvoljeno.",
     msgSaving: "Sprema se radna uputa...",
     msgNoFirm: "Tvrtka nije učitana.",
     msgNoTitle: "Unesite naslov radne upute.",
@@ -562,7 +563,7 @@ const texts = {
     msgPhotoUploading: "Nalaganje fotografij...",
     msgPhotoOk: "Fotografije so naložene.",
     msgPhotoErr: "Napaka pri nalaganju fotografije: ",
-    msgPhotoLimit: "Dovoljeni sta največ 2 fotografiji.",
+    msgPhotoLimit: "Največ {n} fotografij dovoljeno.",
     msgSaving: "Shranjevanje delovnega navodila...",
     msgNoFirm: "Podjetje ni naloženo.",
     msgNoTitle: "Vnesite naslov delovnega navodila.",
@@ -743,7 +744,7 @@ const texts = {
     msgPhotoUploading: "Przesyłanie zdjęć...",
     msgPhotoOk: "Zdjęcia zostały przesłane.",
     msgPhotoErr: "Błąd przesyłania zdjęcia: ",
-    msgPhotoLimit: "Maksymalnie 2 zdjęcia.",
+    msgPhotoLimit: "Maksymalnie {n} zdjęć.",
     msgSaving: "Zapisywanie instrukcji pracy...",
     msgNoFirm: "Firma nie jest załadowana.",
     msgNoTitle: "Wprowadź tytuł instrukcji pracy.",
@@ -1238,8 +1239,9 @@ export default function Home() {
   async function handleInstructionPhotos(files: FileList | null) {
     if (!files || !user) return;
     const existing = instructionPhotos.length;
-    if (existing >= 2) { setMessage(t.msgPhotoLimit); return; }
-    const selected = Array.from(files).slice(0, 2 - existing);
+    const limit = companyFeatures?.max_photos ?? 2;
+    if (limit > 0 && existing >= limit) { setMessage(t.msgPhotoLimit.replace("{n}", String(limit))); return; }
+    const selected = limit > 0 ? Array.from(files).slice(0, limit - existing) : Array.from(files);
     const dropped = Array.from(files).length - selected.length;
     setMessage(t.msgPhotoUploading);
     const uploaded: string[] = [];
@@ -1254,14 +1256,15 @@ export default function Home() {
       uploaded.push(data.publicUrl);
     }
     setInstructionPhotos((prev) => [...prev, ...uploaded]);
-    setMessage(dropped > 0 ? t.msgPhotoLimit : t.msgPhotoOk);
+    setMessage(dropped > 0 ? t.msgPhotoLimit.replace("{n}", String(limit)) : t.msgPhotoOk);
   }
 
   async function handleInstructionTaskPhotos(taskIndex: number, files: FileList | null) {
     if (!files || !user) return;
     const existing = (instructionTaskPhotos[taskIndex] || []).length;
-    if (existing >= 2) { setMessage(t.msgPhotoLimit); return; }
-    const selected = Array.from(files).slice(0, 2 - existing);
+    const limit = companyFeatures?.max_photos ?? 2;
+    if (limit > 0 && existing >= limit) { setMessage(t.msgPhotoLimit.replace("{n}", String(limit))); return; }
+    const selected = limit > 0 ? Array.from(files).slice(0, limit - existing) : Array.from(files);
     const dropped = Array.from(files).length - selected.length;
     setMessage(t.msgPhotoUploading);
     const uploaded: string[] = [];
@@ -1276,7 +1279,7 @@ export default function Home() {
       uploaded.push(data.publicUrl);
     }
     setInstructionTaskPhotos((prev) => ({ ...prev, [taskIndex]: [...(prev[taskIndex] || []), ...uploaded] }));
-    setMessage(dropped > 0 ? t.msgPhotoLimit : t.msgPhotoOk);
+    setMessage(dropped > 0 ? t.msgPhotoLimit.replace("{n}", String(limit)) : t.msgPhotoOk);
   }
 
   function getTranslated(instructionId: string, field: string, fallback: string): string {
@@ -1489,8 +1492,9 @@ export default function Home() {
   async function handlePhotos(index: number, files: FileList | null) {
     if (!files || !user) return;
     const existing = days[index]?.photos?.length || 0;
-    if (existing >= 2) { setMessage(t.msgPhotoLimit); return; }
-    const selected = Array.from(files).slice(0, 2 - existing);
+    const limit = companyFeatures?.max_photos ?? 2;
+    if (limit > 0 && existing >= limit) { setMessage(t.msgPhotoLimit.replace("{n}", String(limit))); return; }
+    const selected = limit > 0 ? Array.from(files).slice(0, limit - existing) : Array.from(files);
     const dropped = Array.from(files).length - selected.length;
     setMessage(t.msgPhotoUploading);
     for (const original of selected) {
@@ -1503,7 +1507,7 @@ export default function Home() {
       const { data } = supabase.storage.from("report-photos").getPublicUrl(filePath);
       const copy = [...days]; copy[index] = { ...copy[index], photos: [...copy[index].photos, data.publicUrl] }; setDays(copy);
     }
-    setMessage(dropped > 0 ? t.msgPhotoLimit : t.msgPhotoOk);
+    setMessage(dropped > 0 ? t.msgPhotoLimit.replace("{n}", String(limit)) : t.msgPhotoOk);
   }
 
   function deletePhoto(dayIndex: number, photoIndex: number) {
@@ -1819,7 +1823,7 @@ export default function Home() {
       companyId = newCompany.id;
       const { error: userError } = await supabase.from("company_users").insert({ company_id: companyId, user_id: user.id, email: user.email, full_name: companySettings.company_name, role: "owner" });
       if (userError) { setMessage("Fehler beim Anlegen des Benutzers: " + userError.message); return; }
-      await supabase.from("company_features").insert({ company_id: companyId, package_name: "starter", max_employees: 5, module_reports: true, module_work_orders: false, module_auto_reports: false, photos_enabled: false, email_enabled: false, signature_enabled: false, ai_enabled: false, allowed_languages: ["Deutsch"] });
+      await supabase.from("company_features").insert({ company_id: companyId, package_name: "starter", max_employees: 5, max_photos: 2, module_reports: true, module_work_orders: false, module_auto_reports: false, photos_enabled: false, email_enabled: false, signature_enabled: false, ai_enabled: false, allowed_languages: ["Deutsch"] });
     }
     const { error } = await supabase.from("company_settings").upsert({ ...companySettings, user_id: user.id }, { onConflict: "user_id" });
     if (error) { setMessage("Fehler beim Speichern: " + error.message); return; }
