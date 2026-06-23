@@ -1936,6 +1936,7 @@ export default function Home() {
     const employeePart = illegal(employee || "Mitarbeiter").replace(/\s+/g, "_");
     const filename = `${projectPart}_${kwPart}_${employeePart}.pdf`;
     if (sendByEmail) {
+      if (!companyFeatures?.email_enabled) { setMessage("🔒 E-Mail-Versand ist in deinem Paket nicht aktiviert."); return; }
       if (!emailTo.trim()) { setMessage(t.msgEmailRequired); return; }
       setMessage(t.msgEmailSending);
       const pdfBase64 = doc.output("datauristring").split(",")[1];
@@ -2157,7 +2158,7 @@ export default function Home() {
               <select className="border p-3 text-black bg-white" value={toLanguage} onChange={(e) => setToLanguage(e.target.value)}>
                 {(getAllowedLanguages(companyFeatures).length > 0 ? getAllowedLanguages(companyFeatures) : languages).filter((lang) => lang !== "Deutsch").map((lang) => <option key={lang} value={lang}>{lang}</option>)}
               </select>
-              <input className="border p-3 text-black bg-white md:col-span-2" placeholder={t.recipientEmail} value={emailTo} onChange={(e) => setEmailTo(e.target.value)} />
+              {companyFeatures?.email_enabled ? <input className="border p-3 text-black bg-white md:col-span-2" placeholder={t.recipientEmail} value={emailTo} onChange={(e) => setEmailTo(e.target.value)} /> : <div className="border rounded p-3 bg-gray-50 text-sm text-gray-400 md:col-span-2">🔒 E-Mail-Versand ist in deinem Paket nicht aktiviert.</div>}
             </div>
           </section>
           <section className="border rounded bg-white text-black">
@@ -2199,7 +2200,7 @@ export default function Home() {
             <button type="button" onClick={translateAll} className="bg-black text-white px-4 py-3 rounded">{loading ? t.translating : t.translateWeek}</button>
             <button type="button" onClick={saveReport} className="bg-orange-600 text-white px-4 py-3 rounded">{currentReportId ? t.update : t.save}</button>
             <button type="button" onClick={() => createPDF(false)} className="bg-green-600 text-white px-4 py-3 rounded">{t.downloadPdf}</button>
-            <button type="button" onClick={() => createPDF(true)} className="bg-purple-600 text-white px-4 py-3 rounded">{t.sendPdf}</button>
+            {companyFeatures?.email_enabled && <button type="button" onClick={() => createPDF(true)} className="bg-purple-600 text-white px-4 py-3 rounded">{t.sendPdf}</button>}
           </div>
         </div>
       )}
