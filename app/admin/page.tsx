@@ -11,10 +11,10 @@ const supabase = createClient(
 type Company = { id: string; name: string; slug: string; created_at: string; features: any; users: any[] };
 
 const PACKAGES: Record<string, { label: string; color: string; defaults: any }> = {
-  starter:    { label: "Starter (bis 5 MA)",      color: "bg-gray-100 border-gray-300",   defaults: { max_employees: 5,    module_reports: true,  module_work_orders: false, module_auto_reports: false, photos_enabled: false, email_enabled: false, signature_enabled: false, ai_enabled: false, allowed_languages: ["Deutsch"] } },
-  team:       { label: "Team (bis 20 MA)",         color: "bg-blue-50 border-blue-300",    defaults: { max_employees: 20,   module_reports: true,  module_work_orders: true,  module_auto_reports: false, photos_enabled: true,  email_enabled: true,  signature_enabled: false, ai_enabled: true,  allowed_languages: ["Deutsch", "Polnisch"] } },
-  business:   { label: "Business (bis 100 MA)",   color: "bg-green-50 border-green-300",  defaults: { max_employees: 100,  module_reports: true,  module_work_orders: true,  module_auto_reports: true,  photos_enabled: true,  email_enabled: true,  signature_enabled: true,  ai_enabled: true,  allowed_languages: ["Deutsch", "Kroatisch", "Slowenisch", "Polnisch", "Englisch"] } },
-  enterprise: { label: "Enterprise (unbegrenzt)", color: "bg-purple-50 border-purple-300", defaults: { max_employees: 9999, module_reports: true,  module_work_orders: true,  module_auto_reports: true,  photos_enabled: true,  email_enabled: true,  signature_enabled: true,  ai_enabled: true,  allowed_languages: ["Deutsch", "Kroatisch", "Slowenisch", "Polnisch", "Englisch"] } },
+  starter:    { label: "Starter (bis 5 MA)",      color: "bg-gray-100 border-gray-300",   defaults: { max_employees: 5,    max_photos: 2,  module_reports: true,  module_work_orders: false, module_auto_reports: false, photos_enabled: false, email_enabled: false, signature_enabled: false, ai_enabled: false, allowed_languages: ["Deutsch"] } },
+  team:       { label: "Team (bis 20 MA)",         color: "bg-blue-50 border-blue-300",    defaults: { max_employees: 20,   max_photos: 10, module_reports: true,  module_work_orders: true,  module_auto_reports: false, photos_enabled: true,  email_enabled: true,  signature_enabled: false, ai_enabled: true,  allowed_languages: ["Deutsch", "Polnisch"] } },
+  business:   { label: "Business (bis 100 MA)",   color: "bg-green-50 border-green-300",  defaults: { max_employees: 100,  max_photos: 30, module_reports: true,  module_work_orders: true,  module_auto_reports: true,  photos_enabled: true,  email_enabled: true,  signature_enabled: true,  ai_enabled: true,  allowed_languages: ["Deutsch", "Kroatisch", "Slowenisch", "Polnisch", "Englisch"] } },
+  enterprise: { label: "Enterprise (unbegrenzt)", color: "bg-purple-50 border-purple-300", defaults: { max_employees: 9999, max_photos: 0,  module_reports: true,  module_work_orders: true,  module_auto_reports: true,  photos_enabled: true,  email_enabled: true,  signature_enabled: true,  ai_enabled: true,  allowed_languages: ["Deutsch", "Kroatisch", "Slowenisch", "Polnisch", "Englisch"] } },
 };
 
 const ALL_LANGUAGES = ["Deutsch", "Kroatisch", "Slowenisch", "Polnisch", "Englisch"];
@@ -269,10 +269,14 @@ export default function AdminPage() {
                   </div>
                   <div>
                     <h3 className="font-bold mb-3">📅 Lizenz & Limits</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       <div>
                         <label className="text-sm text-gray-600 block mb-1">Max. Mitarbeiter</label>
                         <input type="number" className="border p-2 rounded w-full" value={features.max_employees || 5} onChange={(e) => updateFeature(company.id, "max_employees", Number(e.target.value))} />
+                      </div>
+                      <div>
+                        <label className="text-sm text-gray-600 block mb-1">Max. Fotos (0 = unbegrenzt)</label>
+                        <input type="number" min="0" className="border p-2 rounded w-full" value={features.max_photos ?? 2} onChange={(e) => updateFeature(company.id, "max_photos", Number(e.target.value))} />
                       </div>
                       <div>
                         <label className="text-sm text-gray-600 block mb-1">Gültig bis</label>
