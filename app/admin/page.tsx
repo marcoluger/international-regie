@@ -438,9 +438,7 @@ export default function AdminPage() {
                     <h3 className="font-bold mb-3">🧩 Module</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <Toggle label="📋 Regieberichte"      value={!!features.module_reports}      onChange={(v) => updateFeature(company.id, "module_reports", v)} />
-                      <Toggle label="📝 Arbeitsanweisungen" value={!!features.module_work_orders}  onChange={(v) => updateFeature(company.id, "module_work_orders", v)} />
                       <Toggle label="🤖 Auto-Regieberichte" value={!!features.module_auto_reports} onChange={(v) => updateFeature(company.id, "module_auto_reports", v)} />
-                      <Toggle label="🧠 KI-Übersetzung"     value={!!features.ai_enabled}          onChange={(v) => updateFeature(company.id, "ai_enabled", v)} />
                       <Toggle label="📸 Foto-Upload"        value={!!features.photos_enabled}      onChange={(v) => updateFeature(company.id, "photos_enabled", v)} />
                       <Toggle label="✉️ E-Mail-Versand"      value={!!features.email_enabled}       onChange={(v) => updateFeature(company.id, "email_enabled", v)} />
                       <Toggle label="✍️ Unterschriften"     value={!!features.signature_enabled}   onChange={(v) => updateFeature(company.id, "signature_enabled", v)} />
