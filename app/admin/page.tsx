@@ -46,6 +46,7 @@ export default function AdminPage() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [featuresMap, setFeaturesMap] = useState<Record<string, any>>({});
   const [openCompanyId, setOpenCompanyId] = useState<string | null>(null);
+  const [openDataId, setOpenDataId] = useState<string | null>(null);
   const [saving, setSaving] = useState<string | null>(null);
   const [savingData, setSavingData] = useState<string | null>(null);
   const [nameMap, setNameMap] = useState<Record<string, string>>({});
@@ -346,7 +347,8 @@ export default function AdminPage() {
                     <input className="border p-2 rounded w-full max-w-xs" value={company.slug || ""} onChange={(e) => { const s = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""); updateSlug(company.id, s); }} />
                   </div>
                   <div>
-                    <h3 className="font-bold mb-3">🏢 Firmendaten</h3>
+                    <h3 className="font-bold mb-3 flex items-center gap-2 cursor-pointer select-none" onClick={() => setOpenDataId(openDataId === company.id ? null : company.id)}><span>{openDataId === company.id ? "▾" : "▸"}</span>🏢 Firmendaten</h3>
+                    {openDataId === company.id && (<>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div>
                         <label className="text-sm text-gray-600 block mb-1">Interner Firmenname (Admin-Liste)</label>
@@ -391,6 +393,7 @@ export default function AdminPage() {
                     <button type="button" onClick={() => saveCompanyData(company.id)} disabled={savingData === company.id} className="mt-3 bg-indigo-700 text-white px-5 py-2 rounded font-medium disabled:opacity-50">
                       {savingData === company.id ? "Speichert..." : "💾 Firmendaten speichern"}
                     </button>
+                    </>)}
                   </div>
                   <div>
                     <h3 className="font-bold mb-3">📦 Paket</h3>
