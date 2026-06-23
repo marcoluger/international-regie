@@ -1602,6 +1602,28 @@ export default function Home() {
     await loadProjects(); setMessage("Projektleiter geändert.");
   }
 
+  // Neuen Projektleiter (additiv) allen Anweisungen des Projekts zuweisen, damit er sie sieht.
+  async function assignPmToProjectInstructions(projectId: string, pmName: string) {
+    if (!currentCompany) return;
+    const member = companyUsers.find((m: any) => m.role === "project_manager" && (m.full_name || m.email) === pmName);
+    if (!member) { setMessage("Kein Projektleiter mit diesem Namen in der Mitarbeiterliste gefunden – Sichtbarkeit kann nicht übertragen werden."); return; }
+    const newId = member.user_id;
+    const { data: insts, error: loadErr } = await supabase.from("work_instructions").select("id, assigned_user_ids").eq("project_id", projectId);
+    if (loadErr) { setMessage("Fehler beim Laden der Anweisungen: " + loadErr.message); return; }
+    if (!insts || insts.length === 0) { setMessage("Dieses Projekt hat noch keine Anweisungen."); return; }
+    if (!window.confirm(`${pmName} allen ${insts.length} Anweisung(en) dieses Projekts zuweisen (Sichtbarkeit)?`)) return;
+    let changed = 0;
+    for (const inst of insts as any[]) {
+      const current: string[] = inst.assigned_user_ids || [];
+      if (current.includes(newId)) continue;
+      const { error: upErr } = await supabase.from("work_instructions").update({ assigned_user_ids: [...current, newId] }).eq("id", inst.id);
+      if (upErr) { setMessage("Fehler beim Zuweisen: " + upErr.message); return; }
+      changed++;
+    }
+    await loadWorkInstructions(currentCompany.company_id);
+    setMessage(`Sichtbarkeit übertragen: ${pmName} wurde ${changed} Anweisung(en) zugewiesen.`);
+  }
+
   async function deleteProject(id: string) {
     if (!currentCompany) return;
     const { error } = await supabase.from("projects").delete().eq("id", id);
@@ -2177,9 +2199,13 @@ export default function Home() {
                 <p>{t.site}: {project.site || "-"}</p>
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-sm font-medium">{t.projectManager}:</span>
-                  <input list={`pm-${project.id}`} className="border p-2 rounded text-sm" value={pmEdits[project.id] ?? (project.project_manager || "")} onChange={(e) => setPmEdits((prev) => ({ ...prev, [project.id]: e.target.value }))} placeholder="-" />
-                  <datalist id={`pm-${project.id}`}>{companyUsers.filter((m) => m.role === "project_manager").map((m) => (<option key={m.user_id} value={m.full_name || m.email || ""} />))}</datalist>
+                  <select className="border p-2 rounded text-sm" value={pmEdits[project.id] ?? (project.project_manager || "")} onChange={(e) => setPmEdits((prev) => ({ ...prev, [project.id]: e.target.value }))}>
+                    <option value="">—</option>
+                    {project.project_manager && !companyUsers.some((m: any) => (m.full_name || m.email) === project.project_manager && m.role === "project_manager") && (<option value={project.project_manager}>{project.project_manager}</option>)}
+                    {companyUsers.filter((m: any) => m.role === "project_manager").map((m: any) => (<option key={m.user_id} value={m.full_name || m.email || ""}>{m.full_name || m.email}</option>))}
+                  </select>
                   <button type="button" onClick={() => updateProjectManager(project.id, pmEdits[project.id] ?? (project.project_manager || ""))} className="bg-blue-700 text-white px-3 py-1 rounded text-sm">{t.save}</button>
+                  <button type="button" onClick={() => assignPmToProjectInstructions(project.id, pmEdits[project.id] ?? (project.project_manager || ""))} className="bg-green-700 text-white px-3 py-1 rounded text-sm">Sichtbarkeit zuweisen</button>
                 </div>
                 <div className="flex gap-2">
                   <button type="button" onClick={() => setSelectedProjectDetailId(project.id === selectedProjectDetailId ? "" : project.id)} className="bg-gray-700 text-white px-3 py-2 rounded">{project.id === selectedProjectDetailId ? t.closeProject : t.openProject}</button>
