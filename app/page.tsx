@@ -3982,6 +3982,11 @@ export default function Home() {
           <button type="submit" className="bg-blue-600 text-white px-4 py-3 rounded w-full">{t.login}</button>
           </form>
         </section>
+        <footer className="text-center text-xs text-gray-500 mt-6">
+          <a href="/impressum" className="underline hover:text-gray-700">Impressum</a>
+          <span className="mx-2">·</span>
+          <a href="/datenschutz" className="underline hover:text-gray-700">Datenschutz</a>
+        </footer>
       </main>
     );
   }
@@ -4706,6 +4711,12 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      <footer className="text-center text-xs text-gray-500 pt-4 pb-2">
+        <a href="/impressum" className="underline hover:text-gray-700">Impressum</a>
+        <span className="mx-2">·</span>
+        <a href="/datenschutz" className="underline hover:text-gray-700">Datenschutz</a>
+      </footer>
 
     </main>
   );
