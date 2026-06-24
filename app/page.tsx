@@ -84,6 +84,23 @@ type CompanyFeatures = {
 
 const texts = {
   Deutsch: {
+    msgFillRequired: "Bitte alle Pflichtfelder ausfüllen.",
+    msgEmployeeDeleted: "Mitarbeiter wurde gelöscht.",
+    msgNoEmailAddr: "Keine E-Mail-Adresse vorhanden.",
+    msgCommentSavedOk: "✅ Kommentar gespeichert.",
+    msgNoteSaved: "Notiz wurde gespeichert.",
+    msgLogoUploaded: "Logo wurde hochgeladen. Bitte Firmendaten speichern.",
+    msgPleaseLogin: "Bitte zuerst anmelden.",
+    msgPmUnchanged: "Projektleiter unverändert.",
+    msgPmChanged: "Projektleiter geändert.",
+    msgPmNotFound: "Kein Projektleiter mit diesem Namen in der Mitarbeiterliste gefunden – Sichtbarkeit kann nicht übertragen werden.",
+    msgProjectNoInstr: "Dieses Projekt hat noch keine Anweisungen.",
+    msgTranslatingGeneric: "Übersetze...",
+    msgReportPrepared: "Regiebericht wurde aus Arbeitsanweisung vorbereitet.",
+    msgEmailNotEnabled: "🔒 E-Mail-Versand ist in deinem Paket nicht aktiviert.",
+    assignVisibility: "Sichtbarkeit zuweisen",
+    assignEmployees: "Mitarbeiter zuweisen",
+    assignProjectManager: "Projektleiter zuweisen",
     instructionsLocked: "Arbeitsanweisungen anlegen ist nur für Projektleiter und Admins möglich.",
     title: "Regie International",
     subtitle: "Arbeitsanweisungen und Regieberichte erfassen, übersetzen, speichern und versenden.",
@@ -266,6 +283,23 @@ const texts = {
     copyDone: "Arbeitsschritte wurden übernommen.",
   },
   Rumänisch: {
+    msgFillRequired: "Vă rugăm completați toate câmpurile obligatorii.",
+    msgEmployeeDeleted: "Angajatul a fost șters.",
+    msgNoEmailAddr: "Nu există adresă de e-mail.",
+    msgCommentSavedOk: "✅ Comentariu salvat.",
+    msgNoteSaved: "Nota a fost salvată.",
+    msgLogoUploaded: "Logoul a fost încărcat. Vă rugăm salvați datele firmei.",
+    msgPleaseLogin: "Vă rugăm autentificați-vă mai întâi.",
+    msgPmUnchanged: "Șeful de proiect neschimbat.",
+    msgPmChanged: "Șeful de proiect a fost schimbat.",
+    msgPmNotFound: "Nu s-a găsit niciun șef de proiect cu acest nume în lista de angajați – vizibilitatea nu poate fi transferată.",
+    msgProjectNoInstr: "Acest proiect nu are încă instrucțiuni.",
+    msgTranslatingGeneric: "Se traduce...",
+    msgReportPrepared: "Raportul de lucru a fost pregătit din instrucțiunea de lucru.",
+    msgEmailNotEnabled: "🔒 Trimiterea de e-mailuri nu este activată în pachetul tău.",
+    assignVisibility: "Atribuie vizibilitate",
+    assignEmployees: "Atribuie angajați",
+    assignProjectManager: "Atribuie șef de proiect",
     instructionsLocked: "Crearea instrucțiunilor de lucru este posibilă doar pentru șefii de proiect și administratori.",
     title: "Regie International",
     subtitle: "Înregistrați, traduceți, salvați și trimiteți instrucțiuni de lucru și rapoarte de lucru.",
@@ -448,6 +482,23 @@ const texts = {
     copyDone: "Etapele de lucru au fost preluate.",
   },
   Englisch: {
+    msgFillRequired: "Please fill in all required fields.",
+    msgEmployeeDeleted: "Employee has been deleted.",
+    msgNoEmailAddr: "No email address available.",
+    msgCommentSavedOk: "✅ Comment saved.",
+    msgNoteSaved: "Note has been saved.",
+    msgLogoUploaded: "Logo has been uploaded. Please save the company data.",
+    msgPleaseLogin: "Please log in first.",
+    msgPmUnchanged: "Project manager unchanged.",
+    msgPmChanged: "Project manager changed.",
+    msgPmNotFound: "No project manager with this name found in the employee list – visibility cannot be transferred.",
+    msgProjectNoInstr: "This project has no work instructions yet.",
+    msgTranslatingGeneric: "Translating...",
+    msgReportPrepared: "Work report has been prepared from the work instruction.",
+    msgEmailNotEnabled: "🔒 Email sending is not enabled in your plan.",
+    assignVisibility: "Assign visibility",
+    assignEmployees: "Assign employees",
+    assignProjectManager: "Assign project manager",
     instructionsLocked: "Creating work instructions is only possible for project managers and admins.",
     title: "Regie International",
     subtitle: "Create, translate, save and send work instructions and work reports.",
@@ -630,6 +681,23 @@ const texts = {
     copyDone: "Work steps have been applied.",
   },
   Italienisch: {
+    msgFillRequired: "Compila tutti i campi obbligatori.",
+    msgEmployeeDeleted: "Il dipendente è stato eliminato.",
+    msgNoEmailAddr: "Nessun indirizzo e-mail disponibile.",
+    msgCommentSavedOk: "✅ Commento salvato.",
+    msgNoteSaved: "La nota è stata salvata.",
+    msgLogoUploaded: "Logo caricato. Salva i dati dell'azienda.",
+    msgPleaseLogin: "Accedi prima.",
+    msgPmUnchanged: "Responsabile progetto invariato.",
+    msgPmChanged: "Responsabile progetto modificato.",
+    msgPmNotFound: "Nessun responsabile progetto con questo nome trovato nell'elenco dipendenti – la visibilità non può essere trasferita.",
+    msgProjectNoInstr: "Questo progetto non ha ancora istruzioni.",
+    msgTranslatingGeneric: "Traduzione in corso...",
+    msgReportPrepared: "Il rapporto di lavoro è stato preparato dall'istruzione di lavoro.",
+    msgEmailNotEnabled: "🔒 L'invio di e-mail non è attivo nel tuo pacchetto.",
+    assignVisibility: "Assegna visibilità",
+    assignEmployees: "Assegna dipendenti",
+    assignProjectManager: "Assegna responsabile progetto",
     instructionsLocked: "La creazione di istruzioni di lavoro è possibile solo per i responsabili di progetto e gli amministratori.",
     title: "Regie International",
     subtitle: "Registra, traduci, salva e invia istruzioni di lavoro e rapporti di lavoro.",
@@ -812,6 +880,23 @@ const texts = {
     copyDone: "Le fasi di lavoro sono state applicate.",
   },
   Türkisch: {
+    msgFillRequired: "Lütfen tüm zorunlu alanları doldurun.",
+    msgEmployeeDeleted: "Çalışan silindi.",
+    msgNoEmailAddr: "E-posta adresi yok.",
+    msgCommentSavedOk: "✅ Yorum kaydedildi.",
+    msgNoteSaved: "Not kaydedildi.",
+    msgLogoUploaded: "Logo yüklendi. Lütfen firma bilgilerini kaydedin.",
+    msgPleaseLogin: "Lütfen önce giriş yapın.",
+    msgPmUnchanged: "Proje yöneticisi değişmedi.",
+    msgPmChanged: "Proje yöneticisi değiştirildi.",
+    msgPmNotFound: "Çalışan listesinde bu isimde bir proje yöneticisi bulunamadı – görünürlük aktarılamaz.",
+    msgProjectNoInstr: "Bu projenin henüz talimatı yok.",
+    msgTranslatingGeneric: "Çevriliyor...",
+    msgReportPrepared: "İş raporu, iş talimatından hazırlandı.",
+    msgEmailNotEnabled: "🔒 E-posta gönderimi paketinizde etkin değil.",
+    assignVisibility: "Görünürlük ata",
+    assignEmployees: "Çalışan ata",
+    assignProjectManager: "Proje yöneticisi ata",
     instructionsLocked: "İş talimatı oluşturmak yalnızca proje yöneticileri ve yöneticiler için mümkündür.",
     title: "Regie International",
     subtitle: "İş talimatlarını ve iş raporlarını kaydedin, çevirin, saklayın ve gönderin.",
@@ -994,6 +1079,23 @@ const texts = {
     copyDone: "İş adımları alındı.",
   },
   Ungarisch: {
+    msgFillRequired: "Kérjük, töltse ki az összes kötelező mezőt.",
+    msgEmployeeDeleted: "A munkatárs törölve.",
+    msgNoEmailAddr: "Nincs e-mail cím.",
+    msgCommentSavedOk: "✅ Megjegyzés mentve.",
+    msgNoteSaved: "A jegyzet mentve.",
+    msgLogoUploaded: "A logó feltöltve. Kérjük, mentse a cégadatokat.",
+    msgPleaseLogin: "Kérjük, először jelentkezzen be.",
+    msgPmUnchanged: "Projektvezető változatlan.",
+    msgPmChanged: "Projektvezető módosítva.",
+    msgPmNotFound: "Nem található ilyen nevű projektvezető a munkatársak listáján – a láthatóság nem ruházható át.",
+    msgProjectNoInstr: "Ennek a projektnek még nincsenek utasításai.",
+    msgTranslatingGeneric: "Fordítás...",
+    msgReportPrepared: "A munkajelentés elkészült a munkautasításból.",
+    msgEmailNotEnabled: "🔒 Az e-mail küldés nincs engedélyezve a csomagodban.",
+    assignVisibility: "Láthatóság hozzárendelése",
+    assignEmployees: "Munkatársak hozzárendelése",
+    assignProjectManager: "Projektvezető hozzárendelése",
     instructionsLocked: "Munkautasítások létrehozása csak projektvezetők és adminisztrátorok számára lehetséges.",
     title: "Regie International",
     subtitle: "Munkautasítások és munkajelentések rögzítése, fordítása, mentése és küldése.",
@@ -1176,6 +1278,23 @@ const texts = {
     copyDone: "A munkalépések átvéve.",
   },
   Tschechisch: {
+    msgFillRequired: "Vyplňte prosím všechna povinná pole.",
+    msgEmployeeDeleted: "Zaměstnanec byl smazán.",
+    msgNoEmailAddr: "E-mailová adresa není k dispozici.",
+    msgCommentSavedOk: "✅ Komentář uložen.",
+    msgNoteSaved: "Poznámka byla uložena.",
+    msgLogoUploaded: "Logo bylo nahráno. Uložte prosím údaje o firmě.",
+    msgPleaseLogin: "Nejprve se prosím přihlaste.",
+    msgPmUnchanged: "Vedoucí projektu beze změny.",
+    msgPmChanged: "Vedoucí projektu změněn.",
+    msgPmNotFound: "V seznamu zaměstnanců nebyl nalezen vedoucí projektu s tímto jménem – viditelnost nelze přenést.",
+    msgProjectNoInstr: "Tento projekt zatím nemá žádné pokyny.",
+    msgTranslatingGeneric: "Překládám...",
+    msgReportPrepared: "Pracovní výkaz byl připraven z pracovního pokynu.",
+    msgEmailNotEnabled: "🔒 Odesílání e-mailů není ve vašem balíčku aktivováno.",
+    assignVisibility: "Přiřadit viditelnost",
+    assignEmployees: "Přiřadit zaměstnance",
+    assignProjectManager: "Přiřadit vedoucího projektu",
     instructionsLocked: "Vytváření pracovních pokynů je možné pouze pro vedoucí projektu a administrátory.",
     title: "Regie International",
     subtitle: "Zaznamenávejte, překládejte, ukládejte a odesílejte pracovní pokyny a pracovní výkazy.",
@@ -1358,6 +1477,23 @@ const texts = {
     copyDone: "Pracovní kroky byly převzaty.",
   },
   Ukrainisch: {
+    msgFillRequired: "Будь ласка, заповніть усі обов'язкові поля.",
+    msgEmployeeDeleted: "Працівника видалено.",
+    msgNoEmailAddr: "Немає електронної адреси.",
+    msgCommentSavedOk: "✅ Коментар збережено.",
+    msgNoteSaved: "Нотатку збережено.",
+    msgLogoUploaded: "Логотип завантажено. Збережіть дані компанії.",
+    msgPleaseLogin: "Будь ласка, спочатку увійдіть.",
+    msgPmUnchanged: "Керівник проєкту без змін.",
+    msgPmChanged: "Керівника проєкту змінено.",
+    msgPmNotFound: "Керівника проєкту з таким іменем у списку працівників не знайдено – видимість неможливо передати.",
+    msgProjectNoInstr: "Цей проєкт ще не має інструкцій.",
+    msgTranslatingGeneric: "Перекладаю...",
+    msgReportPrepared: "Робочий звіт підготовлено з робочої інструкції.",
+    msgEmailNotEnabled: "🔒 Надсилання e-mail не активовано у вашому пакеті.",
+    assignVisibility: "Призначити видимість",
+    assignEmployees: "Призначити працівників",
+    assignProjectManager: "Призначити керівника проєкту",
     instructionsLocked: "Створювати робочі інструкції можуть лише керівники проєкту та адміністратори.",
     title: "Regie International",
     subtitle: "Створюйте, перекладайте, зберігайте та надсилайте робочі інструкції та робочі звіти.",
@@ -1540,6 +1676,23 @@ const texts = {
     copyDone: "Робочі кроки перенесено.",
   },
   Bulgarisch: {
+    msgFillRequired: "Моля, попълнете всички задължителни полета.",
+    msgEmployeeDeleted: "Служителят е изтрит.",
+    msgNoEmailAddr: "Няма имейл адрес.",
+    msgCommentSavedOk: "✅ Коментарът е запазен.",
+    msgNoteSaved: "Бележката е запазена.",
+    msgLogoUploaded: "Логото е качено. Моля, запазете данните на фирмата.",
+    msgPleaseLogin: "Моля, първо влезте.",
+    msgPmUnchanged: "Ръководителят на проект е непроменен.",
+    msgPmChanged: "Ръководителят на проект е променен.",
+    msgPmNotFound: "Не е намерен ръководител на проект с това име в списъка със служители – видимостта не може да бъде прехвърлена.",
+    msgProjectNoInstr: "Този проект още няма инструкции.",
+    msgTranslatingGeneric: "Превеждане...",
+    msgReportPrepared: "Отчетът е подготвен от работната инструкция.",
+    msgEmailNotEnabled: "🔒 Изпращането на имейли не е активирано във вашия пакет.",
+    assignVisibility: "Присвояване на видимост",
+    assignEmployees: "Присвояване на служители",
+    assignProjectManager: "Присвояване на ръководител на проект",
     instructionsLocked: "Създаването на работни инструкции е възможно само за ръководители на проект и администратори.",
     title: "Regie International",
     subtitle: "Създавайте, превеждайте, запазвайте и изпращайте работни инструкции и отчети.",
@@ -1722,6 +1875,23 @@ const texts = {
     copyDone: "Работните стъпки са прехвърлени.",
   },
   Serbisch: {
+    msgFillRequired: "Molimo popunite sva obavezna polja.",
+    msgEmployeeDeleted: "Radnik je obrisan.",
+    msgNoEmailAddr: "Nema imejl adrese.",
+    msgCommentSavedOk: "✅ Komentar sačuvan.",
+    msgNoteSaved: "Beleška je sačuvana.",
+    msgLogoUploaded: "Logo je otpremljen. Molimo sačuvajte podatke o firmi.",
+    msgPleaseLogin: "Molimo prvo se prijavite.",
+    msgPmUnchanged: "Rukovodilac projekta nepromenjen.",
+    msgPmChanged: "Rukovodilac projekta promenjen.",
+    msgPmNotFound: "Nije pronađen rukovodilac projekta sa ovim imenom na listi radnika – vidljivost se ne može preneti.",
+    msgProjectNoInstr: "Ovaj projekat još nema naloga.",
+    msgTranslatingGeneric: "Prevođenje...",
+    msgReportPrepared: "Radni izveštaj je pripremljen iz radnog naloga.",
+    msgEmailNotEnabled: "🔒 Slanje imejlova nije aktivirano u vašem paketu.",
+    assignVisibility: "Dodeli vidljivost",
+    assignEmployees: "Dodeli radnike",
+    assignProjectManager: "Dodeli rukovodioca projekta",
     instructionsLocked: "Kreiranje radnih naloga moguće je samo za rukovodioce projekta i administratore.",
     title: "Regie International",
     subtitle: "Kreirajte, prevodite, čuvajte i šaljite radne naloge i radne izveštaje.",
@@ -1904,6 +2074,23 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Kroatisch: {
+    msgFillRequired: "Molimo ispunite sva obavezna polja.",
+    msgEmployeeDeleted: "Djelatnik je obrisan.",
+    msgNoEmailAddr: "Nema e-mail adrese.",
+    msgCommentSavedOk: "✅ Komentar spremljen.",
+    msgNoteSaved: "Bilješka je spremljena.",
+    msgLogoUploaded: "Logo je učitan. Molimo spremite podatke tvrtke.",
+    msgPleaseLogin: "Molimo prvo se prijavite.",
+    msgPmUnchanged: "Voditelj projekta nepromijenjen.",
+    msgPmChanged: "Voditelj projekta promijenjen.",
+    msgPmNotFound: "Nije pronađen voditelj projekta s ovim imenom na popisu djelatnika – vidljivost se ne može prenijeti.",
+    msgProjectNoInstr: "Ovaj projekt još nema naloga.",
+    msgTranslatingGeneric: "Prevodim...",
+    msgReportPrepared: "Radni izvještaj pripremljen iz radnog naloga.",
+    msgEmailNotEnabled: "🔒 Slanje e-pošte nije aktivirano u vašem paketu.",
+    assignVisibility: "Dodijeli vidljivost",
+    assignEmployees: "Dodijeli djelatnike",
+    assignProjectManager: "Dodijeli voditelja projekta",
     instructionsLocked: "Stvaranje radnih naloga moguće je samo za voditelje projekta i administratore.",
     title: "Regie International",
     subtitle: "Unos, prijevod, spremanje i slanje radnih uputa i izvještaja.",
@@ -2086,6 +2273,23 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Slowenisch: {
+    msgFillRequired: "Izpolnite vsa obvezna polja.",
+    msgEmployeeDeleted: "Zaposleni je izbrisan.",
+    msgNoEmailAddr: "E-poštni naslov ni na voljo.",
+    msgCommentSavedOk: "✅ Komentar shranjen.",
+    msgNoteSaved: "Opomba je shranjena.",
+    msgLogoUploaded: "Logotip je naložen. Shranite podatke podjetja.",
+    msgPleaseLogin: "Najprej se prijavite.",
+    msgPmUnchanged: "Vodja projekta nespremenjen.",
+    msgPmChanged: "Vodja projekta spremenjen.",
+    msgPmNotFound: "Vodja projekta s tem imenom ni bil najden na seznamu zaposlenih – vidnosti ni mogoče prenesti.",
+    msgProjectNoInstr: "Ta projekt še nima nalogov.",
+    msgTranslatingGeneric: "Prevajam...",
+    msgReportPrepared: "Delovno poročilo je pripravljeno iz delovnega naloga.",
+    msgEmailNotEnabled: "🔒 Pošiljanje e-pošte ni aktivirano v vašem paketu.",
+    assignVisibility: "Dodeli vidnost",
+    assignEmployees: "Dodeli zaposlene",
+    assignProjectManager: "Dodeli vodjo projekta",
     instructionsLocked: "Ustvarjanje delovnih nalogov je mogoče samo za vodje projektov in administratorje.",
     title: "Regie International",
     subtitle: "Vnos, prevod, shranjevanje in pošiljanje delovnih navodil in poročil.",
@@ -2268,6 +2472,23 @@ const texts = {
     copyDone: "Delovni koraki so prevzeti.",
   },
   Polnisch: {
+    msgFillRequired: "Proszę wypełnić wszystkie wymagane pola.",
+    msgEmployeeDeleted: "Pracownik został usunięty.",
+    msgNoEmailAddr: "Brak adresu e-mail.",
+    msgCommentSavedOk: "✅ Komentarz zapisany.",
+    msgNoteSaved: "Notatka została zapisana.",
+    msgLogoUploaded: "Logo zostało przesłane. Proszę zapisać dane firmy.",
+    msgPleaseLogin: "Proszę najpierw się zalogować.",
+    msgPmUnchanged: "Kierownik projektu bez zmian.",
+    msgPmChanged: "Kierownik projektu zmieniony.",
+    msgPmNotFound: "Nie znaleziono kierownika projektu o tym nazwisku na liście pracowników – widoczności nie można przenieść.",
+    msgProjectNoInstr: "Ten projekt nie ma jeszcze instrukcji.",
+    msgTranslatingGeneric: "Tłumaczę...",
+    msgReportPrepared: "Raport roboczy przygotowano z instrukcji roboczej.",
+    msgEmailNotEnabled: "🔒 Wysyłanie e-maili nie jest aktywne w Twoim pakiecie.",
+    assignVisibility: "Przypisz widoczność",
+    assignEmployees: "Przypisz pracowników",
+    assignProjectManager: "Przypisz kierownika projektu",
     instructionsLocked: "Tworzenie instrukcji roboczych jest możliwe tylko dla kierowników projektu i administratorów.",
     title: "Regie International",
     subtitle: "Wprowadzanie, tłumaczenie, zapisywanie i wysyłanie instrukcji pracy i raportów.",
@@ -2833,7 +3054,7 @@ export default function Home() {
         return;
       }
       setCommentSaveState(prev => ({ ...prev, [taskId]: "saved" }));
-      setMessage("✅ Kommentar gespeichert.");
+      setMessage(t.msgCommentSavedOk);
       // Sofort in die Anzeige-Sprache übersetzen, damit es ohne Neuladen erscheint
       const instructionId = workInstructions.find(i => (i.work_instruction_tasks || []).some((tk: any) => tk.id === taskId))?.id;
       let translated = "";
@@ -2876,7 +3097,7 @@ export default function Home() {
 
   async function addCompanyUser() {
     if (!currentCompany) return;
-    if (!newUserName.trim() || !newUserUsername.trim() || !newUserPassword.trim()) { setMessage("Bitte alle Pflichtfelder ausfüllen."); return; }
+    if (!newUserName.trim() || !newUserUsername.trim() || !newUserPassword.trim()) { setMessage(t.msgFillRequired); return; }
     setCreatingEmployee(true);
     const { data: sessionData } = await supabase.auth.getSession();
     const token = sessionData?.session?.access_token || "";
@@ -2907,7 +3128,7 @@ export default function Home() {
     }
     // Direkt aus State entfernen
     setCompanyUsers(prev => prev.filter(u => u.id !== memberId));
-    setMessage("Mitarbeiter wurde gelöscht.");
+    setMessage(t.msgEmployeeDeleted);
   }
 
   function canDelete(myRole: string, memberRole: string): boolean {
@@ -2918,7 +3139,7 @@ export default function Home() {
   }
 
   async function resetCompanyUserPassword(memberEmail: string) {
-    if (!memberEmail) { setMessage("Keine E-Mail-Adresse vorhanden."); return; }
+    if (!memberEmail) { setMessage(t.msgNoEmailAddr); return; }
     const { error } = await supabase.auth.resetPasswordForEmail(memberEmail, { redirectTo: "https://international-regie.vercel.app" });
     if (error) { setMessage("Fehler beim Passwort-Reset: " + error.message); return; }
     setMessage(t.msgPasswordReset);
@@ -3233,7 +3454,7 @@ export default function Home() {
     const { error } = await supabase.from("work_instructions").update({ employee_note: note }).eq("id", id);
     if (error) { setMessage("Fehler beim Speichern der Notiz: " + error.message); return; }
     if (currentCompany) await loadWorkInstructions(currentCompany.company_id);
-    setMessage("Notiz wurde gespeichert.");
+    setMessage(t.msgNoteSaved);
   }
 
   // Sichtbarkeit einer Arbeitsanweisung je nach Rolle:
@@ -3321,7 +3542,7 @@ export default function Home() {
     if (error) { setMessage("Fehler beim Logo-Upload: " + error.message); return; }
     const { data } = supabase.storage.from("company-logos").getPublicUrl(filePath);
     updateCompanyField("company_logo", data.publicUrl);
-    setMessage("Logo wurde hochgeladen. Bitte Firmendaten speichern.");
+    setMessage(t.msgLogoUploaded);
   }
 
   // Begrenzt einen Supabase-Aufruf zeitlich. Bleibt er haengen (z. B. blockierter
@@ -3347,7 +3568,7 @@ export default function Home() {
 
   async function saveReport() {
     setMessage("");
-    if (!user) { setMessage("Bitte zuerst anmelden."); return; }
+    if (!user) { setMessage(t.msgPleaseLogin); return; }
     await ensureFreshSession();
     const name = reportName.trim() || `${calendarWeek || "Woche"} - ${employee || "Bericht"}`;
     const reportData = { report_name: name, employee, from_language: fromLanguage, to_language: toLanguage, pdf_language: pdfLanguage, days, user_id: user.id, project_id: selectedProjectId || null };
@@ -3404,21 +3625,21 @@ export default function Home() {
   async function updateProjectManager(projectId: string, newPm: string) {
     const project = projects.find((p: any) => p.id === projectId);
     if (!project) return;
-    if ((project.project_manager || "") === (newPm || "")) { setMessage("Projektleiter unverändert."); return; }
+    if ((project.project_manager || "") === (newPm || "")) { setMessage(t.msgPmUnchanged); return; }
     const { error } = await supabase.from("projects").update({ project_manager: newPm }).eq("id", projectId);
     if (error) { setMessage("Fehler beim Ändern des Projektleiters: " + error.message); return; }
-    await loadProjects(); setMessage("Projektleiter geändert.");
+    await loadProjects(); setMessage(t.msgPmChanged);
   }
 
   // Neuen Projektleiter (additiv) allen Anweisungen des Projekts zuweisen, damit er sie sieht.
   async function assignPmToProjectInstructions(projectId: string, pmName: string) {
     if (!currentCompany) return;
     const member = companyUsers.find((m: any) => m.role === "project_manager" && (m.full_name || m.email) === pmName);
-    if (!member) { setMessage("Kein Projektleiter mit diesem Namen in der Mitarbeiterliste gefunden – Sichtbarkeit kann nicht übertragen werden."); return; }
+    if (!member) { setMessage(t.msgPmNotFound); return; }
     const newId = member.user_id;
     const { data: insts, error: loadErr } = await supabase.from("work_instructions").select("id, assigned_user_ids").eq("project_id", projectId);
     if (loadErr) { setMessage("Fehler beim Laden der Anweisungen: " + loadErr.message); return; }
-    if (!insts || insts.length === 0) { setMessage("Dieses Projekt hat noch keine Anweisungen."); return; }
+    if (!insts || insts.length === 0) { setMessage(t.msgProjectNoInstr); return; }
     if (!window.confirm(`${pmName} allen ${insts.length} Anweisung(en) dieses Projekts zuweisen (Sichtbarkeit)?`)) return;
     let changed = 0;
     for (const inst of insts as any[]) {
@@ -3508,7 +3729,7 @@ export default function Home() {
     
     // Automatisch übersetzen wenn Sprache nicht Deutsch und noch keine Übersetzung
     if (uiLanguage !== "Deutsch" && currentTranslations.language !== uiLanguage) {
-      setMessage("Übersetze...");
+      setMessage(t.msgTranslatingGeneric);
       const targetLang = uiLanguage;
       const translatedFields: Record<string, string> = {};
       for (const item of [
@@ -3578,7 +3799,7 @@ export default function Home() {
     const targetIndex = targetDate ? copy.findIndex((day) => day.date === targetDate) : 0;
     const indexToUse = targetIndex >= 0 ? targetIndex : 0;
     copy[indexToUse] = { ...copy[indexToUse], customer: instruction.customer || "", projectNumber: instruction.project || "", site: instruction.site || "", description, photos: [] };
-    setDays(copy); setReportInstruction(instruction); setActiveTab("regiebericht"); setMessage("Regiebericht wurde aus Arbeitsanweisung vorbereitet.");
+    setDays(copy); setReportInstruction(instruction); setActiveTab("regiebericht"); setMessage(t.msgReportPrepared);
   }
 
   // ── FIXED: kein window.location.reload() ──
@@ -3726,7 +3947,7 @@ export default function Home() {
     const employeePart = illegal(employee || "Mitarbeiter").replace(/\s+/g, "_");
     const filename = `${projectPart}_${kwPart}_${employeePart}.pdf`;
     if (sendByEmail) {
-      if (!companyFeatures?.email_enabled) { setMessage("🔒 E-Mail-Versand ist in deinem Paket nicht aktiviert."); return; }
+      if (!companyFeatures?.email_enabled) { setMessage(t.msgEmailNotEnabled); return; }
       if (!emailTo.trim()) { setMessage(t.msgEmailRequired); return; }
       setMessage(t.msgEmailSending);
       const pdfBase64 = doc.output("datauristring").split(",")[1];
@@ -4036,7 +4257,7 @@ export default function Home() {
                     {companyUsers.filter((m: any) => m.role === "project_manager").map((m: any) => (<option key={m.user_id} value={m.full_name || m.email || ""}>{m.full_name || m.email}</option>))}
                   </select>
                   <button type="button" onClick={() => updateProjectManager(project.id, pmEdits[project.id] ?? (project.project_manager || ""))} className="bg-blue-700 text-white px-3 py-1 rounded text-sm">{t.save}</button>
-                  <button type="button" onClick={() => assignPmToProjectInstructions(project.id, pmEdits[project.id] ?? (project.project_manager || ""))} className="bg-green-700 text-white px-3 py-1 rounded text-sm">Sichtbarkeit zuweisen</button>
+                  <button type="button" onClick={() => assignPmToProjectInstructions(project.id, pmEdits[project.id] ?? (project.project_manager || ""))} className="bg-green-700 text-white px-3 py-1 rounded text-sm">{t.assignVisibility}</button>
                 </div>
                 ) : (
                 <p>{t.projectManager}: {project.project_manager || "-"}</p>
@@ -4096,7 +4317,7 @@ export default function Home() {
             {/* Mitarbeiter zuweisen – Mehrfachauswahl */}
             {companyUsers.filter(m => m.role === "employee").length > 0 && (
               <div className="border rounded p-3 bg-gray-50 space-y-2">
-                <h3 className="font-bold text-sm">👤 Mitarbeiter zuweisen</h3>
+                <h3 className="font-bold text-sm">👤 {t.assignEmployees}</h3>
                 {companyUsers.filter(m => m.role === "employee").map((m) => (
                   <label key={m.user_id} className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -4119,7 +4340,7 @@ export default function Home() {
             {/* Projektleiter zuweisen – Mehrfachauswahl */}
             {companyUsers.filter(m => m.role === "project_manager").length > 0 && (
               <div className="border rounded p-3 bg-gray-50 space-y-2">
-                <h3 className="font-bold text-sm">👷 Projektleiter zuweisen</h3>
+                <h3 className="font-bold text-sm">👷 {t.assignProjectManager}</h3>
                 {companyUsers.filter(m => m.role === "project_manager").map((m) => (
                   <label key={m.user_id} className="flex items-center gap-2 cursor-pointer">
                     <input
