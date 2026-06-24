@@ -84,6 +84,8 @@ type CompanyFeatures = {
 
 const texts = {
   Deutsch: {
+    help: "Anleitung",
+    helpEmpty: "Anleitung noch nicht hinterlegt",
     dashOpen: "Öffnen",
     readLabel: "Gelesen",
     readUnread: "ungelesen",
@@ -296,6 +298,8 @@ const texts = {
     copyDone: "Arbeitsschritte wurden übernommen.",
   },
   Rumänisch: {
+    help: "Instrucțiuni",
+    helpEmpty: "Instrucțiunile nu sunt încă disponibile",
     dashOpen: "Deschide",
     readLabel: "Citit",
     readUnread: "necitit",
@@ -508,6 +512,8 @@ const texts = {
     copyDone: "Etapele de lucru au fost preluate.",
   },
   Englisch: {
+    help: "Guide",
+    helpEmpty: "Guide not available yet",
     dashOpen: "Open",
     readLabel: "Read",
     readUnread: "unread",
@@ -720,6 +726,8 @@ const texts = {
     copyDone: "Work steps have been applied.",
   },
   Italienisch: {
+    help: "Guida",
+    helpEmpty: "Guida non ancora disponibile",
     dashOpen: "Apri",
     readLabel: "Letto",
     readUnread: "non letto",
@@ -932,6 +940,8 @@ const texts = {
     copyDone: "Le fasi di lavoro sono state applicate.",
   },
   Türkisch: {
+    help: "Kılavuz",
+    helpEmpty: "Kılavuz henüz eklenmedi",
     dashOpen: "Aç",
     readLabel: "Okundu",
     readUnread: "okunmadı",
@@ -1144,6 +1154,8 @@ const texts = {
     copyDone: "İş adımları alındı.",
   },
   Ungarisch: {
+    help: "Útmutató",
+    helpEmpty: "Az útmutató még nincs megadva",
     dashOpen: "Megnyitás",
     readLabel: "Elolvasva",
     readUnread: "olvasatlan",
@@ -1356,6 +1368,8 @@ const texts = {
     copyDone: "A munkalépések átvéve.",
   },
   Tschechisch: {
+    help: "Návod",
+    helpEmpty: "Návod zatím není k dispozici",
     dashOpen: "Otevřít",
     readLabel: "Přečteno",
     readUnread: "nepřečteno",
@@ -1568,6 +1582,8 @@ const texts = {
     copyDone: "Pracovní kroky byly převzaty.",
   },
   Ukrainisch: {
+    help: "Інструкція",
+    helpEmpty: "Інструкцію ще не додано",
     dashOpen: "Відкрити",
     readLabel: "Прочитано",
     readUnread: "непрочитано",
@@ -1780,6 +1796,8 @@ const texts = {
     copyDone: "Робочі кроки перенесено.",
   },
   Bulgarisch: {
+    help: "Инструкции",
+    helpEmpty: "Инструкциите още не са въведени",
     dashOpen: "Отвори",
     readLabel: "Прочетено",
     readUnread: "непрочетено",
@@ -1992,6 +2010,8 @@ const texts = {
     copyDone: "Работните стъпки са прехвърлени.",
   },
   Serbisch: {
+    help: "Uputstvo",
+    helpEmpty: "Uputstvo još nije uneto",
     dashOpen: "Otvori",
     readLabel: "Pročitano",
     readUnread: "nepročitano",
@@ -2204,6 +2224,8 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Kroatisch: {
+    help: "Upute",
+    helpEmpty: "Upute još nisu unesene",
     dashOpen: "Otvori",
     readLabel: "Pročitano",
     readUnread: "nepročitano",
@@ -2416,6 +2438,8 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Slowenisch: {
+    help: "Navodila",
+    helpEmpty: "Navodila še niso vnesena",
     dashOpen: "Odpri",
     readLabel: "Prebrano",
     readUnread: "neprebrano",
@@ -2628,6 +2652,8 @@ const texts = {
     copyDone: "Delovni koraki so prevzeti.",
   },
   Polnisch: {
+    help: "Instrukcja",
+    helpEmpty: "Instrukcja jeszcze nie dodana",
     dashOpen: "Otwórz",
     readLabel: "Przeczytane",
     readUnread: "nieprzeczytane",
@@ -3008,6 +3034,8 @@ export default function Home() {
   const [refreshing, setRefreshing] = useState(false);
   const [openDashProjects, setOpenDashProjects] = useState<Record<string, boolean>>({});
   const [dashRange, setDashRange] = useState("today");
+  const [helpOpen, setHelpOpen] = useState(false);
+  const [helpText, setHelpText] = useState<string | null>(null);
   const [newPassword, setNewPassword] = useState("");
   const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
   const [changingPassword, setChangingPassword] = useState(false);
@@ -3436,6 +3464,20 @@ export default function Home() {
     setOpenDayCards((prev) => ({ ...prev, [inst.id]: true }));
     setActiveTab("tag");
     markInstructionRead(inst.id);
+  }
+
+  // Oeffnet die Bedienungsanleitung in der aktuellen Anzeige-Sprache (Fallback Deutsch).
+  async function openHelp() {
+    setHelpOpen(true); setHelpText(null);
+    try {
+      const res = await supabase.from("user_guides").select("content").eq("lang", uiLanguage).maybeSingle();
+      let content = res.data?.content || "";
+      if (!content) {
+        const fb = await supabase.from("user_guides").select("content").eq("lang", "Deutsch").maybeSingle();
+        content = fb.data?.content || "";
+      }
+      setHelpText(content);
+    } catch { setHelpText(""); }
   }
 
   // Zeigt den Lesestatus: Mitarbeiter sehen "gelesen", Manager sehen wer gelesen hat / wer nicht.
@@ -4300,6 +4342,7 @@ export default function Home() {
         <div className="flex items-center flex-wrap gap-3 mt-2">
           <button type="button" onClick={signOut} className="bg-gray-800 text-white px-4 py-2 rounded">{t.logout}</button>
           <button type="button" onClick={refreshAll} disabled={refreshing} title="Aktualisieren" className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50">{refreshing ? "⏳" : "🔄"}</button>
+          <button type="button" onClick={openHelp} title={t.help} aria-label={t.help} className="bg-gray-200 text-gray-800 px-4 py-2 rounded">❓</button>
           <select className="border p-2 rounded text-black bg-white text-sm" value={uiLanguage} onChange={(e) => {
             // Nur Sprache umschalten – die Übersetzung aller Felder läuft automatisch
             // über den useEffect (refreshCommentTranslations) in die neue Sprache.
@@ -5008,6 +5051,18 @@ export default function Home() {
               <button type="button" onClick={() => setCopyModalOpen(false)} className="flex-1 bg-gray-200 text-gray-800 py-3 rounded font-medium">{t.copyCancel}</button>
               <button type="button" disabled={!copyModalInstruction || copySelectedTaskIds.length === 0} onClick={applyCopiedSteps} className="flex-1 bg-indigo-600 text-white py-3 rounded font-bold disabled:opacity-50">{t.copyConfirm}</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {helpOpen && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50" onClick={() => setHelpOpen(false)}>
+          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-5 space-y-3" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-center sticky top-0 bg-white pb-2 border-b">
+              <h2 className="text-xl font-bold">❓ {t.help}</h2>
+              <button type="button" onClick={() => setHelpOpen(false)} className="text-gray-500 text-3xl leading-none px-2">×</button>
+            </div>
+            {helpText === null ? (<p className="text-gray-400">…</p>) : helpText.trim() === "" ? (<p className="text-gray-500">{t.helpEmpty}</p>) : (<div className="whitespace-pre-wrap break-words text-sm leading-relaxed">{helpText}</div>)}
           </div>
         </div>
       )}
