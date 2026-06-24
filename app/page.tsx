@@ -3229,11 +3229,22 @@ export default function Home() {
   }
 
   async function loadWorkInstructions(companyId: string) {
-    const { data, error } = await supabase.from("work_instructions").select(`*, work_instruction_tasks (*), instruction_reads (user_id, read_at)`).eq("company_id", companyId).order("created_at", { ascending: false });
+    const { data, error } = await supabase.from("work_instructions").select(`*, work_instruction_tasks (*)`).eq("company_id", companyId).order("created_at", { ascending: false });
     if (error) { setMessage("Fehler beim Laden der Arbeitsanweisungen: " + error.message); return; }
-    setWorkInstructions(data || []);
-    // Kommentare in die aktuelle Anzeige-Sprache übersetzen (z. B. Kroatisch -> Deutsch für den Owner)
-    refreshCommentTranslations(uiLanguage, data || []);
+    let instrs: any[] = data || [];
+    // Lesebestaetigungen SEPARAT laden – das Laden/Uebersetzen darf daran NICHT scheitern.
+    try {
+      const ids = instrs.map((i: any) => i.id);
+      if (ids.length > 0) {
+        const { data: reads } = await supabase.from("instruction_reads").select("instruction_id, user_id, read_at").in("instruction_id", ids);
+        const byInst: Record<string, any[]> = {};
+        for (const r of reads || []) { if (!byInst[r.instruction_id]) byInst[r.instruction_id] = []; byInst[r.instruction_id].push({ user_id: r.user_id, read_at: r.read_at }); }
+        instrs = instrs.map((i: any) => ({ ...i, instruction_reads: byInst[i.id] || [] }));
+      }
+    } catch { /* Lesestatus optional */ }
+    setWorkInstructions(instrs);
+    // Kommentare in die aktuelle Anzeige-Sprache uebersetzen
+    refreshCommentTranslations(uiLanguage, instrs);
   }
 
   async function updateTaskComment(taskId: string, comment: string) {
