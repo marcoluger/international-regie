@@ -84,6 +84,11 @@ type CompanyFeatures = {
 
 const texts = {
   Deutsch: {
+    dashMyProjectsToday: "Meine Projekte – heute",
+    dashNothingToday: "Heute nichts geplant",
+    dashNoProjects: "Noch keine Projekte zugewiesen",
+    dashOverdue: "überfällig",
+    dashDone: "fertig",
     msgFillRequired: "Bitte alle Pflichtfelder ausfüllen.",
     msgEmployeeDeleted: "Mitarbeiter wurde gelöscht.",
     msgNoEmailAddr: "Keine E-Mail-Adresse vorhanden.",
@@ -283,6 +288,11 @@ const texts = {
     copyDone: "Arbeitsschritte wurden übernommen.",
   },
   Rumänisch: {
+    dashMyProjectsToday: "Proiectele mele – azi",
+    dashNothingToday: "Nimic planificat azi",
+    dashNoProjects: "Niciun proiect atribuit",
+    dashOverdue: "întârziat",
+    dashDone: "gata",
     msgFillRequired: "Vă rugăm completați toate câmpurile obligatorii.",
     msgEmployeeDeleted: "Angajatul a fost șters.",
     msgNoEmailAddr: "Nu există adresă de e-mail.",
@@ -482,6 +492,11 @@ const texts = {
     copyDone: "Etapele de lucru au fost preluate.",
   },
   Englisch: {
+    dashMyProjectsToday: "My projects – today",
+    dashNothingToday: "Nothing planned today",
+    dashNoProjects: "No projects assigned yet",
+    dashOverdue: "overdue",
+    dashDone: "done",
     msgFillRequired: "Please fill in all required fields.",
     msgEmployeeDeleted: "Employee has been deleted.",
     msgNoEmailAddr: "No email address available.",
@@ -681,6 +696,11 @@ const texts = {
     copyDone: "Work steps have been applied.",
   },
   Italienisch: {
+    dashMyProjectsToday: "I miei progetti – oggi",
+    dashNothingToday: "Niente in programma oggi",
+    dashNoProjects: "Nessun progetto assegnato",
+    dashOverdue: "in ritardo",
+    dashDone: "fatto",
     msgFillRequired: "Compila tutti i campi obbligatori.",
     msgEmployeeDeleted: "Il dipendente è stato eliminato.",
     msgNoEmailAddr: "Nessun indirizzo e-mail disponibile.",
@@ -880,6 +900,11 @@ const texts = {
     copyDone: "Le fasi di lavoro sono state applicate.",
   },
   Türkisch: {
+    dashMyProjectsToday: "Projelerim – bugün",
+    dashNothingToday: "Bugün için bir şey planlanmadı",
+    dashNoProjects: "Henüz atanmış proje yok",
+    dashOverdue: "gecikmiş",
+    dashDone: "tamam",
     msgFillRequired: "Lütfen tüm zorunlu alanları doldurun.",
     msgEmployeeDeleted: "Çalışan silindi.",
     msgNoEmailAddr: "E-posta adresi yok.",
@@ -1079,6 +1104,11 @@ const texts = {
     copyDone: "İş adımları alındı.",
   },
   Ungarisch: {
+    dashMyProjectsToday: "Saját projektjeim – ma",
+    dashNothingToday: "Mára nincs tervezve",
+    dashNoProjects: "Még nincs hozzárendelt projekt",
+    dashOverdue: "lejárt",
+    dashDone: "kész",
     msgFillRequired: "Kérjük, töltse ki az összes kötelező mezőt.",
     msgEmployeeDeleted: "A munkatárs törölve.",
     msgNoEmailAddr: "Nincs e-mail cím.",
@@ -1278,6 +1308,11 @@ const texts = {
     copyDone: "A munkalépések átvéve.",
   },
   Tschechisch: {
+    dashMyProjectsToday: "Moje projekty – dnes",
+    dashNothingToday: "Na dnešek nic naplánováno",
+    dashNoProjects: "Zatím žádné přiřazené projekty",
+    dashOverdue: "po termínu",
+    dashDone: "hotovo",
     msgFillRequired: "Vyplňte prosím všechna povinná pole.",
     msgEmployeeDeleted: "Zaměstnanec byl smazán.",
     msgNoEmailAddr: "E-mailová adresa není k dispozici.",
@@ -1477,6 +1512,11 @@ const texts = {
     copyDone: "Pracovní kroky byly převzaty.",
   },
   Ukrainisch: {
+    dashMyProjectsToday: "Мої проєкти – сьогодні",
+    dashNothingToday: "На сьогодні нічого не заплановано",
+    dashNoProjects: "Ще немає призначених проєктів",
+    dashOverdue: "прострочено",
+    dashDone: "готово",
     msgFillRequired: "Будь ласка, заповніть усі обов'язкові поля.",
     msgEmployeeDeleted: "Працівника видалено.",
     msgNoEmailAddr: "Немає електронної адреси.",
@@ -1676,6 +1716,11 @@ const texts = {
     copyDone: "Робочі кроки перенесено.",
   },
   Bulgarisch: {
+    dashMyProjectsToday: "Моите проекти – днес",
+    dashNothingToday: "Днес няма планирано",
+    dashNoProjects: "Още няма възложени проекти",
+    dashOverdue: "просрочено",
+    dashDone: "готово",
     msgFillRequired: "Моля, попълнете всички задължителни полета.",
     msgEmployeeDeleted: "Служителят е изтрит.",
     msgNoEmailAddr: "Няма имейл адрес.",
@@ -1875,6 +1920,11 @@ const texts = {
     copyDone: "Работните стъпки са прехвърлени.",
   },
   Serbisch: {
+    dashMyProjectsToday: "Moji projekti – danas",
+    dashNothingToday: "Danas ništa nije planirano",
+    dashNoProjects: "Još nema dodeljenih projekata",
+    dashOverdue: "kasni",
+    dashDone: "gotovo",
     msgFillRequired: "Molimo popunite sva obavezna polja.",
     msgEmployeeDeleted: "Radnik je obrisan.",
     msgNoEmailAddr: "Nema imejl adrese.",
@@ -2074,6 +2124,11 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Kroatisch: {
+    dashMyProjectsToday: "Moji projekti – danas",
+    dashNothingToday: "Danas ništa nije planirano",
+    dashNoProjects: "Još nema dodijeljenih projekata",
+    dashOverdue: "u kašnjenju",
+    dashDone: "gotovo",
     msgFillRequired: "Molimo ispunite sva obavezna polja.",
     msgEmployeeDeleted: "Djelatnik je obrisan.",
     msgNoEmailAddr: "Nema e-mail adrese.",
@@ -2273,6 +2328,11 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Slowenisch: {
+    dashMyProjectsToday: "Moji projekti – danes",
+    dashNothingToday: "Danes ni nič načrtovano",
+    dashNoProjects: "Še ni dodeljenih projektov",
+    dashOverdue: "zamuja",
+    dashDone: "končano",
     msgFillRequired: "Izpolnite vsa obvezna polja.",
     msgEmployeeDeleted: "Zaposleni je izbrisan.",
     msgNoEmailAddr: "E-poštni naslov ni na voljo.",
@@ -2472,6 +2532,11 @@ const texts = {
     copyDone: "Delovni koraki so prevzeti.",
   },
   Polnisch: {
+    dashMyProjectsToday: "Moje projekty – dzisiaj",
+    dashNothingToday: "Nic na dziś",
+    dashNoProjects: "Brak przydzielonych projektów",
+    dashOverdue: "zaległe",
+    dashDone: "gotowe",
     msgFillRequired: "Proszę wypełnić wszystkie wymagane pola.",
     msgEmployeeDeleted: "Pracownik został usunięty.",
     msgNoEmailAddr: "Brak adresu e-mail.",
@@ -4119,35 +4184,80 @@ export default function Home() {
       {message && <div className="border rounded p-3 bg-yellow-100 text-black">{message}</div>}
 
       {activeTab === "dashboard" && (
-        <section className="border rounded p-4 space-y-4 bg-white text-black">
-          <h2 className="text-xl font-bold">{t.dashboard}</h2>
+        <section className="space-y-4">
           {(() => {
-            const visibleInstructions = workInstructions.filter(canSeeInstruction);
-            const visibleProjectIds = new Set(visibleInstructions.map((i: any) => i.project_id).filter(Boolean));
-            const visibleProjectsCount = (currentCompany?.role === "owner" || currentCompany?.role === "admin") ? projects.length : visibleProjectIds.size;
-            const allTasks = visibleInstructions.flatMap((i) => i.work_instruction_tasks || []);
-            const openCount = allTasks.filter((t: any) => (t.status || "open") === "open").length;
-            const progressCount = allTasks.filter((t: any) => t.status === "in_progress").length;
-            const stoppedCount = allTasks.filter((t: any) => t.status === "stopped").length;
-            const completedCount = allTasks.filter((t: any) => t.status === "completed").length;
-            const totalTasks = allTasks.length;
-            const progressPercent = totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0;
             const today = new Date().toISOString().split("T")[0];
-            const todayInstructions = visibleInstructions.filter((i: any) => i.work_date === today);
+            const visible = workInstructions.filter(canSeeInstruction);
+            const groups: Record<string, any> = {};
+            for (const i of visible) {
+              const key = i.project_id || i.project || "__none__";
+              if (!groups[key]) groups[key] = { name: i.project || t.noProject, customer: i.customer || "", site: i.site || "", instructions: [] };
+              if (!groups[key].customer && i.customer) groups[key].customer = i.customer;
+              if (!groups[key].site && i.site) groups[key].site = i.site;
+              groups[key].instructions.push(i);
+            }
+            const statusRank: Record<string, number> = { stopped: 0, in_progress: 1, open: 2, completed: 3 };
+            const built = Object.values(groups).map((g: any) => {
+              const rows: any[] = [];
+              for (const inst of g.instructions) {
+                const wd = inst.work_date || "";
+                const isToday = wd === today;
+                const isOverdue = !!wd && wd < today;
+                for (const task of (inst.work_instruction_tasks || [])) {
+                  if (isToday) rows.push({ task, inst, overdue: false });
+                  else if (isOverdue && (task.status || "open") !== "completed") rows.push({ task, inst, overdue: true });
+                }
+              }
+              rows.sort((a, b) => (statusRank[a.task.status || "open"] ?? 2) - (statusRank[b.task.status || "open"] ?? 2));
+              const stoppedN = rows.filter((r) => r.task.status === "stopped").length;
+              const doneN = rows.filter((r) => r.task.status === "completed").length;
+              return { g, rows, stoppedN, doneN };
+            });
+            built.sort((a, b) => {
+              const ra = a.stoppedN > 0 ? 0 : a.rows.length > 0 ? 1 : 2;
+              const rb = b.stoppedN > 0 ? 0 : b.rows.length > 0 ? 1 : 2;
+              return ra - rb;
+            });
             return (
-              <div className="space-y-3">
-                <p>{t.projects}: <strong>{visibleProjectsCount}</strong></p>
-                <p>{t.workInstructions}: <strong>{visibleInstructions.length}</strong></p>
-                <p>{t.dueToday}: <strong>{todayInstructions.length}</strong></p>
-                <div className="border rounded p-3 bg-gray-100">
-                  <p>{t.statusOpen}: {openCount}</p><p>{t.statusInProgress}: {progressCount}</p>
-                  <p>{t.statusStopped}: {stoppedCount}</p><p>{t.statusCompleted}: {completedCount}</p>
-                  <p className="font-bold mt-3">{t.totalProgress}: {progressPercent}%</p>
-                  <div className="w-full bg-gray-300 rounded h-4 mt-1"><div className="bg-green-600 h-4 rounded" style={{ width: `${progressPercent}%` }} /></div>
+              <>
+                <div className="bg-white border rounded-xl p-4 shadow-sm">
+                  <h2 className="text-xl font-bold">{t.dashMyProjectsToday}</h2>
+                  <p className="text-gray-500 text-sm">{today} · {built.length} {t.projects}</p>
                 </div>
-                {stoppedCount > 0 && (<div className="border rounded p-3 bg-red-50"><h3 className="font-bold mb-2">{t.stoppedSteps}</h3>{allTasks.filter((t: any) => t.status === "stopped").map((task: any) => (<p key={task.id}><strong>{visibleInstructions.find((i) => (i.work_instruction_tasks || []).some((t: any) => t.id === task.id))?.project || t.noProject}</strong>{" — "}⛔ {task.task_text}{task.note ? ` — ${task.note}` : ""}</p>))}</div>)}
-                {progressCount > 0 && (<div className="border rounded p-3 bg-yellow-50"><h3 className="font-bold mb-2">{t.stepsInProgress}</h3>{allTasks.filter((t: any) => t.status === "in_progress").map((task: any) => (<p key={task.id}><strong>{visibleInstructions.find((i) => (i.work_instruction_tasks || []).some((t: any) => t.id === task.id))?.project || t.noProject}</strong>{" — "}🟡 {task.task_text}{task.note ? ` — ${task.note}` : ""}</p>))}</div>)}
-              </div>
+                {built.length === 0 && (<div className="bg-white border rounded-xl p-6 text-gray-500 text-center shadow-sm">{t.dashNoProjects}</div>)}
+                {built.map((b, gi) => (
+                  <div key={gi} className="bg-white border rounded-xl p-4 shadow-sm space-y-3">
+                    <div className="flex justify-between items-start gap-3">
+                      <div className="min-w-0">
+                        <h3 className="font-bold text-lg break-words">{b.g.name}</h3>
+                        {(b.g.customer || b.g.site) && (<p className="text-gray-500 text-sm break-words">{[b.g.customer, b.g.site].filter(Boolean).join(" · ")}</p>)}
+                      </div>
+                      {b.stoppedN > 0 ? (
+                        <span className="text-xs text-red-700 bg-red-50 px-2 py-1 rounded whitespace-nowrap">{b.stoppedN} {t.statusStopped}</span>
+                      ) : b.rows.length > 0 ? (
+                        <span className="text-xs text-green-700 bg-green-50 px-2 py-1 rounded whitespace-nowrap">{b.doneN} / {b.rows.length} {t.dashDone}</span>
+                      ) : null}
+                    </div>
+                    {b.rows.length === 0 ? (
+                      <p className="text-gray-400 text-sm">{t.dashNothingToday}</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {b.rows.map((r, ri) => {
+                          const s = r.task.status || "open";
+                          const icon = s === "completed" ? "✅" : s === "stopped" ? "⛔" : s === "in_progress" ? "🟡" : "⚪";
+                          return (
+                            <div key={ri} className="flex items-center gap-2 text-sm">
+                              <span>{icon}</span>
+                              <span className={`flex-1 break-words ${s === "completed" ? "line-through text-gray-400" : ""}`}>{r.task.task_text}</span>
+                              {r.overdue ? (<span className="text-xs text-red-600 whitespace-nowrap">{t.dashOverdue}: {r.inst.work_date}</span>) : (r.task.note ? (<span className="text-xs text-gray-500 whitespace-nowrap break-words">{r.task.note}</span>) : null)}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </>
             );
           })()}
         </section>
