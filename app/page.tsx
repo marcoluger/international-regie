@@ -2662,6 +2662,7 @@ export default function Home() {
   const [selectedProjectDetailId, setSelectedProjectDetailId] = useState("");
   const [instructionDate, setInstructionDate] = useState("");
   const [assignedUserIds, setAssignedUserIds] = useState<string[]>([]);
+  const [editingInstructionId, setEditingInstructionId] = useState<string | null>(null);
   const [selectedDayDate, setSelectedDayDate] = useState(new Date().toISOString().split("T")[0]);
   const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
   const [selectedWeek, setSelectedWeek] = useState(new Date().toISOString().split("T")[0]);
@@ -3090,13 +3091,56 @@ export default function Home() {
     }
   }
 
+  // Bestehende Arbeitsanweisung zum Bearbeiten ins Formular laden.
+  function startEditInstruction(instruction: any) {
+    setEditingInstructionId(instruction.id);
+    setInstructionTitle(instruction.title || "");
+    setInstructionProject(instruction.project || "");
+    setInstructionCustomer(instruction.customer || "");
+    setInstructionSite(instruction.site || "");
+    setInstructionDescription(instruction.description || "");
+    setInstructionProblems(instruction.problems_text || "");
+    setInstructionPhotos(instruction.photos || []);
+    setInstructionDate(instruction.work_date || "");
+    setSelectedProjectId(instruction.project_id || "");
+    setAssignedUserIds(instruction.assigned_user_ids || []);
+    const sorted = [...(instruction.work_instruction_tasks || [])].sort((a: any, b: any) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+    const tasks = sorted.map((tk: any) => tk.task_text || "");
+    const photos: Record<number, string[]> = {};
+    const statuses: Record<number, string> = {};
+    sorted.forEach((tk: any, i: number) => { photos[i] = tk.photos || []; statuses[i] = tk.status || "open"; });
+    setInstructionTasks(tasks.length > 0 ? tasks : [""]);
+    setInstructionTaskPhotos(photos);
+    setInstructionTaskStatuses(statuses);
+    setMessage("✏️ " + (instruction.title || ""));
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  // Bearbeiten abbrechen und Formular leeren.
+  function cancelEditInstruction() {
+    setEditingInstructionId(null);
+    setInstructionTitle(""); setInstructionProject(""); setInstructionCustomer(""); setInstructionSite(""); setInstructionDescription(""); setInstructionTasks([""]); setInstructionProblems(""); setInstructionPhotos([]); setInstructionTaskPhotos({}); setInstructionTaskStatuses({}); setAssignedUserIds([]); setSelectedProjectId(""); setInstructionDate("");
+    setMessage("");
+  }
+
   async function saveWorkInstruction() {
     setMessage(t.msgSaving);
     if (!currentCompany) { setMessage(t.msgNoFirm); return; }
     if (!instructionTitle.trim()) { setMessage(t.msgNoTitle); return; }
     await ensureFreshSession();
-    const { data: instruction, error } = await dbTimeout(supabase.from("work_instructions").insert({ company_id: currentCompany.company_id, project_id: selectedProjectId || null, work_date: instructionDate || null, created_by: user?.id, assigned_user_ids: assignedUserIds, title: instructionTitle, project: instructionProject, customer: instructionCustomer, site: instructionSite, description: instructionDescription, problems_text: instructionProblems, photos: instructionPhotos }).select().single());
+    const instructionPayload = { company_id: currentCompany.company_id, project_id: selectedProjectId || null, work_date: instructionDate || null, assigned_user_ids: assignedUserIds, title: instructionTitle, project: instructionProject, customer: instructionCustomer, site: instructionSite, description: instructionDescription, problems_text: instructionProblems, photos: instructionPhotos };
+    let instruction: any; let error: any;
+    if (editingInstructionId) {
+      const upd = await dbTimeout(supabase.from("work_instructions").update(instructionPayload).eq("id", editingInstructionId).select().single());
+      instruction = upd.data; error = upd.error;
+      // Alte Schritte entfernen – werden gleich neu geschrieben.
+      if (!error) { await dbTimeout(supabase.from("work_instruction_tasks").delete().eq("work_instruction_id", editingInstructionId)); }
+    } else {
+      const ins = await dbTimeout(supabase.from("work_instructions").insert({ ...instructionPayload, created_by: user?.id }).select().single());
+      instruction = ins.data; error = ins.error;
+    }
     if (error) { setMessage("Fehler: " + error.message); return; }
+    if (!instruction) { setMessage("Fehler: Anweisung konnte nicht gespeichert werden."); return; }
     const taskRows = instructionTasks
       .map((task, originalIndex) => ({ task, originalIndex }))
       .filter((entry) => entry.task.trim() !== "")
@@ -3111,7 +3155,7 @@ export default function Home() {
       const { error: taskError } = await dbTimeout(supabase.from("work_instruction_tasks").insert(taskRows));
       if (taskError) { setMessage("Arbeitsanweisung gespeichert, aber Schritte nicht: " + taskError.message); return; }
     }
-    setInstructionTitle(""); setInstructionProject(""); setInstructionCustomer(""); setInstructionSite(""); setInstructionDescription(""); setInstructionTasks([""]); setInstructionProblems(""); setInstructionPhotos([]); setInstructionTaskPhotos({}); setInstructionTaskStatuses({}); setAssignedUserIds([]);
+    setInstructionTitle(""); setInstructionProject(""); setInstructionCustomer(""); setInstructionSite(""); setInstructionDescription(""); setInstructionTasks([""]); setInstructionProblems(""); setInstructionPhotos([]); setInstructionTaskPhotos({}); setInstructionTaskStatuses({}); setAssignedUserIds([]); setEditingInstructionId(null);
     await loadWorkInstructions(currentCompany.company_id);
     setMessage(t.msgInstructionSaved);
   }
@@ -4023,7 +4067,7 @@ export default function Home() {
         <div className="space-y-4">
           {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") ? (
           <section className="border rounded p-4 space-y-4 bg-white text-black">
-            <h2 className="text-xl font-bold">{t.newInstruction}</h2>
+            <h2 className="text-xl font-bold">{editingInstructionId ? "✏️ " + (instructionTitle || t.newInstruction) : t.newInstruction}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <input className="border p-3 text-black bg-white" placeholder={t.instructionTitle} value={instructionTitle} onChange={(e) => setInstructionTitle(e.target.value)} />
               <select className="border p-3 text-black bg-white" value={selectedProjectId} onChange={(e) => { const pid = e.target.value; setSelectedProjectId(pid); const sp = projects.find((p) => p.id === pid); if (sp) { setInstructionProject(sp.name || ""); setInstructionCustomer(sp.customer || ""); setInstructionSite(sp.site || ""); } }}>
@@ -4101,6 +4145,7 @@ export default function Home() {
             <div className="flex gap-3">
               <button type="button" onClick={() => setInstructionTasks([...instructionTasks, ""])} className="bg-gray-700 text-white px-4 py-3 rounded">{t.addStep}</button>
               <button type="button" onClick={saveWorkInstruction} className="bg-blue-700 text-white px-4 py-3 rounded">{t.saveInstruction}</button>
+              {editingInstructionId && (<button type="button" onClick={cancelEditInstruction} className="bg-gray-500 text-white px-4 py-3 rounded">{t.copyCancel}</button>)}
             </div>
           </section>
           ) : (
@@ -4184,6 +4229,7 @@ export default function Home() {
                 </ul>
                 <div className="flex gap-2 pt-2 border-t flex-wrap">
                   {companyFeatures?.module_auto_reports && (<button type="button" onClick={() => createReportFromInstruction(instruction)} className="bg-green-700 text-white px-3 py-2 rounded text-sm">📋 {t.toReport}</button>)}
+                  {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => startEditInstruction(instruction)} className="bg-amber-600 text-white px-3 py-2 rounded text-sm">✏️ {t.loadEdit}</button>)}
                   {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => deleteWorkInstruction(instruction.id)} className="bg-red-600 text-white px-3 py-2 rounded text-sm">{t.deleteInstruction}</button>)}
                 </div>
                 </>)}
