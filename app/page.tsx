@@ -2602,6 +2602,7 @@ export default function Home() {
   const [onboardingDone, setOnboardingDone] = useState(false);
   const [mustChangePassword, setMustChangePassword] = useState(false);
   const [companyBlocked, setCompanyBlocked] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
   const [changingPassword, setChangingPassword] = useState(false);
@@ -2729,6 +2730,35 @@ export default function Home() {
     await supabase.auth.signOut();
     setUser(null); newReport(); setSavedReports([]); setMessage(t.msgLogout);
   }
+
+  // Laedt alle Listen/Kontextdaten neu (ohne das aktive Formular anzutasten).
+  async function refreshAll() {
+    if (!user?.id) return;
+    setRefreshing(true);
+    try {
+      await loadCompanyContext(user.id);
+      await loadReportsFromDatabase();
+      await loadCompanySettings(user.id);
+    } catch { /* ignorieren */ }
+    setRefreshing(false);
+  }
+
+  // Automatisch neu laden, sobald der Tab/das Fenster wieder aktiv wird.
+  useEffect(() => {
+    function onActive() {
+      if (document.visibilityState === "visible" && user?.id) {
+        loadCompanyContext(user.id);
+        loadReportsFromDatabase();
+        loadCompanySettings(user.id);
+      }
+    }
+    window.addEventListener("focus", onActive);
+    document.addEventListener("visibilitychange", onActive);
+    return () => {
+      window.removeEventListener("focus", onActive);
+      document.removeEventListener("visibilitychange", onActive);
+    };
+  }, [user?.id]);
 
   async function loadCompanyContext(userId: string) {
     const { data: companyUser, error } = await supabase.from("company_users").select("company_id, role").eq("user_id", userId).maybeSingle();
@@ -3737,6 +3767,7 @@ export default function Home() {
         {currentCompany && (<p className="text-gray-700">{t.firma}: <strong>{currentCompany.companies.name}</strong> | {t.role}: <strong>{currentCompany.role === "owner" ? "Owner" : currentCompany.role === "admin" ? t.roleAdmin : currentCompany.role === "project_manager" ? t.roleProjectManager : t.roleEmployee}</strong></p>)}
         <div className="flex items-center gap-3 mt-2">
           <button type="button" onClick={signOut} className="bg-gray-800 text-white px-4 py-2 rounded">{t.logout}</button>
+          <button type="button" onClick={refreshAll} disabled={refreshing} title="Aktualisieren" className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50">{refreshing ? "⏳" : "🔄"}</button>
           <select className="border p-2 rounded text-black bg-white text-sm" value={uiLanguage} onChange={(e) => {
             // Nur Sprache umschalten – die Übersetzung aller Felder läuft automatisch
             // über den useEffect (refreshCommentTranslations) in die neue Sprache.
