@@ -3095,7 +3095,7 @@ export default function Home() {
     if (!currentCompany) { setMessage(t.msgNoFirm); return; }
     if (!instructionTitle.trim()) { setMessage(t.msgNoTitle); return; }
     await ensureFreshSession();
-    const { data: instruction, error } = await supabase.from("work_instructions").insert({ company_id: currentCompany.company_id, project_id: selectedProjectId || null, work_date: instructionDate || null, created_by: user?.id, assigned_user_ids: assignedUserIds, title: instructionTitle, project: instructionProject, customer: instructionCustomer, site: instructionSite, description: instructionDescription, problems_text: instructionProblems, photos: instructionPhotos }).select().single();
+    const { data: instruction, error } = await dbTimeout(supabase.from("work_instructions").insert({ company_id: currentCompany.company_id, project_id: selectedProjectId || null, work_date: instructionDate || null, created_by: user?.id, assigned_user_ids: assignedUserIds, title: instructionTitle, project: instructionProject, customer: instructionCustomer, site: instructionSite, description: instructionDescription, problems_text: instructionProblems, photos: instructionPhotos }).select().single());
     if (error) { setMessage("Fehler: " + error.message); return; }
     const taskRows = instructionTasks
       .map((task, originalIndex) => ({ task, originalIndex }))
@@ -3108,7 +3108,7 @@ export default function Home() {
         status: instructionTaskStatuses[entry.originalIndex] || "open",
       }));
     if (taskRows.length > 0) {
-      const { error: taskError } = await supabase.from("work_instruction_tasks").insert(taskRows);
+      const { error: taskError } = await dbTimeout(supabase.from("work_instruction_tasks").insert(taskRows));
       if (taskError) { setMessage("Arbeitsanweisung gespeichert, aber Schritte nicht: " + taskError.message); return; }
     }
     setInstructionTitle(""); setInstructionProject(""); setInstructionCustomer(""); setInstructionSite(""); setInstructionDescription(""); setInstructionTasks([""]); setInstructionProblems(""); setInstructionPhotos([]); setInstructionTaskPhotos({}); setInstructionTaskStatuses({}); setAssignedUserIds([]);
@@ -3242,7 +3242,7 @@ export default function Home() {
   async function saveCompanySettings() {
     if (!user || !companySettings) return;
     await ensureFreshSession();
-    const { error } = await supabase.from("company_settings").upsert({ ...companySettings, user_id: user.id }, { onConflict: "user_id" });
+    const { error } = await dbTimeout(supabase.from("company_settings").upsert({ ...companySettings, user_id: user.id }, { onConflict: "user_id" }));
     if (error) { setMessage("Fehler beim Speichern der Firmendaten: " + error.message); return; }
     setMessage(t.msgCompanySaved);
   }
@@ -3265,17 +3265,25 @@ export default function Home() {
     setMessage("Logo wurde hochgeladen. Bitte Firmendaten speichern.");
   }
 
+  // Begrenzt einen Supabase-Aufruf zeitlich. Bleibt er haengen (z. B. blockierter
+  // Token-Refresh in der Handy-App), kommt nach `ms` ein Fehler statt ewigem Warten.
+  function dbTimeout(p: any, ms = 12000): Promise<any> {
+    return Promise.race([
+      Promise.resolve(p),
+      new Promise((resolve) => setTimeout(() => resolve({ data: null, error: { message: "Zeitüberschreitung – bitte App neu laden und neu anmelden." } }), ms)),
+    ]);
+  }
+
   // Stellt vor jedem Schreibvorgang sicher, dass die Sitzung gueltig ist und
-  // erneuert das Token bei Bedarf. Verhindert "Speichern geht nicht", wenn das
-  // Zugriffstoken im Hintergrund (Handy-App / zweites Geraet) abgelaufen ist.
+  // erneuert das Token bei Bedarf – selbst zeitlich begrenzt, damit es nie haengt.
   async function ensureFreshSession() {
     try {
-      const { data } = await supabase.auth.getSession();
-      const expMs = data.session?.expires_at ? data.session.expires_at * 1000 : 0;
-      if (!data.session || expMs - Date.now() < 60000) {
-        await supabase.auth.refreshSession();
+      const { data } = await dbTimeout(supabase.auth.getSession(), 8000);
+      const expMs = data?.session?.expires_at ? data.session.expires_at * 1000 : 0;
+      if (!data?.session || expMs - Date.now() < 60000) {
+        await dbTimeout(supabase.auth.refreshSession(), 8000);
       }
-    } catch { /* ignorieren – der folgende Aufruf zeigt ggf. einen Fehler */ }
+    } catch { /* ignorieren */ }
   }
 
   async function saveReport() {
@@ -3286,9 +3294,9 @@ export default function Home() {
     const reportData = { report_name: name, employee, from_language: fromLanguage, to_language: toLanguage, pdf_language: pdfLanguage, days, user_id: user.id, project_id: selectedProjectId || null };
     let error;
     if (currentReportId) {
-      ({ error } = await supabase.from("reports").update(reportData).eq("id", currentReportId));
+      ({ error } = await dbTimeout(supabase.from("reports").update(reportData).eq("id", currentReportId)));
     } else {
-      const result = await supabase.from("reports").insert(reportData).select().single();
+      const result = await dbTimeout(supabase.from("reports").insert(reportData).select().single());
       error = result.error;
       if (result.data?.id) setCurrentReportId(result.data.id);
     }
@@ -3328,7 +3336,7 @@ export default function Home() {
   async function saveProject() {
     if (!currentCompany) return;
     await ensureFreshSession();
-    const { error } = await supabase.from("projects").insert({ company_id: currentCompany.company_id, name: projectName, customer: projectCustomer, site: projectSite, project_manager: projectManager });
+    const { error } = await dbTimeout(supabase.from("projects").insert({ company_id: currentCompany.company_id, name: projectName, customer: projectCustomer, site: projectSite, project_manager: projectManager }));
     if (error) { setMessage("Fehler beim Speichern: " + error.message); return; }
     setProjectName(""); setProjectCustomer(""); setProjectSite(""); setProjectManager("");
     await loadProjects(); setMessage(t.msgProjectSaved);
