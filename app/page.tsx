@@ -4152,6 +4152,29 @@ export default function Home() {
             <section className="border rounded p-4 bg-yellow-50 text-black"><p className="text-yellow-700 text-sm">🔒 Arbeitsanweisungen anlegen ist nur für Projektleiter und Admins möglich.</p></section>
           )}
           <section className="border rounded p-4 bg-blue-50 text-black"><p className="text-blue-700 text-sm">💡 {t.savedInstructions} → {t.tabDay} / {t.tabWeek} / {t.tabMonth}</p></section>
+          <section className="border rounded p-4 bg-white text-black space-y-3">
+            <h2 className="text-xl font-bold">{t.savedInstructions}</h2>
+            {(() => {
+              const allInstructions = workInstructions.filter(canSeeInstruction);
+              if (allInstructions.length === 0) return (<p className="text-gray-500">{t.noInstructionsSaved}</p>);
+              return (
+                <ul className="space-y-2">
+                  {allInstructions.map((instruction) => (
+                    <li key={instruction.id} className="border rounded p-3 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                      <div>
+                        <p className="font-bold">{instruction.title || "-"}</p>
+                        <p className="text-sm text-gray-600">{t.project}: {instruction.project || "-"} · {t.site}: {instruction.site || "-"} · {instruction.work_date || "—"} · {t.workSteps}: {(instruction.work_instruction_tasks || []).length}</p>
+                      </div>
+                      <div className="flex gap-2 flex-wrap">
+                        {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => startEditInstruction(instruction)} className="bg-amber-600 text-white px-3 py-2 rounded text-sm">✏️ {t.loadEdit}</button>)}
+                        {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => deleteWorkInstruction(instruction.id)} className="bg-red-600 text-white px-3 py-2 rounded text-sm">{t.deleteInstruction}</button>)}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              );
+            })()}
+          </section>
         </div>
       )}
 
