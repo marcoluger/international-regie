@@ -84,6 +84,7 @@ type CompanyFeatures = {
 
 const texts = {
   Deutsch: {
+    instructionsLocked: "Arbeitsanweisungen anlegen ist nur für Projektleiter und Admins möglich.",
     title: "Regie International",
     subtitle: "Arbeitsanweisungen und Regieberichte erfassen, übersetzen, speichern und versenden.",
     loginTitle: "Regiebericht Login",
@@ -265,6 +266,7 @@ const texts = {
     copyDone: "Arbeitsschritte wurden übernommen.",
   },
   Rumänisch: {
+    instructionsLocked: "Crearea instrucțiunilor de lucru este posibilă doar pentru șefii de proiect și administratori.",
     title: "Regie International",
     subtitle: "Înregistrați, traduceți, salvați și trimiteți instrucțiuni de lucru și rapoarte de lucru.",
     loginTitle: "Autentificare raport de lucru",
@@ -446,6 +448,7 @@ const texts = {
     copyDone: "Etapele de lucru au fost preluate.",
   },
   Englisch: {
+    instructionsLocked: "Creating work instructions is only possible for project managers and admins.",
     title: "Regie International",
     subtitle: "Create, translate, save and send work instructions and work reports.",
     loginTitle: "Work Report Login",
@@ -627,6 +630,7 @@ const texts = {
     copyDone: "Work steps have been applied.",
   },
   Italienisch: {
+    instructionsLocked: "La creazione di istruzioni di lavoro è possibile solo per i responsabili di progetto e gli amministratori.",
     title: "Regie International",
     subtitle: "Registra, traduci, salva e invia istruzioni di lavoro e rapporti di lavoro.",
     loginTitle: "Accesso rapporto di lavoro",
@@ -808,6 +812,7 @@ const texts = {
     copyDone: "Le fasi di lavoro sono state applicate.",
   },
   Türkisch: {
+    instructionsLocked: "İş talimatı oluşturmak yalnızca proje yöneticileri ve yöneticiler için mümkündür.",
     title: "Regie International",
     subtitle: "İş talimatlarını ve iş raporlarını kaydedin, çevirin, saklayın ve gönderin.",
     loginTitle: "İş Raporu Girişi",
@@ -989,6 +994,7 @@ const texts = {
     copyDone: "İş adımları alındı.",
   },
   Ungarisch: {
+    instructionsLocked: "Munkautasítások létrehozása csak projektvezetők és adminisztrátorok számára lehetséges.",
     title: "Regie International",
     subtitle: "Munkautasítások és munkajelentések rögzítése, fordítása, mentése és küldése.",
     loginTitle: "Munkajelentés belépés",
@@ -1170,6 +1176,7 @@ const texts = {
     copyDone: "A munkalépések átvéve.",
   },
   Tschechisch: {
+    instructionsLocked: "Vytváření pracovních pokynů je možné pouze pro vedoucí projektu a administrátory.",
     title: "Regie International",
     subtitle: "Zaznamenávejte, překládejte, ukládejte a odesílejte pracovní pokyny a pracovní výkazy.",
     loginTitle: "Přihlášení k výkazu",
@@ -1351,6 +1358,7 @@ const texts = {
     copyDone: "Pracovní kroky byly převzaty.",
   },
   Ukrainisch: {
+    instructionsLocked: "Створювати робочі інструкції можуть лише керівники проєкту та адміністратори.",
     title: "Regie International",
     subtitle: "Створюйте, перекладайте, зберігайте та надсилайте робочі інструкції та робочі звіти.",
     loginTitle: "Вхід до звіту",
@@ -1532,6 +1540,7 @@ const texts = {
     copyDone: "Робочі кроки перенесено.",
   },
   Bulgarisch: {
+    instructionsLocked: "Създаването на работни инструкции е възможно само за ръководители на проект и администратори.",
     title: "Regie International",
     subtitle: "Създавайте, превеждайте, запазвайте и изпращайте работни инструкции и отчети.",
     loginTitle: "Вход към отчета",
@@ -1713,6 +1722,7 @@ const texts = {
     copyDone: "Работните стъпки са прехвърлени.",
   },
   Serbisch: {
+    instructionsLocked: "Kreiranje radnih naloga moguće je samo za rukovodioce projekta i administratore.",
     title: "Regie International",
     subtitle: "Kreirajte, prevodite, čuvajte i šaljite radne naloge i radne izveštaje.",
     loginTitle: "Prijava na radni izveštaj",
@@ -1894,6 +1904,7 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Kroatisch: {
+    instructionsLocked: "Stvaranje radnih naloga moguće je samo za voditelje projekta i administratore.",
     title: "Regie International",
     subtitle: "Unos, prijevod, spremanje i slanje radnih uputa i izvještaja.",
     loginTitle: "Prijava",
@@ -2075,6 +2086,7 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Slowenisch: {
+    instructionsLocked: "Ustvarjanje delovnih nalogov je mogoče samo za vodje projektov in administratorje.",
     title: "Regie International",
     subtitle: "Vnos, prevod, shranjevanje in pošiljanje delovnih navodil in poročil.",
     loginTitle: "Prijava",
@@ -2256,6 +2268,7 @@ const texts = {
     copyDone: "Delovni koraki so prevzeti.",
   },
   Polnisch: {
+    instructionsLocked: "Tworzenie instrukcji roboczych jest możliwe tylko dla kierowników projektu i administratorów.",
     title: "Regie International",
     subtitle: "Wprowadzanie, tłumaczenie, zapisywanie i wysyłanie instrukcji pracy i raportów.",
     loginTitle: "Logowanie",
@@ -4151,7 +4164,7 @@ export default function Home() {
             </div>
           </section>
           ) : (
-            <section className="border rounded p-4 bg-yellow-50 text-black"><p className="text-yellow-700 text-sm">🔒 Arbeitsanweisungen anlegen ist nur für Projektleiter und Admins möglich.</p></section>
+            <section className="border rounded p-4 bg-yellow-50 text-black"><p className="text-yellow-700 text-sm">🔒 {t.instructionsLocked}</p></section>
           )}
           <section className="border rounded p-4 bg-blue-50 text-black"><p className="text-blue-700 text-sm">💡 {t.savedInstructions} → {t.tabDay} / {t.tabWeek} / {t.tabMonth}</p></section>
           <section className="border rounded p-4 bg-white text-black space-y-3">
@@ -4167,6 +4180,7 @@ export default function Home() {
                         <div>
                           <p className="font-bold">{openInstrCards[instruction.id] ? "▾" : "▸"} {instruction.title || "-"}</p>
                           <p className="text-sm text-gray-600 ml-4">{t.project}: {instruction.project || "-"}</p>
+                          <p className="text-sm text-gray-600 ml-4">{t.customer}: {instruction.customer || "-"}</p>
                         </div>
                         <span className="text-xs text-gray-500 whitespace-nowrap">{instruction.work_date || "—"} · {t.workSteps}: {(instruction.work_instruction_tasks || []).length}</span>
                       </div>
