@@ -2727,8 +2727,12 @@ export default function Home() {
   }
 
   async function signOut() {
-    await supabase.auth.signOut();
-    setUser(null); newReport(); setSavedReports([]); setMessage(t.msgLogout);
+    // Zuerst die Oberflaeche abmelden – unabhaengig vom Netzwerk.
+    // So klappt der Logout auch, wenn der Aufruf (v. a. auf dem Handy) haengt.
+    setUser(null); newReport(); setSavedReports([]); setCompanyBlocked(false); setMessage(t.msgLogout);
+    try {
+      await supabase.auth.signOut({ scope: "local" });
+    } catch { /* ignorieren */ }
   }
 
   // Laedt alle Listen/Kontextdaten neu (ohne das aktive Formular anzutasten).
