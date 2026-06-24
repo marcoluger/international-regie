@@ -3094,6 +3094,7 @@ export default function Home() {
     setMessage(t.msgSaving);
     if (!currentCompany) { setMessage(t.msgNoFirm); return; }
     if (!instructionTitle.trim()) { setMessage(t.msgNoTitle); return; }
+    await ensureFreshSession();
     const { data: instruction, error } = await supabase.from("work_instructions").insert({ company_id: currentCompany.company_id, project_id: selectedProjectId || null, work_date: instructionDate || null, created_by: user?.id, assigned_user_ids: assignedUserIds, title: instructionTitle, project: instructionProject, customer: instructionCustomer, site: instructionSite, description: instructionDescription, problems_text: instructionProblems, photos: instructionPhotos }).select().single();
     if (error) { setMessage("Fehler: " + error.message); return; }
     const taskRows = instructionTasks
@@ -3240,6 +3241,7 @@ export default function Home() {
 
   async function saveCompanySettings() {
     if (!user || !companySettings) return;
+    await ensureFreshSession();
     const { error } = await supabase.from("company_settings").upsert({ ...companySettings, user_id: user.id }, { onConflict: "user_id" });
     if (error) { setMessage("Fehler beim Speichern der Firmendaten: " + error.message); return; }
     setMessage(t.msgCompanySaved);
@@ -3263,9 +3265,23 @@ export default function Home() {
     setMessage("Logo wurde hochgeladen. Bitte Firmendaten speichern.");
   }
 
+  // Stellt vor jedem Schreibvorgang sicher, dass die Sitzung gueltig ist und
+  // erneuert das Token bei Bedarf. Verhindert "Speichern geht nicht", wenn das
+  // Zugriffstoken im Hintergrund (Handy-App / zweites Geraet) abgelaufen ist.
+  async function ensureFreshSession() {
+    try {
+      const { data } = await supabase.auth.getSession();
+      const expMs = data.session?.expires_at ? data.session.expires_at * 1000 : 0;
+      if (!data.session || expMs - Date.now() < 60000) {
+        await supabase.auth.refreshSession();
+      }
+    } catch { /* ignorieren – der folgende Aufruf zeigt ggf. einen Fehler */ }
+  }
+
   async function saveReport() {
     setMessage("");
     if (!user) { setMessage("Bitte zuerst anmelden."); return; }
+    await ensureFreshSession();
     const name = reportName.trim() || `${calendarWeek || "Woche"} - ${employee || "Bericht"}`;
     const reportData = { report_name: name, employee, from_language: fromLanguage, to_language: toLanguage, pdf_language: pdfLanguage, days, user_id: user.id, project_id: selectedProjectId || null };
     let error;
@@ -3311,6 +3327,7 @@ export default function Home() {
 
   async function saveProject() {
     if (!currentCompany) return;
+    await ensureFreshSession();
     const { error } = await supabase.from("projects").insert({ company_id: currentCompany.company_id, name: projectName, customer: projectCustomer, site: projectSite, project_manager: projectManager });
     if (error) { setMessage("Fehler beim Speichern: " + error.message); return; }
     setProjectName(""); setProjectCustomer(""); setProjectSite(""); setProjectManager("");
