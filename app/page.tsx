@@ -4164,12 +4164,15 @@ export default function Home() {
                   {allInstructions.map((instruction) => (
                     <li key={instruction.id} className="border rounded p-3">
                       <div className="flex justify-between items-start cursor-pointer select-none gap-2" onClick={() => setOpenInstrCards((prev) => ({ ...prev, [instruction.id]: !prev[instruction.id] }))}>
-                        <p className="font-bold">{openInstrCards[instruction.id] ? "▾" : "▸"} {instruction.title || "-"}</p>
+                        <div>
+                          <p className="font-bold">{openInstrCards[instruction.id] ? "▾" : "▸"} {instruction.title || "-"}</p>
+                          <p className="text-sm text-gray-600 ml-4">{t.project}: {instruction.project || "-"}</p>
+                        </div>
                         <span className="text-xs text-gray-500 whitespace-nowrap">{instruction.work_date || "—"} · {t.workSteps}: {(instruction.work_instruction_tasks || []).length}</span>
                       </div>
                       {openInstrCards[instruction.id] && (
                         <div className="mt-2 space-y-2">
-                          <p className="text-sm text-gray-600">{t.project}: {instruction.project || "-"} · {t.site}: {instruction.site || "-"}</p>
+                          <p className="text-sm text-gray-600">{t.site}: {instruction.site || "-"}</p>
                           <div className="flex gap-2 flex-wrap">
                             {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => startEditInstruction(instruction)} className="bg-amber-600 text-white px-3 py-2 rounded text-sm">✏️ {t.loadEdit}</button>)}
                             {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => deleteWorkInstruction(instruction.id)} className="bg-red-600 text-white px-3 py-2 rounded text-sm">{t.deleteInstruction}</button>)}
