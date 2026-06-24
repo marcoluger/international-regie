@@ -3956,7 +3956,10 @@ export default function Home() {
             <input className="border p-3 w-full" placeholder={t.projectName} value={projectName} onChange={(e) => setProjectName(e.target.value)} />
             <input className="border p-3 w-full" placeholder={t.customer} value={projectCustomer} onChange={(e) => setProjectCustomer(e.target.value)} />
             <input className="border p-3 w-full" placeholder={t.site} value={projectSite} onChange={(e) => setProjectSite(e.target.value)} />
-            <input className="border p-3 w-full" placeholder={t.projectManager} value={projectManager} onChange={(e) => setProjectManager(e.target.value)} />
+            <select className="border p-3 w-full" value={projectManager} onChange={(e) => setProjectManager(e.target.value)}>
+              <option value="">{t.projectManager}</option>
+              {companyUsers.filter((m: any) => m.role === "project_manager").map((m: any) => (<option key={m.user_id} value={m.full_name || m.email || ""}>{m.full_name || m.email}</option>))}
+            </select>
           </div>
           <button type="button" onClick={saveProject} className="bg-blue-700 text-white px-4 py-3 rounded">{t.saveProject}</button>
           <div className="space-y-3 mt-4">
