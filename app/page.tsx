@@ -84,6 +84,7 @@ type CompanyFeatures = {
 
 const texts = {
   Deutsch: {
+    dashOpen: "Öffnen",
     readLabel: "Gelesen",
     readUnread: "ungelesen",
     readAllDone: "alle gelesen",
@@ -295,6 +296,7 @@ const texts = {
     copyDone: "Arbeitsschritte wurden übernommen.",
   },
   Rumänisch: {
+    dashOpen: "Deschide",
     readLabel: "Citit",
     readUnread: "necitit",
     readAllDone: "toate citite",
@@ -506,6 +508,7 @@ const texts = {
     copyDone: "Etapele de lucru au fost preluate.",
   },
   Englisch: {
+    dashOpen: "Open",
     readLabel: "Read",
     readUnread: "unread",
     readAllDone: "all read",
@@ -717,6 +720,7 @@ const texts = {
     copyDone: "Work steps have been applied.",
   },
   Italienisch: {
+    dashOpen: "Apri",
     readLabel: "Letto",
     readUnread: "non letto",
     readAllDone: "tutto letto",
@@ -928,6 +932,7 @@ const texts = {
     copyDone: "Le fasi di lavoro sono state applicate.",
   },
   Türkisch: {
+    dashOpen: "Aç",
     readLabel: "Okundu",
     readUnread: "okunmadı",
     readAllDone: "tümü okundu",
@@ -1139,6 +1144,7 @@ const texts = {
     copyDone: "İş adımları alındı.",
   },
   Ungarisch: {
+    dashOpen: "Megnyitás",
     readLabel: "Elolvasva",
     readUnread: "olvasatlan",
     readAllDone: "mind elolvasva",
@@ -1350,6 +1356,7 @@ const texts = {
     copyDone: "A munkalépések átvéve.",
   },
   Tschechisch: {
+    dashOpen: "Otevřít",
     readLabel: "Přečteno",
     readUnread: "nepřečteno",
     readAllDone: "vše přečteno",
@@ -1561,6 +1568,7 @@ const texts = {
     copyDone: "Pracovní kroky byly převzaty.",
   },
   Ukrainisch: {
+    dashOpen: "Відкрити",
     readLabel: "Прочитано",
     readUnread: "непрочитано",
     readAllDone: "усе прочитано",
@@ -1772,6 +1780,7 @@ const texts = {
     copyDone: "Робочі кроки перенесено.",
   },
   Bulgarisch: {
+    dashOpen: "Отвори",
     readLabel: "Прочетено",
     readUnread: "непрочетено",
     readAllDone: "всичко прочетено",
@@ -1983,6 +1992,7 @@ const texts = {
     copyDone: "Работните стъпки са прехвърлени.",
   },
   Serbisch: {
+    dashOpen: "Otvori",
     readLabel: "Pročitano",
     readUnread: "nepročitano",
     readAllDone: "sve pročitano",
@@ -2194,6 +2204,7 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Kroatisch: {
+    dashOpen: "Otvori",
     readLabel: "Pročitano",
     readUnread: "nepročitano",
     readAllDone: "sve pročitano",
@@ -2405,6 +2416,7 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Slowenisch: {
+    dashOpen: "Odpri",
     readLabel: "Prebrano",
     readUnread: "neprebrano",
     readAllDone: "vse prebrano",
@@ -2616,6 +2628,7 @@ const texts = {
     copyDone: "Delovni koraki so prevzeti.",
   },
   Polnisch: {
+    dashOpen: "Otwórz",
     readLabel: "Przeczytane",
     readUnread: "nieprzeczytane",
     readAllDone: "wszystko przeczytane",
@@ -3415,6 +3428,14 @@ export default function Home() {
       await supabase.from("instruction_reads").upsert({ instruction_id: instructionId, user_id: user.id }, { onConflict: "instruction_id,user_id", ignoreDuplicates: true });
       setWorkInstructions((prev: any[]) => prev.map((i: any) => i.id === instructionId ? { ...i, instruction_reads: [...(i.instruction_reads || []), { user_id: user.id, read_at: new Date().toISOString() }] } : i));
     } catch { /* ignorieren */ }
+  }
+
+  // Springt vom Dashboard zur Arbeitsanweisung (Tagesansicht, passendes Datum, aufgeklappt).
+  function openInstructionFromDashboard(inst: any) {
+    if (inst?.work_date) setSelectedDayDate(inst.work_date);
+    setOpenDayCards((prev) => ({ ...prev, [inst.id]: true }));
+    setActiveTab("tag");
+    markInstructionRead(inst.id);
   }
 
   // Zeigt den Lesestatus: Mitarbeiter sehen "gelesen", Manager sehen wer gelesen hat / wer nicht.
@@ -4414,6 +4435,7 @@ export default function Home() {
                               <span>{icon}</span>
                               <span className={`flex-1 break-words ${s === "completed" ? "line-through text-gray-400" : ""}`}>{getTranslatedTask(r.inst.id, r.task.id, r.task.task_text)}</span>
                               {r.date && r.date !== today ? (<span className={r.overdue ? "text-xs text-red-600 whitespace-nowrap" : "text-xs text-gray-500 whitespace-nowrap"}>{r.overdue ? t.dashOverdue + ": " : ""}{r.date}</span>) : (r.task.note ? (<span className="text-xs text-gray-500 whitespace-nowrap break-words">{r.task.note}</span>) : null)}
+                              <button type="button" onClick={() => openInstructionFromDashboard(r.inst)} title={t.dashOpen} aria-label={t.dashOpen} className="text-blue-600 hover:text-blue-800 shrink-0 px-1 font-bold">→</button>
                             </div>
                           );
                         })}
