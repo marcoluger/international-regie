@@ -84,6 +84,10 @@ type CompanyFeatures = {
 
 const texts = {
   Deutsch: {
+    dashMyProjects: "Meine Projekte",
+    dashToday: "Heute",
+    dashTomorrow: "Morgen",
+    dashWeek: "Woche",
     dashMyProjectsToday: "Meine Projekte – heute",
     dashNothingToday: "Heute nichts geplant",
     dashNoProjects: "Noch keine Projekte zugewiesen",
@@ -288,6 +292,10 @@ const texts = {
     copyDone: "Arbeitsschritte wurden übernommen.",
   },
   Rumänisch: {
+    dashMyProjects: "Proiectele mele",
+    dashToday: "Azi",
+    dashTomorrow: "Mâine",
+    dashWeek: "Săptămână",
     dashMyProjectsToday: "Proiectele mele – azi",
     dashNothingToday: "Nimic planificat azi",
     dashNoProjects: "Niciun proiect atribuit",
@@ -492,6 +500,10 @@ const texts = {
     copyDone: "Etapele de lucru au fost preluate.",
   },
   Englisch: {
+    dashMyProjects: "My projects",
+    dashToday: "Today",
+    dashTomorrow: "Tomorrow",
+    dashWeek: "Week",
     dashMyProjectsToday: "My projects – today",
     dashNothingToday: "Nothing planned today",
     dashNoProjects: "No projects assigned yet",
@@ -696,6 +708,10 @@ const texts = {
     copyDone: "Work steps have been applied.",
   },
   Italienisch: {
+    dashMyProjects: "I miei progetti",
+    dashToday: "Oggi",
+    dashTomorrow: "Domani",
+    dashWeek: "Settimana",
     dashMyProjectsToday: "I miei progetti – oggi",
     dashNothingToday: "Niente in programma oggi",
     dashNoProjects: "Nessun progetto assegnato",
@@ -900,6 +916,10 @@ const texts = {
     copyDone: "Le fasi di lavoro sono state applicate.",
   },
   Türkisch: {
+    dashMyProjects: "Projelerim",
+    dashToday: "Bugün",
+    dashTomorrow: "Yarın",
+    dashWeek: "Hafta",
     dashMyProjectsToday: "Projelerim – bugün",
     dashNothingToday: "Bugün için bir şey planlanmadı",
     dashNoProjects: "Henüz atanmış proje yok",
@@ -1104,6 +1124,10 @@ const texts = {
     copyDone: "İş adımları alındı.",
   },
   Ungarisch: {
+    dashMyProjects: "Saját projektjeim",
+    dashToday: "Ma",
+    dashTomorrow: "Holnap",
+    dashWeek: "Hét",
     dashMyProjectsToday: "Saját projektjeim – ma",
     dashNothingToday: "Mára nincs tervezve",
     dashNoProjects: "Még nincs hozzárendelt projekt",
@@ -1308,6 +1332,10 @@ const texts = {
     copyDone: "A munkalépések átvéve.",
   },
   Tschechisch: {
+    dashMyProjects: "Moje projekty",
+    dashToday: "Dnes",
+    dashTomorrow: "Zítra",
+    dashWeek: "Týden",
     dashMyProjectsToday: "Moje projekty – dnes",
     dashNothingToday: "Na dnešek nic naplánováno",
     dashNoProjects: "Zatím žádné přiřazené projekty",
@@ -1512,6 +1540,10 @@ const texts = {
     copyDone: "Pracovní kroky byly převzaty.",
   },
   Ukrainisch: {
+    dashMyProjects: "Мої проєкти",
+    dashToday: "Сьогодні",
+    dashTomorrow: "Завтра",
+    dashWeek: "Тиждень",
     dashMyProjectsToday: "Мої проєкти – сьогодні",
     dashNothingToday: "На сьогодні нічого не заплановано",
     dashNoProjects: "Ще немає призначених проєктів",
@@ -1716,6 +1748,10 @@ const texts = {
     copyDone: "Робочі кроки перенесено.",
   },
   Bulgarisch: {
+    dashMyProjects: "Моите проекти",
+    dashToday: "Днес",
+    dashTomorrow: "Утре",
+    dashWeek: "Седмица",
     dashMyProjectsToday: "Моите проекти – днес",
     dashNothingToday: "Днес няма планирано",
     dashNoProjects: "Още няма възложени проекти",
@@ -1920,6 +1956,10 @@ const texts = {
     copyDone: "Работните стъпки са прехвърлени.",
   },
   Serbisch: {
+    dashMyProjects: "Moji projekti",
+    dashToday: "Danas",
+    dashTomorrow: "Sutra",
+    dashWeek: "Nedelja",
     dashMyProjectsToday: "Moji projekti – danas",
     dashNothingToday: "Danas ništa nije planirano",
     dashNoProjects: "Još nema dodeljenih projekata",
@@ -2124,6 +2164,10 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Kroatisch: {
+    dashMyProjects: "Moji projekti",
+    dashToday: "Danas",
+    dashTomorrow: "Sutra",
+    dashWeek: "Tjedan",
     dashMyProjectsToday: "Moji projekti – danas",
     dashNothingToday: "Danas ništa nije planirano",
     dashNoProjects: "Još nema dodijeljenih projekata",
@@ -2328,6 +2372,10 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Slowenisch: {
+    dashMyProjects: "Moji projekti",
+    dashToday: "Danes",
+    dashTomorrow: "Jutri",
+    dashWeek: "Teden",
     dashMyProjectsToday: "Moji projekti – danes",
     dashNothingToday: "Danes ni nič načrtovano",
     dashNoProjects: "Še ni dodeljenih projektov",
@@ -2532,6 +2580,10 @@ const texts = {
     copyDone: "Delovni koraki so prevzeti.",
   },
   Polnisch: {
+    dashMyProjects: "Moje projekty",
+    dashToday: "Dziś",
+    dashTomorrow: "Jutro",
+    dashWeek: "Tydzień",
     dashMyProjectsToday: "Moje projekty – dzisiaj",
     dashNothingToday: "Nic na dziś",
     dashNoProjects: "Brak przydzielonych projektów",
@@ -2903,6 +2955,7 @@ export default function Home() {
   const [companyBlocked, setCompanyBlocked] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [openDashProjects, setOpenDashProjects] = useState<Record<string, boolean>>({});
+  const [dashRange, setDashRange] = useState("today");
   const [newPassword, setNewPassword] = useState("");
   const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
   const [changingPassword, setChangingPassword] = useState(false);
@@ -4188,6 +4241,16 @@ export default function Home() {
         <section className="space-y-4">
           {(() => {
             const today = new Date().toISOString().split("T")[0];
+            const todayDate = new Date(today + "T00:00:00Z");
+            const addDays = (n: number) => { const d = new Date(todayDate); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().split("T")[0]; };
+            const tomorrow = addDays(1);
+            const dow = todayDate.getUTCDay();
+            const diffToMon = dow === 0 ? -6 : 1 - dow;
+            const weekStart = addDays(diffToMon);
+            const weekEnd = addDays(diffToMon + 6);
+            const winStart = dashRange === "week" ? weekStart : dashRange === "tomorrow" ? tomorrow : today;
+            const winEnd = dashRange === "week" ? weekEnd : dashRange === "tomorrow" ? tomorrow : today;
+            const rangeLabel = dashRange === "week" ? `${weekStart} – ${weekEnd}` : dashRange === "tomorrow" ? tomorrow : today;
             const visible = workInstructions.filter(canSeeInstruction);
             const groups: Record<string, any> = {};
             for (const i of visible) {
@@ -4208,14 +4271,14 @@ export default function Home() {
               const rows: any[] = [];
               for (const inst of g.instructions) {
                 const wd = inst.work_date || "";
-                const isToday = wd === today;
-                const isOverdue = !!wd && wd < today;
+                const inWindow = !!wd && wd >= winStart && wd <= winEnd;
                 for (const task of (inst.work_instruction_tasks || [])) {
-                  if (isToday) rows.push({ task, inst, overdue: false });
-                  else if (isOverdue && (task.status || "open") !== "completed") rows.push({ task, inst, overdue: true });
+                  const st = task.status || "open";
+                  const overdueOpen = !!wd && wd < today && st !== "completed";
+                  if (inWindow || overdueOpen) rows.push({ task, inst, date: wd, overdue: wd < today && st !== "completed" });
                 }
               }
-              rows.sort((a, b) => (statusRank[a.task.status || "open"] ?? 2) - (statusRank[b.task.status || "open"] ?? 2));
+              rows.sort((a, b) => (a.date || "").localeCompare(b.date || "") || ((statusRank[a.task.status || "open"] ?? 2) - (statusRank[b.task.status || "open"] ?? 2)));
               const stoppedN = rows.filter((r) => r.task.status === "stopped").length;
               const doneN = rows.filter((r) => r.task.status === "completed").length;
               return { key: gkey, g, rows, stoppedN, doneN };
@@ -4229,8 +4292,13 @@ export default function Home() {
             return (
               <>
                 <div className="bg-white border rounded-xl p-4 shadow-sm">
-                  <h2 className="text-xl font-bold">{t.dashMyProjectsToday}</h2>
-                  <p className="text-gray-500 text-sm">{today} · {dashShown.length} {t.projects}</p>
+                  <h2 className="text-xl font-bold">{t.dashMyProjects}</h2>
+                  <p className="text-gray-500 text-sm">{rangeLabel} · {dashShown.length} {t.projects}</p>
+                  <div className="flex gap-2 mt-3">
+                    {([["today", t.dashToday], ["tomorrow", t.dashTomorrow], ["week", t.dashWeek]] as [string, string][]).map(([val, lbl]) => (
+                      <button key={val} type="button" onClick={() => setDashRange(val)} className={`px-3 py-1 rounded text-sm ${dashRange === val ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-700"}`}>{lbl}</button>
+                    ))}
+                  </div>
                 </div>
                 {dashShown.length === 0 && (<div className="bg-white border rounded-xl p-6 text-gray-500 text-center shadow-sm">{built.length === 0 ? t.dashNoProjects : t.dashNothingToday}</div>)}
                 {dashShown.map((b) => {
@@ -4259,7 +4327,7 @@ export default function Home() {
                             <div key={ri} className="flex items-center gap-2 text-sm">
                               <span>{icon}</span>
                               <span className={`flex-1 break-words ${s === "completed" ? "line-through text-gray-400" : ""}`}>{r.task.task_text}</span>
-                              {r.overdue ? (<span className="text-xs text-red-600 whitespace-nowrap">{t.dashOverdue}: {r.inst.work_date}</span>) : (r.task.note ? (<span className="text-xs text-gray-500 whitespace-nowrap break-words">{r.task.note}</span>) : null)}
+                              {r.date && r.date !== today ? (<span className={r.overdue ? "text-xs text-red-600 whitespace-nowrap" : "text-xs text-gray-500 whitespace-nowrap"}>{r.overdue ? t.dashOverdue + ": " : ""}{r.date}</span>) : (r.task.note ? (<span className="text-xs text-gray-500 whitespace-nowrap break-words">{r.task.note}</span>) : null)}
                             </div>
                           );
                         })}
