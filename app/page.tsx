@@ -969,10 +969,8 @@ export default function Home() {
   const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
   const [changingPassword, setChangingPassword] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
-  const [isUsernameLogin, setIsUsernameLogin] = useState(false);
   const [companySettings, setCompanySettings] = useState<CompanySettings | null>(null);
   const [currentReportId, setCurrentReportId] = useState<string | null>(null);
   const [employee, setEmployee] = useState("");
@@ -1078,27 +1076,13 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentSignature, uiLanguage]);
 
-  async function signUp() {
-    setMessage("");
-    const { error } = await supabase.auth.signUp({ email, password });
-    if (error) { setMessage(t.msgRegisterFail + error.message); return; }
-    setMessage(t.msgRegisterOk);
-  }
-
   const [companySlug, setCompanySlug] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   async function signIn() {
     setMessage("");
-    let loginEmail = "";
-    if (email.includes("@")) {
-      // Direkte E-Mail (für Owner/Admin)
-      loginEmail = email;
-    } else {
-      // Firmenkürzel + Benutzername
-      if (!companySlug.trim()) { setMessage("Bitte Firmenkürzel eingeben."); return; }
-      loginEmail = `${companySlug.toLowerCase().trim()}.${username.toLowerCase().trim()}@regie-internal.app`;
-    }
+    if (!companySlug.trim()) { setMessage("Bitte Firmenkürzel eingeben."); return; }
+    const loginEmail = `${companySlug.toLowerCase().trim()}.${username.toLowerCase().trim()}@regie-internal.app`;
     const { error } = await supabase.auth.signInWithPassword({ email: loginEmail, password });
     if (error) { setMessage(t.msgLoginFail + error.message); return; }
     setMessage(t.msgLoginOk);
@@ -2010,26 +1994,17 @@ export default function Home() {
             {languages.map((lang) => <option key={lang} value={lang}>{lang}</option>)}
           </select>
           {message && <div className="border rounded p-3 bg-yellow-100 text-black">{message}</div>}
-          <div className="flex gap-2">
-            <button type="button" onClick={() => setIsUsernameLogin(false)} className={`flex-1 py-2 rounded font-medium ${!isUsernameLogin ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-700"}`}>📧 E-Mail</button>
-            <button type="button" onClick={() => setIsUsernameLogin(true)} className={`flex-1 py-2 rounded font-medium ${isUsernameLogin ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-700"}`}>👤 Benutzername</button>
-          </div>
           <form onSubmit={(e) => { e.preventDefault(); signIn(); }} autoComplete="on" className="space-y-3">
-          {isUsernameLogin ? (
-            <div className="space-y-3">
-              <input name="company" autoComplete="organization" className="border p-3 w-full text-black bg-white rounded" placeholder="Firmenkürzel (z.B. luger)" value={companySlug} onChange={(e) => setCompanySlug(e.target.value)} />
-              <input name="username" autoComplete="username" className="border p-3 w-full text-black bg-white rounded" placeholder="Benutzername (z.B. max)" value={username} onChange={(e) => setUsername(e.target.value)} />
-            </div>
-          ) : (
-            <input name="email" autoComplete="email" className="border p-3 w-full text-black bg-white" placeholder={t.email} value={email} onChange={(e) => setEmail(e.target.value)} />
-          )}
+          <div className="space-y-3">
+            <input name="company" autoComplete="organization" className="border p-3 w-full text-black bg-white rounded" placeholder="Firmenkürzel (z.B. luger)" value={companySlug} onChange={(e) => setCompanySlug(e.target.value)} />
+            <input name="username" autoComplete="username" className="border p-3 w-full text-black bg-white rounded" placeholder="Benutzername (z.B. max)" value={username} onChange={(e) => setUsername(e.target.value)} />
+          </div>
           <div className="relative">
             <input name="password" autoComplete="current-password" className="border p-3 w-full text-black bg-white pr-12" placeholder={t.password} type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} />
             <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-lg">{showPassword ? "🙈" : "👁️"}</button>
           </div>
           <button type="submit" className="bg-blue-600 text-white px-4 py-3 rounded w-full">{t.login}</button>
           </form>
-          <p className="text-center text-sm text-gray-500">Noch kein Konto? <button type="button" onClick={signUp} className="text-blue-600 underline ml-1">{t.register}</button></p>
         </section>
       </main>
     );
