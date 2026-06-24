@@ -61,6 +61,10 @@ export default function AdminPage() {
   const [creatingCompany, setCreatingCompany] = useState(false);
   const [lastCreated, setLastCreated] = useState<{ username: string; password: string; company: string; slug: string } | null>(null);
   const [resetCreds, setResetCreds] = useState<{ name: string; email: string; password: string } | null>(null);
+  const [legalImpressum, setLegalImpressum] = useState("");
+  const [legalDatenschutz, setLegalDatenschutz] = useState("");
+  const [savingLegal, setSavingLegal] = useState(false);
+  const [openLegal, setOpenLegal] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -109,10 +113,29 @@ export default function AdminPage() {
       }
       setNameMap(nmap);
       setSettingsMap(smap);
+      setLegalImpressum(data.legal?.impressum || "");
+      setLegalDatenschutz(data.legal?.datenschutz || "");
       setMessage("");
     } catch (e: any) {
       setMessage("Fehler beim Laden: " + (e?.message || String(e)));
     }
+  }
+
+  async function saveLegal() {
+    setSavingLegal(true); setMessage("");
+    try {
+      const res = await fetch("/api/admin-data", {
+        method: "POST",
+        headers: await authHeaders(),
+        body: JSON.stringify({ action: "saveLegal", impressum: legalImpressum, datenschutz: legalDatenschutz }),
+      });
+      const data = await res.json();
+      if (data.error) { setMessage("Fehler: " + data.error); }
+      else { setMessage("✅ Impressum & Datenschutz gespeichert."); }
+    } catch (e: any) {
+      setMessage("Fehler: " + (e?.message || String(e)));
+    }
+    setSavingLegal(false);
   }
 
   function updateFeature(companyId: string, field: string, value: any) {
@@ -297,6 +320,23 @@ export default function AdminPage() {
           <button type="button" onClick={() => setResetCreds(null)} className="bg-gray-200 px-4 py-2 rounded text-sm">Schließen</button>
         </div>
       )}
+
+      {/* Impressum & Datenschutz */}
+      <section className="bg-white border rounded-xl p-4 space-y-3">
+        <h2 className="text-lg font-bold flex items-center gap-2 cursor-pointer select-none" onClick={() => setOpenLegal((v) => !v)}><span>{openLegal ? "▾" : "▸"}</span>📄 Impressum & Datenschutz</h2>
+        {openLegal && (<div className="space-y-4">
+          <p className="text-sm text-gray-500">Diese Texte erscheinen öffentlich unter /impressum und /datenschutz. Platzhalter in [eckigen Klammern] ausfüllen – und vor dem Verkauf rechtlich prüfen lassen.</p>
+          <div className="space-y-1">
+            <label className="font-medium text-sm">Impressum</label>
+            <textarea className="border p-3 w-full rounded text-sm font-mono" rows={12} value={legalImpressum} onChange={(e) => setLegalImpressum(e.target.value)} placeholder="Impressum-Text …" />
+          </div>
+          <div className="space-y-1">
+            <label className="font-medium text-sm">Datenschutzerklärung</label>
+            <textarea className="border p-3 w-full rounded text-sm font-mono" rows={16} value={legalDatenschutz} onChange={(e) => setLegalDatenschutz(e.target.value)} placeholder="Datenschutz-Text …" />
+          </div>
+          <button type="button" onClick={saveLegal} disabled={savingLegal} className="bg-blue-700 text-white px-4 py-2 rounded disabled:opacity-50">{savingLegal ? "Speichere …" : "Speichern"}</button>
+        </div>)}
+      </section>
 
       {/* Neue Firma */}
       <section className="bg-white border rounded-xl p-4 space-y-4">
