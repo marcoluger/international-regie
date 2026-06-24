@@ -17,7 +17,7 @@ const PACKAGES: Record<string, { label: string; color: string; defaults: any }> 
   enterprise: { label: "Enterprise (unbegrenzt)", color: "bg-purple-50 border-purple-300", defaults: { max_employees: 9999, max_photos: 0,  module_reports: true,  module_work_orders: true,  module_auto_reports: true,  photos_enabled: true,  email_enabled: true,  signature_enabled: true,  ai_enabled: true,  allowed_languages: ["Deutsch", "Kroatisch", "Slowenisch", "Polnisch", "Englisch"] } },
 };
 
-const ALL_LANGUAGES = ["Deutsch", "Kroatisch", "Slowenisch", "Polnisch", "Englisch", "Rumänisch"];
+const ALL_LANGUAGES = ["Deutsch", "Kroatisch", "Slowenisch", "Polnisch", "Englisch", "Rumänisch", "Ukrainisch", "Ungarisch", "Bulgarisch", "Tschechisch", "Türkisch", "Italienisch"];
 
 // Holt den aktuellen Anmelde-Token, damit die Server-Route den Aufrufer prüfen kann.
 async function authHeaders(): Promise<Record<string, string>> {
