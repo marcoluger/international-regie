@@ -2902,6 +2902,7 @@ export default function Home() {
   const [mustChangePassword, setMustChangePassword] = useState(false);
   const [companyBlocked, setCompanyBlocked] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [openDashProjects, setOpenDashProjects] = useState<Record<string, boolean>>({});
   const [newPassword, setNewPassword] = useState("");
   const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
   const [changingPassword, setChangingPassword] = useState(false);
@@ -4203,7 +4204,7 @@ export default function Home() {
               }
             }
             const statusRank: Record<string, number> = { stopped: 0, in_progress: 1, open: 2, completed: 3 };
-            const built = Object.values(groups).map((g: any) => {
+            const built = Object.entries(groups).map(([gkey, g]: [string, any]) => {
               const rows: any[] = [];
               for (const inst of g.instructions) {
                 const wd = inst.work_date || "";
@@ -4217,7 +4218,7 @@ export default function Home() {
               rows.sort((a, b) => (statusRank[a.task.status || "open"] ?? 2) - (statusRank[b.task.status || "open"] ?? 2));
               const stoppedN = rows.filter((r) => r.task.status === "stopped").length;
               const doneN = rows.filter((r) => r.task.status === "completed").length;
-              return { g, rows, stoppedN, doneN };
+              return { key: gkey, g, rows, stoppedN, doneN };
             });
             built.sort((a, b) => {
               const ra = a.stoppedN > 0 ? 0 : a.rows.length > 0 ? 1 : 2;
@@ -4231,11 +4232,13 @@ export default function Home() {
                   <p className="text-gray-500 text-sm">{today} · {built.length} {t.projects}</p>
                 </div>
                 {built.length === 0 && (<div className="bg-white border rounded-xl p-6 text-gray-500 text-center shadow-sm">{t.dashNoProjects}</div>)}
-                {built.map((b, gi) => (
-                  <div key={gi} className="bg-white border rounded-xl p-4 shadow-sm space-y-3">
-                    <div className="flex justify-between items-start gap-3">
+                {built.map((b) => {
+                  const dOpen = openDashProjects[b.key] !== false;
+                  return (
+                  <div key={b.key} className="bg-white border rounded-xl p-4 shadow-sm space-y-3">
+                    <div className="flex justify-between items-start gap-3 cursor-pointer select-none" onClick={() => setOpenDashProjects((prev) => ({ ...prev, [b.key]: prev[b.key] === false }))}>
                       <div className="min-w-0">
-                        <h3 className="font-bold text-lg break-words">{b.g.name}</h3>
+                        <h3 className="font-bold text-lg break-words">{dOpen ? "▾" : "▸"} {b.g.name}</h3>
                         {(b.g.customer || b.g.site) && (<p className="text-gray-500 text-sm break-words">{[b.g.customer, b.g.site].filter(Boolean).join(" · ")}</p>)}
                       </div>
                       {b.stoppedN > 0 ? (
@@ -4244,7 +4247,7 @@ export default function Home() {
                         <span className="text-xs text-green-700 bg-green-50 px-2 py-1 rounded whitespace-nowrap">{b.doneN} / {b.rows.length} {t.dashDone}</span>
                       ) : null}
                     </div>
-                    {b.rows.length === 0 ? (
+                    {dOpen && (b.rows.length === 0 ? (
                       <p className="text-gray-400 text-sm">{t.dashNothingToday}</p>
                     ) : (
                       <div className="space-y-2">
@@ -4260,9 +4263,10 @@ export default function Home() {
                           );
                         })}
                       </div>
-                    )}
+                    ))}
                   </div>
-                ))}
+                  );
+                })}
               </>
             );
           })()}
