@@ -4225,14 +4225,15 @@ export default function Home() {
               const rb = b.stoppedN > 0 ? 0 : b.rows.length > 0 ? 1 : 2;
               return ra - rb;
             });
+            const dashShown = (dashRole === "owner" || dashRole === "admin") ? built : built.filter((b: any) => b.rows.length > 0);
             return (
               <>
                 <div className="bg-white border rounded-xl p-4 shadow-sm">
                   <h2 className="text-xl font-bold">{t.dashMyProjectsToday}</h2>
-                  <p className="text-gray-500 text-sm">{today} · {built.length} {t.projects}</p>
+                  <p className="text-gray-500 text-sm">{today} · {dashShown.length} {t.projects}</p>
                 </div>
-                {built.length === 0 && (<div className="bg-white border rounded-xl p-6 text-gray-500 text-center shadow-sm">{t.dashNoProjects}</div>)}
-                {built.map((b) => {
+                {dashShown.length === 0 && (<div className="bg-white border rounded-xl p-6 text-gray-500 text-center shadow-sm">{built.length === 0 ? t.dashNoProjects : t.dashNothingToday}</div>)}
+                {dashShown.map((b) => {
                   const dOpen = openDashProjects[b.key] !== false;
                   return (
                   <div key={b.key} className="bg-white border rounded-xl p-4 shadow-sm space-y-3">
