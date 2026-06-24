@@ -3109,6 +3109,13 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentSignature, uiLanguage]);
 
+  // Gelbe Meldung nach 10 Sekunden automatisch ausblenden.
+  useEffect(() => {
+    if (!message) return;
+    const timer = setTimeout(() => setMessage(""), 10000);
+    return () => clearTimeout(timer);
+  }, [message]);
+
   const [companySlug, setCompanySlug] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
