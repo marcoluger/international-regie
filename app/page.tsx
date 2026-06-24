@@ -4068,13 +4068,13 @@ export default function Home() {
   }
 
   return (
-    <main className="max-w-5xl mx-auto p-4 md:p-8 space-y-6 bg-gray-100 min-h-screen text-black">
+    <main className="max-w-5xl mx-auto p-4 md:p-8 space-y-6 bg-gray-100 min-h-screen text-black overflow-x-hidden">
       <header className="bg-white border rounded p-4 space-y-1">
         <h1 className="text-3xl font-bold">{t.title}</h1>
         <p className="text-gray-600">{t.subtitle}</p>
-        <p className="text-gray-700">{t.loggedInAs}: <strong>{user.email}</strong></p>
-        {currentCompany && (<p className="text-gray-700">{t.firma}: <strong>{currentCompany.companies.name}</strong> | {t.role}: <strong>{currentCompany.role === "owner" ? "Owner" : currentCompany.role === "admin" ? t.roleAdmin : currentCompany.role === "project_manager" ? t.roleProjectManager : t.roleEmployee}</strong></p>)}
-        <div className="flex items-center gap-3 mt-2">
+        <p className="text-gray-700 break-words">{t.loggedInAs}: <strong>{user.email}</strong></p>
+        {currentCompany && (<p className="text-gray-700 break-words">{t.firma}: <strong>{currentCompany.companies.name}</strong> | {t.role}: <strong>{currentCompany.role === "owner" ? "Owner" : currentCompany.role === "admin" ? t.roleAdmin : currentCompany.role === "project_manager" ? t.roleProjectManager : t.roleEmployee}</strong></p>)}
+        <div className="flex items-center flex-wrap gap-3 mt-2">
           <button type="button" onClick={signOut} className="bg-gray-800 text-white px-4 py-2 rounded">{t.logout}</button>
           <button type="button" onClick={refreshAll} disabled={refreshing} title="Aktualisieren" className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50">{refreshing ? "⏳" : "🔄"}</button>
           <select className="border p-2 rounded text-black bg-white text-sm" value={uiLanguage} onChange={(e) => {
@@ -4590,7 +4590,7 @@ export default function Home() {
                       const dateStr = `${selectedMonth}-${String(day).padStart(2, "0")}`;
                       const entries = monthInstructions.filter((inst) => inst.work_date === dateStr);
                       const isToday = dateStr === new Date().toISOString().split("T")[0];
-                      return (<div key={day} onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }} className={`border rounded p-1 min-h-14 cursor-pointer hover:border-blue-400 transition-colors ${isToday ? "border-blue-500 bg-blue-50" : entries.length > 0 ? "bg-green-50 border-green-300" : "bg-white"}`}><div className={`text-xs font-bold ${isToday ? "text-blue-600" : "text-gray-700"}`}>{day}</div>{entries.length > 0 && <div className="text-xs text-green-700 font-medium">{entries.length} ✓</div>}{entries[0] && <div className="text-xs text-gray-500 truncate">{entries[0].title}</div>}</div>);
+                      return (<div key={day} onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }} className={`border rounded p-1 min-h-14 min-w-0 cursor-pointer hover:border-blue-400 transition-colors ${isToday ? "border-blue-500 bg-blue-50" : entries.length > 0 ? "bg-green-50 border-green-300" : "bg-white"}`}><div className={`text-xs font-bold ${isToday ? "text-blue-600" : "text-gray-700"}`}>{day}</div>{entries.length > 0 && <div className="text-xs text-green-700 font-medium">{entries.length} ✓</div>}{entries[0] && <div className="text-xs text-gray-500 truncate">{entries[0].title}</div>}</div>);
                     })}
                   </div>
                 </section>
