@@ -1966,12 +1966,16 @@ export default function Home() {
       }
       doc.setDrawColor(200); doc.line(marginLeft, y, pageWidth - marginRight, y); y += 10; doc.setDrawColor(0);
     }
-    addNewPageIfNeeded(65);
+    const sigW = 70; const sigH = 21;
+    const anySig = !!(sigEmployee || sigCustomer);
+    addNewPageIfNeeded(anySig ? 92 : 65);
     doc.setFontSize(12); doc.setFont(FONT, "bold"); doc.text(p.summary, marginLeft, y); y += 8;
     doc.setFontSize(10); doc.setFont(FONT, "normal");
     doc.text(`${p.totalHours}: ${totalHours.toString().replace(".", ",")} ${p.hours}`, marginLeft, y); y += 8;
     Object.entries(projectTotals).forEach(([project, total]) => { doc.text(`${p.project} ${project}: ${total.toString().replace(".", ",")} ${p.hours}`, marginLeft, y); y += 6; });
-    y += 18;
+    y += anySig ? 30 : 18;
+    if (sigEmployee) { try { doc.addImage(sigEmployee, "PNG", marginLeft, y - sigH, sigW, sigH); } catch {} }
+    if (sigCustomer) { try { doc.addImage(sigCustomer, "PNG", pageWidth - marginRight - sigW, y - sigH, sigW, sigH); } catch {} }
     doc.line(marginLeft, y, marginLeft + 70, y); doc.line(pageWidth - marginRight - 70, y, pageWidth - marginRight, y);
     y += 6; doc.setFontSize(9); doc.text(p.signatureEmployee, marginLeft, y); doc.text(p.signatureCustomer, pageWidth - marginRight - 70, y);
     addFooter();
