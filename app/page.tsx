@@ -4196,6 +4196,12 @@ export default function Home() {
               if (!groups[key].site && i.site) groups[key].site = i.site;
               groups[key].instructions.push(i);
             }
+            const dashRole = currentCompany?.role;
+            if (dashRole === "owner" || dashRole === "admin") {
+              for (const pr of projects) {
+                if (!groups[pr.id]) groups[pr.id] = { name: pr.name || t.noProject, customer: pr.customer || "", site: pr.site || "", instructions: [] };
+              }
+            }
             const statusRank: Record<string, number> = { stopped: 0, in_progress: 1, open: 2, completed: 3 };
             const built = Object.values(groups).map((g: any) => {
               const rows: any[] = [];
