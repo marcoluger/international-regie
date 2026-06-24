@@ -4326,7 +4326,7 @@ export default function Home() {
                           return (
                             <div key={ri} className="flex items-center gap-2 text-sm">
                               <span>{icon}</span>
-                              <span className={`flex-1 break-words ${s === "completed" ? "line-through text-gray-400" : ""}`}>{r.task.task_text}</span>
+                              <span className={`flex-1 break-words ${s === "completed" ? "line-through text-gray-400" : ""}`}>{getTranslatedTask(r.inst.id, r.task.id, r.task.task_text)}</span>
                               {r.date && r.date !== today ? (<span className={r.overdue ? "text-xs text-red-600 whitespace-nowrap" : "text-xs text-gray-500 whitespace-nowrap"}>{r.overdue ? t.dashOverdue + ": " : ""}{r.date}</span>) : (r.task.note ? (<span className="text-xs text-gray-500 whitespace-nowrap break-words">{r.task.note}</span>) : null)}
                             </div>
                           );
