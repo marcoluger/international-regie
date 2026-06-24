@@ -84,6 +84,9 @@ type CompanyFeatures = {
 
 const texts = {
   Deutsch: {
+    readLabel: "Gelesen",
+    readUnread: "ungelesen",
+    readAllDone: "alle gelesen",
     dashMyProjects: "Meine Projekte",
     dashToday: "Heute",
     dashTomorrow: "Morgen",
@@ -292,6 +295,9 @@ const texts = {
     copyDone: "Arbeitsschritte wurden übernommen.",
   },
   Rumänisch: {
+    readLabel: "Citit",
+    readUnread: "necitit",
+    readAllDone: "toate citite",
     dashMyProjects: "Proiectele mele",
     dashToday: "Azi",
     dashTomorrow: "Mâine",
@@ -500,6 +506,9 @@ const texts = {
     copyDone: "Etapele de lucru au fost preluate.",
   },
   Englisch: {
+    readLabel: "Read",
+    readUnread: "unread",
+    readAllDone: "all read",
     dashMyProjects: "My projects",
     dashToday: "Today",
     dashTomorrow: "Tomorrow",
@@ -708,6 +717,9 @@ const texts = {
     copyDone: "Work steps have been applied.",
   },
   Italienisch: {
+    readLabel: "Letto",
+    readUnread: "non letto",
+    readAllDone: "tutto letto",
     dashMyProjects: "I miei progetti",
     dashToday: "Oggi",
     dashTomorrow: "Domani",
@@ -916,6 +928,9 @@ const texts = {
     copyDone: "Le fasi di lavoro sono state applicate.",
   },
   Türkisch: {
+    readLabel: "Okundu",
+    readUnread: "okunmadı",
+    readAllDone: "tümü okundu",
     dashMyProjects: "Projelerim",
     dashToday: "Bugün",
     dashTomorrow: "Yarın",
@@ -1124,6 +1139,9 @@ const texts = {
     copyDone: "İş adımları alındı.",
   },
   Ungarisch: {
+    readLabel: "Elolvasva",
+    readUnread: "olvasatlan",
+    readAllDone: "mind elolvasva",
     dashMyProjects: "Saját projektjeim",
     dashToday: "Ma",
     dashTomorrow: "Holnap",
@@ -1332,6 +1350,9 @@ const texts = {
     copyDone: "A munkalépések átvéve.",
   },
   Tschechisch: {
+    readLabel: "Přečteno",
+    readUnread: "nepřečteno",
+    readAllDone: "vše přečteno",
     dashMyProjects: "Moje projekty",
     dashToday: "Dnes",
     dashTomorrow: "Zítra",
@@ -1540,6 +1561,9 @@ const texts = {
     copyDone: "Pracovní kroky byly převzaty.",
   },
   Ukrainisch: {
+    readLabel: "Прочитано",
+    readUnread: "непрочитано",
+    readAllDone: "усе прочитано",
     dashMyProjects: "Мої проєкти",
     dashToday: "Сьогодні",
     dashTomorrow: "Завтра",
@@ -1748,6 +1772,9 @@ const texts = {
     copyDone: "Робочі кроки перенесено.",
   },
   Bulgarisch: {
+    readLabel: "Прочетено",
+    readUnread: "непрочетено",
+    readAllDone: "всичко прочетено",
     dashMyProjects: "Моите проекти",
     dashToday: "Днес",
     dashTomorrow: "Утре",
@@ -1956,6 +1983,9 @@ const texts = {
     copyDone: "Работните стъпки са прехвърлени.",
   },
   Serbisch: {
+    readLabel: "Pročitano",
+    readUnread: "nepročitano",
+    readAllDone: "sve pročitano",
     dashMyProjects: "Moji projekti",
     dashToday: "Danas",
     dashTomorrow: "Sutra",
@@ -2164,6 +2194,9 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Kroatisch: {
+    readLabel: "Pročitano",
+    readUnread: "nepročitano",
+    readAllDone: "sve pročitano",
     dashMyProjects: "Moji projekti",
     dashToday: "Danas",
     dashTomorrow: "Sutra",
@@ -2372,6 +2405,9 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Slowenisch: {
+    readLabel: "Prebrano",
+    readUnread: "neprebrano",
+    readAllDone: "vse prebrano",
     dashMyProjects: "Moji projekti",
     dashToday: "Danes",
     dashTomorrow: "Jutri",
@@ -2580,6 +2616,9 @@ const texts = {
     copyDone: "Delovni koraki so prevzeti.",
   },
   Polnisch: {
+    readLabel: "Przeczytane",
+    readUnread: "nieprzeczytane",
+    readAllDone: "wszystko przeczytane",
     dashMyProjects: "Moje projekty",
     dashToday: "Dziś",
     dashTomorrow: "Jutro",
@@ -3142,7 +3181,7 @@ export default function Home() {
   }
 
   async function loadWorkInstructions(companyId: string) {
-    const { data, error } = await supabase.from("work_instructions").select(`*, work_instruction_tasks (*)`).eq("company_id", companyId).order("created_at", { ascending: false });
+    const { data, error } = await supabase.from("work_instructions").select(`*, work_instruction_tasks (*), instruction_reads (user_id, read_at)`).eq("company_id", companyId).order("created_at", { ascending: false });
     if (error) { setMessage("Fehler beim Laden der Arbeitsanweisungen: " + error.message); return; }
     setWorkInstructions(data || []);
     // Kommentare in die aktuelle Anzeige-Sprache übersetzen (z. B. Kroatisch -> Deutsch für den Owner)
@@ -3358,6 +3397,38 @@ export default function Home() {
     const trans = instructionTranslations[instructionId];
     if (trans && trans.language === uiLanguage && trans.tasks?.[taskId]) return trans.tasks[taskId];
     return fallback;
+  }
+
+  // Markiert eine Arbeitsanweisung als vom Mitarbeiter gelesen (einmalig, nicht widerrufbar).
+  async function markInstructionRead(instructionId: string) {
+    if (!user?.id || currentCompany?.role !== "employee") return;
+    const inst = workInstructions.find((i: any) => i.id === instructionId);
+    if ((inst?.instruction_reads || []).some((r: any) => r.user_id === user.id)) return;
+    try {
+      await supabase.from("instruction_reads").upsert({ instruction_id: instructionId, user_id: user.id }, { onConflict: "instruction_id,user_id", ignoreDuplicates: true });
+      setWorkInstructions((prev: any[]) => prev.map((i: any) => i.id === instructionId ? { ...i, instruction_reads: [...(i.instruction_reads || []), { user_id: user.id, read_at: new Date().toISOString() }] } : i));
+    } catch { /* ignorieren */ }
+  }
+
+  // Zeigt den Lesestatus: Mitarbeiter sehen "gelesen", Manager sehen wer gelesen hat / wer nicht.
+  function renderReadStatus(instruction: any) {
+    const reads = instruction.instruction_reads || [];
+    const readerIds = new Set(reads.map((r: any) => r.user_id));
+    const role = currentCompany?.role;
+    const assigned: string[] = instruction.assigned_user_ids || [];
+    const nameOf = (id: string) => { const u = companyUsers.find((m: any) => m.user_id === id); return u ? (u.full_name || u.email || id) : id; };
+    if (role === "employee") {
+      const iRead = !!user?.id && readerIds.has(user.id);
+      return iRead ? (<p className="text-xs text-green-600">✅ {t.readLabel}</p>) : null;
+    }
+    if (assigned.length === 0) return null;
+    const readers = assigned.filter((id) => readerIds.has(id));
+    return (
+      <p className="text-xs break-words">
+        <span className={readers.length === assigned.length ? "text-green-600" : "text-orange-600"}>👁 {t.readLabel} {readers.length}/{assigned.length}</span>
+        <span className="text-gray-500"> — {assigned.map((id) => `${nameOf(id)} ${readerIds.has(id) ? "✓" : "✗"}`).join(", ")}</span>
+      </p>
+    );
   }
 
   // Übersetzt mehrere Texte PARALLEL (statt nacheinander) -> deutlich schneller.
@@ -4266,22 +4337,29 @@ export default function Home() {
                 if (!groups[pr.id]) groups[pr.id] = { name: pr.name || t.noProject, customer: pr.customer || "", site: pr.site || "", instructions: [] };
               }
             }
+            const isManager = dashRole === "owner" || dashRole === "admin" || dashRole === "project_manager";
             const statusRank: Record<string, number> = { stopped: 0, in_progress: 1, open: 2, completed: 3 };
             const built = Object.entries(groups).map(([gkey, g]: [string, any]) => {
               const rows: any[] = [];
+              const relevant = new Set<any>();
               for (const inst of g.instructions) {
                 const wd = inst.work_date || "";
                 const inWindow = !!wd && wd >= winStart && wd <= winEnd;
                 for (const task of (inst.work_instruction_tasks || [])) {
                   const st = task.status || "open";
                   const overdueOpen = !!wd && wd < today && st !== "completed";
-                  if (inWindow || overdueOpen) rows.push({ task, inst, date: wd, overdue: wd < today && st !== "completed" });
+                  if (inWindow || overdueOpen) { rows.push({ task, inst, date: wd, overdue: wd < today && st !== "completed" }); relevant.add(inst); }
                 }
               }
               rows.sort((a, b) => (a.date || "").localeCompare(b.date || "") || ((statusRank[a.task.status || "open"] ?? 2) - (statusRank[b.task.status || "open"] ?? 2)));
               const stoppedN = rows.filter((r) => r.task.status === "stopped").length;
               const doneN = rows.filter((r) => r.task.status === "completed").length;
-              return { key: gkey, g, rows, stoppedN, doneN };
+              let unread = 0, totalAssign = 0;
+              relevant.forEach((inst: any) => {
+                const readerIds = new Set((inst.instruction_reads || []).map((r: any) => r.user_id));
+                for (const uid of (inst.assigned_user_ids || [])) { totalAssign++; if (!readerIds.has(uid)) unread++; }
+              });
+              return { key: gkey, g, rows, stoppedN, doneN, unread, totalAssign };
             });
             built.sort((a, b) => {
               const ra = a.stoppedN > 0 ? 0 : a.rows.length > 0 ? 1 : 2;
@@ -4309,6 +4387,7 @@ export default function Home() {
                       <div className="min-w-0">
                         <h3 className="font-bold text-lg break-words">{dOpen ? "▾" : "▸"} {b.g.name}</h3>
                         {(b.g.customer || b.g.site) && (<p className="text-gray-500 text-sm break-words">{[b.g.customer, b.g.site].filter(Boolean).join(" · ")}</p>)}
+                        {isManager && b.totalAssign > 0 && (<p className={`text-xs ${b.unread > 0 ? "text-orange-600" : "text-green-600"}`}>{b.unread > 0 ? `👁 ${b.unread} ${t.readUnread}` : `✅ ${t.readAllDone}`}</p>)}
                       </div>
                       {b.stoppedN > 0 ? (
                         <span className="text-xs text-red-700 bg-red-50 px-2 py-1 rounded whitespace-nowrap">{b.stoppedN} {t.statusStopped}</span>
@@ -4599,6 +4678,7 @@ export default function Home() {
                         </div>
                         <span className="text-xs text-gray-500 whitespace-nowrap">{instruction.work_date || "—"} · {t.workSteps}: {(instruction.work_instruction_tasks || []).length}</span>
                       </div>
+                      {renderReadStatus(instruction)}
                       {openInstrCards[instruction.id] && (
                         <div className="mt-2 space-y-2">
                           <p className="text-sm text-gray-600">{t.site}: {instruction.site || "-"}</p>
@@ -4631,13 +4711,14 @@ export default function Home() {
             if (dayInstructions.length === 0) return (<section className="border rounded p-4 bg-white text-black"><p className="text-gray-500">{t.noInstructionsDay}</p></section>);
             return dayInstructions.map((instruction) => (
               <section key={instruction.id} className="border rounded p-4 bg-white text-black space-y-2">
-                <div className="flex justify-between items-start cursor-pointer select-none" onClick={() => setOpenDayCards(prev => ({ ...prev, [instruction.id]: !prev[instruction.id] }))}>
+                <div className="flex justify-between items-start cursor-pointer select-none" onClick={() => { const willOpen = !openDayCards[instruction.id]; setOpenDayCards(prev => ({ ...prev, [instruction.id]: !prev[instruction.id] })); if (willOpen) markInstructionRead(instruction.id); }}>
                   <div>
                     <h3 className="font-bold text-lg">{openDayCards[instruction.id] ? "▾" : "▸"} {getTranslated(instruction.id, "title", instruction.title)}</h3>
                     <p className="text-sm text-gray-600 ml-5"><strong>{t.project}:</strong> {instruction.project || "-"} &nbsp;·&nbsp; <strong>{t.site}:</strong> {instruction.site || "-"}</p>
                   </div>
                   <span className="text-sm text-gray-500">{instruction.work_date}</span>
                 </div>
+                {renderReadStatus(instruction)}
                 {openDayCards[instruction.id] && (<>
                 <p><strong>{t.customer}:</strong> {instruction.customer || "-"}</p>
                 {instruction.problems_text && (<div className="bg-yellow-50 border rounded p-2"><strong>{t.problemsHints}:</strong> {getTranslated(instruction.id, "problems_text", instruction.problems_text)}</div>)}
@@ -4726,7 +4807,7 @@ export default function Home() {
               return (
                 <section key={dateStr} className="border rounded p-4 bg-white text-black space-y-3">
                   <div className="flex justify-between items-center bg-gray-100 rounded p-2">
-                    <h3 className="font-bold cursor-pointer select-none" onClick={() => setOpenWeekDays(prev => ({ ...prev, [dateStr]: !prev[dateStr] }))}>{openWeekDays[dateStr] ? "▾" : "▸"} {t.weekdays[di]} — {dateStr}</h3>
+                    <h3 className="font-bold cursor-pointer select-none" onClick={() => { const willOpen = !openWeekDays[dateStr]; setOpenWeekDays(prev => ({ ...prev, [dateStr]: !prev[dateStr] })); if (willOpen) dayInstructions.forEach((ins: any) => markInstructionRead(ins.id)); }}>{openWeekDays[dateStr] ? "▾" : "▸"} {t.weekdays[di]} — {dateStr}</h3>
                     <button type="button" onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }} className="text-blue-600 text-sm hover:underline">→ {t.dayView}</button>
                   </div>
                   {openWeekDays[dateStr] && (<>
@@ -4734,6 +4815,7 @@ export default function Home() {
                     <div key={instruction.id} className="border rounded p-3 space-y-2">
                       <div className="flex justify-between"><strong>{getTranslated(instruction.id, "title", instruction.title)}</strong><span className="text-sm text-gray-500">{instruction.project || "-"}</span></div>
                       <p className="text-sm"><strong>{t.customer}:</strong> {instruction.customer || "-"} | <strong>{t.site}:</strong> {instruction.site || "-"}</p>
+                      {renderReadStatus(instruction)}
                       {instruction.problems_text && (<div className="bg-yellow-50 border rounded p-2 text-sm"><strong>{t.problemsHints}:</strong> {getTranslated(instruction.id, "problems_text", instruction.problems_text)}</div>)}
                       <ul className="space-y-1">
                         {(instruction.work_instruction_tasks || []).sort((a: any, b: any) => a.sort_order - b.sort_order).map((task: any) => (
@@ -4791,7 +4873,7 @@ export default function Home() {
                 <section className="border rounded p-4 bg-white text-black space-y-2">
                   <h3 className="font-bold">{t.workInstructions} ({monthInstructions.length})</h3>
                   {monthInstructions.length === 0 && <p className="text-gray-500">{t.noInstructionsMonth}</p>}
-                  {monthInstructions.sort((a, b) => (a.work_date || "").localeCompare(b.work_date || "")).map((instruction) => (<div key={instruction.id} onClick={() => { setSelectedDayDate(instruction.work_date); setActiveTab("tag"); }} className="border rounded p-3 bg-gray-50 cursor-pointer hover:bg-gray-100 flex justify-between items-center"><div><span className="font-medium">{getTranslated(instruction.id, "title", instruction.title)}</span><span className="text-gray-500 text-sm ml-2">{instruction.customer || "-"}</span></div><span className="text-sm text-gray-500">{instruction.work_date}</span></div>))}
+                  {monthInstructions.sort((a, b) => (a.work_date || "").localeCompare(b.work_date || "")).map((instruction) => (<div key={instruction.id} className="border rounded p-3 bg-gray-50"><div onClick={() => { markInstructionRead(instruction.id); setSelectedDayDate(instruction.work_date); setActiveTab("tag"); }} className="cursor-pointer hover:bg-gray-100 flex justify-between items-center"><div><span className="font-medium">{getTranslated(instruction.id, "title", instruction.title)}</span><span className="text-gray-500 text-sm ml-2">{instruction.customer || "-"}</span></div><span className="text-sm text-gray-500">{instruction.work_date}</span></div>{renderReadStatus(instruction)}</div>))}
                 </section>
               </>
             );
