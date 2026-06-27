@@ -3234,6 +3234,7 @@ export default function Home() {
   const [savedReports, setSavedReports] = useState<SavedReport[]>([]);
   const [teamReports, setTeamReports] = useState<SavedReport[]>([]);
   const [teamOpenId, setTeamOpenId] = useState<string | null>(null);
+  const [teamLoading, setTeamLoading] = useState(false);
   const [days, setDays] = useState<DayEntry[]>(createEmptyDays());
   const [currentCompany, setCurrentCompany] = useState<CurrentCompany | null>(null);
   const [companyFeatures, setCompanyFeatures] = useState<CompanyFeatures | null>(null);
@@ -3593,11 +3594,13 @@ export default function Home() {
   async function loadTeamReports() {
     const role = currentCompany?.role;
     if (role !== "owner" && role !== "admin" && role !== "project_manager") { setTeamReports([]); return; }
-    const ids = companyUsers.map((m: any) => m.user_id).filter(Boolean);
-    if (ids.length === 0) { setTeamReports([]); return; }
-    const { data, error } = await supabase.from("reports").select("*").in("user_id", ids).order("created_at", { ascending: false });
-    if (error) { setMessage("Fehler beim Laden: " + error.message); return; }
-    setTeamReports((data || []) as SavedReport[]);
+    setTeamLoading(true);
+    try {
+      // RLS entscheidet serverseitig, welche Berichte ein Manager sehen darf.
+      const { data, error } = await supabase.from("reports").select("*").order("created_at", { ascending: false });
+      if (error) { setMessage("Fehler beim Laden: " + error.message); setTeamReports([]); return; }
+      setTeamReports((data || []) as SavedReport[]);
+    } finally { setTeamLoading(false); }
   }
 
   function updateDay(index: number, field: keyof DayEntry, value: string) {
@@ -5101,7 +5104,7 @@ export default function Home() {
               <h2 className="text-xl font-bold">👁 {t.teamReports}</h2>
               <button type="button" onClick={loadTeamReports} className="bg-gray-200 px-3 py-2 rounded text-sm">🔄</button>
             </div>
-            {entries.length === 0 ? (<p className="text-gray-500">{t.teamNoReports}</p>) : entries.map(([uid, group]) => (
+            {teamLoading ? (<p className="text-gray-500">⏳ ...</p>) : entries.length === 0 ? (<p className="text-gray-500">{t.teamNoReports}</p>) : entries.map(([uid, group]) => (
               <div key={uid} className="border rounded overflow-hidden">
                 <div className="bg-gray-100 px-3 py-2 font-bold">{group.name} ({group.reports.length})</div>
                 <div className="divide-y">
