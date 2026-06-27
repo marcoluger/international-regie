@@ -4211,7 +4211,7 @@ export default function Home() {
   }
 
   async function createPDF(sendByEmail = false) {
-    const p = pdfTexts[pdfLanguage as keyof typeof pdfTexts];
+    const p = pdfTexts[uiLanguage as keyof typeof pdfTexts] || pdfTexts["Deutsch" as keyof typeof pdfTexts];
     const doc = new jsPDF("p", "mm", "a4");
     const FONT = "helvetica";
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -4459,9 +4459,6 @@ export default function Home() {
             setUiLanguage(e.target.value as Language);
           }}>
             {getAllowedLanguages(companyFeatures).filter(l => languages.includes(l as Language)).map((lang) => (<option key={lang} value={lang}>🌐 {lang}</option>))}
-          </select>
-          <select className="border p-2 rounded text-black bg-white text-sm" value={pdfLanguage} onChange={(e) => setPdfLanguage(e.target.value)}>
-            {getAllowedLanguages(companyFeatures).filter(l => pdfLanguages.includes(l)).map((lang) => (<option key={lang} value={lang}>📄 {lang}</option>))}
           </select>
         </div>
       </header>
