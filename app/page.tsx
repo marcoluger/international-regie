@@ -3224,6 +3224,15 @@ export default function Home() {
     };
   }, [user?.id]);
 
+  // Traegt automatisch den Namen des angemeldeten Benutzers ins Feld "Mitarbeiter" ein,
+  // aber NUR wenn das Feld noch leer ist (eine vorhandene Eingabe wird nie ueberschrieben).
+  useEffect(() => {
+    if (!user?.id || companyUsers.length === 0) return;
+    const me = companyUsers.find((m: any) => m.user_id === user.id);
+    const name = me?.full_name || "";
+    if (name) setEmployee((prev) => (prev && prev.trim() ? prev : name));
+  }, [companyUsers, user?.id]);
+
   async function loadCompanyContext(userId: string) {
     const { data: companyUser, error } = await supabase.from("company_users").select("company_id, role").eq("user_id", userId).maybeSingle();
     if (error) { setMessage("Fehler beim Laden der Firma: " + error.message); return; }
