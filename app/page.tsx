@@ -4125,7 +4125,9 @@ export default function Home() {
       problemsTranslated ? `─────\n⚠️ ${currentTexts.problemsHints}: ${problemsTranslated}` : "",
       instruction.employee_note ? `${currentTexts.feedbackLabel}: ${instruction.employee_note}` : ""
     ].filter(Boolean).join("\n─────\n");
-    const copy = [...days];
+    // Frische, leere Woche -> nur der uebertragene Tag wird gefuellt,
+    // alte Tage aus einer frueheren Uebertragung bleiben NICHT stehen.
+    const copy = createEmptyDays();
     const targetDate = instruction.work_date || "";
     if (targetDate) {
       const [year, month, day] = targetDate.split("-").map(Number);
@@ -4138,7 +4140,7 @@ export default function Home() {
     const targetIndex = targetDate ? copy.findIndex((day) => day.date === targetDate) : 0;
     const indexToUse = targetIndex >= 0 ? targetIndex : 0;
     copy[indexToUse] = { ...copy[indexToUse], customer: instruction.customer || "", projectNumber: instruction.project || "", site: instruction.site || "", description, photos: [] };
-    setDays(copy); setReportInstruction(instruction); setActiveTab("regiebericht"); setMessage(t.msgReportPrepared);
+    setDays(copy); setCurrentReportId(null); setReportName(""); setReportInstruction(instruction); setActiveTab("regiebericht"); setMessage(t.msgReportPrepared);
   }
 
   // ── FIXED: kein window.location.reload() ──
