@@ -3183,11 +3183,15 @@ export default function Home() {
     if (!user?.id) return;
     setRefreshing(true);
     try {
-      await loadCompanyContext(user.id);
-      await loadReportsFromDatabase();
-      await loadCompanySettings(user.id);
-    } catch { /* ignorieren */ }
-    setRefreshing(false);
+      // Jeder Ladevorgang ist zeitlich begrenzt (max. 12s), damit der Knopf
+      // bei einer haengenden Verbindung nicht ewig auf "Laden" stehen bleibt.
+      await dbTimeout(loadCompanyContext(user.id), 12000);
+      await dbTimeout(loadReportsFromDatabase(), 12000);
+      await dbTimeout(loadCompanySettings(user.id), 12000);
+    } catch { /* ignorieren */ } finally {
+      // Wird IMMER ausgefuehrt -> der Aktualisieren-Knopf haengt nie dauerhaft.
+      setRefreshing(false);
+    }
   }
 
   // Automatisch neu laden, sobald der Tab/das Fenster wieder aktiv wird.
