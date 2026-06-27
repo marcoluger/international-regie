@@ -185,6 +185,8 @@ const texts = {
     instructionTitle: "Titel",
     selectProject: "Projekt auswählen",
     problems: "Probleme / Hinweise",
+    material: "Material",
+    werkzeug: "Werkzeug",
     workSteps: "Arbeitsschritte",
     addStep: "+ Arbeitsschritt",
     saveInstruction: "Arbeitsanweisung speichern",
@@ -401,6 +403,8 @@ const texts = {
     instructionTitle: "Titlu",
     selectProject: "Selectare proiect",
     problems: "Probleme / observații",
+    material: "Material",
+    werkzeug: "Unelte",
     workSteps: "Etape de lucru",
     addStep: "+ Etapă de lucru",
     saveInstruction: "Salvare instrucțiune de lucru",
@@ -617,6 +621,8 @@ const texts = {
     instructionTitle: "Title",
     selectProject: "Select project",
     problems: "Problems / notes",
+    material: "Material",
+    werkzeug: "Tools",
     workSteps: "Work steps",
     addStep: "+ Work step",
     saveInstruction: "Save work instruction",
@@ -833,6 +839,8 @@ const texts = {
     instructionTitle: "Titolo",
     selectProject: "Seleziona progetto",
     problems: "Problemi / note",
+    material: "Materiale",
+    werkzeug: "Attrezzi",
     workSteps: "Fasi di lavoro",
     addStep: "+ Fase di lavoro",
     saveInstruction: "Salva istruzione di lavoro",
@@ -1049,6 +1057,8 @@ const texts = {
     instructionTitle: "Başlık",
     selectProject: "Proje seç",
     problems: "Sorunlar / notlar",
+    material: "Malzeme",
+    werkzeug: "Aletler",
     workSteps: "İş adımları",
     addStep: "+ İş adımı",
     saveInstruction: "İş talimatını kaydet",
@@ -1265,6 +1275,8 @@ const texts = {
     instructionTitle: "Cím",
     selectProject: "Projekt kiválasztása",
     problems: "Problémák / megjegyzések",
+    material: "Anyag",
+    werkzeug: "Szerszámok",
     workSteps: "Munkalépések",
     addStep: "+ Munkalépés",
     saveInstruction: "Munkautasítás mentése",
@@ -1481,6 +1493,8 @@ const texts = {
     instructionTitle: "Název",
     selectProject: "Vybrat projekt",
     problems: "Problémy / poznámky",
+    material: "Materiál",
+    werkzeug: "Nářadí",
     workSteps: "Pracovní kroky",
     addStep: "+ Pracovní krok",
     saveInstruction: "Uložit pracovní pokyn",
@@ -1697,6 +1711,8 @@ const texts = {
     instructionTitle: "Назва",
     selectProject: "Вибрати проєкт",
     problems: "Проблеми / примітки",
+    material: "Матеріал",
+    werkzeug: "Інструменти",
     workSteps: "Робочі кроки",
     addStep: "+ Робочий крок",
     saveInstruction: "Зберегти інструкцію",
@@ -1913,6 +1929,8 @@ const texts = {
     instructionTitle: "Заглавие",
     selectProject: "Избор на проект",
     problems: "Проблеми / бележки",
+    material: "Материали",
+    werkzeug: "Инструменти",
     workSteps: "Работни стъпки",
     addStep: "+ Работна стъпка",
     saveInstruction: "Запазване на инструкция",
@@ -2129,6 +2147,8 @@ const texts = {
     instructionTitle: "Naslov",
     selectProject: "Izaberi projekat",
     problems: "Problemi / napomene",
+    material: "Materijal",
+    werkzeug: "Alat",
     workSteps: "Radni koraci",
     addStep: "+ Radni korak",
     saveInstruction: "Sačuvaj radni nalog",
@@ -2345,6 +2365,8 @@ const texts = {
     instructionTitle: "Naslov",
     selectProject: "Odaberi projekt",
     problems: "Problemi / napomene",
+    material: "Materijal",
+    werkzeug: "Alat",
     workSteps: "Radni koraci",
     addStep: "+ Korak",
     saveInstruction: "Spremi radnu uputu",
@@ -2561,6 +2583,8 @@ const texts = {
     instructionTitle: "Naslov",
     selectProject: "Izberi projekt",
     problems: "Težave / opombe",
+    material: "Material",
+    werkzeug: "Orodje",
     workSteps: "Delovni koraki",
     addStep: "+ Korak",
     saveInstruction: "Shrani delovno navodilo",
@@ -2777,6 +2801,8 @@ const texts = {
     instructionTitle: "Tytuł",
     selectProject: "Wybierz projekt",
     problems: "Problemy / Uwagi",
+    material: "Materiał",
+    werkzeug: "Narzędzia",
     workSteps: "Kroki pracy",
     addStep: "+ Krok",
     saveInstruction: "Zapisz instrukcję",
@@ -3099,6 +3125,8 @@ export default function Home() {
   const [commentSaveState, setCommentSaveState] = useState<Record<string, string>>({});
   const [reportInstruction, setReportInstruction] = useState<any>(null);
   const [instructionProblems, setInstructionProblems] = useState("");
+  const [instructionMaterial, setInstructionMaterial] = useState("");
+  const [instructionWerkzeug, setInstructionWerkzeug] = useState("");
   const [instructionTitle, setInstructionTitle] = useState("");
   const [instructionProject, setInstructionProject] = useState("");
   const [instructionCustomer, setInstructionCustomer] = useState("");
@@ -3606,6 +3634,8 @@ export default function Home() {
       const fields: { key: string; text: string }[] = [
         { key: "title", text: inst.title || "" },
         { key: "problems_text", text: inst.problems_text || "" },
+        { key: "material", text: inst.material || "" },
+        { key: "werkzeug", text: inst.werkzeug || "" },
         { key: "description", text: inst.description || "" },
       ];
       for (const f of fields) {
@@ -3672,6 +3702,8 @@ export default function Home() {
     setInstructionSite(instruction.site || "");
     setInstructionDescription(instruction.description || "");
     setInstructionProblems(instruction.problems_text || "");
+    setInstructionMaterial(instruction.material || "");
+    setInstructionWerkzeug(instruction.werkzeug || "");
     setInstructionPhotos(instruction.photos || []);
     setInstructionDate(instruction.work_date || "");
     setSelectedProjectId(instruction.project_id || "");
@@ -3691,7 +3723,7 @@ export default function Home() {
   // Bearbeiten abbrechen und Formular leeren.
   function cancelEditInstruction() {
     setEditingInstructionId(null);
-    setInstructionTitle(""); setInstructionProject(""); setInstructionCustomer(""); setInstructionSite(""); setInstructionDescription(""); setInstructionTasks([""]); setInstructionProblems(""); setInstructionPhotos([]); setInstructionTaskPhotos({}); setInstructionTaskStatuses({}); setAssignedUserIds([]); setSelectedProjectId(""); setInstructionDate("");
+    setInstructionTitle(""); setInstructionProject(""); setInstructionCustomer(""); setInstructionSite(""); setInstructionDescription(""); setInstructionTasks([""]); setInstructionProblems(""); setInstructionMaterial(""); setInstructionWerkzeug(""); setInstructionPhotos([]); setInstructionTaskPhotos({}); setInstructionTaskStatuses({}); setAssignedUserIds([]); setSelectedProjectId(""); setInstructionDate("");
     setMessage("");
   }
 
@@ -3700,7 +3732,7 @@ export default function Home() {
     if (!currentCompany) { setMessage(t.msgNoFirm); return; }
     if (!instructionTitle.trim()) { setMessage(t.msgNoTitle); return; }
     await ensureFreshSession();
-    const instructionPayload = { company_id: currentCompany.company_id, project_id: selectedProjectId || null, work_date: instructionDate || null, assigned_user_ids: assignedUserIds, title: instructionTitle, project: instructionProject, customer: instructionCustomer, site: instructionSite, description: instructionDescription, problems_text: instructionProblems, photos: instructionPhotos };
+    const instructionPayload = { company_id: currentCompany.company_id, project_id: selectedProjectId || null, work_date: instructionDate || null, assigned_user_ids: assignedUserIds, title: instructionTitle, project: instructionProject, customer: instructionCustomer, site: instructionSite, description: instructionDescription, problems_text: instructionProblems, material: instructionMaterial, werkzeug: instructionWerkzeug, photos: instructionPhotos };
     let instruction: any; let error: any;
     if (editingInstructionId) {
       const upd = await dbTimeout(supabase.from("work_instructions").update(instructionPayload).eq("id", editingInstructionId).select().single());
@@ -3727,7 +3759,7 @@ export default function Home() {
       const { error: taskError } = await dbTimeout(supabase.from("work_instruction_tasks").insert(taskRows));
       if (taskError) { setMessage("Arbeitsanweisung gespeichert, aber Schritte nicht: " + taskError.message); return; }
     }
-    setInstructionTitle(""); setInstructionProject(""); setInstructionCustomer(""); setInstructionSite(""); setInstructionDescription(""); setInstructionTasks([""]); setInstructionProblems(""); setInstructionPhotos([]); setInstructionTaskPhotos({}); setInstructionTaskStatuses({}); setAssignedUserIds([]); setEditingInstructionId(null);
+    setInstructionTitle(""); setInstructionProject(""); setInstructionCustomer(""); setInstructionSite(""); setInstructionDescription(""); setInstructionTasks([""]); setInstructionProblems(""); setInstructionMaterial(""); setInstructionWerkzeug(""); setInstructionPhotos([]); setInstructionTaskPhotos({}); setInstructionTaskStatuses({}); setAssignedUserIds([]); setEditingInstructionId(null);
     await loadWorkInstructions(currentCompany.company_id);
     setMessage(t.msgInstructionSaved);
   }
@@ -4811,6 +4843,8 @@ export default function Home() {
               </div>
             )}
             <input className="border p-3 w-full text-black bg-white" placeholder={t.problems} value={instructionProblems} onChange={(e) => setInstructionProblems(e.target.value)} />
+            <input className="border p-3 w-full text-black bg-white" placeholder={t.material} value={instructionMaterial} onChange={(e) => setInstructionMaterial(e.target.value)} />
+            <input className="border p-3 w-full text-black bg-white" placeholder={t.werkzeug} value={instructionWerkzeug} onChange={(e) => setInstructionWerkzeug(e.target.value)} />
             {companyFeatures?.photos_enabled && (
               <div>
                 <h3 className="font-bold mb-2">{t.photos}</h3>
@@ -4899,6 +4933,8 @@ export default function Home() {
                 {openDayCards[instruction.id] && (<>
                 <p><strong>{t.customer}:</strong> {instruction.customer || "-"}</p>
                 {instruction.problems_text && (<div className="bg-yellow-50 border rounded p-2"><strong>{t.problemsHints}:</strong> {getTranslated(instruction.id, "problems_text", instruction.problems_text)}</div>)}
+                {instruction.material && (<div className="bg-blue-50 border rounded p-2"><strong>{t.material}:</strong> {getTranslated(instruction.id, "material", instruction.material)}</div>)}
+                {instruction.werkzeug && (<div className="bg-green-50 border rounded p-2"><strong>{t.werkzeug}:</strong> {getTranslated(instruction.id, "werkzeug", instruction.werkzeug)}</div>)}
                 {(instruction.photos || []).length > 0 && companyFeatures?.photos_enabled && (<div className="grid grid-cols-3 gap-2">{(instruction.photos || []).map((photo: string, i: number) => (<img key={i} src={photo} alt="Foto" className="w-full h-24 object-cover rounded border" />))}</div>)}
                 <ul className="space-y-4 mt-2">
                   {(instruction.work_instruction_tasks || []).sort((a: any, b: any) => a.sort_order - b.sort_order).map((task: any) => (
