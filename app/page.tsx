@@ -200,6 +200,8 @@ const texts = {
     feedback: "Rückmeldung",
     saveFeedback: "Rückmeldung speichern",
     toReport: "In Regiebericht übernehmen",
+    transferTitle: "Wohin übertragen?",
+    transferInsert: "Hier einfügen",
     deleteInstruction: "Arbeitsanweisung löschen",
     autoReportLocked: "Automatische Regieberichte sind in deinem Paket nicht aktiviert.",
     employeeManagement: "Mitarbeiterverwaltung",
@@ -418,6 +420,8 @@ const texts = {
     feedback: "Feedback",
     saveFeedback: "Salvare feedback",
     toReport: "Preluare în raportul de lucru",
+    transferTitle: "Unde să transfer?",
+    transferInsert: "Inserează aici",
     deleteInstruction: "Ștergere instrucțiune de lucru",
     autoReportLocked: "Rapoartele de lucru automate nu sunt activate în pachetul dumneavoastră.",
     employeeManagement: "Administrare angajați",
@@ -636,6 +640,8 @@ const texts = {
     feedback: "Feedback",
     saveFeedback: "Save feedback",
     toReport: "Add to work report",
+    transferTitle: "Transfer where?",
+    transferInsert: "Insert here",
     deleteInstruction: "Delete work instruction",
     autoReportLocked: "Automatic work reports are not enabled in your plan.",
     employeeManagement: "Employee management",
@@ -854,6 +860,8 @@ const texts = {
     feedback: "Riscontro",
     saveFeedback: "Salva riscontro",
     toReport: "Aggiungi al rapporto di lavoro",
+    transferTitle: "Trasferire dove?",
+    transferInsert: "Inserisci qui",
     deleteInstruction: "Elimina istruzione di lavoro",
     autoReportLocked: "I rapporti di lavoro automatici non sono attivi nel tuo pacchetto.",
     employeeManagement: "Gestione dipendenti",
@@ -1072,6 +1080,8 @@ const texts = {
     feedback: "Geri bildirim",
     saveFeedback: "Geri bildirimi kaydet",
     toReport: "İş raporuna aktar",
+    transferTitle: "Nereye aktarılsın?",
+    transferInsert: "Buraya ekle",
     deleteInstruction: "İş talimatını sil",
     autoReportLocked: "Otomatik iş raporları paketinizde etkin değil.",
     employeeManagement: "Çalışan yönetimi",
@@ -1290,6 +1300,8 @@ const texts = {
     feedback: "Visszajelzés",
     saveFeedback: "Visszajelzés mentése",
     toReport: "Átvétel a munkajelentésbe",
+    transferTitle: "Hová vegyük át?",
+    transferInsert: "Beszúrás ide",
     deleteInstruction: "Munkautasítás törlése",
     autoReportLocked: "Az automatikus munkajelentések nincsenek engedélyezve a csomagodban.",
     employeeManagement: "Munkatársak kezelése",
@@ -1508,6 +1520,8 @@ const texts = {
     feedback: "Zpětná vazba",
     saveFeedback: "Uložit zpětnou vazbu",
     toReport: "Převzít do pracovního výkazu",
+    transferTitle: "Kam převést?",
+    transferInsert: "Vložit sem",
     deleteInstruction: "Smazat pracovní pokyn",
     autoReportLocked: "Automatické pracovní výkazy nejsou ve vašem balíčku aktivovány.",
     employeeManagement: "Správa zaměstnanců",
@@ -1726,6 +1740,8 @@ const texts = {
     feedback: "Відгук",
     saveFeedback: "Зберегти відгук",
     toReport: "Додати до звіту",
+    transferTitle: "Куди перенести?",
+    transferInsert: "Вставити сюди",
     deleteInstruction: "Видалити інструкцію",
     autoReportLocked: "Автоматичні звіти не активовані у вашому пакеті.",
     employeeManagement: "Управління працівниками",
@@ -1944,6 +1960,8 @@ const texts = {
     feedback: "Обратна връзка",
     saveFeedback: "Запазване на обратна връзка",
     toReport: "Добавяне към отчета",
+    transferTitle: "Къде да се прехвърли?",
+    transferInsert: "Вмъкни тук",
     deleteInstruction: "Изтриване на инструкция",
     autoReportLocked: "Автоматичните отчети не са активирани във вашия пакет.",
     employeeManagement: "Управление на служители",
@@ -2162,6 +2180,8 @@ const texts = {
     feedback: "Povratna informacija",
     saveFeedback: "Sačuvaj povratnu informaciju",
     toReport: "Dodaj u radni izveštaj",
+    transferTitle: "Gde preneti?",
+    transferInsert: "Ubaci ovde",
     deleteInstruction: "Obriši radni nalog",
     autoReportLocked: "Automatski radni izveštaji nisu aktivirani u vašem paketu.",
     employeeManagement: "Upravljanje radnicima",
@@ -2380,6 +2400,8 @@ const texts = {
     feedback: "Povratna informacija",
     saveFeedback: "Spremi povratnu informaciju",
     toReport: "Prenesi u izvještaj",
+    transferTitle: "Kamo prenijeti?",
+    transferInsert: "Umetni ovdje",
     deleteInstruction: "Obriši radnu uputu",
     autoReportLocked: "Automatski izvještaji nisu aktivni u vašem paketu.",
     employeeManagement: "Upravljanje radnicima",
@@ -2598,6 +2620,8 @@ const texts = {
     feedback: "Povratna informacija",
     saveFeedback: "Shrani povratno informacijo",
     toReport: "Prenesi v poročilo",
+    transferTitle: "Kam prenesti?",
+    transferInsert: "Vstavi sem",
     deleteInstruction: "Izbriši delovno navodilo",
     autoReportLocked: "Samodejno poročanje ni aktivno v vašem paketu.",
     employeeManagement: "Upravljanje zaposlenih",
@@ -2816,6 +2840,8 @@ const texts = {
     feedback: "Informacja zwrotna",
     saveFeedback: "Zapisz informację",
     toReport: "Przenieś do raportu",
+    transferTitle: "Gdzie przenieść?",
+    transferInsert: "Wstaw tutaj",
     deleteInstruction: "Usuń instrukcję",
     autoReportLocked: "Automatyczne raporty nie są aktywne w Twoim pakiecie.",
     employeeManagement: "Zarządzanie pracownikami",
@@ -3124,6 +3150,7 @@ export default function Home() {
   const [taskComments, setTaskComments] = useState<Record<string, string>>({});
   const [commentSaveState, setCommentSaveState] = useState<Record<string, string>>({});
   const [reportInstruction, setReportInstruction] = useState<any>(null);
+  const [transferInst, setTransferInst] = useState<any>(null);
   const [instructionProblems, setInstructionProblems] = useState("");
   const [instructionMaterial, setInstructionMaterial] = useState("");
   const [instructionWerkzeug, setInstructionWerkzeug] = useState("");
@@ -4116,7 +4143,7 @@ export default function Home() {
     setTranslatingInstructionId(null);
   }
 
-  async function createReportFromInstruction(instruction: any) {
+  async function createReportFromInstruction(instruction: any, targetReport?: SavedReport | null) {
     // Frisch laden damit employee_comment aktuell ist
     if (currentCompany) {
       const { data } = await supabase.from("work_instructions").select("*, work_instruction_tasks (*)").eq("id", instruction.id).single();
@@ -4186,10 +4213,22 @@ export default function Home() {
       problemsTranslated ? `─────\n⚠️ ${currentTexts.problemsHints}: ${problemsTranslated}` : "",
       instruction.employee_note ? `${currentTexts.feedbackLabel}: ${instruction.employee_note}` : ""
     ].filter(Boolean).join("\n─────\n");
-    // Frische, leere Woche -> nur der uebertragene Tag wird gefuellt,
-    // alte Tage aus einer frueheren Uebertragung bleiben NICHT stehen.
-    const copy = createEmptyDays();
     const targetDate = instruction.work_date || "";
+
+    // In einen BESTEHENDEN Bericht einfuegen
+    if (targetReport) {
+      const baseDays: DayEntry[] = (targetReport.days && targetReport.days.length === 7) ? targetReport.days.map((d: any) => ({ ...d })) : createEmptyDays();
+      let idx = targetDate ? baseDays.findIndex((d) => d.date === targetDate) : -1;
+      if (idx < 0) idx = baseDays.findIndex((d) => !(d.description || "").trim());
+      if (idx < 0) idx = 0;
+      const existingDesc = (baseDays[idx].description || "").trim();
+      baseDays[idx] = { ...baseDays[idx], customer: baseDays[idx].customer || instruction.customer || "", projectNumber: baseDays[idx].projectNumber || instruction.project || "", site: baseDays[idx].site || instruction.site || "", description: existingDesc ? `${existingDesc}\n─────\n${description}` : description };
+      setDays(baseDays); setCurrentReportId(targetReport.id); setReportName(targetReport.report_name || ""); setReportLoaded(true); setReportVersion((v) => v + 1); setReportInstruction(instruction); setActiveTab("regiebericht"); setMessage(t.msgReportPrepared);
+      return;
+    }
+
+    // NEUER Bericht: frische, leere Woche -> nur der uebertragene Tag wird gefuellt
+    const copy = createEmptyDays();
     if (targetDate) {
       const [year, month, day] = targetDate.split("-").map(Number);
       const selectedDate = new Date(Date.UTC(year, month - 1, day));
@@ -4765,7 +4804,7 @@ export default function Home() {
                         <p><strong>{t.site}:</strong> {instruction.site || "-"}</p>
                         {instruction.problems_text && <p><strong>{t.problems}:</strong> {getTranslated(instruction.id, "problems_text", instruction.problems_text)}</p>}
                         {(instruction.work_instruction_tasks || []).length > 0 && (<ul className="list-disc pl-6 space-y-1">{instruction.work_instruction_tasks.map((task: any) => (<li key={task.id}>{task.status === "completed" ? t.statusCompleted : task.status === "in_progress" ? t.statusInProgress : task.status === "stopped" ? t.statusStopped : t.statusOpen}{" "}{getTranslatedTask(instruction.id, task.id, task.task_text)}{task.note && <div className="text-sm text-gray-600 ml-2">{t.feedbackLabel}: {task.note}</div>}</li>))}</ul>)}
-                        {companyFeatures?.module_auto_reports ? (<button type="button" onClick={() => createReportFromInstruction(instruction)} className="bg-green-700 text-white px-3 py-2 rounded">{t.toReport}</button>) : (<p className="text-sm text-gray-500">{t.autoReportLocked}</p>)}
+                        {companyFeatures?.module_auto_reports ? (<button type="button" onClick={() => setTransferInst(instruction)} className="bg-green-700 text-white px-3 py-2 rounded">{t.toReport}</button>) : (<p className="text-sm text-gray-500">{t.autoReportLocked}</p>)}
                       </div>
                     ))}
                     {workInstructions.filter((i) => i.project_id === project.id).length === 0 && <p className="text-gray-600">{t.noInstructions}</p>}
@@ -4984,7 +5023,7 @@ export default function Home() {
                   ))}
                 </ul>
                 <div className="flex gap-2 pt-2 border-t flex-wrap">
-                  {companyFeatures?.module_auto_reports && (<button type="button" onClick={() => createReportFromInstruction(instruction)} className="bg-green-700 text-white px-3 py-2 rounded text-sm">📋 {t.toReport}</button>)}
+                  {companyFeatures?.module_auto_reports && (<button type="button" onClick={() => setTransferInst(instruction)} className="bg-green-700 text-white px-3 py-2 rounded text-sm">📋 {t.toReport}</button>)}
                   {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => startEditInstruction(instruction)} className="bg-amber-600 text-white px-3 py-2 rounded text-sm">✏️ {t.loadEdit}</button>)}
                   {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => deleteWorkInstruction(instruction.id)} className="bg-red-600 text-white px-3 py-2 rounded text-sm">{t.deleteInstruction}</button>)}
                 </div>
@@ -5040,7 +5079,7 @@ export default function Home() {
                           </li>
                         ))}
                       </ul>
-                      {companyFeatures?.module_auto_reports && (<button type="button" onClick={() => createReportFromInstruction(instruction)} className="bg-green-700 text-white px-3 py-1 rounded text-sm">📋 {t.toReport}</button>)}
+                      {companyFeatures?.module_auto_reports && (<button type="button" onClick={() => setTransferInst(instruction)} className="bg-green-700 text-white px-3 py-1 rounded text-sm">📋 {t.toReport}</button>)}
                     </div>
                   ))}
                   </>)}
@@ -5204,6 +5243,29 @@ export default function Home() {
               <button type="button" onClick={() => setHelpOpen(false)} className="text-gray-500 text-3xl leading-none px-2">×</button>
             </div>
             {helpText === null ? (<p className="text-gray-400">…</p>) : helpText.trim() === "" ? (<p className="text-gray-500">{t.helpEmpty}</p>) : (<div className="whitespace-pre-wrap break-words text-sm leading-relaxed">{helpText}</div>)}
+          </div>
+        </div>
+      )}
+
+      {transferInst && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setTransferInst(null)}>
+          <div className="bg-white rounded-xl max-w-md w-full max-h-[85vh] overflow-y-auto p-5 space-y-3 text-black" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-center border-b pb-2">
+              <h2 className="text-xl font-bold">{t.transferTitle}</h2>
+              <button type="button" onClick={() => setTransferInst(null)} className="text-gray-500 text-3xl leading-none px-2">×</button>
+            </div>
+            <button type="button" onClick={() => { const inst = transferInst; setTransferInst(null); createReportFromInstruction(inst); }} className="w-full bg-green-700 text-white px-4 py-3 rounded">➕ {t.newReport}</button>
+            {savedReports.length > 0 && (
+              <div className="space-y-2 pt-2 border-t">
+                {savedReports.map((report) => (
+                  <div key={report.id} className="flex items-center justify-between gap-2 border rounded p-2">
+                    <span className="text-sm truncate"><strong>{report.report_name}</strong></span>
+                    <button type="button" onClick={() => { const inst = transferInst; setTransferInst(null); createReportFromInstruction(inst, report); }} className="bg-blue-600 text-white px-3 py-2 rounded text-sm whitespace-nowrap">{t.transferInsert}</button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <button type="button" onClick={() => setTransferInst(null)} className="w-full bg-gray-300 text-black px-4 py-2 rounded">{t.copyCancel}</button>
           </div>
         </div>
       )}
