@@ -3070,6 +3070,7 @@ export default function Home() {
   const [username, setUsername] = useState("");
   const [companySettings, setCompanySettings] = useState<CompanySettings | null>(null);
   const [currentReportId, setCurrentReportId] = useState<string | null>(null);
+  const [reportLoaded, setReportLoaded] = useState(false);
   const [employee, setEmployee] = useState("");
   const [reportName, setReportName] = useState("");
   const [emailTo, setEmailTo] = useState("");
@@ -3920,12 +3921,14 @@ export default function Home() {
     const result = await dbTimeout(supabase.from("reports").insert(reportData).select().single());
     if (result.error) { setMessage("Fehler beim Speichern: " + result.error.message); return; }
     if (result.data?.id) setCurrentReportId(result.data.id);
+    setReportLoaded(false);
     setReportName(name);
     setMessage(t.msgSaved);
     await loadReportsFromDatabase();
   }
 
   function loadReport(report: SavedReport) {
+    setReportLoaded(true);
     setCurrentReportId(report.id); setReportName(report.report_name); setEmployee(report.employee || "");
     setFromLanguage(report.from_language || "Deutsch"); setToLanguage(report.to_language || "Polnisch");
     setPdfLanguage(report.pdf_language || "Deutsch"); setDays(report.days || createEmptyDays());
@@ -3940,6 +3943,7 @@ export default function Home() {
   }
 
   function newReport() {
+    setReportLoaded(false);
     setCurrentReportId(null); setReportName(""); setEmployee(""); setEmailTo(""); setSigEmployee(""); setSigCustomer("");
     setFromLanguage("Deutsch"); setToLanguage("Polnisch"); setPdfLanguage("Deutsch"); setDays(createEmptyDays());
   }
@@ -4140,7 +4144,7 @@ export default function Home() {
     const targetIndex = targetDate ? copy.findIndex((day) => day.date === targetDate) : 0;
     const indexToUse = targetIndex >= 0 ? targetIndex : 0;
     copy[indexToUse] = { ...copy[indexToUse], customer: instruction.customer || "", projectNumber: instruction.project || "", site: instruction.site || "", description, photos: [] };
-    setDays(copy); setCurrentReportId(null); setReportName(""); setReportInstruction(instruction); setActiveTab("regiebericht"); setMessage(t.msgReportPrepared);
+    setDays(copy); setCurrentReportId(null); setReportName(""); setReportLoaded(false); setReportInstruction(instruction); setActiveTab("regiebericht"); setMessage(t.msgReportPrepared);
   }
 
   // ── FIXED: kein window.location.reload() ──
@@ -4639,7 +4643,7 @@ export default function Home() {
           <div className="flex flex-wrap gap-4">
             <button type="button" onClick={translateAll} className="bg-black text-white px-4 py-3 rounded">{loading ? t.translating : t.translateWeek}</button>
             <button type="button" onClick={saveReport} className="bg-orange-600 text-white px-4 py-3 rounded">{currentReportId ? t.update : t.save}</button>
-            {currentReportId && <button type="button" onClick={saveAsNewReport} className="bg-amber-700 text-white px-4 py-3 rounded">{t.saveAsNew}</button>}
+            {reportLoaded && <button type="button" onClick={saveAsNewReport} className="bg-amber-700 text-white px-4 py-3 rounded">{t.saveAsNew}</button>}
             <button type="button" onClick={() => createPDF(false)} className="bg-green-600 text-white px-4 py-3 rounded">{t.downloadPdf}</button>
             {companyFeatures?.email_enabled && <button type="button" onClick={() => createPDF(true)} className="bg-purple-600 text-white px-4 py-3 rounded">{t.sendPdf}</button>}
           </div>
