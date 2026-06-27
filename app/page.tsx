@@ -3071,6 +3071,7 @@ export default function Home() {
   const [companySettings, setCompanySettings] = useState<CompanySettings | null>(null);
   const [currentReportId, setCurrentReportId] = useState<string | null>(null);
   const [reportLoaded, setReportLoaded] = useState(false);
+  const [reportVersion, setReportVersion] = useState(0);
   const [employee, setEmployee] = useState("");
   const [reportName, setReportName] = useState("");
   const [emailTo, setEmailTo] = useState("");
@@ -3246,6 +3247,29 @@ export default function Home() {
     const name = me?.full_name || "";
     if (name) setEmployee((prev) => (prev && prev.trim() ? prev : name));
   }, [companyUsers, user?.id]);
+
+  // Uebersetzt die Tages-Texte des Regieberichts automatisch in die Anzeige-Sprache (oben).
+  // Laeuft NUR bei Sprachwechsel oder beim Laden/Uebertragen eines Berichts (reportVersion) –
+  // NICHT bei jeder Eingabe. Nutzt den Cache, daher sparsam.
+  useEffect(() => {
+    let cancelled = false;
+    const snapshot = days;
+    (async () => {
+      const results = await Promise.all(snapshot.map(async (day) => {
+        const text = (day.description || "").trim();
+        if (!text) return "";
+        try {
+          const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: text, fromLanguage: "automatisch", toLanguage: uiLanguage }) });
+          const data = await res.json();
+          if (data.error || !data.translation) return "";
+          return data.translation.trim() === text ? "" : data.translation;
+        } catch { return ""; }
+      }));
+      if (cancelled) return;
+      setDays((prev) => prev.map((d, i) => (i < results.length ? { ...d, translation: results[i] } : d)));
+    })();
+    return () => { cancelled = true; };
+  }, [uiLanguage, reportVersion]);
 
   async function loadCompanyContext(userId: string) {
     const { data: companyUser, error } = await supabase.from("company_users").select("company_id, role").eq("user_id", userId).maybeSingle();
@@ -3932,6 +3956,7 @@ export default function Home() {
     setCurrentReportId(report.id); setReportName(report.report_name); setEmployee(report.employee || "");
     setFromLanguage(report.from_language || "Deutsch"); setToLanguage(report.to_language || "Polnisch");
     setPdfLanguage(report.pdf_language || "Deutsch"); setDays(report.days || createEmptyDays());
+    setReportVersion((v) => v + 1);
     setMessage(t.msgLoaded); setActiveTab("regiebericht");
   }
 
@@ -4144,7 +4169,7 @@ export default function Home() {
     const targetIndex = targetDate ? copy.findIndex((day) => day.date === targetDate) : 0;
     const indexToUse = targetIndex >= 0 ? targetIndex : 0;
     copy[indexToUse] = { ...copy[indexToUse], customer: instruction.customer || "", projectNumber: instruction.project || "", site: instruction.site || "", description, photos: [] };
-    setDays(copy); setCurrentReportId(null); setReportName(""); setReportLoaded(false); setReportInstruction(instruction); setActiveTab("regiebericht"); setMessage(t.msgReportPrepared);
+    setDays(copy); setCurrentReportId(null); setReportName(""); setReportLoaded(false); setReportVersion((v) => v + 1); setReportInstruction(instruction); setActiveTab("regiebericht"); setMessage(t.msgReportPrepared);
   }
 
   // ── FIXED: kein window.location.reload() ──
@@ -4587,12 +4612,6 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <input className="border p-3 text-black bg-white" placeholder={t.employee} value={employee} onChange={(e) => setEmployee(e.target.value)} />
               <input className="border p-3 bg-gray-200 text-black" value={calendarWeek} readOnly placeholder={t.calendarWeek} />
-              <select className="border p-3 text-black bg-white" value={fromLanguage} onChange={(e) => setFromLanguage(e.target.value)}>
-                {(getAllowedLanguages(companyFeatures).length > 0 ? getAllowedLanguages(companyFeatures) : languages).map((lang) => <option key={lang} value={lang}>{lang}</option>)}
-              </select>
-              <select className="border p-3 text-black bg-white" value={toLanguage} onChange={(e) => setToLanguage(e.target.value)}>
-                {(getAllowedLanguages(companyFeatures).length > 0 ? getAllowedLanguages(companyFeatures) : languages).filter((lang) => lang !== "Deutsch").map((lang) => <option key={lang} value={lang}>{lang}</option>)}
-              </select>
               {companyFeatures?.email_enabled ? <input className="border p-3 text-black bg-white md:col-span-2" placeholder={t.recipientEmail} value={emailTo} onChange={(e) => setEmailTo(e.target.value)} /> : <div className="border rounded p-3 bg-gray-50 text-sm text-gray-400 md:col-span-2">🔒 E-Mail-Versand ist in deinem Paket nicht aktiviert.</div>}
             </div>
           </section>
@@ -4641,7 +4660,6 @@ export default function Home() {
             </section>
           )}
           <div className="flex flex-wrap gap-4">
-            <button type="button" onClick={translateAll} className="bg-black text-white px-4 py-3 rounded">{loading ? t.translating : t.translateWeek}</button>
             <button type="button" onClick={saveReport} className="bg-orange-600 text-white px-4 py-3 rounded">{currentReportId ? t.update : t.save}</button>
             {reportLoaded && <button type="button" onClick={saveAsNewReport} className="bg-amber-700 text-white px-4 py-3 rounded">{t.saveAsNew}</button>}
             <button type="button" onClick={() => createPDF(false)} className="bg-green-600 text-white px-4 py-3 rounded">{t.downloadPdf}</button>
