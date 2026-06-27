@@ -157,6 +157,7 @@ const texts = {
     translating: "Übersetze...",
     save: "Speichern",
     update: "Aktualisieren",
+    saveAsNew: "Als neuen Bericht speichern",
     downloadPdf: "PDF herunterladen",
     sendPdf: "PDF per E-Mail senden",
     dashboard: "Dashboard",
@@ -372,6 +373,7 @@ const texts = {
     translating: "Se traduce...",
     save: "Salvare",
     update: "Actualizare",
+    saveAsNew: "Salvează ca raport nou",
     downloadPdf: "Descărcare PDF",
     sendPdf: "Trimitere PDF prin e-mail",
     dashboard: "Tablou de bord",
@@ -587,6 +589,7 @@ const texts = {
     translating: "Translating...",
     save: "Save",
     update: "Update",
+    saveAsNew: "Save as new report",
     downloadPdf: "Download PDF",
     sendPdf: "Send PDF by email",
     dashboard: "Dashboard",
@@ -802,6 +805,7 @@ const texts = {
     translating: "Traduzione in corso...",
     save: "Salva",
     update: "Aggiorna",
+    saveAsNew: "Salva come nuovo rapporto",
     downloadPdf: "Scarica PDF",
     sendPdf: "Invia PDF via e-mail",
     dashboard: "Dashboard",
@@ -1017,6 +1021,7 @@ const texts = {
     translating: "Çevriliyor...",
     save: "Kaydet",
     update: "Güncelle",
+    saveAsNew: "Yeni rapor olarak kaydet",
     downloadPdf: "PDF indir",
     sendPdf: "PDF'yi e-posta ile gönder",
     dashboard: "Panel",
@@ -1232,6 +1237,7 @@ const texts = {
     translating: "Fordítás...",
     save: "Mentés",
     update: "Frissítés",
+    saveAsNew: "Mentés új jelentésként",
     downloadPdf: "PDF letöltése",
     sendPdf: "PDF küldése e-mailben",
     dashboard: "Áttekintő",
@@ -1447,6 +1453,7 @@ const texts = {
     translating: "Překládám...",
     save: "Uložit",
     update: "Aktualizovat",
+    saveAsNew: "Uložit jako nový výkaz",
     downloadPdf: "Stáhnout PDF",
     sendPdf: "Odeslat PDF e-mailem",
     dashboard: "Přehled",
@@ -1662,6 +1669,7 @@ const texts = {
     translating: "Перекладається...",
     save: "Зберегти",
     update: "Оновити",
+    saveAsNew: "Зберегти як новий звіт",
     downloadPdf: "Завантажити PDF",
     sendPdf: "Надіслати PDF ел. поштою",
     dashboard: "Панель",
@@ -1877,6 +1885,7 @@ const texts = {
     translating: "Превеждане...",
     save: "Запазване",
     update: "Обновяване",
+    saveAsNew: "Запази като нов отчет",
     downloadPdf: "Изтегляне на PDF",
     sendPdf: "Изпращане на PDF по имейл",
     dashboard: "Табло",
@@ -2092,6 +2101,7 @@ const texts = {
     translating: "Prevođenje...",
     save: "Sačuvaj",
     update: "Ažuriraj",
+    saveAsNew: "Sačuvaj kao novi izveštaj",
     downloadPdf: "Preuzmi PDF",
     sendPdf: "Pošalji PDF imejlom",
     dashboard: "Kontrolna tabla",
@@ -2307,6 +2317,7 @@ const texts = {
     translating: "Prevodi se...",
     save: "Spremi",
     update: "Ažuriraj",
+    saveAsNew: "Spremi kao novi izvještaj",
     downloadPdf: "Preuzmi PDF",
     sendPdf: "Pošalji PDF e-poštom",
     dashboard: "Nadzorna ploča",
@@ -2522,6 +2533,7 @@ const texts = {
     translating: "Prevajam...",
     save: "Shrani",
     update: "Posodobi",
+    saveAsNew: "Shrani kot novo poročilo",
     downloadPdf: "Prenesi PDF",
     sendPdf: "Pošlji PDF po e-pošti",
     dashboard: "Nadzorna plošča",
@@ -2737,6 +2749,7 @@ const texts = {
     translating: "Tłumaczenie...",
     save: "Zapisz",
     update: "Aktualizuj",
+    saveAsNew: "Zapisz jako nowy raport",
     downloadPdf: "Pobierz PDF",
     sendPdf: "Wyślij PDF e-mailem",
     dashboard: "Panel główny",
@@ -3884,6 +3897,22 @@ export default function Home() {
     await loadReportsFromDatabase();
   }
 
+  // Speichert den aktuellen Inhalt IMMER als NEUEN Bericht (eigene ID).
+  // Der bisher geoeffnete Bericht bleibt unveraendert erhalten.
+  async function saveAsNewReport() {
+    setMessage("");
+    if (!user) { setMessage(t.msgPleaseLogin); return; }
+    await ensureFreshSession();
+    const name = reportName.trim() || `${calendarWeek || "Woche"} - ${employee || "Bericht"}`;
+    const reportData = { report_name: name, employee, from_language: fromLanguage, to_language: toLanguage, pdf_language: pdfLanguage, days, user_id: user.id, project_id: selectedProjectId || null };
+    const result = await dbTimeout(supabase.from("reports").insert(reportData).select().single());
+    if (result.error) { setMessage("Fehler beim Speichern: " + result.error.message); return; }
+    if (result.data?.id) setCurrentReportId(result.data.id);
+    setReportName(name);
+    setMessage(t.msgSaved);
+    await loadReportsFromDatabase();
+  }
+
   function loadReport(report: SavedReport) {
     setCurrentReportId(report.id); setReportName(report.report_name); setEmployee(report.employee || "");
     setFromLanguage(report.from_language || "Deutsch"); setToLanguage(report.to_language || "Polnisch");
@@ -4596,6 +4625,7 @@ export default function Home() {
           <div className="flex flex-wrap gap-4">
             <button type="button" onClick={translateAll} className="bg-black text-white px-4 py-3 rounded">{loading ? t.translating : t.translateWeek}</button>
             <button type="button" onClick={saveReport} className="bg-orange-600 text-white px-4 py-3 rounded">{currentReportId ? t.update : t.save}</button>
+            {currentReportId && <button type="button" onClick={saveAsNewReport} className="bg-amber-700 text-white px-4 py-3 rounded">{t.saveAsNew}</button>}
             <button type="button" onClick={() => createPDF(false)} className="bg-green-600 text-white px-4 py-3 rounded">{t.downloadPdf}</button>
             {companyFeatures?.email_enabled && <button type="button" onClick={() => createPDF(true)} className="bg-purple-600 text-white px-4 py-3 rounded">{t.sendPdf}</button>}
           </div>
