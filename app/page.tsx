@@ -94,6 +94,7 @@ const texts = {
     dashToday: "Heute",
     dashTomorrow: "Morgen",
     dashWeek: "Woche",
+    dashNextWeek: "Nächste Woche",
     dashMyProjectsToday: "Meine Projekte – heute",
     dashNothingToday: "Heute nichts geplant",
     dashNoProjects: "Noch keine Projekte zugewiesen",
@@ -308,6 +309,7 @@ const texts = {
     dashToday: "Azi",
     dashTomorrow: "Mâine",
     dashWeek: "Săptămână",
+    dashNextWeek: "Săptămâna viitoare",
     dashMyProjectsToday: "Proiectele mele – azi",
     dashNothingToday: "Nimic planificat azi",
     dashNoProjects: "Niciun proiect atribuit",
@@ -522,6 +524,7 @@ const texts = {
     dashToday: "Today",
     dashTomorrow: "Tomorrow",
     dashWeek: "Week",
+    dashNextWeek: "Next week",
     dashMyProjectsToday: "My projects – today",
     dashNothingToday: "Nothing planned today",
     dashNoProjects: "No projects assigned yet",
@@ -736,6 +739,7 @@ const texts = {
     dashToday: "Oggi",
     dashTomorrow: "Domani",
     dashWeek: "Settimana",
+    dashNextWeek: "Prossima settimana",
     dashMyProjectsToday: "I miei progetti – oggi",
     dashNothingToday: "Niente in programma oggi",
     dashNoProjects: "Nessun progetto assegnato",
@@ -950,6 +954,7 @@ const texts = {
     dashToday: "Bugün",
     dashTomorrow: "Yarın",
     dashWeek: "Hafta",
+    dashNextWeek: "Gelecek hafta",
     dashMyProjectsToday: "Projelerim – bugün",
     dashNothingToday: "Bugün için bir şey planlanmadı",
     dashNoProjects: "Henüz atanmış proje yok",
@@ -1164,6 +1169,7 @@ const texts = {
     dashToday: "Ma",
     dashTomorrow: "Holnap",
     dashWeek: "Hét",
+    dashNextWeek: "Jövő hét",
     dashMyProjectsToday: "Saját projektjeim – ma",
     dashNothingToday: "Mára nincs tervezve",
     dashNoProjects: "Még nincs hozzárendelt projekt",
@@ -1378,6 +1384,7 @@ const texts = {
     dashToday: "Dnes",
     dashTomorrow: "Zítra",
     dashWeek: "Týden",
+    dashNextWeek: "Příští týden",
     dashMyProjectsToday: "Moje projekty – dnes",
     dashNothingToday: "Na dnešek nic naplánováno",
     dashNoProjects: "Zatím žádné přiřazené projekty",
@@ -1592,6 +1599,7 @@ const texts = {
     dashToday: "Сьогодні",
     dashTomorrow: "Завтра",
     dashWeek: "Тиждень",
+    dashNextWeek: "Наступний тиждень",
     dashMyProjectsToday: "Мої проєкти – сьогодні",
     dashNothingToday: "На сьогодні нічого не заплановано",
     dashNoProjects: "Ще немає призначених проєктів",
@@ -1806,6 +1814,7 @@ const texts = {
     dashToday: "Днес",
     dashTomorrow: "Утре",
     dashWeek: "Седмица",
+    dashNextWeek: "Следваща седмица",
     dashMyProjectsToday: "Моите проекти – днес",
     dashNothingToday: "Днес няма планирано",
     dashNoProjects: "Още няма възложени проекти",
@@ -2020,6 +2029,7 @@ const texts = {
     dashToday: "Danas",
     dashTomorrow: "Sutra",
     dashWeek: "Nedelja",
+    dashNextWeek: "Sledeća nedelja",
     dashMyProjectsToday: "Moji projekti – danas",
     dashNothingToday: "Danas ništa nije planirano",
     dashNoProjects: "Još nema dodeljenih projekata",
@@ -2234,6 +2244,7 @@ const texts = {
     dashToday: "Danas",
     dashTomorrow: "Sutra",
     dashWeek: "Tjedan",
+    dashNextWeek: "Sljedeći tjedan",
     dashMyProjectsToday: "Moji projekti – danas",
     dashNothingToday: "Danas ništa nije planirano",
     dashNoProjects: "Još nema dodijeljenih projekata",
@@ -2448,6 +2459,7 @@ const texts = {
     dashToday: "Danes",
     dashTomorrow: "Jutri",
     dashWeek: "Teden",
+    dashNextWeek: "Naslednji teden",
     dashMyProjectsToday: "Moji projekti – danes",
     dashNothingToday: "Danes ni nič načrtovano",
     dashNoProjects: "Še ni dodeljenih projektov",
@@ -2662,6 +2674,7 @@ const texts = {
     dashToday: "Dziś",
     dashTomorrow: "Jutro",
     dashWeek: "Tydzień",
+    dashNextWeek: "Następny tydzień",
     dashMyProjectsToday: "Moje projekty – dzisiaj",
     dashNothingToday: "Nic na dziś",
     dashNoProjects: "Brak przydzielonych projektów",
@@ -4406,9 +4419,11 @@ export default function Home() {
             const diffToMon = dow === 0 ? -6 : 1 - dow;
             const weekStart = addDays(diffToMon);
             const weekEnd = addDays(diffToMon + 6);
-            const winStart = dashRange === "week" ? weekStart : dashRange === "tomorrow" ? tomorrow : today;
-            const winEnd = dashRange === "week" ? weekEnd : dashRange === "tomorrow" ? tomorrow : today;
-            const rangeLabel = dashRange === "week" ? `${weekStart} – ${weekEnd}` : dashRange === "tomorrow" ? tomorrow : today;
+            const nextWeekStart = addDays(diffToMon + 7);
+            const nextWeekEnd = addDays(diffToMon + 13);
+            const winStart = dashRange === "nextweek" ? nextWeekStart : dashRange === "week" ? weekStart : dashRange === "tomorrow" ? tomorrow : today;
+            const winEnd = dashRange === "nextweek" ? nextWeekEnd : dashRange === "week" ? weekEnd : dashRange === "tomorrow" ? tomorrow : today;
+            const rangeLabel = dashRange === "nextweek" ? `${nextWeekStart} – ${nextWeekEnd}` : dashRange === "week" ? `${weekStart} – ${weekEnd}` : dashRange === "tomorrow" ? tomorrow : today;
             const visible = workInstructions.filter(canSeeInstruction);
             const groups: Record<string, any> = {};
             for (const i of visible) {
@@ -4460,7 +4475,7 @@ export default function Home() {
                   <h2 className="text-xl font-bold">{t.dashMyProjects}</h2>
                   <p className="text-gray-500 text-sm">{rangeLabel} · {dashShown.length} {t.projects}</p>
                   <div className="flex gap-2 mt-3">
-                    {([["today", t.dashToday], ["tomorrow", t.dashTomorrow], ["week", t.dashWeek]] as [string, string][]).map(([val, lbl]) => (
+                    {([["today", t.dashToday], ["tomorrow", t.dashTomorrow], ["week", t.dashWeek], ["nextweek", t.dashNextWeek]] as [string, string][]).map(([val, lbl]) => (
                       <button key={val} type="button" onClick={() => setDashRange(val)} className={`px-3 py-1 rounded text-sm ${dashRange === val ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-700"}`}>{lbl}</button>
                     ))}
                   </div>
