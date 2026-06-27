@@ -4268,8 +4268,8 @@ export default function Home() {
       if (!hasContent) continue;
       const descriptionText = sanitizePdfText(day.translation || day.description || "-");
       const splitDescription = doc.splitTextToSize(descriptionText, contentWidth - 8);
-      const estimatedHeight = 45 + splitDescription.length * 5 + day.photos.length * 10;
-      addNewPageIfNeeded(estimatedHeight);
+      // Nur sicherstellen, dass der Tages-Kopf passt; der Text fliesst danach ueber die Seiten.
+      addNewPageIfNeeded(40);
       doc.setFillColor(230, 230, 230); doc.rect(marginLeft, y, contentWidth, 9, "F");
       doc.setFontSize(11); doc.setFont(FONT, "bold"); doc.text(`${day.weekday} - ${day.date || "-"}`, marginLeft + 3, y + 6); y += 13;
       doc.setFont(FONT, "normal"); doc.setFontSize(9);
@@ -4278,7 +4278,9 @@ export default function Home() {
       if (day.startTime || day.endTime || day.breakMinutes) { doc.text(`${p.startLabel}: ${day.startTime || "-"}   ${p.endLabel}: ${day.endTime || "-"}   ${p.pauseLabel}: ${day.breakMinutes ? day.breakMinutes + " min" : "-"}`, marginLeft + 3, y); y += 6; }
       y += 2;
       doc.setFont(FONT, "bold"); doc.text(`${p.description}:`, marginLeft + 3, y); y += 6;
-      doc.setFont(FONT, "normal"); doc.text(splitDescription, marginLeft + 3, y); y += splitDescription.length * 5 + 5;
+      doc.setFont(FONT, "normal");
+      for (const line of splitDescription) { addNewPageIfNeeded(6); doc.text(line, marginLeft + 3, y); y += 5; }
+      y += 5;
       if (day.photos.length > 0) {
         doc.setFont(FONT, "bold"); doc.text(`${p.photos}:`, marginLeft + 3, y); y += 6;
         doc.setFont(FONT, "normal"); doc.setFontSize(8);
