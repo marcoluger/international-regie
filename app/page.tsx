@@ -3581,7 +3581,10 @@ export default function Home() {
   }
 
   async function loadReportsFromDatabase() {
-    const { data, error } = await supabase.from("reports").select("*").order("created_at", { ascending: false });
+    const { data: au } = await supabase.auth.getUser();
+    const uid = au?.user?.id;
+    if (!uid) { setSavedReports([]); return; }
+    const { data, error } = await supabase.from("reports").select("*").eq("user_id", uid).order("created_at", { ascending: false });
     if (error) { setMessage("Fehler beim Laden: " + error.message); return; }
     setSavedReports((data || []) as SavedReport[]);
   }
