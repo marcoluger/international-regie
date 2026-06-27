@@ -210,6 +210,8 @@ const texts = {
     transferInsert: "Hier einfügen",
     transferNoReports: "Keine gespeicherten Berichte",
     travelTime: "Fahrzeit",
+    teamReports: "Mitarbeiter-Berichte",
+    teamNoReports: "Keine Berichte vorhanden",
     travelOut: "Hinfahrt",
     travelReturn: "Rückfahrt",
     km: "km",
@@ -435,6 +437,8 @@ const texts = {
     transferInsert: "Inserează aici",
     transferNoReports: "Niciun raport salvat",
     travelTime: "Timp de deplasare",
+    teamReports: "Rapoartele angajaților",
+    teamNoReports: "Niciun raport disponibil",
     travelOut: "Dus",
     travelReturn: "Întors",
     km: "km",
@@ -660,6 +664,8 @@ const texts = {
     transferInsert: "Insert here",
     transferNoReports: "No saved reports",
     travelTime: "Travel time",
+    teamReports: "Employee reports",
+    teamNoReports: "No reports available",
     travelOut: "Outbound",
     travelReturn: "Return",
     km: "km",
@@ -885,6 +891,8 @@ const texts = {
     transferInsert: "Inserisci qui",
     transferNoReports: "Nessun rapporto salvato",
     travelTime: "Tempo di viaggio",
+    teamReports: "Rapporti dei dipendenti",
+    teamNoReports: "Nessun rapporto disponibile",
     travelOut: "Andata",
     travelReturn: "Ritorno",
     km: "km",
@@ -1110,6 +1118,8 @@ const texts = {
     transferInsert: "Buraya ekle",
     transferNoReports: "Kayıtlı rapor yok",
     travelTime: "Yol süresi",
+    teamReports: "Çalışan raporları",
+    teamNoReports: "Rapor bulunmuyor",
     travelOut: "Gidiş",
     travelReturn: "Dönüş",
     km: "km",
@@ -1335,6 +1345,8 @@ const texts = {
     transferInsert: "Beszúrás ide",
     transferNoReports: "Nincs mentett jelentés",
     travelTime: "Utazási idő",
+    teamReports: "Munkatársak jelentései",
+    teamNoReports: "Nincs elérhető jelentés",
     travelOut: "Odaút",
     travelReturn: "Visszaút",
     km: "km",
@@ -1560,6 +1572,8 @@ const texts = {
     transferInsert: "Vložit sem",
     transferNoReports: "Žádné uložené výkazy",
     travelTime: "Doba jízdy",
+    teamReports: "Výkazy zaměstnanců",
+    teamNoReports: "Žádné výkazy",
     travelOut: "Cesta tam",
     travelReturn: "Cesta zpět",
     km: "km",
@@ -1785,6 +1799,8 @@ const texts = {
     transferInsert: "Вставити сюди",
     transferNoReports: "Немає збережених звітів",
     travelTime: "Час у дорозі",
+    teamReports: "Звіти працівників",
+    teamNoReports: "Немає звітів",
     travelOut: "Туди",
     travelReturn: "Назад",
     km: "km",
@@ -2010,6 +2026,8 @@ const texts = {
     transferInsert: "Вмъкни тук",
     transferNoReports: "Няма запазени отчети",
     travelTime: "Време за път",
+    teamReports: "Отчети на служителите",
+    teamNoReports: "Няма отчети",
     travelOut: "Отиване",
     travelReturn: "Връщане",
     km: "km",
@@ -2235,6 +2253,8 @@ const texts = {
     transferInsert: "Ubaci ovde",
     transferNoReports: "Nema sačuvanih izveštaja",
     travelTime: "Vreme putovanja",
+    teamReports: "Izveštaji radnika",
+    teamNoReports: "Nema izveštaja",
     travelOut: "Polazak",
     travelReturn: "Povratak",
     km: "km",
@@ -2460,6 +2480,8 @@ const texts = {
     transferInsert: "Umetni ovdje",
     transferNoReports: "Nema spremljenih izvještaja",
     travelTime: "Vrijeme putovanja",
+    teamReports: "Izvještaji radnika",
+    teamNoReports: "Nema izvještaja",
     travelOut: "Polazak",
     travelReturn: "Povratak",
     km: "km",
@@ -2685,6 +2707,8 @@ const texts = {
     transferInsert: "Vstavi sem",
     transferNoReports: "Ni shranjenih poročil",
     travelTime: "Čas vožnje",
+    teamReports: "Poročila zaposlenih",
+    teamNoReports: "Ni poročil",
     travelOut: "Pot tja",
     travelReturn: "Pot nazaj",
     km: "km",
@@ -2910,6 +2934,8 @@ const texts = {
     transferInsert: "Wstaw tutaj",
     transferNoReports: "Brak zapisanych raportów",
     travelTime: "Czas dojazdu",
+    teamReports: "Raporty pracowników",
+    teamNoReports: "Brak raportów",
     travelOut: "Dojazd",
     travelReturn: "Powrót",
     km: "km",
@@ -3206,6 +3232,8 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [savedReports, setSavedReports] = useState<SavedReport[]>([]);
+  const [teamReports, setTeamReports] = useState<SavedReport[]>([]);
+  const [teamOpenId, setTeamOpenId] = useState<string | null>(null);
   const [days, setDays] = useState<DayEntry[]>(createEmptyDays());
   const [currentCompany, setCurrentCompany] = useState<CurrentCompany | null>(null);
   const [companyFeatures, setCompanyFeatures] = useState<CompanyFeatures | null>(null);
@@ -3556,6 +3584,17 @@ export default function Home() {
     const { data, error } = await supabase.from("reports").select("*").order("created_at", { ascending: false });
     if (error) { setMessage("Fehler beim Laden: " + error.message); return; }
     setSavedReports((data || []) as SavedReport[]);
+  }
+
+  // Berichte ALLER Mitarbeiter der Firma laden (nur Ansicht, nach Mitarbeiter gruppiert).
+  async function loadTeamReports() {
+    const role = currentCompany?.role;
+    if (role !== "owner" && role !== "admin" && role !== "project_manager") { setTeamReports([]); return; }
+    const ids = companyUsers.map((m: any) => m.user_id).filter(Boolean);
+    if (ids.length === 0) { setTeamReports([]); return; }
+    const { data, error } = await supabase.from("reports").select("*").in("user_id", ids).order("created_at", { ascending: false });
+    if (error) { setMessage("Fehler beim Laden: " + error.message); return; }
+    setTeamReports((data || []) as SavedReport[]);
   }
 
   function updateDay(index: number, field: keyof DayEntry, value: string) {
@@ -4625,6 +4664,9 @@ export default function Home() {
         {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
           <TabButton label={t.employeeManagement} tabName="mitarbeiter"      activeTab={activeTab} onClick={() => setActiveTab("mitarbeiter")} />
         )}
+        {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
+          <TabButton label={t.teamReports}       tabName="teamberichte"      activeTab={activeTab} onClick={() => { setActiveTab("teamberichte"); loadTeamReports(); }} />
+        )}
         {(currentCompany?.role === "owner" || currentCompany?.role === "admin") && (
           <TabButton label={t.companyData}      tabName="firmendaten"        activeTab={activeTab} onClick={() => setActiveTab("firmendaten")} />
         )}
@@ -5041,6 +5083,52 @@ export default function Home() {
           </section>
         </div>
       )}
+
+      {activeTab === "teamberichte" && (currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (() => {
+        const groups: Record<string, { name: string; reports: SavedReport[] }> = {};
+        for (const r of teamReports) {
+          const uid = r.user_id || "unknown";
+          if (!groups[uid]) { const m = companyUsers.find((u: any) => u.user_id === uid); groups[uid] = { name: m?.full_name || m?.email || r.employee || uid, reports: [] }; }
+          groups[uid].reports.push(r);
+        }
+        const entries = Object.entries(groups);
+        return (
+          <section className="border rounded p-4 space-y-4 bg-white text-black">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-bold">👁 {t.teamReports}</h2>
+              <button type="button" onClick={loadTeamReports} className="bg-gray-200 px-3 py-2 rounded text-sm">🔄</button>
+            </div>
+            {entries.length === 0 ? (<p className="text-gray-500">{t.teamNoReports}</p>) : entries.map(([uid, group]) => (
+              <div key={uid} className="border rounded overflow-hidden">
+                <div className="bg-gray-100 px-3 py-2 font-bold">{group.name} ({group.reports.length})</div>
+                <div className="divide-y">
+                  {group.reports.map((r) => (
+                    <div key={r.id} className="p-3 space-y-2">
+                      <button type="button" onClick={() => setTeamOpenId(teamOpenId === r.id ? null : r.id)} className="w-full text-left flex justify-between items-center gap-2">
+                        <span className="truncate"><strong>{r.report_name}</strong> <span className="text-xs text-gray-500">{new Date(r.created_at).toLocaleString("de-DE")}</span></span>
+                        <span className="text-gray-400">{teamOpenId === r.id ? "▲" : "▼"}</span>
+                      </button>
+                      {teamOpenId === r.id && (
+                        <div className="space-y-2 pt-1">
+                          {(r.days || []).filter((d) => d.description || d.customer || d.projectNumber || d.site || d.hours).map((d, di) => (
+                            <div key={di} className="border rounded p-2 bg-gray-50 text-sm space-y-1">
+                              <p className="font-semibold">{d.weekday}{d.date ? ` – ${d.date}` : ""}</p>
+                              <p>{t.customer}: {d.customer || "-"} | {t.projectNumber}: {d.projectNumber || "-"}</p>
+                              <p>{t.site}: {d.site || "-"} | {t.hours}: {d.hours || "-"}</p>
+                              {(d.travelOutStart || d.travelOutEnd || d.travelOutKm || d.travelReturnStart || d.travelReturnEnd || d.travelReturnKm) && (<p className="text-xs text-gray-600">{t.travelTime}: {t.travelOut} {d.travelOutStart || "-"}–{d.travelOutEnd || "-"} {d.travelOutKm ? d.travelOutKm + " km" : ""} | {t.travelReturn} {d.travelReturnStart || "-"}–{d.travelReturnEnd || "-"} {d.travelReturnKm ? d.travelReturnKm + " km" : ""}</p>)}
+                              {d.description && (<p className="whitespace-pre-wrap break-words">{d.description}</p>)}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </section>
+        );
+      })()}
 
       {activeTab === "tag" && (
         <div className="space-y-4">
