@@ -3462,9 +3462,10 @@ export default function Home() {
     return fallback;
   }
 
-  // Markiert eine Arbeitsanweisung als vom Mitarbeiter gelesen (einmalig, nicht widerrufbar).
+  // Markiert eine Arbeitsanweisung als gelesen (Mitarbeiter ODER Projektleiter), einmalig.
   async function markInstructionRead(instructionId: string) {
-    if (!user?.id || currentCompany?.role !== "employee") return;
+    const markRole = currentCompany?.role;
+    if (!user?.id || (markRole !== "employee" && markRole !== "project_manager")) return;
     const inst = workInstructions.find((i: any) => i.id === instructionId);
     if ((inst?.instruction_reads || []).some((r: any) => r.user_id === user.id)) return;
     try {
