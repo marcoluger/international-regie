@@ -26,6 +26,12 @@ type DayEntry = {
   startTime: string;
   endTime: string;
   breakMinutes: string;
+  travelOutStart?: string;
+  travelOutEnd?: string;
+  travelOutKm?: string;
+  travelReturnStart?: string;
+  travelReturnEnd?: string;
+  travelReturnKm?: string;
   hours: string;
   description: string;
   translation: string;
@@ -202,6 +208,11 @@ const texts = {
     toReport: "In Regiebericht übernehmen",
     transferTitle: "Wohin übertragen?",
     transferInsert: "Hier einfügen",
+    transferNoReports: "Keine gespeicherten Berichte",
+    travelTime: "Fahrzeit",
+    travelOut: "Hinfahrt",
+    travelReturn: "Rückfahrt",
+    km: "km",
     deleteInstruction: "Arbeitsanweisung löschen",
     autoReportLocked: "Automatische Regieberichte sind in deinem Paket nicht aktiviert.",
     employeeManagement: "Mitarbeiterverwaltung",
@@ -422,6 +433,11 @@ const texts = {
     toReport: "Preluare în raportul de lucru",
     transferTitle: "Unde să transfer?",
     transferInsert: "Inserează aici",
+    transferNoReports: "Niciun raport salvat",
+    travelTime: "Timp de deplasare",
+    travelOut: "Dus",
+    travelReturn: "Întors",
+    km: "km",
     deleteInstruction: "Ștergere instrucțiune de lucru",
     autoReportLocked: "Rapoartele de lucru automate nu sunt activate în pachetul dumneavoastră.",
     employeeManagement: "Administrare angajați",
@@ -642,6 +658,11 @@ const texts = {
     toReport: "Add to work report",
     transferTitle: "Transfer where?",
     transferInsert: "Insert here",
+    transferNoReports: "No saved reports",
+    travelTime: "Travel time",
+    travelOut: "Outbound",
+    travelReturn: "Return",
+    km: "km",
     deleteInstruction: "Delete work instruction",
     autoReportLocked: "Automatic work reports are not enabled in your plan.",
     employeeManagement: "Employee management",
@@ -862,6 +883,11 @@ const texts = {
     toReport: "Aggiungi al rapporto di lavoro",
     transferTitle: "Trasferire dove?",
     transferInsert: "Inserisci qui",
+    transferNoReports: "Nessun rapporto salvato",
+    travelTime: "Tempo di viaggio",
+    travelOut: "Andata",
+    travelReturn: "Ritorno",
+    km: "km",
     deleteInstruction: "Elimina istruzione di lavoro",
     autoReportLocked: "I rapporti di lavoro automatici non sono attivi nel tuo pacchetto.",
     employeeManagement: "Gestione dipendenti",
@@ -1082,6 +1108,11 @@ const texts = {
     toReport: "İş raporuna aktar",
     transferTitle: "Nereye aktarılsın?",
     transferInsert: "Buraya ekle",
+    transferNoReports: "Kayıtlı rapor yok",
+    travelTime: "Yol süresi",
+    travelOut: "Gidiş",
+    travelReturn: "Dönüş",
+    km: "km",
     deleteInstruction: "İş talimatını sil",
     autoReportLocked: "Otomatik iş raporları paketinizde etkin değil.",
     employeeManagement: "Çalışan yönetimi",
@@ -1302,6 +1333,11 @@ const texts = {
     toReport: "Átvétel a munkajelentésbe",
     transferTitle: "Hová vegyük át?",
     transferInsert: "Beszúrás ide",
+    transferNoReports: "Nincs mentett jelentés",
+    travelTime: "Utazási idő",
+    travelOut: "Odaút",
+    travelReturn: "Visszaút",
+    km: "km",
     deleteInstruction: "Munkautasítás törlése",
     autoReportLocked: "Az automatikus munkajelentések nincsenek engedélyezve a csomagodban.",
     employeeManagement: "Munkatársak kezelése",
@@ -1522,6 +1558,11 @@ const texts = {
     toReport: "Převzít do pracovního výkazu",
     transferTitle: "Kam převést?",
     transferInsert: "Vložit sem",
+    transferNoReports: "Žádné uložené výkazy",
+    travelTime: "Doba jízdy",
+    travelOut: "Cesta tam",
+    travelReturn: "Cesta zpět",
+    km: "km",
     deleteInstruction: "Smazat pracovní pokyn",
     autoReportLocked: "Automatické pracovní výkazy nejsou ve vašem balíčku aktivovány.",
     employeeManagement: "Správa zaměstnanců",
@@ -1742,6 +1783,11 @@ const texts = {
     toReport: "Додати до звіту",
     transferTitle: "Куди перенести?",
     transferInsert: "Вставити сюди",
+    transferNoReports: "Немає збережених звітів",
+    travelTime: "Час у дорозі",
+    travelOut: "Туди",
+    travelReturn: "Назад",
+    km: "km",
     deleteInstruction: "Видалити інструкцію",
     autoReportLocked: "Автоматичні звіти не активовані у вашому пакеті.",
     employeeManagement: "Управління працівниками",
@@ -1962,6 +2008,11 @@ const texts = {
     toReport: "Добавяне към отчета",
     transferTitle: "Къде да се прехвърли?",
     transferInsert: "Вмъкни тук",
+    transferNoReports: "Няма запазени отчети",
+    travelTime: "Време за път",
+    travelOut: "Отиване",
+    travelReturn: "Връщане",
+    km: "km",
     deleteInstruction: "Изтриване на инструкция",
     autoReportLocked: "Автоматичните отчети не са активирани във вашия пакет.",
     employeeManagement: "Управление на служители",
@@ -2182,6 +2233,11 @@ const texts = {
     toReport: "Dodaj u radni izveštaj",
     transferTitle: "Gde preneti?",
     transferInsert: "Ubaci ovde",
+    transferNoReports: "Nema sačuvanih izveštaja",
+    travelTime: "Vreme putovanja",
+    travelOut: "Polazak",
+    travelReturn: "Povratak",
+    km: "km",
     deleteInstruction: "Obriši radni nalog",
     autoReportLocked: "Automatski radni izveštaji nisu aktivirani u vašem paketu.",
     employeeManagement: "Upravljanje radnicima",
@@ -2402,6 +2458,11 @@ const texts = {
     toReport: "Prenesi u izvještaj",
     transferTitle: "Kamo prenijeti?",
     transferInsert: "Umetni ovdje",
+    transferNoReports: "Nema spremljenih izvještaja",
+    travelTime: "Vrijeme putovanja",
+    travelOut: "Polazak",
+    travelReturn: "Povratak",
+    km: "km",
     deleteInstruction: "Obriši radnu uputu",
     autoReportLocked: "Automatski izvještaji nisu aktivni u vašem paketu.",
     employeeManagement: "Upravljanje radnicima",
@@ -2622,6 +2683,11 @@ const texts = {
     toReport: "Prenesi v poročilo",
     transferTitle: "Kam prenesti?",
     transferInsert: "Vstavi sem",
+    transferNoReports: "Ni shranjenih poročil",
+    travelTime: "Čas vožnje",
+    travelOut: "Pot tja",
+    travelReturn: "Pot nazaj",
+    km: "km",
     deleteInstruction: "Izbriši delovno navodilo",
     autoReportLocked: "Samodejno poročanje ni aktivno v vašem paketu.",
     employeeManagement: "Upravljanje zaposlenih",
@@ -2842,6 +2908,11 @@ const texts = {
     toReport: "Przenieś do raportu",
     transferTitle: "Gdzie przenieść?",
     transferInsert: "Wstaw tutaj",
+    transferNoReports: "Brak zapisanych raportów",
+    travelTime: "Czas dojazdu",
+    travelOut: "Dojazd",
+    travelReturn: "Powrót",
+    km: "km",
     deleteInstruction: "Usuń instrukcję",
     autoReportLocked: "Automatyczne raporty nie są aktywne w Twoim pakiecie.",
     employeeManagement: "Zarządzanie pracownikami",
@@ -2962,7 +3033,7 @@ const pdfTexts = {
 };
 
 function createEmptyDays(): DayEntry[] {
-  return weekdays.map((day) => ({ weekday: day, date: "", customer: "", projectNumber: "", site: "", startTime: "", endTime: "", breakMinutes: "", hours: "", description: "", translation: "", photos: [] }));
+  return weekdays.map((day) => ({ weekday: day, date: "", customer: "", projectNumber: "", site: "", startTime: "", endTime: "", breakMinutes: "", travelOutStart: "", travelOutEnd: "", travelOutKm: "", travelReturnStart: "", travelReturnEnd: "", travelReturnKm: "", hours: "", description: "", translation: "", photos: [] }));
 }
 
 // Bricht ein hängendes Promise nach ms Millisekunden mit Fehler ab (verhindert "ewiges Laden")
@@ -4347,6 +4418,11 @@ export default function Home() {
       doc.text(`${p.customer}: ${day.customer || "-"}`, marginLeft + 3, y); doc.text(`${p.project}: ${day.projectNumber || "-"}`, marginLeft + 80, y); y += 6;
       doc.text(`${p.site}: ${day.site || "-"}`, marginLeft + 3, y); doc.text(`${p.hours}: ${day.hours || "-"}`, marginLeft + 80, y); y += 6;
       if (day.startTime || day.endTime || day.breakMinutes) { doc.text(`${p.startLabel}: ${day.startTime || "-"}   ${p.endLabel}: ${day.endTime || "-"}   ${p.pauseLabel}: ${day.breakMinutes ? day.breakMinutes + " min" : "-"}`, marginLeft + 3, y); y += 6; }
+      if (day.travelOutStart || day.travelOutEnd || day.travelOutKm || day.travelReturnStart || day.travelReturnEnd || day.travelReturnKm) {
+        doc.text(sanitizePdfText(`${t.travelTime}:`), marginLeft + 3, y); y += 6;
+        if (day.travelOutStart || day.travelOutEnd || day.travelOutKm) { doc.text(sanitizePdfText(`  ${t.travelOut}: ${day.travelOutStart || "-"} - ${day.travelOutEnd || "-"}   ${day.travelOutKm ? day.travelOutKm + " km" : "-"}`), marginLeft + 3, y); y += 6; }
+        if (day.travelReturnStart || day.travelReturnEnd || day.travelReturnKm) { doc.text(sanitizePdfText(`  ${t.travelReturn}: ${day.travelReturnStart || "-"} - ${day.travelReturnEnd || "-"}   ${day.travelReturnKm ? day.travelReturnKm + " km" : "-"}`), marginLeft + 3, y); y += 6; }
+      }
       y += 2;
       doc.setFont(FONT, "bold"); doc.text(`${p.description}:`, marginLeft + 3, y); y += 6;
       doc.setFont(FONT, "normal");
@@ -4706,6 +4782,25 @@ export default function Home() {
                   <div><label className="text-xs text-gray-500 block mb-1">{t.breakLabel}</label><input type="number" min="0" step="5" className="border p-2 w-full text-black bg-white" value={day.breakMinutes || ""} onChange={(e) => updateDayTime(index, "breakMinutes", e.target.value)} /></div>
                   <div><label className="text-xs text-gray-500 block mb-1">{t.hours}</label><input className="border p-2 w-full text-black bg-white" value={day.hours} onChange={(e) => updateDay(index, "hours", e.target.value)} readOnly={!!(day.startTime && day.endTime)} /></div>
                 </div>
+                <div className="md:col-span-2 border-t pt-3 mt-1 space-y-3">
+                  <p className="text-sm font-semibold text-gray-600">{t.travelTime}</p>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">{t.travelOut}</p>
+                    <div className="grid grid-cols-3 gap-3">
+                      <div><label className="text-xs text-gray-500 block mb-1">{t.startTime}</label><input type="time" className="border p-2 w-full text-black bg-white" value={day.travelOutStart || ""} onChange={(e) => updateDay(index, "travelOutStart", e.target.value)} /></div>
+                      <div><label className="text-xs text-gray-500 block mb-1">{t.endTime}</label><input type="time" className="border p-2 w-full text-black bg-white" value={day.travelOutEnd || ""} onChange={(e) => updateDay(index, "travelOutEnd", e.target.value)} /></div>
+                      <div><label className="text-xs text-gray-500 block mb-1">{t.km}</label><input type="number" min="0" className="border p-2 w-full text-black bg-white" value={day.travelOutKm || ""} onChange={(e) => updateDay(index, "travelOutKm", e.target.value)} /></div>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">{t.travelReturn}</p>
+                    <div className="grid grid-cols-3 gap-3">
+                      <div><label className="text-xs text-gray-500 block mb-1">{t.startTime}</label><input type="time" className="border p-2 w-full text-black bg-white" value={day.travelReturnStart || ""} onChange={(e) => updateDay(index, "travelReturnStart", e.target.value)} /></div>
+                      <div><label className="text-xs text-gray-500 block mb-1">{t.endTime}</label><input type="time" className="border p-2 w-full text-black bg-white" value={day.travelReturnEnd || ""} onChange={(e) => updateDay(index, "travelReturnEnd", e.target.value)} /></div>
+                      <div><label className="text-xs text-gray-500 block mb-1">{t.km}</label><input type="number" min="0" className="border p-2 w-full text-black bg-white" value={day.travelReturnKm || ""} onChange={(e) => updateDay(index, "travelReturnKm", e.target.value)} /></div>
+                    </div>
+                  </div>
+                </div>
               </div>
               <textarea className="border p-3 w-full text-black bg-white resize-none overflow-hidden" rows={Math.max(4, (day.description || "").split("\n").length + 1)} placeholder={t.description} value={day.description} onChange={(e) => updateDay(index, "description", e.target.value)} />
               {companyFeatures?.photos_enabled ? <input type="file" accept="image/*" multiple className="border p-3 w-full text-black bg-white" onChange={(e) => handlePhotos(index, e.target.files)} /> : <div className="border rounded p-3 bg-gray-50 text-sm text-gray-400">🔒 Foto-Upload ist in deinem Paket nicht aktiviert.</div>}
@@ -4804,7 +4899,7 @@ export default function Home() {
                         <p><strong>{t.site}:</strong> {instruction.site || "-"}</p>
                         {instruction.problems_text && <p><strong>{t.problems}:</strong> {getTranslated(instruction.id, "problems_text", instruction.problems_text)}</p>}
                         {(instruction.work_instruction_tasks || []).length > 0 && (<ul className="list-disc pl-6 space-y-1">{instruction.work_instruction_tasks.map((task: any) => (<li key={task.id}>{task.status === "completed" ? t.statusCompleted : task.status === "in_progress" ? t.statusInProgress : task.status === "stopped" ? t.statusStopped : t.statusOpen}{" "}{getTranslatedTask(instruction.id, task.id, task.task_text)}{task.note && <div className="text-sm text-gray-600 ml-2">{t.feedbackLabel}: {task.note}</div>}</li>))}</ul>)}
-                        {companyFeatures?.module_auto_reports ? (<button type="button" onClick={() => setTransferInst(instruction)} className="bg-green-700 text-white px-3 py-2 rounded">{t.toReport}</button>) : (<p className="text-sm text-gray-500">{t.autoReportLocked}</p>)}
+                        {companyFeatures?.module_auto_reports ? (<button type="button" onClick={() => { setTransferInst(instruction); loadReportsFromDatabase(); }} className="bg-green-700 text-white px-3 py-2 rounded">{t.toReport}</button>) : (<p className="text-sm text-gray-500">{t.autoReportLocked}</p>)}
                       </div>
                     ))}
                     {workInstructions.filter((i) => i.project_id === project.id).length === 0 && <p className="text-gray-600">{t.noInstructions}</p>}
@@ -5023,7 +5118,7 @@ export default function Home() {
                   ))}
                 </ul>
                 <div className="flex gap-2 pt-2 border-t flex-wrap">
-                  {companyFeatures?.module_auto_reports && (<button type="button" onClick={() => setTransferInst(instruction)} className="bg-green-700 text-white px-3 py-2 rounded text-sm">📋 {t.toReport}</button>)}
+                  {companyFeatures?.module_auto_reports && (<button type="button" onClick={() => { setTransferInst(instruction); loadReportsFromDatabase(); }} className="bg-green-700 text-white px-3 py-2 rounded text-sm">📋 {t.toReport}</button>)}
                   {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => startEditInstruction(instruction)} className="bg-amber-600 text-white px-3 py-2 rounded text-sm">✏️ {t.loadEdit}</button>)}
                   {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => deleteWorkInstruction(instruction.id)} className="bg-red-600 text-white px-3 py-2 rounded text-sm">{t.deleteInstruction}</button>)}
                 </div>
@@ -5079,7 +5174,7 @@ export default function Home() {
                           </li>
                         ))}
                       </ul>
-                      {companyFeatures?.module_auto_reports && (<button type="button" onClick={() => setTransferInst(instruction)} className="bg-green-700 text-white px-3 py-1 rounded text-sm">📋 {t.toReport}</button>)}
+                      {companyFeatures?.module_auto_reports && (<button type="button" onClick={() => { setTransferInst(instruction); loadReportsFromDatabase(); }} className="bg-green-700 text-white px-3 py-1 rounded text-sm">📋 {t.toReport}</button>)}
                     </div>
                   ))}
                   </>)}
@@ -5265,6 +5360,7 @@ export default function Home() {
                 ))}
               </div>
             )}
+            {savedReports.length === 0 && (<p className="text-sm text-gray-500 text-center py-1">{t.transferNoReports}</p>)}
             <button type="button" onClick={() => setTransferInst(null)} className="w-full bg-gray-300 text-black px-4 py-2 rounded">{t.copyCancel}</button>
           </div>
         </div>
