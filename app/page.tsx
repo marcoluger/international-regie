@@ -3877,11 +3877,21 @@ export default function Home() {
     } catch { /* ignorieren */ }
   }
 
+  // Erzeugt einen eindeutigen, fortlaufend nummerierten Berichtsnamen,
+  // z. B. "KW 26 - Jasmin 1", "KW 26 - Jasmin 2", ... (naechste freie Nummer).
+  function buildReportName(): string {
+    const base = `${calendarWeek || "Woche"} - ${employee || "Bericht"}`;
+    const taken = new Set(savedReports.map((r: any) => (r.report_name || "").trim()));
+    let n = 1;
+    while (taken.has(`${base} ${n}`)) n++;
+    return `${base} ${n}`;
+  }
+
   async function saveReport() {
     setMessage("");
     if (!user) { setMessage(t.msgPleaseLogin); return; }
     await ensureFreshSession();
-    const name = reportName.trim() || `${calendarWeek || "Woche"} - ${employee || "Bericht"}`;
+    const name = reportName.trim() || buildReportName();
     const reportData = { report_name: name, employee, from_language: fromLanguage, to_language: toLanguage, pdf_language: pdfLanguage, days, user_id: user.id, project_id: selectedProjectId || null };
     let error;
     if (currentReportId) {
@@ -3903,7 +3913,9 @@ export default function Home() {
     setMessage("");
     if (!user) { setMessage(t.msgPleaseLogin); return; }
     await ensureFreshSession();
-    const name = reportName.trim() || `${calendarWeek || "Woche"} - ${employee || "Bericht"}`;
+    const typed = reportName.trim();
+    const takenNames = new Set(savedReports.map((r: any) => (r.report_name || "").trim()));
+    const name = (typed && !takenNames.has(typed)) ? typed : buildReportName();
     const reportData = { report_name: name, employee, from_language: fromLanguage, to_language: toLanguage, pdf_language: pdfLanguage, days, user_id: user.id, project_id: selectedProjectId || null };
     const result = await dbTimeout(supabase.from("reports").insert(reportData).select().single());
     if (result.error) { setMessage("Fehler beim Speichern: " + result.error.message); return; }
