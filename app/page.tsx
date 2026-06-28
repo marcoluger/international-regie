@@ -4415,7 +4415,7 @@ export default function Home() {
       companyId = newCompany.id;
       const { error: userError } = await supabase.from("company_users").insert({ company_id: companyId, user_id: user.id, email: user.email, full_name: companySettings.company_name, role: "owner" });
       if (userError) { setMessage("Fehler beim Anlegen des Benutzers: " + userError.message); return; }
-      await supabase.from("company_features").insert({ company_id: companyId, package_name: "starter", max_employees: 5, max_photos: 2, module_reports: true, module_work_orders: false, module_auto_reports: false, photos_enabled: false, email_enabled: false, signature_enabled: false, ai_enabled: false, allowed_languages: ["Deutsch"] });
+      // Paket-Features (company_features) werden vom Super-Admin gesetzt – per RLS gegen Client-Schreiben geschuetzt.
     }
     const { error } = await supabase.from("company_settings").upsert({ ...companySettings, user_id: user.id }, { onConflict: "user_id" });
     if (error) { setMessage("Fehler beim Speichern: " + error.message); return; }
