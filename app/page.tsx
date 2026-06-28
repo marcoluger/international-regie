@@ -3126,6 +3126,51 @@ function sanitizePdfText(s: string): string {
     .replace(/─/g, "-");
 }
 
+// Laedt eine Unicode-Schrift (Noto Sans) fuer das PDF und gibt den Font-Namen zurueck.
+// Bei JEDEM Problem -> Fallback "helvetica", damit das PDF niemals bricht.
+async function loadPdfFont(doc: any): Promise<string> {
+  try {
+    const toBase64 = (buf: ArrayBuffer): string => {
+      const bytes = new Uint8Array(buf);
+      let binary = "";
+      const chunk = 0x8000; // chunk-weise -> verhindert "Maximum call stack size exceeded"
+      for (let i = 0; i < bytes.length; i += chunk) {
+        binary += String.fromCharCode.apply(null, Array.from(bytes.subarray(i, i + chunk)) as unknown as number[]);
+      }
+      return btoa(binary);
+    };
+    const tryFetchFont = async (urls: string[]): Promise<ArrayBuffer | null> => {
+      for (const u of urls) {
+        try {
+          const r = await fetch(u);
+          if (r.ok) {
+            const b = await r.arrayBuffer();
+            if (b && b.byteLength > 2000) return b; // kleine Dateien = LFS-Pointer/Fehlerseite -> ignorieren
+          }
+        } catch { /* naechster Kandidat */ }
+      }
+      return null;
+    };
+    const regBuf = await tryFetchFont([
+      "/fonts/NotoSans-Regular.ttf", "/fonts/NotoSans.ttf",
+      "/fonts/notosans-regular.ttf", "/fonts/NotoSans-regular.ttf",
+    ]);
+    if (!regBuf) return "helvetica";
+    const regB64 = toBase64(regBuf);
+    doc.addFileToVFS("NotoSans-Regular.ttf", regB64);
+    doc.addFont("NotoSans-Regular.ttf", "NotoSans", "normal");
+    const boldBuf = await tryFetchFont([
+      "/fonts/NotoSans-Bold.ttf", "/fonts/NotoSans-bold.ttf", "/fonts/notosans-bold.ttf",
+    ]);
+    const boldB64 = boldBuf ? toBase64(boldBuf) : regB64; // kein Bold-File -> Regular auch fuer fett
+    doc.addFileToVFS("NotoSans-Bold.ttf", boldB64);
+    doc.addFont("NotoSans-Bold.ttf", "NotoSans", "bold");
+    return "NotoSans";
+  } catch {
+    return "helvetica";
+  }
+}
+
 function getCalendarWeek(dateString: string) {
   if (!dateString) return "";
   const [yearText, monthText, dayText] = dateString.split("-");
@@ -4426,7 +4471,7 @@ export default function Home() {
   async function createPDF(sendByEmail = false) {
     const p = pdfTexts[uiLanguage as keyof typeof pdfTexts] || pdfTexts["Deutsch" as keyof typeof pdfTexts];
     const doc = new jsPDF("p", "mm", "a4");
-    const FONT = "helvetica";
+    const FONT = await loadPdfFont(doc);
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
     const marginLeft = 15; const marginRight = 15;
