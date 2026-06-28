@@ -4092,6 +4092,13 @@ export default function Home() {
   const totalTravelMinutes = days.reduce((sum, day) => sum + travelMinutes(day.travelOutStart, day.travelOutEnd) + travelMinutes(day.travelReturnStart, day.travelReturnEnd), 0);
   const totalTravelKm = days.reduce((sum, day) => sum + (Number((day.travelOutKm || "").replace(",", ".")) || 0) + (Number((day.travelReturnKm || "").replace(",", ".")) || 0), 0);
   const totalTravelKmDisplay = (Math.round(totalTravelKm * 10) / 10).toString().replace(".", ",");
+  const travelKmByProject = days.reduce<Record<string, number>>((acc, day) => {
+    if (!day.projectNumber) return acc;
+    const km = (Number((day.travelOutKm || "").replace(",", ".")) || 0) + (Number((day.travelReturnKm || "").replace(",", ".")) || 0);
+    if (km > 0) acc[day.projectNumber] = (acc[day.projectNumber] || 0) + km;
+    return acc;
+  }, {});
+  const formatKm = (km: number) => (Math.round(km * 10) / 10).toString().replace(".", ",");
 
   async function handlePhotos(index: number, files: FileList | null) {
     if (!files || !user) return;
@@ -4619,7 +4626,8 @@ export default function Home() {
     doc.setFontSize(12); doc.setFont(FONT, "bold"); doc.text(p.summary, marginLeft, y); y += 8;
     doc.setFontSize(10); doc.setFont(FONT, "normal");
     doc.text(`${p.totalHours}: ${totalHours.toString().replace(".", ",")} ${p.hours}`, marginLeft, y); y += 8;
-    Object.entries(projectTotals).forEach(([project, total]) => { doc.text(`${p.project} ${project}: ${total.toString().replace(".", ",")} ${p.hours}`, marginLeft, y); y += 6; });
+    Object.entries(projectTotals).forEach(([project, total]) => { doc.text(sanitizePdfText(`${p.project} ${project}: ${total.toString().replace(".", ",")} ${p.hours}${travelKmByProject[project] ? ` · ${formatKm(travelKmByProject[project])} ${t.km}` : ""}`), marginLeft, y); y += 6; });
+    if (totalTravelMinutes > 0 || totalTravelKm > 0) { doc.text(sanitizePdfText(`${t.travelTime} (${t.total}): ${formatTravelTime(totalTravelMinutes)} h · ${totalTravelKmDisplay} ${t.km}`), marginLeft, y); y += 8; }
     y += anySig ? 30 : 18;
     if (sigEmployee) { try { doc.addImage(sigEmployee, "PNG", marginLeft, y - sigH, sigW, sigH); } catch {} }
     if (sigCustomer) { try { doc.addImage(sigCustomer, "PNG", pageWidth - marginRight - sigW, y - sigH, sigW, sigH); } catch {} }
@@ -4987,7 +4995,7 @@ export default function Home() {
           <section className="border rounded p-4 space-y-2 bg-white text-black">
             <h2 className="text-xl font-bold">{t.hoursOverview}</h2>
             <p><strong>{t.total}:</strong> {totalHours.toString().replace(".", ",")} {t.hours}</p>
-            {Object.entries(projectTotals).map(([project, total]) => (<p key={project}><strong>{t.projectNumber} {project}:</strong> {total.toString().replace(".", ",")} {t.hours}</p>))}
+            {Object.entries(projectTotals).map(([project, total]) => (<p key={project}><strong>{t.projectNumber} {project}:</strong> {total.toString().replace(".", ",")} {t.hours}{travelKmByProject[project] ? ` · ${formatKm(travelKmByProject[project])} ${t.km}` : ""}</p>))}
             {(totalTravelMinutes > 0 || totalTravelKm > 0) && (<p><strong>{t.travelTime} ({t.total}):</strong> {formatTravelTime(totalTravelMinutes)} h · {totalTravelKmDisplay} {t.km}</p>)}
           </section>
           </>)}
