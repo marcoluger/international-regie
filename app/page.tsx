@@ -3489,7 +3489,7 @@ export default function Home() {
   }, [uiLanguage, reportVersion]);
 
   async function loadCompanyContext(userId: string) {
-    const { data: companyUser, error } = await supabase.from("company_users").select("company_id, role").eq("user_id", userId).maybeSingle();
+    const { data: companyUser, error } = await supabase.from("company_users").select("company_id, role, preferred_language").eq("user_id", userId).maybeSingle();
     if (error) { setMessage("Fehler beim Laden der Firma: " + error.message); return; }
     if (!companyUser) { return; } // Kein Onboarding hier – wird in loadCompanySettings entschieden
     const { data: companyData, error: companyError } = await supabase.from("companies").select("id, name, slug, status").eq("id", companyUser.company_id).single();
@@ -3503,6 +3503,8 @@ export default function Home() {
       const allowed = Array.isArray(features.allowed_languages) ? features.allowed_languages : (typeof features.allowed_languages === "string" ? JSON.parse(features.allowed_languages) : []);
       const firstTarget = allowed.filter((l: string) => l !== "Deutsch")[0];
       if (firstTarget) { setInstructionToLanguage(firstTarget); setToLanguage(firstTarget); }
+      const pref = (companyUser as any).preferred_language;
+      if (pref && allowed.includes(pref) && languages.includes(pref as Language)) { setUiLanguage(pref as Language); }
     }
     await loadCompanyUsers(companyUser.company_id);
     await loadWorkInstructions(companyUser.company_id);
@@ -4558,7 +4560,9 @@ export default function Home() {
       // Nur sicherstellen, dass der Tages-Kopf passt; der Text fliesst danach ueber die Seiten.
       addNewPageIfNeeded(40);
       doc.setFillColor(230, 230, 230); doc.rect(marginLeft, y, contentWidth, 9, "F");
-      doc.setFontSize(11); doc.setFont(FONT, "bold"); doc.text(`${day.weekday} - ${day.date || "-"}`, marginLeft + 3, y + 6); y += 13;
+      const wdIdx = weekdays.indexOf(day.weekday);
+      const wdLabel = (wdIdx >= 0 && t.weekdays && t.weekdays[wdIdx]) ? t.weekdays[wdIdx] : day.weekday;
+      doc.setFontSize(11); doc.setFont(FONT, "bold"); doc.text(`${wdLabel} - ${day.date || "-"}`, marginLeft + 3, y + 6); y += 13;
       doc.setFont(FONT, "normal"); doc.setFontSize(9);
       doc.text(`${p.customer}: ${day.customer || "-"}`, marginLeft + 3, y); doc.text(`${p.project}: ${day.projectNumber || "-"}`, marginLeft + 80, y); y += 6;
       doc.text(`${p.site}: ${day.site || "-"}`, marginLeft + 3, y); doc.text(`${p.hours}: ${day.hours || "-"}`, marginLeft + 80, y); y += 6;
@@ -4630,9 +4634,6 @@ export default function Home() {
       <main className="max-w-xl mx-auto p-4 md:p-8 space-y-6 bg-gray-100 min-h-screen text-black">
         <section className="border rounded p-4 space-y-4 bg-white">
           <h1 className="text-3xl font-bold">{t.loginTitle}</h1>
-          <select className="border p-3 w-full text-black bg-white" value={uiLanguage} onChange={(e) => setUiLanguage(e.target.value as Language)}>
-            {languages.map((lang) => <option key={lang} value={lang}>{lang}</option>)}
-          </select>
           {message && <div className="border rounded p-3 bg-yellow-100 text-black">{message}</div>}
           <form onSubmit={(e) => { e.preventDefault(); signIn(); }} autoComplete="on" className="space-y-3">
           <div className="space-y-3">
@@ -4748,9 +4749,10 @@ export default function Home() {
           <button type="button" onClick={refreshAll} disabled={refreshing} title="Aktualisieren" className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50">{refreshing ? "⏳" : "🔄"}</button>
           <button type="button" onClick={openHelp} title={t.help} aria-label={t.help} className="bg-gray-200 text-gray-800 px-4 py-2 rounded">❓</button>
           <select className="border p-2 rounded text-black bg-white text-sm" value={uiLanguage} onChange={(e) => {
-            // Nur Sprache umschalten – die Übersetzung aller Felder läuft automatisch
-            // über den useEffect (refreshCommentTranslations) in die neue Sprache.
-            setUiLanguage(e.target.value as Language);
+            // Sprache umschalten + pro Benutzer in der DB merken (geraeteuebergreifend).
+            const newLang = e.target.value as Language;
+            setUiLanguage(newLang);
+            if (user?.id) { supabase.from("company_users").update({ preferred_language: newLang }).eq("user_id", user.id); }
           }}>
             {getAllowedLanguages(companyFeatures).filter(l => languages.includes(l as Language)).map((lang) => (<option key={lang} value={lang}>🌐 {lang}</option>))}
           </select>
