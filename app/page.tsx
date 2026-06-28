@@ -5400,7 +5400,7 @@ export default function Home() {
                       </button>
                       {teamOpenId === r.id && (
                         <div className="space-y-2 pt-1">
-                          {(r.days || []).filter((d) => d.description || d.customer || d.projectNumber || d.site || d.hours).map((d, di) => (
+                          {(r.days || []).map((d, di) => ({ d, di })).filter((x) => x.d.description || x.d.customer || x.d.projectNumber || x.d.site || x.d.hours).map(({ d, di }) => (
                             <div key={di} className="border rounded p-2 bg-gray-50 text-sm space-y-1">
                               <p className="font-semibold">{(() => { const wi = weekdays.indexOf(d.weekday); return (wi >= 0 && t.weekdays[wi]) ? t.weekdays[wi] : d.weekday; })()}{d.date ? ` – ${d.date}` : ""}</p>
                               <p>{t.customer}: {d.customer || "-"} | {t.projectNumber}: {d.projectNumber || "-"}</p>
