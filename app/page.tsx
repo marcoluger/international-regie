@@ -3110,20 +3110,36 @@ async function compressImage(file: File): Promise<File> {
 }
 // Ersetzt Emojis und Sonderlinien fuer das PDF durch klare Zeichen,
 // weil die PDF-Standardschrift keine Emojis darstellen kann.
+// Wird in createPDF gesetzt: true, wenn die Unicode-Schrift (NotoSans) geladen wurde.
+let pdfUnicodeSymbols = false;
 function sanitizePdfText(s: string): string {
   if (!s) return s;
-  return s
-    .replace(/⬜/g, "[ ]")
-    .replace(/🟡/g, "[~]")
-    .replace(/⛔/g, "[X]")
-    .replace(/✅/g, "[v]")
+  let r = s
     .replace(/📋/g, "")
     .replace(/📝/g, "")
     .replace(/💬/g, "")
-    .replace(/⚠️/g, "")
-    .replace(/⚠/g, "")
-    .replace(/️/g, "")
     .replace(/─/g, "-");
+  if (pdfUnicodeSymbols) {
+    // echte Symbole (DejaVu Sans deckt diese ab)
+    r = r
+      .replace(/⬜/g, "□")
+      .replace(/🟡/g, "◐")
+      .replace(/⛔/g, "✗")
+      .replace(/✅/g, "✓")
+      .replace(/⚠️/g, "⚠")
+      .replace(/⚠/g, "⚠");
+  } else {
+    // sichere ASCII-Platzhalter (Helvetica-Fallback)
+    r = r
+      .replace(/⬜/g, "[ ]")
+      .replace(/🟡/g, "[~]")
+      .replace(/⛔/g, "[X]")
+      .replace(/✅/g, "[v]")
+      .replace(/⚠️/g, "(!)")
+      .replace(/⚠/g, "(!)");
+  }
+  r = r.replace(/️/g, "");
+  return r;
 }
 
 // Laedt eine Unicode-Schrift (Noto Sans) fuer das PDF und gibt den Font-Namen zurueck.
@@ -4472,6 +4488,7 @@ export default function Home() {
     const p = pdfTexts[uiLanguage as keyof typeof pdfTexts] || pdfTexts["Deutsch" as keyof typeof pdfTexts];
     const doc = new jsPDF("p", "mm", "a4");
     const FONT = await loadPdfFont(doc);
+    pdfUnicodeSymbols = FONT === "NotoSans";
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
     const marginLeft = 15; const marginRight = 15;
