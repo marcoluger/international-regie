@@ -3235,6 +3235,7 @@ export default function Home() {
   const [teamReports, setTeamReports] = useState<SavedReport[]>([]);
   const [teamOpenId, setTeamOpenId] = useState<string | null>(null);
   const [teamLoading, setTeamLoading] = useState(false);
+  const [teamTrans, setTeamTrans] = useState<Record<string, { lang: string; days: Record<number, string> }>>({});
   const [days, setDays] = useState<DayEntry[]>(createEmptyDays());
   const [currentCompany, setCurrentCompany] = useState<CurrentCompany | null>(null);
   const [companyFeatures, setCompanyFeatures] = useState<CompanyFeatures | null>(null);
@@ -3602,6 +3603,31 @@ export default function Home() {
       setTeamReports((data || []) as SavedReport[]);
     } finally { setTeamLoading(false); }
   }
+
+  // Inhalt eines Mitarbeiter-Berichts in die Anzeige-Sprache uebersetzen (beim Aufklappen).
+  async function translateTeamReport(r: SavedReport) {
+    const existing = teamTrans[r.id];
+    if (existing && existing.lang === uiLanguage) return;
+    const days = r.days || [];
+    const out: Record<number, string> = {};
+    await Promise.all(days.map(async (d, i) => {
+      const text = (d.description || "").trim();
+      if (!text) return;
+      try {
+        const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: text, fromLanguage: "automatisch", toLanguage: uiLanguage }) });
+        const data = await res.json();
+        if (!data.error && data.translation && data.translation.trim() !== text) out[i] = data.translation;
+      } catch { /* ignore */ }
+    }));
+    setTeamTrans((prev) => ({ ...prev, [r.id]: { lang: uiLanguage, days: out } }));
+  }
+
+  // Bei Sprachwechsel den gerade geoeffneten Bericht neu uebersetzen.
+  useEffect(() => {
+    if (!teamOpenId) return;
+    const r = teamReports.find((x) => x.id === teamOpenId);
+    if (r) translateTeamReport(r);
+  }, [uiLanguage]);
 
   function updateDay(index: number, field: keyof DayEntry, value: string) {
     const copy = [...days]; copy[index] = { ...copy[index], [field]: value }; setDays(copy);
@@ -5116,7 +5142,7 @@ export default function Home() {
                 <div className="divide-y">
                   {group.reports.map((r) => (
                     <div key={r.id} className="p-3 space-y-2">
-                      <button type="button" onClick={() => setTeamOpenId(teamOpenId === r.id ? null : r.id)} className="w-full text-left flex justify-between items-center gap-2">
+                      <button type="button" onClick={() => { const willOpen = teamOpenId !== r.id; setTeamOpenId(willOpen ? r.id : null); if (willOpen) translateTeamReport(r); }} className="w-full text-left flex justify-between items-center gap-2">
                         <span className="truncate"><strong>{r.report_name}</strong> <span className="text-xs text-gray-500">{new Date(r.created_at).toLocaleString("de-DE")}</span></span>
                         <span className="text-gray-400">{teamOpenId === r.id ? "▲" : "▼"}</span>
                       </button>
@@ -5128,7 +5154,7 @@ export default function Home() {
                               <p>{t.customer}: {d.customer || "-"} | {t.projectNumber}: {d.projectNumber || "-"}</p>
                               <p>{t.site}: {d.site || "-"} | {t.hours}: {d.hours || "-"}</p>
                               {(d.travelOutStart || d.travelOutEnd || d.travelOutKm || d.travelReturnStart || d.travelReturnEnd || d.travelReturnKm) && (<p className="text-xs text-gray-600">{t.travelTime}: {t.travelOut} {d.travelOutStart || "-"}–{d.travelOutEnd || "-"} {d.travelOutKm ? d.travelOutKm + " km" : ""} | {t.travelReturn} {d.travelReturnStart || "-"}–{d.travelReturnEnd || "-"} {d.travelReturnKm ? d.travelReturnKm + " km" : ""}</p>)}
-                              {d.description && (<p className="whitespace-pre-wrap break-words">{d.description}</p>)}
+                              {d.description && (<p className="whitespace-pre-wrap break-words">{(teamTrans[r.id] && teamTrans[r.id].lang === uiLanguage && teamTrans[r.id].days[di]) || d.description}</p>)}
                             </div>
                           ))}
                         </div>
