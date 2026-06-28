@@ -4719,31 +4719,37 @@ export default function Home() {
             const built = Object.entries(groups).map(([gkey, g]: [string, any]) => {
               const rows: any[] = [];
               const relevant = new Set<any>();
+              let winTotal = 0, winDone = 0;
               for (const inst of g.instructions) {
                 const wd = inst.work_date || "";
                 const inWindow = !!wd && wd >= winStart && wd <= winEnd;
                 for (const task of (inst.work_instruction_tasks || [])) {
                   const st = task.status || "open";
                   const overdueOpen = !!wd && wd < today && st !== "completed";
-                  if (inWindow || overdueOpen) { rows.push({ task, inst, date: wd, overdue: wd < today && st !== "completed" }); relevant.add(inst); }
+                  if (inWindow || overdueOpen) {
+                    winTotal++;
+                    relevant.add(inst);
+                    if (st === "completed") { winDone++; }
+                    else { rows.push({ task, inst, date: wd, overdue: wd < today && st !== "completed" }); }
+                  }
                 }
               }
               rows.sort((a, b) => (a.date || "").localeCompare(b.date || "") || ((statusRank[a.task.status || "open"] ?? 2) - (statusRank[b.task.status || "open"] ?? 2)));
               const stoppedN = rows.filter((r) => r.task.status === "stopped").length;
-              const doneN = rows.filter((r) => r.task.status === "completed").length;
+              const doneN = winDone;
               let unread = 0, totalAssign = 0;
               relevant.forEach((inst: any) => {
                 const readerIds = new Set((inst.instruction_reads || []).map((r: any) => r.user_id));
                 for (const uid of (inst.assigned_user_ids || [])) { totalAssign++; if (!readerIds.has(uid)) unread++; }
               });
-              return { key: gkey, g, rows, stoppedN, doneN, unread, totalAssign };
+              return { key: gkey, g, rows, stoppedN, doneN, winTotal, unread, totalAssign };
             });
             built.sort((a, b) => {
               const ra = a.stoppedN > 0 ? 0 : a.rows.length > 0 ? 1 : 2;
               const rb = b.stoppedN > 0 ? 0 : b.rows.length > 0 ? 1 : 2;
               return ra - rb;
             });
-            const dashShown = (dashRole === "owner" || dashRole === "admin") ? built : built.filter((b: any) => b.rows.length > 0);
+            const dashShown = built.filter((b: any) => b.rows.length > 0);
             return (
               <>
                 <div className="bg-white border rounded-xl p-4 shadow-sm">
@@ -4769,7 +4775,7 @@ export default function Home() {
                       {b.stoppedN > 0 ? (
                         <span className="text-xs text-red-700 bg-red-50 px-2 py-1 rounded whitespace-nowrap">{b.stoppedN} {t.statusStopped}</span>
                       ) : b.rows.length > 0 ? (
-                        <span className="text-xs text-green-700 bg-green-50 px-2 py-1 rounded whitespace-nowrap">{b.doneN} / {b.rows.length} {t.dashDone}</span>
+                        <span className="text-xs text-green-700 bg-green-50 px-2 py-1 rounded whitespace-nowrap">{b.doneN} / {b.winTotal} {t.dashDone}</span>
                       ) : null}
                     </div>
                     {dOpen && (b.rows.length === 0 ? (
