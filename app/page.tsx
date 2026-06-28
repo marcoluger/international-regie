@@ -3598,6 +3598,7 @@ export default function Home() {
   async function addCompanyUser() {
     if (!currentCompany) return;
     if (!newUserName.trim() || !newUserUsername.trim() || !newUserPassword.trim()) { setMessage(t.msgFillRequired); return; }
+    if (newUserPassword.length < 8) { setMessage("Passwort muss mindestens 8 Zeichen haben."); return; }
     setCreatingEmployee(true);
     const { data: sessionData } = await supabase.auth.getSession();
     const token = sessionData?.session?.access_token || "";
@@ -4450,7 +4451,7 @@ export default function Home() {
 
   // ── FIXED: kein window.location.reload() ──
   async function changePassword() {
-    if (!newPassword.trim() || newPassword.length < 6) { setMessage("Passwort muss mindestens 6 Zeichen haben."); return; }
+    if (!newPassword.trim() || newPassword.length < 8) { setMessage("Passwort muss mindestens 8 Zeichen haben."); return; }
     if (newPassword !== newPasswordConfirm) { setMessage("Passwörter stimmen nicht überein."); return; }
     setChangingPassword(true); setMessage("Speichere...");
     try {
@@ -4662,7 +4663,7 @@ export default function Home() {
         <div className="bg-white border rounded-xl p-6 space-y-5 w-full shadow-lg">
           <div className="text-center"><div className="text-5xl mb-3">🔐</div><h2 className="text-2xl font-bold">Passwort ändern</h2><p className="text-gray-500 text-sm mt-1">Bitte ändern Sie Ihr temporäres Passwort.</p></div>
           {message && <div className="bg-yellow-50 border rounded p-3 text-sm">{message}</div>}
-          <input className="border p-3 w-full rounded text-black" placeholder="Neues Passwort (min. 6 Zeichen)" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+          <input className="border p-3 w-full rounded text-black" placeholder="Neues Passwort (min. 8 Zeichen)" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
           <input className="border p-3 w-full rounded text-black" placeholder="Passwort bestätigen" type="password" value={newPasswordConfirm} onChange={(e) => setNewPasswordConfirm(e.target.value)} />
           <button type="button" onClick={changePassword} disabled={changingPassword} className="w-full bg-blue-700 text-white py-3 rounded font-bold disabled:opacity-50">{changingPassword ? "Wird gespeichert..." : "Passwort speichern & weiter"}</button>
         </div>
@@ -5439,7 +5440,7 @@ export default function Home() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <input className="border p-3 text-black bg-white" placeholder="Vollständiger Name *" value={newUserName} onChange={(e) => setNewUserName(e.target.value)} />
                 <input className="border p-3 text-black bg-white" placeholder="Benutzername * (für Login)" value={newUserUsername} onChange={(e) => setNewUserUsername(e.target.value)} />
-                <input className="border p-3 text-black bg-white" placeholder="Passwort *" type="password" value={newUserPassword} onChange={(e) => setNewUserPassword(e.target.value)} />
+                <input className="border p-3 text-black bg-white" placeholder="Passwort * (min. 8 Zeichen)" type="password" value={newUserPassword} onChange={(e) => setNewUserPassword(e.target.value)} />
                 <select className="border p-3 text-black bg-white" value={newUserRole} onChange={(e) => setNewUserRole(e.target.value)}>
                   <option value="employee">{t.roleEmployee}</option>
                   {(currentCompany?.role === "owner" || currentCompany?.role === "admin") && <option value="project_manager">{t.roleProjectManager}</option>}
