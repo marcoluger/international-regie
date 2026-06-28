@@ -5402,7 +5402,7 @@ export default function Home() {
                         <div className="space-y-2 pt-1">
                           {(r.days || []).filter((d) => d.description || d.customer || d.projectNumber || d.site || d.hours).map((d, di) => (
                             <div key={di} className="border rounded p-2 bg-gray-50 text-sm space-y-1">
-                              <p className="font-semibold">{d.weekday}{d.date ? ` – ${d.date}` : ""}</p>
+                              <p className="font-semibold">{(() => { const wi = weekdays.indexOf(d.weekday); return (wi >= 0 && t.weekdays[wi]) ? t.weekdays[wi] : d.weekday; })()}{d.date ? ` – ${d.date}` : ""}</p>
                               <p>{t.customer}: {d.customer || "-"} | {t.projectNumber}: {d.projectNumber || "-"}</p>
                               <p>{t.site}: {d.site || "-"} | {t.hours}: {d.hours || "-"}</p>
                               {(d.travelOutStart || d.travelOutEnd || d.travelOutKm || d.travelReturnStart || d.travelReturnEnd || d.travelReturnKm) && (<p className="text-xs text-gray-600">{t.travelTime}: {t.travelOut} {d.travelOutStart || "-"}–{d.travelOutEnd || "-"} {d.travelOutKm ? d.travelOutKm + " km" : ""} | {t.travelReturn} {d.travelReturnStart || "-"}–{d.travelReturnEnd || "-"} {d.travelReturnKm ? d.travelReturnKm + " km" : ""}</p>)}
