@@ -4538,10 +4538,22 @@ export default function Home() {
     }
     y += 10; if (y < 75) y = 75;
     doc.setFontSize(12); doc.setFont(FONT, "bold"); doc.text(p.dailyReports, marginLeft, y); y += 8;
-    for (const day of days) {
+    // Tagestexte fuer das PDF sicher in die Anzeige-Sprache bringen (nutzt Cache; verhindert halb-uebersetzte PDFs).
+    const pdfDayText: string[] = [];
+    for (let di = 0; di < days.length; di++) {
+      const src = (days[di].description || "").trim();
+      if (!src || uiLanguage === "Deutsch") { pdfDayText[di] = src; continue; }
+      try {
+        const tr = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: src, fromLanguage: "automatisch", toLanguage: uiLanguage }) });
+        const td = await tr.json();
+        pdfDayText[di] = (!td.error && td.translation && td.translation.trim() !== src) ? td.translation : src;
+      } catch { pdfDayText[di] = src; }
+    }
+    for (let di = 0; di < days.length; di++) {
+      const day = days[di];
       const hasContent = day.description || day.hours || day.customer || day.projectNumber || day.site || day.photos.length > 0;
       if (!hasContent) continue;
-      const descriptionText = sanitizePdfText(day.translation || day.description || "-");
+      const descriptionText = sanitizePdfText(pdfDayText[di] || day.description || "-");
       const splitDescription = doc.splitTextToSize(descriptionText, contentWidth - 8);
       // Nur sicherstellen, dass der Tages-Kopf passt; der Text fliesst danach ueber die Seiten.
       addNewPageIfNeeded(40);
