@@ -4074,6 +4074,24 @@ export default function Home() {
     acc[day.projectNumber] = (acc[day.projectNumber] || 0) + parseHours(day.hours);
     return acc;
   }, {});
+  // Fahrzeit-Summe pro Woche: Dauer (Hin- + Rueckfahrt) in Minuten und km gesamt.
+  function travelMinutes(start?: string, end?: string): number {
+    if (!start || !end) return 0;
+    const [sh, sm] = start.split(":").map(Number);
+    const [eh, em] = end.split(":").map(Number);
+    if ([sh, sm, eh, em].some((n) => Number.isNaN(n))) return 0;
+    let mins = (eh * 60 + em) - (sh * 60 + sm);
+    if (mins < 0) mins += 24 * 60;
+    return mins;
+  }
+  function formatTravelTime(mins: number): string {
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    return `${h}:${m.toString().padStart(2, "0")}`;
+  }
+  const totalTravelMinutes = days.reduce((sum, day) => sum + travelMinutes(day.travelOutStart, day.travelOutEnd) + travelMinutes(day.travelReturnStart, day.travelReturnEnd), 0);
+  const totalTravelKm = days.reduce((sum, day) => sum + (Number((day.travelOutKm || "").replace(",", ".")) || 0) + (Number((day.travelReturnKm || "").replace(",", ".")) || 0), 0);
+  const totalTravelKmDisplay = (Math.round(totalTravelKm * 10) / 10).toString().replace(".", ",");
 
   async function handlePhotos(index: number, files: FileList | null) {
     if (!files || !user) return;
@@ -4970,6 +4988,7 @@ export default function Home() {
             <h2 className="text-xl font-bold">{t.hoursOverview}</h2>
             <p><strong>{t.total}:</strong> {totalHours.toString().replace(".", ",")} {t.hours}</p>
             {Object.entries(projectTotals).map(([project, total]) => (<p key={project}><strong>{t.projectNumber} {project}:</strong> {total.toString().replace(".", ",")} {t.hours}</p>))}
+            {(totalTravelMinutes > 0 || totalTravelKm > 0) && (<p><strong>{t.travelTime} ({t.total}):</strong> {formatTravelTime(totalTravelMinutes)} h · {totalTravelKmDisplay} {t.km}</p>)}
           </section>
           </>)}
           {companyFeatures?.signature_enabled && (
