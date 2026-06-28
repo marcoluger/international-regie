@@ -3118,6 +3118,8 @@ function sanitizePdfText(s: string): string {
     .replace(/📋/g, "")
     .replace(/📝/g, "")
     .replace(/💬/g, "")
+    .replace(/📦/g, "")
+    .replace(/🔧/g, "")
     .replace(/─/g, "-");
   if (pdfUnicodeSymbols) {
     // echte Symbole (DejaVu Sans deckt diese ab)
@@ -4393,6 +4395,8 @@ export default function Home() {
       for (const item of [
         { key: "title", text: instruction.title || "" },
         { key: "problems_text", text: instruction.problems_text || "" },
+        { key: "material", text: instruction.material || "" },
+        { key: "werkzeug", text: instruction.werkzeug || "" },
       ]) {
         if (!item.text.trim()) continue;
         const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: item.text, fromLanguage: "Deutsch", toLanguage: targetLang }) });
@@ -4421,6 +4425,8 @@ export default function Home() {
     const getCommentText = (taskId: string, fallback: string) => mergedTasks[`comment_${taskId}`] || fallback;
     const getTitleText = () => currentTranslations.title || instruction.title;
     const getProblemsText = () => currentTranslations.problems_text || instruction.problems_text || "";
+    const getMaterialText = () => currentTranslations.material || instruction.material || "";
+    const getWerkzeugText = () => currentTranslations.werkzeug || instruction.werkzeug || "";
 
     const currentTexts = texts[uiLanguage];
     const completedTasks = (instruction.work_instruction_tasks || [])
@@ -4438,10 +4444,14 @@ export default function Home() {
       });
     const titleTranslated = getTitleText();
     const problemsTranslated = getProblemsText();
+    const materialTranslated = getMaterialText();
+    const werkzeugTranslated = getWerkzeugText();
     const description = [
       titleTranslated !== instruction.title ? `📋 ${titleTranslated}` : "",
       ...completedTasks,
       problemsTranslated ? `─────\n⚠️ ${currentTexts.problemsHints}: ${problemsTranslated}` : "",
+      materialTranslated ? `📦 ${currentTexts.material}: ${materialTranslated}` : "",
+      werkzeugTranslated ? `🔧 ${currentTexts.werkzeug}: ${werkzeugTranslated}` : "",
       instruction.employee_note ? `${currentTexts.feedbackLabel}: ${instruction.employee_note}` : ""
     ].filter(Boolean).join("\n─────\n");
     const targetDate = instruction.work_date || "";
