@@ -90,6 +90,7 @@ type CompanyFeatures = {
 
 const texts = {
   Deutsch: {
+    instructionDoc: "Arbeitsanweisung",
     help: "Anleitung",
     helpEmpty: "Anleitung noch nicht hinterlegt",
     dashOpen: "Öffnen",
@@ -317,6 +318,7 @@ const texts = {
     copyDone: "Arbeitsschritte wurden übernommen.",
   },
   Rumänisch: {
+    instructionDoc: "Instrucțiune de lucru",
     help: "Instrucțiuni",
     helpEmpty: "Instrucțiunile nu sunt încă disponibile",
     dashOpen: "Deschide",
@@ -544,6 +546,7 @@ const texts = {
     copyDone: "Etapele de lucru au fost preluate.",
   },
   Englisch: {
+    instructionDoc: "Work instruction",
     help: "Guide",
     helpEmpty: "Guide not available yet",
     dashOpen: "Open",
@@ -771,6 +774,7 @@ const texts = {
     copyDone: "Work steps have been applied.",
   },
   Italienisch: {
+    instructionDoc: "Istruzione di lavoro",
     help: "Guida",
     helpEmpty: "Guida non ancora disponibile",
     dashOpen: "Apri",
@@ -998,6 +1002,7 @@ const texts = {
     copyDone: "Le fasi di lavoro sono state applicate.",
   },
   Türkisch: {
+    instructionDoc: "İş talimatı",
     help: "Kılavuz",
     helpEmpty: "Kılavuz henüz eklenmedi",
     dashOpen: "Aç",
@@ -1225,6 +1230,7 @@ const texts = {
     copyDone: "İş adımları alındı.",
   },
   Ungarisch: {
+    instructionDoc: "Munkautasítás",
     help: "Útmutató",
     helpEmpty: "Az útmutató még nincs megadva",
     dashOpen: "Megnyitás",
@@ -1452,6 +1458,7 @@ const texts = {
     copyDone: "A munkalépések átvéve.",
   },
   Tschechisch: {
+    instructionDoc: "Pracovní pokyn",
     help: "Návod",
     helpEmpty: "Návod zatím není k dispozici",
     dashOpen: "Otevřít",
@@ -1679,6 +1686,7 @@ const texts = {
     copyDone: "Pracovní kroky byly převzaty.",
   },
   Ukrainisch: {
+    instructionDoc: "Робоча інструкція",
     help: "Інструкція",
     helpEmpty: "Інструкцію ще не додано",
     dashOpen: "Відкрити",
@@ -1906,6 +1914,7 @@ const texts = {
     copyDone: "Робочі кроки перенесено.",
   },
   Bulgarisch: {
+    instructionDoc: "Работна инструкция",
     help: "Инструкции",
     helpEmpty: "Инструкциите още не са въведени",
     dashOpen: "Отвори",
@@ -2133,6 +2142,7 @@ const texts = {
     copyDone: "Работните стъпки са прехвърлени.",
   },
   Serbisch: {
+    instructionDoc: "Radni nalog",
     help: "Uputstvo",
     helpEmpty: "Uputstvo još nije uneto",
     dashOpen: "Otvori",
@@ -2360,6 +2370,7 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Kroatisch: {
+    instructionDoc: "Radni nalog",
     help: "Upute",
     helpEmpty: "Upute još nisu unesene",
     dashOpen: "Otvori",
@@ -2587,6 +2598,7 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Slowenisch: {
+    instructionDoc: "Delovni nalog",
     help: "Navodila",
     helpEmpty: "Navodila še niso vnesena",
     dashOpen: "Odpri",
@@ -2814,6 +2826,7 @@ const texts = {
     copyDone: "Delovni koraki so prevzeti.",
   },
   Polnisch: {
+    instructionDoc: "Instrukcja robocza",
     help: "Instrukcja",
     helpEmpty: "Instrukcja jeszcze nie dodana",
     dashOpen: "Otwórz",
@@ -4666,6 +4679,129 @@ export default function Home() {
     doc.save(filename);
   }
 
+  async function createInstructionPDF(instruction: any) {
+    let inst = instruction;
+    if (currentCompany) {
+      const { data } = await supabase.from("work_instructions").select("*, work_instruction_tasks (*)").eq("id", instruction.id).single();
+      if (data) inst = data;
+    }
+    const p = pdfTexts[uiLanguage as keyof typeof pdfTexts] || pdfTexts["Deutsch" as keyof typeof pdfTexts];
+    const doc = new jsPDF("p", "mm", "a4");
+    const FONT = await loadPdfFont(doc);
+    pdfUnicodeSymbols = FONT === "NotoSans";
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const marginLeft = 15; const marginRight = 15;
+    const contentWidth = pageWidth - marginLeft - marginRight;
+    let y = 15;
+    // Bei Bedarf in die Anzeige-Sprache uebersetzen (Deutsch = unveraendert).
+    const tr = async (text: string): Promise<string> => {
+      const src = (text || "").trim();
+      if (!src || uiLanguage === "Deutsch") return src;
+      try {
+        const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: src, fromLanguage: "Deutsch", toLanguage: uiLanguage }) });
+        const data = await res.json();
+        return (!data.error && data.translation && data.translation.trim()) ? data.translation : src;
+      } catch { return src; }
+    };
+    const addFooter = () => { doc.setFontSize(8); doc.setTextColor(120); doc.text(companySettings?.company_name || currentCompany?.companies?.name || p.company, marginLeft, pageHeight - 10); doc.text(`${p.createdAt}: ${new Date().toLocaleDateString("de-DE")}`, pageWidth - marginRight, pageHeight - 10, { align: "right" }); doc.setTextColor(0); };
+    const addNewPageIfNeeded = (neededHeight: number) => { if (y + neededHeight > pageHeight - 25) { addFooter(); doc.addPage(); y = 15; } };
+    let logoBase64 = "";
+    if (companySettings?.company_logo) {
+      try {
+        const response = await fetch(companySettings.company_logo);
+        const blob = await response.blob();
+        logoBase64 = await new Promise<string>((resolve, reject) => { const reader = new FileReader(); reader.onloadend = () => resolve(reader.result as string); reader.onerror = reject; reader.readAsDataURL(blob); });
+      } catch (error) { console.error("Logo konnte nicht geladen werden:", error); }
+    }
+    doc.setFillColor(240, 240, 240); doc.rect(0, 0, pageWidth, 70, "F");
+    doc.setFontSize(20); doc.setFont(FONT, "bold"); doc.text(sanitizePdfText(t.instructionDoc), marginLeft, y);
+    doc.setFontSize(11); doc.setFont(FONT, "normal"); y += 8;
+    doc.text(companySettings?.company_name || currentCompany?.companies?.name || "Regie International", marginLeft, y); y += 6;
+    if (companySettings?.street) { doc.text(companySettings.street, marginLeft, y); y += 5; }
+    if (companySettings?.zip_code || companySettings?.city) { doc.text(`${companySettings?.zip_code || ""} ${companySettings?.city || ""}`, marginLeft, y); y += 5; }
+    if (companySettings?.phone) { doc.text(`Tel: ${companySettings.phone}`, marginLeft, y); y += 5; }
+    if (companySettings?.email) { doc.text(`E-Mail: ${companySettings.email}`, marginLeft, y); y += 5; }
+    y += 7;
+    const titleTr = await tr(inst.title || "");
+    doc.setFont(FONT, "bold"); doc.setFontSize(13); doc.text(sanitizePdfText(titleTr || "-"), marginLeft, y); doc.setFontSize(11); doc.setFont(FONT, "normal"); y += 6;
+    doc.text(sanitizePdfText(`${p.project}: ${inst.project || "-"}`), marginLeft, y); y += 6;
+    doc.text(sanitizePdfText(`${p.customer}: ${inst.customer || "-"}`), marginLeft, y);
+    if (logoBase64) {
+      const maxW = 55, maxH = 30, topY = 8, rightEdge = pageWidth - marginRight;
+      let drawW = 30, drawH = 30, fmt = "PNG";
+      try {
+        const props: any = doc.getImageProperties(logoBase64);
+        const ft = (props?.fileType || "").toUpperCase();
+        fmt = (ft === "JPEG" || ft === "JPG") ? "JPEG" : "PNG";
+        const ratio = (props.width || 1) / (props.height || 1);
+        drawW = maxW; drawH = drawW / ratio;
+        if (drawH > maxH) { drawH = maxH; drawW = drawH * ratio; }
+      } catch (e) { drawW = 30; drawH = 30; fmt = "PNG"; }
+      doc.addImage(logoBase64, fmt, rightEdge - drawW, topY, drawW, drawH);
+    }
+    y += 10; if (y < 78) y = 78;
+    doc.setFontSize(10);
+    doc.text(sanitizePdfText(`${p.site}: ${inst.site || "-"}`), marginLeft, y); y += 6;
+    doc.text(sanitizePdfText(`${t.date}: ${inst.work_date || "-"}`), marginLeft, y); y += 8;
+    const block = async (label: string, value: string) => {
+      const v = (value || "").trim();
+      if (!v) return;
+      const txt = sanitizePdfText(await tr(v));
+      addNewPageIfNeeded(14);
+      doc.setFont(FONT, "bold"); doc.text(sanitizePdfText(`${label}:`), marginLeft, y); y += 6;
+      doc.setFont(FONT, "normal");
+      for (const line of doc.splitTextToSize(txt, contentWidth)) { addNewPageIfNeeded(6); doc.text(line, marginLeft, y); y += 5; }
+      y += 3;
+    };
+    await block(t.problems, inst.problems_text || "");
+    await block(t.material, inst.material || "");
+    await block(t.werkzeug, inst.werkzeug || "");
+    const tasks = (inst.work_instruction_tasks || []).slice().sort((a: any, b: any) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+    if (tasks.length > 0) {
+      addNewPageIfNeeded(12);
+      doc.setFont(FONT, "bold"); doc.setFontSize(12); doc.text(sanitizePdfText(`${t.workSteps}:`), marginLeft, y); y += 7;
+      doc.setFontSize(10); doc.setFont(FONT, "normal");
+      let nr = 1;
+      for (const task of tasks) {
+        const statusLabel = task.status === "completed" ? t.statusCompleted : task.status === "in_progress" ? t.statusInProgress : task.status === "stopped" ? t.statusStopped : t.statusOpen;
+        const taskTextTr = sanitizePdfText(await tr(task.task_text || ""));
+        addNewPageIfNeeded(14);
+        doc.setFont(FONT, "bold"); doc.text(sanitizePdfText(`${nr}. [${statusLabel}]`), marginLeft, y); doc.setFont(FONT, "normal"); y += 5;
+        for (const line of doc.splitTextToSize(taskTextTr, contentWidth - 6)) { addNewPageIfNeeded(6); doc.text(line, marginLeft + 6, y); y += 5; }
+        if ((task.note || "").trim()) {
+          const noteTr = sanitizePdfText(`${t.feedbackLabel}: ${task.note}`);
+          for (const line of doc.splitTextToSize(noteTr, contentWidth - 6)) { addNewPageIfNeeded(6); doc.text(line, marginLeft + 6, y); y += 5; }
+        }
+        if ((task.employee_comment || "").trim()) {
+          const cTr = sanitizePdfText(`${t.commentLabel}: ${await tr(task.employee_comment)}`);
+          for (const line of doc.splitTextToSize(cTr, contentWidth - 6)) { addNewPageIfNeeded(6); doc.text(line, marginLeft + 6, y); y += 5; }
+        }
+        y += 3; nr++;
+      }
+    }
+    const photos = (inst.photos || []) as string[];
+    if (photos.length > 0 && companyFeatures?.photos_enabled) {
+      addNewPageIfNeeded(12);
+      doc.setFont(FONT, "bold"); doc.text(sanitizePdfText(`${p.photos}:`), marginLeft, y); y += 6; doc.setFont(FONT, "normal");
+      for (let i = 0; i < photos.length; i++) {
+        try {
+          const response = await fetch(photos[i]);
+          const blob = await response.blob();
+          const photoBase64 = await new Promise<string>((resolve, reject) => { const reader = new FileReader(); reader.onloadend = () => resolve(reader.result as string); reader.onerror = reject; reader.readAsDataURL(blob); });
+          addNewPageIfNeeded(65);
+          doc.text(`${p.photo} ${i + 1}:`, marginLeft, y); y += 5;
+          doc.addImage(photoBase64, "JPEG", marginLeft, y, 70, 50); y += 56;
+        } catch { doc.text(`${p.photo} ${i + 1}: -`, marginLeft, y); y += 6; }
+      }
+    }
+    addFooter();
+    const titlePart = (inst.title || "Arbeitsanweisung").replace(/[^A-Za-z0-9_-]+/g, "_").replace(/^_+|_+$/g, "");
+    const datePart = (inst.work_date || "").replace(/[^0-9-]/g, "");
+    const filename = `Arbeitsanweisung_${titlePart || "Anweisung"}${datePart ? "_" + datePart : ""}.pdf`;
+    doc.save(filename);
+  }
+
   if (!user) {
     return (
       <main className="max-w-xl mx-auto p-4 md:p-8 space-y-6 bg-gray-100 min-h-screen text-black">
@@ -5094,6 +5230,7 @@ export default function Home() {
                         {instruction.problems_text && <p><strong>{t.problems}:</strong> {getTranslated(instruction.id, "problems_text", instruction.problems_text)}</p>}
                         {(instruction.work_instruction_tasks || []).length > 0 && (<ul className="list-disc pl-6 space-y-1">{instruction.work_instruction_tasks.map((task: any) => (<li key={task.id}>{task.status === "completed" ? t.statusCompleted : task.status === "in_progress" ? t.statusInProgress : task.status === "stopped" ? t.statusStopped : t.statusOpen}{" "}{getTranslatedTask(instruction.id, task.id, task.task_text)}{task.note && <div className="text-sm text-gray-600 ml-2">{t.feedbackLabel}: {task.note}</div>}</li>))}</ul>)}
                         {companyFeatures?.module_auto_reports ? (<button type="button" onClick={() => { setTransferInst(instruction); loadReportsFromDatabase(); }} className="bg-green-700 text-white px-3 py-2 rounded">{t.toReport}</button>) : (<p className="text-sm text-gray-500">{t.autoReportLocked}</p>)}
+                        <button type="button" onClick={() => createInstructionPDF(instruction)} className="bg-slate-700 text-white px-3 py-2 rounded text-sm">📄 PDF</button>
                       </div>
                     ))}
                     {workInstructions.filter((i) => i.project_id === project.id).length === 0 && <p className="text-gray-600">{t.noInstructions}</p>}
@@ -5222,6 +5359,7 @@ export default function Home() {
                         <div className="mt-2 space-y-2">
                           <p className="text-sm text-gray-600">{t.site}: {instruction.site || "-"}</p>
                           <div className="flex gap-2 flex-wrap">
+                            <button type="button" onClick={() => createInstructionPDF(instruction)} className="bg-slate-700 text-white px-3 py-2 rounded text-sm">📄 PDF</button>
                             {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => startEditInstruction(instruction)} className="bg-amber-600 text-white px-3 py-2 rounded text-sm">✏️ {t.loadEdit}</button>)}
                             {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => deleteWorkInstruction(instruction.id)} className="bg-red-600 text-white px-3 py-2 rounded text-sm">{t.deleteInstruction}</button>)}
                           </div>
@@ -5359,6 +5497,7 @@ export default function Home() {
                 </ul>
                 <div className="flex gap-2 pt-2 border-t flex-wrap">
                   {companyFeatures?.module_auto_reports && (<button type="button" onClick={() => { setTransferInst(instruction); loadReportsFromDatabase(); }} className="bg-green-700 text-white px-3 py-2 rounded text-sm">📋 {t.toReport}</button>)}
+                  <button type="button" onClick={() => createInstructionPDF(instruction)} className="bg-slate-700 text-white px-3 py-2 rounded text-sm">📄 PDF</button>
                   {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => startEditInstruction(instruction)} className="bg-amber-600 text-white px-3 py-2 rounded text-sm">✏️ {t.loadEdit}</button>)}
                   {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => deleteWorkInstruction(instruction.id)} className="bg-red-600 text-white px-3 py-2 rounded text-sm">{t.deleteInstruction}</button>)}
                 </div>
@@ -5415,6 +5554,7 @@ export default function Home() {
                         ))}
                       </ul>
                       {companyFeatures?.module_auto_reports && (<button type="button" onClick={() => { setTransferInst(instruction); loadReportsFromDatabase(); }} className="bg-green-700 text-white px-3 py-1 rounded text-sm">📋 {t.toReport}</button>)}
+                      <button type="button" onClick={() => createInstructionPDF(instruction)} className="bg-slate-700 text-white px-3 py-1 rounded text-sm">📄 PDF</button>
                     </div>
                   ))}
                   </>)}
