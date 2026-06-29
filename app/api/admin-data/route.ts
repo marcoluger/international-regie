@@ -135,13 +135,16 @@ export async function POST(request: Request) {
   }
 
   if (action === "resetUserPassword") {
-    const { userId } = body;
+    const { userId, newPassword } = body;
     if (!userId) return Response.json({ error: "userId fehlt" }, { status: 400 });
-    const newPassword = generatePassword();
+    // Passwort wird vom Admin uebergeben (kein Klartext-Generat mehr) + serverseitige Mindestlaenge 8.
+    if (typeof newPassword !== "string" || newPassword.length < 8) {
+      return Response.json({ error: "Passwort muss mindestens 8 Zeichen haben." }, { status: 400 });
+    }
     const { error } = await supabaseAdmin.auth.admin.updateUserById(userId, { password: newPassword });
     if (error) return Response.json({ error: error.message }, { status: 500 });
     await supabaseAdmin.from("company_users").update({ must_change_password: true }).eq("user_id", userId);
-    return Response.json({ success: true, password: newPassword });
+    return Response.json({ success: true });
   }
 
   if (action === "createCompany") {

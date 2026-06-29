@@ -60,7 +60,7 @@ export default function AdminPage() {
   const [newOwnerPackage, setNewOwnerPackage] = useState("starter");
   const [creatingCompany, setCreatingCompany] = useState(false);
   const [lastCreated, setLastCreated] = useState<{ username: string; password: string; company: string; slug: string } | null>(null);
-  const [resetCreds, setResetCreds] = useState<{ name: string; email: string; password: string } | null>(null);
+  const [resetCreds, setResetCreds] = useState<{ name: string; email: string } | null>(null);
   const [legalImpressum, setLegalImpressum] = useState("");
   const [legalDatenschutz, setLegalDatenschutz] = useState("");
   const [savingLegal, setSavingLegal] = useState(false);
@@ -270,16 +270,18 @@ export default function AdminPage() {
   }
 
   async function resetUserPassword(userId: string, name: string, email: string) {
-    if (!confirm(`Passwort für "${name || email}" wirklich zurücksetzen? Es wird ein neues Passwort erzeugt.`)) return;
+    const newPassword = window.prompt(`Neues Passwort für "${name || email}" festlegen (mindestens 8 Zeichen).\nDer Mitarbeiter muss es beim ersten Login ändern.`);
+    if (newPassword === null) return; // abgebrochen
+    if (newPassword.length < 8) { setMessage("Passwort muss mindestens 8 Zeichen haben."); return; }
     const res = await fetch("/api/admin-data", {
       method: "POST",
       headers: await authHeaders(),
-      body: JSON.stringify({ action: "resetUserPassword", userId }),
+      body: JSON.stringify({ action: "resetUserPassword", userId, newPassword }),
     });
     const data = await res.json();
     if (data.error) { setMessage("Fehler: " + data.error); return; }
-    setResetCreds({ name: name || email, email, password: data.password });
-    setMessage(`✅ Passwort für "${name || email}" zurückgesetzt.`);
+    setResetCreds({ name: name || email, email });
+    setMessage(`✅ Passwort für "${name || email}" gesetzt.`);
   }
 
   if (!isAdmin) {
@@ -312,11 +314,10 @@ export default function AdminPage() {
 
       {resetCreds && (
         <div className="bg-green-50 border-2 border-green-500 rounded-xl p-4 space-y-2">
-          <h3 className="font-bold text-green-700">🔑 Neues Passwort:</h3>
+          <h3 className="font-bold text-green-700">🔑 Passwort gesetzt</h3>
           <p><strong>Mitarbeiter:</strong> {resetCreds.name}</p>
           <p><strong>E-Mail/Login:</strong> {resetCreds.email}</p>
-          <p><strong>Neues Passwort:</strong> {resetCreds.password}</p>
-          <p className="text-sm text-orange-600">⚠️ Bitte jetzt notieren und dem Mitarbeiter geben! Er wird beim nächsten Login zum Ändern aufgefordert.</p>
+          <p className="text-sm text-orange-600">⚠️ Der Mitarbeiter wird beim nächsten Login zum Ändern aufgefordert. Das Passwort wird aus Sicherheitsgründen nicht angezeigt.</p>
           <button type="button" onClick={() => setResetCreds(null)} className="bg-gray-200 px-4 py-2 rounded text-sm">Schließen</button>
         </div>
       )}
