@@ -59,10 +59,6 @@ async function cacheSet(key: string, translation: string): Promise<void> {
 
 export async function POST(req: Request) {
   try {
-    // Rate-Limiting (translate – grosszuegig; greift nur, wenn Upstash konfiguriert ist)
-    const limited = await rateLimit(req, "translate");
-    if (limited) return limited;
-
     const body = await req.json();
     const description: string = body?.description ?? "";
     const fromLanguage: string = body?.fromLanguage ?? "Deutsch";
@@ -77,7 +73,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ translation: description });
     }
 
-    // Schritt 1: Cache pruefen – kein OpenAI-Aufruf, wenn schon vorhanden
+    // Schritt 1: Cache pruefen – kein OpenAI-Aufruf, wenn schon vorhanden.
+    // WICHTIG: Cache-Treffer werden NICHT rate-limitiert (sonst bricht der Sprachwechsel-Schwung).
     const cacheKey = await hashKey(`${fromLanguage}|||${toLanguage}|||${description}`);
     const cached = await cacheGet(cacheKey);
     if (cached != null) {
@@ -88,6 +85,10 @@ export async function POST(req: Request) {
     if (!key) {
       return NextResponse.json({ error: "Kein OpenAI-API-Key gefunden." }, { status: 500 });
     }
+
+    // Rate-Limiting NUR fuer echte OpenAI-Aufrufe (greift nur, wenn Upstash konfiguriert ist).
+    const limited = await rateLimit(req, "translate");
+    if (limited) return limited;
 
     // Schritt 2: OpenAI aufrufen
     const res = await fetch("https://api.openai.com/v1/chat/completions", {

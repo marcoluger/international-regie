@@ -12,7 +12,8 @@ const redis = url && token ? new Redis({ url, token }) : null;
 // Drei Stufen je nach Sensibilitaet/Kosten der Route:
 // - strict:    teuer/missbrauchsanfaellig (E-Mail-Versand) -> wenige pro Minute
 // - standard:  normale geschuetzte Routen
-// - translate: wird in Schleifen aufgerufen -> grosszuegiger
+// - translate: wird beim Sprachwechsel STOSSWEISE (viele parallel) aufgerufen -> grosszuegig.
+//              In der translate-Route zaehlt das Limit nur echte OpenAI-Aufrufe (Cache-Treffer sind frei).
 const strictLimiter = redis
   ? new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(10, "60 s"), prefix: "rl:strict", analytics: false })
   : null;
@@ -22,7 +23,7 @@ const standardLimiter = redis
   : null;
 
 const translateLimiter = redis
-  ? new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(100, "60 s"), prefix: "rl:translate", analytics: false })
+  ? new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(600, "60 s"), prefix: "rl:translate", analytics: false })
   : null;
 
 export type RateLimitKind = "strict" | "standard" | "translate";
