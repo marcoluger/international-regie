@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { rateLimit } from "../../../lib/rateLimit";
 
 export const runtime = "nodejs";
 
@@ -15,10 +16,19 @@ const ALLOWED_TO_CREATE: Record<string, string[]> = {
 
 export async function POST(request: Request) {
   try {
+    // Rate-Limiting (greift nur, wenn Upstash konfiguriert ist)
+    const limited = await rateLimit(request, "standard");
+    if (limited) return limited;
+
     const { username, password, fullName, role, companyId, companySlug, mustChangePassword } = await request.json();
 
     if (!username || !password || !companyId) {
       return Response.json({ error: "Pflichtfelder fehlen." }, { status: 400 });
+    }
+
+    // Mindest-Passwortlaenge serverseitig erzwingen (clientseitiger Check ist umgehbar).
+    if (typeof password !== "string" || password.length < 8) {
+      return Response.json({ error: "Passwort muss mindestens 8 Zeichen haben." }, { status: 400 });
     }
 
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";

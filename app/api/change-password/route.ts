@@ -1,9 +1,14 @@
 import { createClient } from "@supabase/supabase-js";
+import { rateLimit } from "../../../lib/rateLimit";
 
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   try {
+    // Rate-Limiting (greift nur, wenn Upstash konfiguriert ist)
+    const limited = await rateLimit(request, "standard");
+    if (limited) return limited;
+
     const { userId, newPassword } = await request.json();
 
     if (!userId || !newPassword) {
