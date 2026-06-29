@@ -3818,17 +3818,31 @@ export default function Home() {
     markInstructionRead(inst.id);
   }
 
-  // Oeffnet die Bedienungsanleitung in der aktuellen Anzeige-Sprache (Fallback Deutsch).
+  // Oeffnet die Bedienungsanleitung in der aktuellen Anzeige-Sprache.
+  // Reihenfolge: hinterlegte Zeile fuer die Sprache, sonst deutsche Vorlage live uebersetzen
+  // (Cache der translate-Route -> jede Sprache nur einmal wirklich uebersetzt), sonst Deutsch.
   async function openHelp() {
     setHelpOpen(true); setHelpText(null);
     try {
+      // a. Schon hinterlegte Uebersetzung fuer diese Sprache?
       const res = await supabase.from("user_guides").select("content").eq("lang", uiLanguage).maybeSingle();
-      let content = res.data?.content || "";
-      if (!content) {
-        const fb = await supabase.from("user_guides").select("content").eq("lang", "Deutsch").maybeSingle();
-        content = fb.data?.content || "";
+      const direct = res.data?.content || "";
+      if (direct.trim()) { setHelpText(direct); return; }
+
+      // b. Deutsche Vorlage laden
+      const fb = await supabase.from("user_guides").select("content").eq("lang", "Deutsch").maybeSingle();
+      const german = fb.data?.content || "";
+      if (!german.trim()) { setHelpText(""); return; }
+      if (uiLanguage === "Deutsch") { setHelpText(german); return; }
+
+      // c. Live in die Anzeige-Sprache uebersetzen, Fallback Deutsch bei Fehler
+      try {
+        const tr = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: german, fromLanguage: "Deutsch", toLanguage: uiLanguage }) });
+        const trData = await tr.json();
+        setHelpText(!trData.error && trData.translation ? trData.translation : german);
+      } catch {
+        setHelpText(german);
       }
-      setHelpText(content);
     } catch { setHelpText(""); }
   }
 
