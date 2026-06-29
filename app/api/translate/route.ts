@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { rateLimit } from "../../../lib/rateLimit";
 
 // /api/translate
 // Uebersetzt Text von fromLanguage nach toLanguage – in BEIDE Richtungen.
@@ -58,6 +59,10 @@ async function cacheSet(key: string, translation: string): Promise<void> {
 
 export async function POST(req: Request) {
   try {
+    // Rate-Limiting (translate – grosszuegig; greift nur, wenn Upstash konfiguriert ist)
+    const limited = await rateLimit(req, "translate");
+    if (limited) return limited;
+
     const body = await req.json();
     const description: string = body?.description ?? "";
     const fromLanguage: string = body?.fromLanguage ?? "Deutsch";

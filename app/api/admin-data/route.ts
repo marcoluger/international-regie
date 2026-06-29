@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { rateLimit } from "../../../lib/rateLimit";
 
 export const runtime = "nodejs";
 
@@ -55,6 +56,10 @@ async function requireSuperAdmin(request: Request): Promise<Response | null> {
 }
 
 export async function GET(request: Request) {
+  // Rate-Limiting (standard; greift nur, wenn Upstash konfiguriert ist)
+  const limited = await rateLimit(request, "standard");
+  if (limited) return limited;
+
   const denied = await requireSuperAdmin(request);
   if (denied) return denied;
 
@@ -78,6 +83,10 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  // Rate-Limiting (standard; greift nur, wenn Upstash konfiguriert ist)
+  const limited = await rateLimit(request, "standard");
+  if (limited) return limited;
+
   const denied = await requireSuperAdmin(request);
   if (denied) return denied;
 

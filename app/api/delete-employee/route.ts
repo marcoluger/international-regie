@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { rateLimit } from "../../../lib/rateLimit";
 
 export const runtime = "nodejs";
 
@@ -15,6 +16,10 @@ function canDelete(myRole: string, targetRole: string): boolean {
 
 export async function POST(request: Request) {
   try {
+    // Rate-Limiting (standard; greift nur, wenn Upstash konfiguriert ist)
+    const limited = await rateLimit(request, "standard");
+    if (limited) return limited;
+
     const { userId } = await request.json();
     if (!userId) {
       return Response.json({ error: "User ID fehlt." }, { status: 400 });
