@@ -3908,8 +3908,11 @@ export default function Home() {
     if (jobs.length === 0) return;
     const fieldUpdates: Record<string, Record<string, string>> = {};
     const taskUpdates: Record<string, Record<string, string>> = {};
-    // PARALLEL übersetzen (statt nacheinander)
-    await Promise.all(jobs.map(async (job) => {
+    // Gedrosselt uebersetzen: max. CONCURRENCY gleichzeitig, damit der Browser
+    // Verbindungen fuer andere Aktionen (z. B. Kommentar-Speichern) frei behaelt
+    // und der Server nicht von hunderten Anfragen auf einmal ueberrannt wird.
+    const CONCURRENCY = 4;
+    const runJob = async (job: Job) => {
       try {
         const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: job.text, fromLanguage: job.sourceLang, toLanguage: targetLang }) });
         const data = await res.json();
@@ -3923,7 +3926,10 @@ export default function Home() {
           }
         }
       } catch { /* Übersetzung übersprungen */ }
-    }));
+    };
+    for (let i = 0; i < jobs.length; i += CONCURRENCY) {
+      await Promise.all(jobs.slice(i, i + CONCURRENCY).map(runJob));
+    }
     const ids = new Set([...Object.keys(fieldUpdates), ...Object.keys(taskUpdates)]);
     if (ids.size > 0) {
       setInstructionTranslations((prev) => {
