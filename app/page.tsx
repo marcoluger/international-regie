@@ -4182,7 +4182,7 @@ export default function Home() {
 
     const { data: ownerUser } = await supabase.from("company_users").select("user_id").eq("company_id", companyUser.company_id).eq("role", "owner").maybeSingle();
     const ownerUserId = ownerUser?.user_id || userId;
-    const { data } = await supabase.from("company_settings").select("*").eq("user_id", ownerUserId).single();
+    const { data } = await supabase.from("company_settings").select("*").eq("user_id", ownerUserId).maybeSingle();
     const settings = data || { user_id: ownerUserId, company_name: "", company_logo: "", street: "", zip_code: "", city: "", phone: "", email: "", website: "", tax_number: "" };
     setCompanySettings(settings);
   }
