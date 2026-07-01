@@ -5123,7 +5123,7 @@ export default function Home() {
           </section>
           <section className="border rounded bg-white text-black">
             <div className="p-4 cursor-pointer select-none flex justify-between items-center" onClick={() => setReportExpanded(v => !v)}>
-              <h2 className="text-xl font-bold">{reportExpanded ? "▾" : "▸"} {t.tabReport}{calendarWeek ? ` — ${t.calendarWeek}: ${calendarWeek}` : ""}{employee ? ` — ${employee}` : ""}</h2>
+              <h2 className="text-xl font-bold">{reportExpanded ? "▾" : "▸"} {t.tabReport}{reportName ? ` — ${t.calendarWeek}: ${reportName}` : (calendarWeek ? ` — ${t.calendarWeek}: ${calendarWeek}` : "")}{reportName ? "" : (employee ? ` — ${employee}` : "")}</h2>
             </div>
           </section>
           {reportExpanded && (<>
