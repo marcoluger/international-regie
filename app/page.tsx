@@ -3264,12 +3264,12 @@ function SignaturePad({ label, value, onChange }: { label: string; value: string
     hasDrawn.current = false; onChange("");
   }
   return (
-    <div className="border rounded p-3 bg-white">
+    <div className="border border-slate-200 rounded-xl p-3 shadow-sm bg-white">
       <div className="flex items-center justify-between mb-2">
         <span className="text-sm font-medium text-gray-700">{label}{value ? <span className="text-xs text-green-600 ml-2">✓ erfasst</span> : null}</span>
         <button type="button" onClick={clear} className="text-xs text-red-600 underline">Löschen</button>
       </div>
-      <canvas ref={canvasRef} width={500} height={150} onPointerDown={start} onPointerMove={move} onPointerUp={end} onPointerLeave={end} className="w-full border rounded bg-gray-50" style={{ touchAction: "none" }} />
+      <canvas ref={canvasRef} width={500} height={150} onPointerDown={start} onPointerMove={move} onPointerUp={end} onPointerLeave={end} className="w-full border rounded-lg bg-gray-50" style={{ touchAction: "none" }} />
     </div>
   );
 }
@@ -4836,19 +4836,19 @@ export default function Home() {
   if (!user) {
     return (
       <main className="max-w-xl mx-auto p-4 md:p-8 space-y-6 bg-slate-100 min-h-screen text-black">
-        <section className="border rounded p-4 space-y-4 bg-white">
+        <section className="border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4 bg-white">
           <h1 className="text-3xl font-bold">{t.loginTitle}</h1>
-          {message && <div className="border rounded p-3 bg-yellow-100 text-black">{message}</div>}
+          {message && <div className="border border-slate-200 rounded-xl p-3 shadow-sm bg-yellow-100 text-black">{message}</div>}
           <form onSubmit={(e) => { e.preventDefault(); signIn(); }} autoComplete="on" className="space-y-3">
           <div className="space-y-3">
-            <input name="company" autoComplete="organization" className="border p-3 w-full text-black bg-white rounded" placeholder="Firmenkürzel (z.B. luger)" value={companySlug} onChange={(e) => setCompanySlug(e.target.value)} />
-            <input name="username" autoComplete="username" className="border p-3 w-full text-black bg-white rounded" placeholder="Benutzername (z.B. max)" value={username} onChange={(e) => setUsername(e.target.value)} />
+            <input name="company" autoComplete="organization" className="border p-3 w-full text-black bg-white rounded-lg" placeholder="Firmenkürzel (z.B. luger)" value={companySlug} onChange={(e) => setCompanySlug(e.target.value)} />
+            <input name="username" autoComplete="username" className="border p-3 w-full text-black bg-white rounded-lg" placeholder="Benutzername (z.B. max)" value={username} onChange={(e) => setUsername(e.target.value)} />
           </div>
           <div className="relative">
             <input name="password" autoComplete="current-password" className="border p-3 w-full text-black bg-white pr-12" placeholder={t.password} type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} />
             <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-lg">{showPassword ? "🙈" : "👁️"}</button>
           </div>
-          <button type="submit" className="bg-cyan-600 text-white px-4 py-3 rounded w-full">{t.login}</button>
+          <button type="submit" className="bg-cyan-600 text-white px-4 py-3 rounded-lg w-full">{t.login}</button>
           </form>
         </section>
         <footer className="text-center text-xs text-gray-500 mt-6">
@@ -4863,12 +4863,12 @@ export default function Home() {
   if (user && mustChangePassword) {
     return (
       <main className="max-w-md mx-auto p-4 md:p-8 min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="bg-white border rounded-xl p-6 space-y-5 w-full shadow-lg">
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-5 w-full shadow-lg">
           <div className="text-center"><div className="text-5xl mb-3">🔐</div><h2 className="text-2xl font-bold">Passwort ändern</h2><p className="text-gray-500 text-sm mt-1">Bitte ändern Sie Ihr temporäres Passwort.</p></div>
-          {message && <div className="bg-yellow-50 border rounded p-3 text-sm">{message}</div>}
-          <input className="border p-3 w-full rounded text-black" placeholder="Neues Passwort (min. 8 Zeichen)" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
-          <input className="border p-3 w-full rounded text-black" placeholder="Passwort bestätigen" type="password" value={newPasswordConfirm} onChange={(e) => setNewPasswordConfirm(e.target.value)} />
-          <button type="button" onClick={changePassword} disabled={changingPassword} className="w-full bg-cyan-700 text-white py-3 rounded font-bold disabled:opacity-50">{changingPassword ? "Wird gespeichert..." : "Passwort speichern & weiter"}</button>
+          {message && <div className="bg-yellow-50 border border-slate-200 rounded-xl p-3 shadow-sm text-sm">{message}</div>}
+          <input className="border p-3 w-full rounded-lg text-black" placeholder="Neues Passwort (min. 8 Zeichen)" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+          <input className="border p-3 w-full rounded-lg text-black" placeholder="Passwort bestätigen" type="password" value={newPasswordConfirm} onChange={(e) => setNewPasswordConfirm(e.target.value)} />
+          <button type="button" onClick={changePassword} disabled={changingPassword} className="w-full bg-cyan-700 text-white py-3 rounded-lg font-bold disabled:opacity-50">{changingPassword ? "Wird gespeichert..." : "Passwort speichern & weiter"}</button>
         </div>
       </main>
     );
@@ -4877,11 +4877,11 @@ export default function Home() {
   if (user && companyBlocked) {
     return (
       <main className="max-w-md mx-auto p-4 md:p-8 min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="bg-white border rounded-xl p-6 space-y-5 w-full shadow-lg text-center">
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-5 w-full shadow-lg text-center">
           <div className="text-6xl mb-2">🔒</div>
           <h2 className="text-2xl font-bold text-red-700">Konto gesperrt</h2>
           <p className="text-gray-600">Dieses Firmenkonto ist derzeit gesperrt. Bitte kontaktieren Sie Ihren Anbieter, um den Zugang wieder freizuschalten.</p>
-          <button type="button" onClick={signOut} className="w-full bg-gray-800 text-white py-3 rounded font-bold">Abmelden</button>
+          <button type="button" onClick={signOut} className="w-full bg-gray-800 text-white py-3 rounded-lg font-bold">Abmelden</button>
         </div>
       </main>
     );
@@ -4890,35 +4890,35 @@ export default function Home() {
   if (user && showOnboarding && false) {
     return (
       <main className="max-w-xl mx-auto p-4 md:p-8 min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="bg-white border rounded-xl p-6 space-y-6 w-full shadow-lg">
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6 w-full shadow-lg">
           <div className="flex items-center gap-2 mb-2">{[1, 2, 3].map((step) => (<div key={step} className={`flex-1 h-2 rounded-full ${onboardingStep >= step ? "bg-cyan-600" : "bg-gray-200"}`} />))}</div>
           {onboardingStep === 1 && (
             <div className="space-y-4">
               <h2 className="text-2xl font-bold">👋 Willkommen!</h2>
               <p className="text-gray-600">Bitte hinterlegen Sie zuerst Ihre Firmendaten.</p>
               <div className="space-y-3">
-                <input className="border p-3 w-full rounded text-black" placeholder="Firmenname *" value={companySettings?.company_name || ""} onChange={(e) => updateCompanyField("company_name", e.target.value)} />
-                <input className="border p-3 w-full rounded text-black" placeholder="Straße" value={companySettings?.street || ""} onChange={(e) => updateCompanyField("street", e.target.value)} />
+                <input className="border p-3 w-full rounded-lg text-black" placeholder="Firmenname *" value={companySettings?.company_name || ""} onChange={(e) => updateCompanyField("company_name", e.target.value)} />
+                <input className="border p-3 w-full rounded-lg text-black" placeholder="Straße" value={companySettings?.street || ""} onChange={(e) => updateCompanyField("street", e.target.value)} />
                 <div className="grid grid-cols-2 gap-3">
-                  <input className="border p-3 rounded text-black" placeholder="PLZ" value={companySettings?.zip_code || ""} onChange={(e) => updateCompanyField("zip_code", e.target.value)} />
-                  <input className="border p-3 rounded text-black" placeholder="Ort" value={companySettings?.city || ""} onChange={(e) => updateCompanyField("city", e.target.value)} />
+                  <input className="border p-3 rounded-lg text-black" placeholder="PLZ" value={companySettings?.zip_code || ""} onChange={(e) => updateCompanyField("zip_code", e.target.value)} />
+                  <input className="border p-3 rounded-lg text-black" placeholder="Ort" value={companySettings?.city || ""} onChange={(e) => updateCompanyField("city", e.target.value)} />
                 </div>
               </div>
-              <button type="button" onClick={() => { if (!companySettings?.company_name?.trim()) { setMessage("Bitte Firmenname eingeben."); return; } setOnboardingStep(2); }} className="w-full bg-cyan-700 text-white py-3 rounded font-bold">Weiter →</button>
+              <button type="button" onClick={() => { if (!companySettings?.company_name?.trim()) { setMessage("Bitte Firmenname eingeben."); return; } setOnboardingStep(2); }} className="w-full bg-cyan-700 text-white py-3 rounded-lg font-bold">Weiter →</button>
             </div>
           )}
           {onboardingStep === 2 && (
             <div className="space-y-4">
               <h2 className="text-2xl font-bold">📞 Kontaktdaten</h2>
               <div className="space-y-3">
-                <input className="border p-3 w-full rounded text-black" placeholder="Telefon" value={companySettings?.phone || ""} onChange={(e) => updateCompanyField("phone", e.target.value)} />
-                <input className="border p-3 w-full rounded text-black" placeholder="E-Mail" value={companySettings?.email || ""} onChange={(e) => updateCompanyField("email", e.target.value)} />
-                <input className="border p-3 w-full rounded text-black" placeholder="Webseite" value={companySettings?.website || ""} onChange={(e) => updateCompanyField("website", e.target.value)} />
-                <input className="border p-3 w-full rounded text-black" placeholder="UID / Steuernummer" value={companySettings?.tax_number || ""} onChange={(e) => updateCompanyField("tax_number", e.target.value)} />
+                <input className="border p-3 w-full rounded-lg text-black" placeholder="Telefon" value={companySettings?.phone || ""} onChange={(e) => updateCompanyField("phone", e.target.value)} />
+                <input className="border p-3 w-full rounded-lg text-black" placeholder="E-Mail" value={companySettings?.email || ""} onChange={(e) => updateCompanyField("email", e.target.value)} />
+                <input className="border p-3 w-full rounded-lg text-black" placeholder="Webseite" value={companySettings?.website || ""} onChange={(e) => updateCompanyField("website", e.target.value)} />
+                <input className="border p-3 w-full rounded-lg text-black" placeholder="UID / Steuernummer" value={companySettings?.tax_number || ""} onChange={(e) => updateCompanyField("tax_number", e.target.value)} />
               </div>
               <div className="flex gap-3">
-                <button type="button" onClick={() => setOnboardingStep(1)} className="flex-1 bg-gray-200 text-gray-800 py-3 rounded font-medium">← Zurück</button>
-                <button type="button" onClick={() => setOnboardingStep(3)} className="flex-1 bg-cyan-700 text-white py-3 rounded font-bold">Weiter →</button>
+                <button type="button" onClick={() => setOnboardingStep(1)} className="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg font-medium">← Zurück</button>
+                <button type="button" onClick={() => setOnboardingStep(3)} className="flex-1 bg-cyan-700 text-white py-3 rounded-lg font-bold">Weiter →</button>
               </div>
             </div>
           )}
@@ -4926,12 +4926,12 @@ export default function Home() {
             <div className="space-y-4">
               <h2 className="text-2xl font-bold">🖼️ Firmenlogo</h2>
               <p className="text-gray-600">Optional — kann später hinzugefügt werden.</p>
-              {companySettings?.company_logo && (<img src={companySettings?.company_logo} alt="Logo" className="h-20 object-contain border rounded p-2" />)}
-              <input type="file" accept="image/*" className="border p-3 w-full rounded text-black bg-white" onChange={(e) => uploadCompanyLogo(e.target.files)} />
-              {message && <div className="bg-yellow-50 border rounded p-3 text-sm">{message}</div>}
+              {companySettings?.company_logo && (<img src={companySettings?.company_logo} alt="Logo" className="h-20 object-contain border rounded-lg p-2" />)}
+              <input type="file" accept="image/*" className="border p-3 w-full rounded-lg text-black bg-white" onChange={(e) => uploadCompanyLogo(e.target.files)} />
+              {message && <div className="bg-yellow-50 border border-slate-200 rounded-xl p-3 shadow-sm text-sm">{message}</div>}
               <div className="flex gap-3">
-                <button type="button" onClick={() => setOnboardingStep(2)} className="flex-1 bg-gray-200 text-gray-800 py-3 rounded font-medium">← Zurück</button>
-                <button type="button" onClick={saveOnboarding} className="flex-1 bg-green-700 text-white py-3 rounded font-bold">✅ Speichern & Starten</button>
+                <button type="button" onClick={() => setOnboardingStep(2)} className="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg font-medium">← Zurück</button>
+                <button type="button" onClick={saveOnboarding} className="flex-1 bg-green-700 text-white py-3 rounded-lg font-bold">✅ Speichern & Starten</button>
               </div>
               <button type="button" onClick={() => setShowOnboarding(false)} className="w-full text-gray-400 text-sm underline">Überspringen</button>
             </div>
@@ -4987,7 +4987,7 @@ export default function Home() {
         <TabButton label={t.tabMonth}           tabName="monat"              activeTab={activeTab} onClick={() => { setActiveTab("monat"); if (currentCompany) loadWorkInstructions(currentCompany.company_id); }} />
       </nav>
 
-      {message && <div className="border rounded p-3 bg-yellow-100 text-black">{message}</div>}
+      {message && <div className="border border-slate-200 rounded-xl p-3 shadow-sm bg-yellow-100 text-black">{message}</div>}
 
       {activeTab === "dashboard" && (
         <section className="space-y-4">
@@ -5058,20 +5058,20 @@ export default function Home() {
             const dashShown = built.filter((b: any) => b.rows.length > 0);
             return (
               <>
-                <div className="bg-white border rounded-xl p-4 shadow-sm">
+                <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
                   <h2 className="text-xl font-bold">{t.dashMyProjects}</h2>
                   <p className="text-gray-500 text-sm">{rangeLabel} · {dashShown.length} {t.projects}</p>
                   <div className="flex gap-2 mt-3">
                     {([["today", t.dashToday], ["tomorrow", t.dashTomorrow], ["week", t.dashWeek], ["nextweek", t.dashNextWeek]] as [string, string][]).map(([val, lbl]) => (
-                      <button key={val} type="button" onClick={() => setDashRange(val)} className={`px-3 py-1 rounded text-sm ${dashRange === val ? "bg-cyan-600 text-white" : "bg-gray-100 text-gray-700"}`}>{lbl}</button>
+                      <button key={val} type="button" onClick={() => setDashRange(val)} className={`px-3 py-1 rounded-lg text-sm ${dashRange === val ? "bg-cyan-600 text-white" : "bg-gray-100 text-gray-700"}`}>{lbl}</button>
                     ))}
                   </div>
                 </div>
-                {dashShown.length === 0 && (<div className="bg-white border rounded-xl p-6 text-gray-500 text-center shadow-sm">{built.length === 0 ? t.dashNoProjects : t.dashNothingToday}</div>)}
+                {dashShown.length === 0 && (<div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm text-gray-500 text-center shadow-sm">{built.length === 0 ? t.dashNoProjects : t.dashNothingToday}</div>)}
                 {dashShown.map((b) => {
                   const dOpen = openDashProjects[b.key] !== false;
                   return (
-                  <div key={b.key} className="bg-white border rounded-xl p-4 shadow-sm space-y-3">
+                  <div key={b.key} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
                     <div className="flex justify-between items-start gap-3 cursor-pointer select-none" onClick={() => setOpenDashProjects((prev) => ({ ...prev, [b.key]: prev[b.key] === false }))}>
                       <div className="min-w-0">
                         <h3 className="font-bold text-lg break-words">{dOpen ? "▾" : "▸"} {b.g.name}</h3>
@@ -5079,9 +5079,9 @@ export default function Home() {
                         {isManager && b.totalAssign > 0 && (<p className={`text-xs ${b.unread > 0 ? "text-orange-600" : "text-green-600"}`}>{b.unread > 0 ? `👁 ${b.unread} ${t.readUnread}` : `✅ ${t.readAllDone}`}</p>)}
                       </div>
                       {b.stoppedN > 0 ? (
-                        <span className="text-xs text-red-700 bg-red-50 px-2 py-1 rounded whitespace-nowrap">{b.stoppedN} {t.statusStopped}</span>
+                        <span className="text-xs text-red-700 bg-red-50 px-2 py-1 rounded-lg whitespace-nowrap">{b.stoppedN} {t.statusStopped}</span>
                       ) : b.rows.length > 0 ? (
-                        <span className="text-xs text-green-700 bg-green-50 px-2 py-1 rounded whitespace-nowrap">{b.doneN} / {b.winTotal} {t.dashDone}</span>
+                        <span className="text-xs text-green-700 bg-green-50 px-2 py-1 rounded-lg whitespace-nowrap">{b.doneN} / {b.winTotal} {t.dashDone}</span>
                       ) : null}
                     </div>
                     {dOpen && (b.rows.length === 0 ? (
@@ -5113,22 +5113,22 @@ export default function Home() {
 
       {activeTab === "regiebericht" && (
         <div className="space-y-4">
-          <section className="border rounded p-4 space-y-4 bg-white text-black">
+          <section className="border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4 bg-white text-black">
             <h2 className="text-xl font-bold">{t.general}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <input className="border p-3 text-black bg-white" placeholder={t.employee} value={employee} onChange={(e) => setEmployee(e.target.value)} />
               <input className="border p-3 bg-gray-200 text-black" value={calendarWeek} readOnly placeholder={t.calendarWeek} />
-              {companyFeatures?.email_enabled ? <input className="border p-3 text-black bg-white md:col-span-2" placeholder={t.recipientEmail} value={emailTo} onChange={(e) => setEmailTo(e.target.value)} /> : <div className="border rounded p-3 bg-gray-50 text-sm text-gray-400 md:col-span-2">🔒 E-Mail-Versand ist in deinem Paket nicht aktiviert.</div>}
+              {companyFeatures?.email_enabled ? <input className="border p-3 text-black bg-white md:col-span-2" placeholder={t.recipientEmail} value={emailTo} onChange={(e) => setEmailTo(e.target.value)} /> : <div className="border border-slate-200 rounded-xl p-3 shadow-sm bg-gray-50 text-sm text-gray-400 md:col-span-2">🔒 E-Mail-Versand ist in deinem Paket nicht aktiviert.</div>}
             </div>
           </section>
-          <section className="border rounded bg-white text-black">
+          <section className="border rounded-lg bg-white text-black">
             <div className="p-4 cursor-pointer select-none flex justify-between items-center" onClick={() => setReportExpanded(v => !v)}>
               <h2 className="text-xl font-bold">{reportExpanded ? "▾" : "▸"} {t.tabReport}{reportName ? ` — ${t.calendarWeek}: ${reportName}` : (calendarWeek ? ` — ${t.calendarWeek}: ${calendarWeek}` : "")}{reportName ? "" : (employee ? ` — ${employee}` : "")}</h2>
             </div>
           </section>
           {reportExpanded && (<>
           {days.map((day, index) => (
-            <section key={day.weekday} className="border rounded p-4 space-y-3 bg-white text-black">
+            <section key={day.weekday} className="border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3 bg-white text-black">
               <h2 className="text-xl font-bold cursor-pointer select-none" onClick={() => setOpenReportDays(prev => ({ ...prev, [day.weekday]: !prev[day.weekday] }))}>{openReportDays[day.weekday] ? "▾" : "▸"} {t.weekdays[index] || day.weekday}{(day.description || day.hours || day.customer || day.projectNumber || day.site || (day.photos && day.photos.length > 0)) ? <span className="inline-block w-3 h-3 rounded-full bg-green-500 ml-2 align-middle"></span> : null}</h2>
               {openReportDays[day.weekday] && (<>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -5163,13 +5163,13 @@ export default function Home() {
                 </div>
               </div>
               <textarea className="border p-3 w-full text-black bg-white resize-none overflow-hidden" rows={Math.max(4, (day.description || "").split("\n").length + 1)} placeholder={t.description} value={day.description} onChange={(e) => updateDay(index, "description", e.target.value)} />
-              {companyFeatures?.photos_enabled ? <input type="file" accept="image/*" multiple className="border p-3 w-full text-black bg-white" onChange={(e) => handlePhotos(index, e.target.files)} /> : <div className="border rounded p-3 bg-gray-50 text-sm text-gray-400">🔒 Foto-Upload ist in deinem Paket nicht aktiviert.</div>}
-              {day.photos.length > 0 && (<div className="grid grid-cols-2 gap-3">{day.photos.map((photo, photoIndex) => (<div key={photoIndex} className="border rounded p-2"><img src={photo} alt="Foto" className="w-full h-32 object-cover" /><button type="button" onClick={() => deletePhoto(index, photoIndex)} className="mt-2 bg-red-600 text-white px-2 py-2 rounded w-full">{t.deletePhoto}</button></div>))}</div>)}
-              {day.translation && (<div className="border p-3 rounded bg-gray-100 text-black"><strong>{t.translation}:</strong><p className="whitespace-pre-wrap break-words mt-1 leading-relaxed">{day.translation}</p></div>)}
+              {companyFeatures?.photos_enabled ? <input type="file" accept="image/*" multiple className="border p-3 w-full text-black bg-white" onChange={(e) => handlePhotos(index, e.target.files)} /> : <div className="border border-slate-200 rounded-xl p-3 shadow-sm bg-gray-50 text-sm text-gray-400">🔒 Foto-Upload ist in deinem Paket nicht aktiviert.</div>}
+              {day.photos.length > 0 && (<div className="grid grid-cols-2 gap-3">{day.photos.map((photo, photoIndex) => (<div key={photoIndex} className="border rounded-lg p-2"><img src={photo} alt="Foto" className="w-full h-32 object-cover" /><button type="button" onClick={() => deletePhoto(index, photoIndex)} className="mt-2 bg-red-600 text-white px-2 py-2.5 rounded-lg w-full">{t.deletePhoto}</button></div>))}</div>)}
+              {day.translation && (<div className="border p-3 rounded-lg bg-gray-100 text-black"><strong>{t.translation}:</strong><p className="whitespace-pre-wrap break-words mt-1 leading-relaxed">{day.translation}</p></div>)}
               </>)}
             </section>
           ))}
-          <section className="border rounded p-4 space-y-2 bg-white text-black">
+          <section className="border border-slate-200 rounded-2xl p-4 shadow-sm space-y-2 bg-white text-black">
             <h2 className="text-xl font-bold">{t.hoursOverview}</h2>
             <p><strong>{t.total}:</strong> {totalHours.toString().replace(".", ",")} {t.hours}</p>
             {Object.entries(projectTotals).map(([project, total]) => (<p key={project}><strong>{t.projectNumber} {project}:</strong> {total.toString().replace(".", ",")} {t.hours}{travelKmByProject[project] ? ` · ${formatKm(travelKmByProject[project])} ${t.km}` : ""}</p>))}
@@ -5177,7 +5177,7 @@ export default function Home() {
           </section>
           </>)}
           {companyFeatures?.signature_enabled && (
-            <section className="border rounded p-4 space-y-3 bg-white text-black">
+            <section className="border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3 bg-white text-black">
               <h2 className="text-xl font-bold">✍️ Unterschriften</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <SignaturePad label={pdfTexts[uiLanguage as keyof typeof pdfTexts]?.signatureEmployee || "Unterschrift Mitarbeiter"} value={sigEmployee} onChange={setSigEmployee} />
@@ -5186,28 +5186,28 @@ export default function Home() {
             </section>
           )}
           <div className="flex flex-wrap gap-4">
-            <button type="button" onClick={saveReport} className="bg-orange-600 text-white px-4 py-3 rounded">{currentReportId ? t.update : t.save}</button>
-            {reportLoaded && <button type="button" onClick={saveAsNewReport} className="bg-amber-700 text-white px-4 py-3 rounded">{t.saveAsNew}</button>}
-            <button type="button" onClick={() => createPDF(false)} className="bg-green-600 text-white px-4 py-3 rounded">{t.downloadPdf}</button>
-            {companyFeatures?.email_enabled && <button type="button" onClick={() => createPDF(true)} className="bg-purple-600 text-white px-4 py-3 rounded">{t.sendPdf}</button>}
+            <button type="button" onClick={saveReport} className="bg-orange-600 text-white px-4 py-3 rounded-lg">{currentReportId ? t.update : t.save}</button>
+            {reportLoaded && <button type="button" onClick={saveAsNewReport} className="bg-amber-700 text-white px-4 py-3 rounded-lg">{t.saveAsNew}</button>}
+            <button type="button" onClick={() => createPDF(false)} className="bg-green-600 text-white px-4 py-3 rounded-lg">{t.downloadPdf}</button>
+            {companyFeatures?.email_enabled && <button type="button" onClick={() => createPDF(true)} className="bg-purple-600 text-white px-4 py-3 rounded-lg">{t.sendPdf}</button>}
           </div>
         </div>
       )}
 
       {activeTab === "berichte" && (
-        <section className="border rounded p-4 space-y-4 bg-white text-black">
+        <section className="border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4 bg-white text-black">
           <h2 className="text-xl font-bold">{t.saveLoad}</h2>
           <input className="border p-3 w-full text-black bg-white" placeholder={t.reportName} value={reportName} onChange={(e) => setReportName(e.target.value)} />
           <div className="flex flex-wrap gap-3">
-            <button type="button" onClick={saveReport} className="bg-orange-600 text-white px-4 py-3 rounded">{currentReportId ? t.updateReport : t.saveReport}</button>
-            <button type="button" onClick={() => { newReport(); setMessage(t.msgNewReport); }} className="bg-gray-700 text-white px-4 py-3 rounded">{t.newReport}</button>
+            <button type="button" onClick={saveReport} className="bg-orange-600 text-white px-4 py-3 rounded-lg">{currentReportId ? t.updateReport : t.saveReport}</button>
+            <button type="button" onClick={() => { newReport(); setMessage(t.msgNewReport); }} className="bg-gray-700 text-white px-4 py-3 rounded-lg">{t.newReport}</button>
           </div>
-          {savedReports.length > 0 && (<div className="space-y-2"><h3 className="font-bold">{t.savedReports}</h3>{savedReports.map((report) => (<div key={report.id} className="border rounded p-3 space-y-2"><strong>{report.report_name}</strong><p className="text-sm text-gray-700">{t.employee}: {report.employee || "-"} | {new Date(report.created_at).toLocaleString("de-DE")}</p><div className="flex gap-2"><button type="button" onClick={() => loadReport(report)} className="bg-cyan-600 text-white px-3 py-2 rounded">{t.loadEdit}</button><button type="button" onClick={() => deleteReport(report.id)} className="bg-red-600 text-white px-3 py-2 rounded">{t.delete}</button></div></div>))}</div>)}
+          {savedReports.length > 0 && (<div className="space-y-2"><h3 className="font-bold">{t.savedReports}</h3>{savedReports.map((report) => (<div key={report.id} className="border border-slate-200 rounded-xl p-3 shadow-sm space-y-2"><strong>{report.report_name}</strong><p className="text-sm text-gray-700">{t.employee}: {report.employee || "-"} | {new Date(report.created_at).toLocaleString("de-DE")}</p><div className="flex gap-2"><button type="button" onClick={() => loadReport(report)} className="bg-cyan-600 text-white px-3 py-2.5 rounded-lg">{t.loadEdit}</button><button type="button" onClick={() => deleteReport(report.id)} className="bg-red-600 text-white px-3 py-2.5 rounded-lg">{t.delete}</button></div></div>))}</div>)}
         </section>
       )}
 
       {activeTab === "projekte" && (
-        <section className="border rounded p-4 space-y-4 bg-white text-black">
+        <section className="border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4 bg-white text-black">
           <h2 className="text-xl font-bold">{t.projectsTab}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <input className="border p-3 w-full" placeholder={t.projectName} value={projectName} onChange={(e) => setProjectName(e.target.value)} />
@@ -5218,55 +5218,55 @@ export default function Home() {
               {companyUsers.filter((m: any) => m.role === "project_manager").map((m: any) => (<option key={m.user_id} value={m.full_name || m.email || ""}>{m.full_name || m.email}</option>))}
             </select>
           </div>
-          <button type="button" onClick={saveProject} className="bg-cyan-700 text-white px-4 py-3 rounded">{t.saveProject}</button>
+          <button type="button" onClick={saveProject} className="bg-cyan-700 text-white px-4 py-3 rounded-lg">{t.saveProject}</button>
           <div className="space-y-3 mt-4">
             {projects.map((project) => (
-              <div key={project.id} className="border rounded p-3 space-y-2">
+              <div key={project.id} className="border border-slate-200 rounded-xl p-3 shadow-sm space-y-2">
                 <strong>{project.name}</strong>
                 <p>{t.customer}: {project.customer || "-"}</p>
                 <p>{t.site}: {project.site || "-"}</p>
                 {(currentCompany?.role === "owner" || currentCompany?.role === "admin") ? (
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-sm font-medium">{t.projectManager}:</span>
-                  <select className="border p-2 rounded text-sm" value={pmEdits[project.id] ?? (project.project_manager || "")} onChange={(e) => setPmEdits((prev) => ({ ...prev, [project.id]: e.target.value }))}>
+                  <select className="border p-2 rounded-lg text-sm" value={pmEdits[project.id] ?? (project.project_manager || "")} onChange={(e) => setPmEdits((prev) => ({ ...prev, [project.id]: e.target.value }))}>
                     <option value="">—</option>
                     {project.project_manager && !companyUsers.some((m: any) => (m.full_name || m.email) === project.project_manager && m.role === "project_manager") && (<option value={project.project_manager}>{project.project_manager}</option>)}
                     {companyUsers.filter((m: any) => m.role === "project_manager").map((m: any) => (<option key={m.user_id} value={m.full_name || m.email || ""}>{m.full_name || m.email}</option>))}
                   </select>
-                  <button type="button" onClick={() => updateProjectManager(project.id, pmEdits[project.id] ?? (project.project_manager || ""))} className="bg-cyan-700 text-white px-3 py-1 rounded text-sm">{t.save}</button>
-                  <button type="button" onClick={() => assignPmToProjectInstructions(project.id, pmEdits[project.id] ?? (project.project_manager || ""))} className="bg-green-700 text-white px-3 py-1 rounded text-sm">{t.assignVisibility}</button>
+                  <button type="button" onClick={() => updateProjectManager(project.id, pmEdits[project.id] ?? (project.project_manager || ""))} className="bg-cyan-700 text-white px-3 py-1 rounded-lg text-sm">{t.save}</button>
+                  <button type="button" onClick={() => assignPmToProjectInstructions(project.id, pmEdits[project.id] ?? (project.project_manager || ""))} className="bg-green-700 text-white px-3 py-1 rounded-lg text-sm">{t.assignVisibility}</button>
                 </div>
                 ) : (
                 <p>{t.projectManager}: {project.project_manager || "-"}</p>
                 )}
                 <div className="flex gap-2">
-                  <button type="button" onClick={() => setSelectedProjectDetailId(project.id === selectedProjectDetailId ? "" : project.id)} className="bg-gray-700 text-white px-3 py-2 rounded">{project.id === selectedProjectDetailId ? t.closeProject : t.openProject}</button>
-                  <button type="button" onClick={() => deleteProject(project.id)} className="bg-red-600 text-white px-3 py-2 rounded">{t.deleteProject}</button>
+                  <button type="button" onClick={() => setSelectedProjectDetailId(project.id === selectedProjectDetailId ? "" : project.id)} className="bg-gray-700 text-white px-3 py-2.5 rounded-lg">{project.id === selectedProjectDetailId ? t.closeProject : t.openProject}</button>
+                  <button type="button" onClick={() => deleteProject(project.id)} className="bg-red-600 text-white px-3 py-2.5 rounded-lg">{t.deleteProject}</button>
                 </div>
                 {selectedProjectDetailId === project.id && (
-                  <div className="border rounded p-3 bg-gray-50 space-y-3 mt-2">
+                  <div className="border border-slate-200 rounded-xl p-3 shadow-sm bg-gray-50 space-y-3 mt-2">
                     {(() => {
                       const tasks = workInstructions.filter((i) => i.project_id === project.id).flatMap((i) => i.work_instruction_tasks || []);
                       const completedCount = tasks.filter((t: any) => t.status === "completed").length;
                       const progressPercent = tasks.length > 0 ? Math.round((completedCount / tasks.length) * 100) : 0;
-                      return (<div className="border rounded p-3 bg-gray-100"><p>{t.statusOpen}: {tasks.filter((t: any) => (t.status || "open") === "open").length}</p><p>{t.statusInProgress}: {tasks.filter((t: any) => t.status === "in_progress").length}</p><p>{t.statusStopped}: {tasks.filter((t: any) => t.status === "stopped").length}</p><p>{t.statusCompleted}: {completedCount}</p><p className="font-bold mt-2">{t.progress}: {progressPercent}%</p><div className="w-full bg-gray-300 rounded h-4 mt-1"><div className="bg-green-600 h-4 rounded" style={{ width: `${progressPercent}%` }} /></div></div>);
+                      return (<div className="border border-slate-200 rounded-xl p-3 shadow-sm bg-gray-100"><p>{t.statusOpen}: {tasks.filter((t: any) => (t.status || "open") === "open").length}</p><p>{t.statusInProgress}: {tasks.filter((t: any) => t.status === "in_progress").length}</p><p>{t.statusStopped}: {tasks.filter((t: any) => t.status === "stopped").length}</p><p>{t.statusCompleted}: {completedCount}</p><p className="font-bold mt-2">{t.progress}: {progressPercent}%</p><div className="w-full bg-gray-300 rounded-lg h-4 mt-1"><div className="bg-green-600 h-4 rounded-lg" style={{ width: `${progressPercent}%` }} /></div></div>);
                     })()}
                     <h4 className="font-bold">{t.workInstructions}</h4>
                     {workInstructions.filter((i) => i.project_id === project.id).map((instruction) => (
-                      <div key={instruction.id} className="border rounded p-3 bg-white space-y-2">
+                      <div key={instruction.id} className="border border-slate-200 rounded-xl p-3 shadow-sm bg-white space-y-2">
                         <strong>{getTranslated(instruction.id, "title", instruction.title)}</strong>
                         <p><strong>{t.date}:</strong> {instruction.work_date || "-"}</p>
                         <p><strong>{t.customer}:</strong> {instruction.customer || "-"}</p>
                         <p><strong>{t.site}:</strong> {instruction.site || "-"}</p>
                         {instruction.problems_text && <p><strong>{t.problems}:</strong> {getTranslated(instruction.id, "problems_text", instruction.problems_text)}</p>}
                         {(instruction.work_instruction_tasks || []).length > 0 && (<ul className="list-disc pl-6 space-y-1">{instruction.work_instruction_tasks.map((task: any) => (<li key={task.id}>{task.status === "completed" ? t.statusCompleted : task.status === "in_progress" ? t.statusInProgress : task.status === "stopped" ? t.statusStopped : t.statusOpen}{" "}{getTranslatedTask(instruction.id, task.id, task.task_text)}{task.note && <div className="text-sm text-gray-600 ml-2">{t.feedbackLabel}: {task.note}</div>}</li>))}</ul>)}
-                        {companyFeatures?.module_auto_reports ? (<button type="button" onClick={() => { setTransferInst(instruction); loadReportsFromDatabase(); }} className="bg-green-700 text-white px-3 py-2 rounded">{t.toReport}</button>) : (<p className="text-sm text-gray-500">{t.autoReportLocked}</p>)}
-                        <button type="button" onClick={() => createInstructionPDF(instruction)} className="bg-slate-700 text-white px-3 py-2 rounded text-sm">📄 PDF</button>
+                        {companyFeatures?.module_auto_reports ? (<button type="button" onClick={() => { setTransferInst(instruction); loadReportsFromDatabase(); }} className="bg-green-700 text-white px-3 py-2.5 rounded-lg">{t.toReport}</button>) : (<p className="text-sm text-gray-500">{t.autoReportLocked}</p>)}
+                        <button type="button" onClick={() => createInstructionPDF(instruction)} className="bg-slate-700 text-white px-3 py-2.5 rounded-lg text-sm">📄 PDF</button>
                       </div>
                     ))}
                     {workInstructions.filter((i) => i.project_id === project.id).length === 0 && <p className="text-gray-600">{t.noInstructions}</p>}
                     <h4 className="font-bold mt-2">{t.reportsTab}</h4>
-                    {savedReports.filter((r: any) => r.project_id === project.id).map((report: any) => (<div key={report.id} className="border rounded p-3 bg-white"><strong>{report.report_name}</strong><p>{t.employee}: {report.employee || "-"}</p></div>))}
+                    {savedReports.filter((r: any) => r.project_id === project.id).map((report: any) => (<div key={report.id} className="border border-slate-200 rounded-xl p-3 shadow-sm bg-white"><strong>{report.report_name}</strong><p>{t.employee}: {report.employee || "-"}</p></div>))}
                     {savedReports.filter((r: any) => r.project_id === project.id).length === 0 && <p className="text-gray-600">{t.noReports}</p>}
                   </div>
                 )}
@@ -5280,7 +5280,7 @@ export default function Home() {
       {activeTab === "arbeitsanweisungen" && (
         <div className="space-y-4">
           {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") ? (
-          <section className="border rounded p-4 space-y-4 bg-white text-black">
+          <section className="border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4 bg-white text-black">
             <h2 className="text-xl font-bold">{editingInstructionId ? "✏️ " + (instructionTitle || t.newInstruction) : t.newInstruction}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <input className="border p-3 text-black bg-white" placeholder={t.instructionTitle} value={instructionTitle} onChange={(e) => setInstructionTitle(e.target.value)} />
@@ -5294,7 +5294,7 @@ export default function Home() {
             </div>
             {/* Mitarbeiter zuweisen – Mehrfachauswahl */}
             {companyUsers.filter(m => m.role === "employee").length > 0 && (
-              <div className="border rounded p-3 bg-gray-50 space-y-2">
+              <div className="border border-slate-200 rounded-xl p-3 shadow-sm bg-gray-50 space-y-2">
                 <h3 className="font-bold text-sm">👤 {t.assignEmployees}</h3>
                 {companyUsers.filter(m => m.role === "employee").map((m) => (
                   <label key={m.user_id} className="flex items-center gap-2 cursor-pointer">
@@ -5317,7 +5317,7 @@ export default function Home() {
             )}
             {/* Projektleiter zuweisen – Mehrfachauswahl */}
             {companyUsers.filter(m => m.role === "project_manager").length > 0 && (
-              <div className="border rounded p-3 bg-gray-50 space-y-2">
+              <div className="border border-slate-200 rounded-xl p-3 shadow-sm bg-gray-50 space-y-2">
                 <h3 className="font-bold text-sm">👷 {t.assignProjectManager}</h3>
                 {companyUsers.filter(m => m.role === "project_manager").map((m) => (
                   <label key={m.user_id} className="flex items-center gap-2 cursor-pointer">
@@ -5345,30 +5345,30 @@ export default function Home() {
               <div>
                 <h3 className="font-bold mb-2">{t.photos}</h3>
                 <input type="file" accept="image/*" multiple className="border p-3 w-full text-black bg-white" onChange={(e) => handleInstructionPhotos(e.target.files)} />
-                {instructionPhotos.length > 0 && (<div className="grid grid-cols-3 gap-2 mt-2">{instructionPhotos.map((photo, i) => (<div key={i} className="relative"><img src={photo} alt="Foto" className="w-full h-24 object-cover rounded" /><button type="button" onClick={() => setInstructionPhotos((prev) => prev.filter((_, idx) => idx !== i))} className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 text-xs">✕</button></div>))}</div>)}
+                {instructionPhotos.length > 0 && (<div className="grid grid-cols-3 gap-2 mt-2">{instructionPhotos.map((photo, i) => (<div key={i} className="relative"><img src={photo} alt="Foto" className="w-full h-24 object-cover rounded-lg" /><button type="button" onClick={() => setInstructionPhotos((prev) => prev.filter((_, idx) => idx !== i))} className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 text-xs">✕</button></div>))}</div>)}
               </div>
             )}
             <div className="flex items-center justify-between flex-wrap gap-2">
               <h3 className="font-bold">{t.workSteps}</h3>
-              <button type="button" onClick={openCopyModal} className="bg-indigo-600 text-white px-3 py-2 rounded text-sm">📋 {t.copyInstruction}</button>
+              <button type="button" onClick={openCopyModal} className="bg-indigo-600 text-white px-3 py-2.5 rounded-lg text-sm">📋 {t.copyInstruction}</button>
             </div>
             {instructionTasks.map((task, index) => (
-              <div key={index} className="border rounded p-3 space-y-2 bg-gray-50">
+              <div key={index} className="border border-slate-200 rounded-xl p-3 shadow-sm space-y-2 bg-gray-50">
                 <input className="border p-3 w-full text-black bg-white" placeholder={`${t.workSteps} ${index + 1}`} value={task} onChange={(e) => { const copy = [...instructionTasks]; copy[index] = e.target.value; setInstructionTasks(copy); }} />
-                {companyFeatures?.photos_enabled && (<><input type="file" accept="image/*" multiple className="border p-2 w-full text-black bg-white text-sm" onChange={(e) => handleInstructionTaskPhotos(index, e.target.files)} />{(instructionTaskPhotos[index] || []).length > 0 && (<div className="grid grid-cols-3 gap-2">{(instructionTaskPhotos[index] || []).map((photo, pi) => (<div key={pi} className="relative"><img src={photo} alt="Foto" className="w-full h-20 object-cover rounded" /><button type="button" onClick={() => setInstructionTaskPhotos((prev) => ({ ...prev, [index]: (prev[index] || []).filter((_, idx) => idx !== pi) }))} className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 text-xs">✕</button></div>))}</div>)}</>)}
+                {companyFeatures?.photos_enabled && (<><input type="file" accept="image/*" multiple className="border p-2 w-full text-black bg-white text-sm" onChange={(e) => handleInstructionTaskPhotos(index, e.target.files)} />{(instructionTaskPhotos[index] || []).length > 0 && (<div className="grid grid-cols-3 gap-2">{(instructionTaskPhotos[index] || []).map((photo, pi) => (<div key={pi} className="relative"><img src={photo} alt="Foto" className="w-full h-20 object-cover rounded-lg" /><button type="button" onClick={() => setInstructionTaskPhotos((prev) => ({ ...prev, [index]: (prev[index] || []).filter((_, idx) => idx !== pi) }))} className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 text-xs">✕</button></div>))}</div>)}</>)}
               </div>
             ))}
             <div className="flex gap-3">
-              <button type="button" onClick={() => setInstructionTasks([...instructionTasks, ""])} className="bg-gray-700 text-white px-4 py-3 rounded">{t.addStep}</button>
-              <button type="button" onClick={saveWorkInstruction} className="bg-cyan-700 text-white px-4 py-3 rounded">{t.saveInstruction}</button>
-              {editingInstructionId && (<button type="button" onClick={cancelEditInstruction} className="bg-gray-500 text-white px-4 py-3 rounded">{t.copyCancel}</button>)}
+              <button type="button" onClick={() => setInstructionTasks([...instructionTasks, ""])} className="bg-gray-700 text-white px-4 py-3 rounded-lg">{t.addStep}</button>
+              <button type="button" onClick={saveWorkInstruction} className="bg-cyan-700 text-white px-4 py-3 rounded-lg">{t.saveInstruction}</button>
+              {editingInstructionId && (<button type="button" onClick={cancelEditInstruction} className="bg-gray-500 text-white px-4 py-3 rounded-lg">{t.copyCancel}</button>)}
             </div>
           </section>
           ) : (
-            <section className="border rounded p-4 bg-yellow-50 text-black"><p className="text-yellow-700 text-sm">🔒 {t.instructionsLocked}</p></section>
+            <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-yellow-50 text-black"><p className="text-yellow-700 text-sm">🔒 {t.instructionsLocked}</p></section>
           )}
-          <section className="border rounded p-4 bg-cyan-50 text-black"><p className="text-cyan-700 text-sm">💡 {t.savedInstructions} → {t.tabDay} / {t.tabWeek} / {t.tabMonth}</p></section>
-          <section className="border rounded p-4 bg-white text-black space-y-3">
+          <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-cyan-50 text-black"><p className="text-cyan-700 text-sm">💡 {t.savedInstructions} → {t.tabDay} / {t.tabWeek} / {t.tabMonth}</p></section>
+          <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-3">
             <h2 className="text-xl font-bold cursor-pointer select-none" onClick={() => setOpenInstrList((v) => !v)}>{openInstrList ? "▾" : "▸"} {t.savedInstructions}</h2>
             {openInstrList && (() => {
               const allInstructions = workInstructions.filter(canSeeInstruction);
@@ -5376,7 +5376,7 @@ export default function Home() {
               return (
                 <ul className="space-y-2">
                   {allInstructions.map((instruction) => (
-                    <li key={instruction.id} className="border rounded p-3">
+                    <li key={instruction.id} className="border border-slate-200 rounded-xl p-3 shadow-sm">
                       <div className="flex justify-between items-start cursor-pointer select-none gap-2" onClick={() => setOpenInstrCards((prev) => ({ ...prev, [instruction.id]: !prev[instruction.id] }))}>
                         <div>
                           <p className="font-bold">{openInstrCards[instruction.id] ? "▾" : "▸"} {instruction.title || "-"}</p>
@@ -5390,9 +5390,9 @@ export default function Home() {
                         <div className="mt-2 space-y-2">
                           <p className="text-sm text-gray-600">{t.site}: {instruction.site || "-"}</p>
                           <div className="flex gap-2 flex-wrap">
-                            <button type="button" onClick={() => createInstructionPDF(instruction)} className="bg-slate-700 text-white px-3 py-2 rounded text-sm">📄 PDF</button>
-                            {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => startEditInstruction(instruction)} className="bg-amber-600 text-white px-3 py-2 rounded text-sm">✏️ {t.loadEdit}</button>)}
-                            {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => deleteWorkInstruction(instruction.id)} className="bg-red-600 text-white px-3 py-2 rounded text-sm">{t.deleteInstruction}</button>)}
+                            <button type="button" onClick={() => createInstructionPDF(instruction)} className="bg-slate-700 text-white px-3 py-2.5 rounded-lg text-sm">📄 PDF</button>
+                            {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => startEditInstruction(instruction)} className="bg-amber-600 text-white px-3 py-2.5 rounded-lg text-sm">✏️ {t.loadEdit}</button>)}
+                            {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => deleteWorkInstruction(instruction.id)} className="bg-red-600 text-white px-3 py-2.5 rounded-lg text-sm">{t.deleteInstruction}</button>)}
                           </div>
                         </div>
                       )}
@@ -5414,13 +5414,13 @@ export default function Home() {
         }
         const entries = Object.entries(groups);
         return (
-          <section className="border rounded p-4 space-y-4 bg-white text-black">
+          <section className="border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4 bg-white text-black">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold">👁 {t.teamReports}</h2>
-              <button type="button" onClick={loadTeamReports} className="bg-gray-200 px-3 py-2 rounded text-sm">🔄</button>
+              <button type="button" onClick={loadTeamReports} className="bg-gray-200 px-3 py-2.5 rounded-lg text-sm">🔄</button>
             </div>
             {teamLoading ? (<p className="text-gray-500">⏳ ...</p>) : entries.length === 0 ? (<p className="text-gray-500">{t.teamNoReports}</p>) : entries.map(([uid, group]) => (
-              <div key={uid} className="border rounded overflow-hidden">
+              <div key={uid} className="border rounded-lg overflow-hidden">
                 <div className="bg-gray-100 px-3 py-2 font-bold">{group.name} ({group.reports.length})</div>
                 <div className="divide-y">
                   {group.reports.map((r) => (
@@ -5432,7 +5432,7 @@ export default function Home() {
                       {teamOpenId === r.id && (
                         <div className="space-y-2 pt-1">
                           {(r.days || []).map((d, di) => ({ d, di })).filter((x) => x.d.description || x.d.customer || x.d.projectNumber || x.d.site || x.d.hours).map(({ d, di }) => (
-                            <div key={di} className="border rounded p-2 bg-gray-50 text-sm space-y-1">
+                            <div key={di} className="border rounded-lg p-2 bg-gray-50 text-sm space-y-1">
                               <p className="font-semibold">{(() => { const wi = weekdays.indexOf(d.weekday); return (wi >= 0 && t.weekdays[wi]) ? t.weekdays[wi] : d.weekday; })()}{d.date ? ` – ${d.date}` : ""}</p>
                               <p>{t.customer}: {d.customer || "-"} | {t.projectNumber}: {d.projectNumber || "-"}</p>
                               <p>{t.site}: {d.site || "-"} | {t.hours}: {d.hours || "-"}</p>
@@ -5453,18 +5453,18 @@ export default function Home() {
 
       {activeTab === "tag" && (
         <div className="space-y-4">
-          <section className="border rounded p-4 bg-white text-black space-y-3">
+          <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-3">
             <h2 className="text-xl font-bold">{t.dayView}</h2>
-            <input type="date" className="border p-3 rounded text-black bg-white" value={selectedDayDate} onChange={(e) => setSelectedDayDate(e.target.value)} />
+            <input type="date" className="border p-3 rounded-lg text-black bg-white" value={selectedDayDate} onChange={(e) => setSelectedDayDate(e.target.value)} />
           </section>
           {(() => {
             const dayInstructions = workInstructions.filter((i) => {
               if (i.work_date !== selectedDayDate) return false;
               return canSeeInstruction(i);
             });
-            if (dayInstructions.length === 0) return (<section className="border rounded p-4 bg-white text-black"><p className="text-gray-500">{t.noInstructionsDay}</p></section>);
+            if (dayInstructions.length === 0) return (<section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black"><p className="text-gray-500">{t.noInstructionsDay}</p></section>);
             return dayInstructions.map((instruction) => (
-              <section key={instruction.id} className="border rounded p-4 bg-white text-black space-y-2">
+              <section key={instruction.id} className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-2">
                 <div className="flex justify-between items-start cursor-pointer select-none" onClick={() => { const willOpen = !openDayCards[instruction.id]; setOpenDayCards(prev => ({ ...prev, [instruction.id]: !prev[instruction.id] })); if (willOpen) markInstructionRead(instruction.id); }}>
                   <div>
                     <h3 className="font-bold text-lg">{openDayCards[instruction.id] ? "▾" : "▸"} {getTranslated(instruction.id, "title", instruction.title)}</h3>
@@ -5475,26 +5475,26 @@ export default function Home() {
                 {renderReadStatus(instruction)}
                 {openDayCards[instruction.id] && (<>
                 <p><strong>{t.customer}:</strong> {instruction.customer || "-"}</p>
-                {instruction.problems_text && (<div className="bg-yellow-50 border rounded p-2"><strong>{t.problemsHints}:</strong> {getTranslated(instruction.id, "problems_text", instruction.problems_text)}</div>)}
-                {instruction.material && (<div className="bg-cyan-50 border rounded p-2"><strong>{t.material}:</strong> {getTranslated(instruction.id, "material", instruction.material)}</div>)}
-                {instruction.werkzeug && (<div className="bg-green-50 border rounded p-2"><strong>{t.werkzeug}:</strong> {getTranslated(instruction.id, "werkzeug", instruction.werkzeug)}</div>)}
-                {(instruction.photos || []).length > 0 && companyFeatures?.photos_enabled && (<div className="grid grid-cols-3 gap-2">{(instruction.photos || []).map((photo: string, i: number) => (<img key={i} src={photo} alt="Foto" className="w-full h-24 object-cover rounded border" />))}</div>)}
+                {instruction.problems_text && (<div className="bg-yellow-50 border rounded-lg p-2"><strong>{t.problemsHints}:</strong> {getTranslated(instruction.id, "problems_text", instruction.problems_text)}</div>)}
+                {instruction.material && (<div className="bg-cyan-50 border rounded-lg p-2"><strong>{t.material}:</strong> {getTranslated(instruction.id, "material", instruction.material)}</div>)}
+                {instruction.werkzeug && (<div className="bg-green-50 border rounded-lg p-2"><strong>{t.werkzeug}:</strong> {getTranslated(instruction.id, "werkzeug", instruction.werkzeug)}</div>)}
+                {(instruction.photos || []).length > 0 && companyFeatures?.photos_enabled && (<div className="grid grid-cols-3 gap-2">{(instruction.photos || []).map((photo: string, i: number) => (<img key={i} src={photo} alt="Foto" className="w-full h-24 object-cover rounded-lg border" />))}</div>)}
                 <ul className="space-y-4 mt-2">
                   {(instruction.work_instruction_tasks || []).sort((a: any, b: any) => a.sort_order - b.sort_order).map((task: any) => (
-                    <li key={task.id} className="border rounded-lg p-3 bg-gray-50 space-y-3">
+                    <li key={task.id} className="border border-slate-200 rounded-xl p-3 shadow-sm bg-gray-50 space-y-3">
                       <div className="flex items-center gap-2">
-                        <select className="border rounded p-1 text-sm text-black bg-white" value={task.status || "open"} onChange={(e) => updateTaskStatus(task.id, e.target.value)}>
+                        <select className="border rounded-lg p-1 text-sm text-black bg-white" value={task.status || "open"} onChange={(e) => updateTaskStatus(task.id, e.target.value)}>
                           <option value="open">{t.statusOpen}</option><option value="in_progress">{t.statusInProgress}</option><option value="stopped">{t.statusStopped}</option><option value="completed">{t.statusCompleted}</option>
                         </select>
                         <span className="font-medium">{getTranslatedTask(instruction.id, task.id, task.task_text)}</span>
                       </div>
                       {task.note && <p className="text-sm text-gray-600 ml-2">{t.feedbackLabel}: {task.note}</p>}
-                      {(task.photos || []).length > 0 && companyFeatures?.photos_enabled && (<div className="grid grid-cols-3 gap-1">{(task.photos || []).map((photo: string, pi: number) => (<img key={pi} src={photo} alt="Foto" className="w-full h-16 object-cover rounded" />))}</div>)}
+                      {(task.photos || []).length > 0 && companyFeatures?.photos_enabled && (<div className="grid grid-cols-3 gap-1">{(task.photos || []).map((photo: string, pi: number) => (<img key={pi} src={photo} alt="Foto" className="w-full h-16 object-cover rounded-lg" />))}</div>)}
                       {/* Mitarbeiter-Kommentar */}
                       <div className="border-t pt-2 space-y-2">
                         <p className="text-sm font-medium text-gray-700">💬 {t.commentLabel} (max. 1000 {t.charsLabel}):</p>
                         <textarea
-                          className="border p-2 w-full rounded text-sm text-black bg-white"
+                          className="border p-2 w-full rounded-lg text-sm text-black bg-white"
                           rows={5}
                           maxLength={1000}
                           placeholder={t.commentPlaceholder}
@@ -5516,7 +5516,7 @@ export default function Home() {
                                 const val = taskComments[task.id] !== undefined ? taskComments[task.id] : getTranslatedComment(instruction.id, task.id, task.employee_comment || "");
                                 updateTaskComment(task.id, val);
                               }}
-                              className="bg-cyan-600 text-white px-4 py-2 rounded text-sm font-medium disabled:opacity-50"
+                              className="bg-cyan-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50"
                             >
                               💾 {t.commentSaveBtn}
                             </button>
@@ -5527,10 +5527,10 @@ export default function Home() {
                   ))}
                 </ul>
                 <div className="flex gap-2 pt-2 border-t flex-wrap">
-                  {companyFeatures?.module_auto_reports && (<button type="button" onClick={() => { setTransferInst(instruction); loadReportsFromDatabase(); }} className="bg-green-700 text-white px-3 py-2 rounded text-sm">📋 {t.toReport}</button>)}
-                  <button type="button" onClick={() => createInstructionPDF(instruction)} className="bg-slate-700 text-white px-3 py-2 rounded text-sm">📄 PDF</button>
-                  {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => startEditInstruction(instruction)} className="bg-amber-600 text-white px-3 py-2 rounded text-sm">✏️ {t.loadEdit}</button>)}
-                  {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => deleteWorkInstruction(instruction.id)} className="bg-red-600 text-white px-3 py-2 rounded text-sm">{t.deleteInstruction}</button>)}
+                  {companyFeatures?.module_auto_reports && (<button type="button" onClick={() => { setTransferInst(instruction); loadReportsFromDatabase(); }} className="bg-green-700 text-white px-3 py-2.5 rounded-lg text-sm">📋 {t.toReport}</button>)}
+                  <button type="button" onClick={() => createInstructionPDF(instruction)} className="bg-slate-700 text-white px-3 py-2.5 rounded-lg text-sm">📄 PDF</button>
+                  {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => startEditInstruction(instruction)} className="bg-amber-600 text-white px-3 py-2.5 rounded-lg text-sm">✏️ {t.loadEdit}</button>)}
+                  {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => deleteWorkInstruction(instruction.id)} className="bg-red-600 text-white px-3 py-2.5 rounded-lg text-sm">{t.deleteInstruction}</button>)}
                 </div>
                 </>)}
               </section>
@@ -5541,9 +5541,9 @@ export default function Home() {
 
       {activeTab === "woche" && (
         <div className="space-y-4">
-          <section className="border rounded p-4 bg-white text-black space-y-3">
+          <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-3">
             <h2 className="text-xl font-bold">{t.weekView}</h2>
-            <div className="flex items-center gap-3"><label className="text-sm font-medium">{t.selectDate}:</label><input type="date" className="border p-3 rounded text-black bg-white" value={selectedWeek} onChange={(e) => setSelectedWeek(e.target.value)} /></div>
+            <div className="flex items-center gap-3"><label className="text-sm font-medium">{t.selectDate}:</label><input type="date" className="border p-3 rounded-lg text-black bg-white" value={selectedWeek} onChange={(e) => setSelectedWeek(e.target.value)} /></div>
             <p className="text-sm text-gray-500">{t.week}: {getCalendarWeek(selectedWeek)}</p>
           </section>
           {(() => {
@@ -5557,35 +5557,35 @@ export default function Home() {
               if (!weekDates.includes(i.work_date)) return false;
               return canSeeInstruction(i);
             });
-            if (weekInstructions.length === 0) return (<section className="border rounded p-4 bg-white text-black"><p className="text-gray-500">{t.noInstructionsWeek}</p></section>);
+            if (weekInstructions.length === 0) return (<section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black"><p className="text-gray-500">{t.noInstructionsWeek}</p></section>);
             return weekDates.map((dateStr, di) => {
               const dayInstructions = weekInstructions.filter((i) => i.work_date === dateStr);
               if (dayInstructions.length === 0) return null;
               return (
-                <section key={dateStr} className="border rounded p-4 bg-white text-black space-y-3">
-                  <div className="flex justify-between items-center bg-gray-100 rounded p-2">
+                <section key={dateStr} className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-3">
+                  <div className="flex justify-between items-center bg-gray-100 rounded-lg p-2">
                     <h3 className="font-bold cursor-pointer select-none" onClick={() => { const willOpen = !openWeekDays[dateStr]; setOpenWeekDays(prev => ({ ...prev, [dateStr]: !prev[dateStr] })); if (willOpen) dayInstructions.forEach((ins: any) => markInstructionRead(ins.id)); }}>{openWeekDays[dateStr] ? "▾" : "▸"} {t.weekdays[di]} — {dateStr}</h3>
                     <button type="button" onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }} className="text-cyan-700 text-sm hover:underline">→ {t.dayView}</button>
                   </div>
                   {openWeekDays[dateStr] && (<>
                   {dayInstructions.map((instruction) => (
-                    <div key={instruction.id} className="border rounded p-3 space-y-2">
+                    <div key={instruction.id} className="border border-slate-200 rounded-xl p-3 shadow-sm space-y-2">
                       <div className="flex justify-between"><strong>{getTranslated(instruction.id, "title", instruction.title)}</strong><span className="text-sm text-gray-500">{instruction.project || "-"}</span></div>
                       <p className="text-sm"><strong>{t.customer}:</strong> {instruction.customer || "-"} | <strong>{t.site}:</strong> {instruction.site || "-"}</p>
                       {renderReadStatus(instruction)}
-                      {instruction.problems_text && (<div className="bg-yellow-50 border rounded p-2 text-sm"><strong>{t.problemsHints}:</strong> {getTranslated(instruction.id, "problems_text", instruction.problems_text)}</div>)}
+                      {instruction.problems_text && (<div className="bg-yellow-50 border rounded-lg p-2 text-sm"><strong>{t.problemsHints}:</strong> {getTranslated(instruction.id, "problems_text", instruction.problems_text)}</div>)}
                       <ul className="space-y-1">
                         {(instruction.work_instruction_tasks || []).sort((a: any, b: any) => a.sort_order - b.sort_order).map((task: any) => (
                           <li key={task.id} className="flex items-center gap-2 text-sm">
-                            <select className="border rounded p-1 text-xs text-black bg-white" value={task.status || "open"} onChange={(e) => updateTaskStatus(task.id, e.target.value)}>
+                            <select className="border rounded-lg p-1 text-xs text-black bg-white" value={task.status || "open"} onChange={(e) => updateTaskStatus(task.id, e.target.value)}>
                               <option value="open">{t.statusOpen}</option><option value="in_progress">{t.statusInProgress}</option><option value="stopped">{t.statusStopped}</option><option value="completed">{t.statusCompleted}</option>
                             </select>
                             <span>{getTranslatedTask(instruction.id, task.id, task.task_text)}</span>{task.note && <span className="text-gray-500">— {task.note}</span>}
                           </li>
                         ))}
                       </ul>
-                      {companyFeatures?.module_auto_reports && (<button type="button" onClick={() => { setTransferInst(instruction); loadReportsFromDatabase(); }} className="bg-green-700 text-white px-3 py-1 rounded text-sm">📋 {t.toReport}</button>)}
-                      <button type="button" onClick={() => createInstructionPDF(instruction)} className="bg-slate-700 text-white px-3 py-1 rounded text-sm">📄 PDF</button>
+                      {companyFeatures?.module_auto_reports && (<button type="button" onClick={() => { setTransferInst(instruction); loadReportsFromDatabase(); }} className="bg-green-700 text-white px-3 py-1 rounded-lg text-sm">📋 {t.toReport}</button>)}
+                      <button type="button" onClick={() => createInstructionPDF(instruction)} className="bg-slate-700 text-white px-3 py-1 rounded-lg text-sm">📄 PDF</button>
                     </div>
                   ))}
                   </>)}
@@ -5598,9 +5598,9 @@ export default function Home() {
 
       {activeTab === "monat" && (
         <div className="space-y-4">
-          <section className="border rounded p-4 bg-white text-black space-y-3">
+          <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-3">
             <h2 className="text-xl font-bold">{t.monthView}</h2>
-            <input type="month" className="border p-3 rounded text-black bg-white" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} />
+            <input type="month" className="border p-3 rounded-lg text-black bg-white" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} />
           </section>
           {(() => {
             const monthInstructions = workInstructions.filter((i) => {
@@ -5615,7 +5615,7 @@ export default function Home() {
             for (let d = 1; d <= daysInMonth; d++) cells.push(d);
             return (
               <>
-                <section className="border rounded p-4 bg-white text-black">
+                <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black">
                   <h3 className="font-bold mb-3">{selectedMonth}</h3>
                   <div className="grid grid-cols-7 gap-1 mb-1">{t.weekdays.map((label) => (<div key={label} className="text-center text-xs font-bold text-gray-500 py-1">{label.slice(0, 2)}</div>))}</div>
                   <div className="grid grid-cols-7 gap-1">
@@ -5624,14 +5624,14 @@ export default function Home() {
                       const dateStr = `${selectedMonth}-${String(day).padStart(2, "0")}`;
                       const entries = monthInstructions.filter((inst) => inst.work_date === dateStr);
                       const isToday = dateStr === new Date().toISOString().split("T")[0];
-                      return (<div key={day} onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }} className={`border rounded p-1 min-h-14 min-w-0 cursor-pointer hover:border-cyan-500 transition-colors ${isToday ? "border-cyan-600 bg-cyan-50" : entries.length > 0 ? "bg-green-50 border-green-300" : "bg-white"}`}><div className={`text-xs font-bold ${isToday ? "text-cyan-700" : "text-gray-700"}`}>{day}</div>{entries.length > 0 && <div className="text-xs text-green-700 font-medium">{entries.length} ✓</div>}{entries[0] && <div className="text-xs text-gray-500 truncate">{entries[0].title}</div>}</div>);
+                      return (<div key={day} onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }} className={`border rounded-lg p-1 min-h-14 min-w-0 cursor-pointer hover:border-cyan-500 transition-colors ${isToday ? "border-cyan-600 bg-cyan-50" : entries.length > 0 ? "bg-green-50 border-green-300" : "bg-white"}`}><div className={`text-xs font-bold ${isToday ? "text-cyan-700" : "text-gray-700"}`}>{day}</div>{entries.length > 0 && <div className="text-xs text-green-700 font-medium">{entries.length} ✓</div>}{entries[0] && <div className="text-xs text-gray-500 truncate">{entries[0].title}</div>}</div>);
                     })}
                   </div>
                 </section>
-                <section className="border rounded p-4 bg-white text-black space-y-2">
+                <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-2">
                   <h3 className="font-bold">{t.workInstructions} ({monthInstructions.length})</h3>
                   {monthInstructions.length === 0 && <p className="text-gray-500">{t.noInstructionsMonth}</p>}
-                  {monthInstructions.sort((a, b) => (a.work_date || "").localeCompare(b.work_date || "")).map((instruction) => (<div key={instruction.id} className="border rounded p-3 bg-gray-50"><div onClick={() => { markInstructionRead(instruction.id); setSelectedDayDate(instruction.work_date); setActiveTab("tag"); }} className="cursor-pointer hover:bg-gray-100 flex justify-between items-center"><div><span className="font-medium">{getTranslated(instruction.id, "title", instruction.title)}</span><span className="text-gray-500 text-sm ml-2">{instruction.customer || "-"}</span></div><span className="text-sm text-gray-500">{instruction.work_date}</span></div>{renderReadStatus(instruction)}</div>))}
+                  {monthInstructions.sort((a, b) => (a.work_date || "").localeCompare(b.work_date || "")).map((instruction) => (<div key={instruction.id} className="border border-slate-200 rounded-xl p-3 shadow-sm bg-gray-50"><div onClick={() => { markInstructionRead(instruction.id); setSelectedDayDate(instruction.work_date); setActiveTab("tag"); }} className="cursor-pointer hover:bg-gray-100 flex justify-between items-center"><div><span className="font-medium">{getTranslated(instruction.id, "title", instruction.title)}</span><span className="text-gray-500 text-sm ml-2">{instruction.customer || "-"}</span></div><span className="text-sm text-gray-500">{instruction.work_date}</span></div>{renderReadStatus(instruction)}</div>))}
                 </section>
               </>
             );
@@ -5640,10 +5640,10 @@ export default function Home() {
       )}
 
       {activeTab === "mitarbeiter" && (
-        <section className="border rounded p-4 space-y-4 bg-white text-black">
+        <section className="border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4 bg-white text-black">
           <h2 className="text-xl font-bold">{t.employeeManagement}</h2>
           {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
-            <div className="border rounded p-4 bg-gray-50 space-y-3">
+            <div className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-gray-50 space-y-3">
               <h3 className="font-bold">Neuen Mitarbeiter anlegen</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <input className="border p-3 text-black bg-white" placeholder="Vollständiger Name *" value={newUserName} onChange={(e) => setNewUserName(e.target.value)} />
@@ -5655,21 +5655,21 @@ export default function Home() {
                   {currentCompany?.role === "owner" && <option value="admin">{t.roleAdmin}</option>}
                 </select>
               </div>
-              <button type="button" onClick={addCompanyUser} disabled={creatingEmployee} className="bg-cyan-700 text-white px-4 py-3 rounded disabled:opacity-50">{creatingEmployee ? "Wird angelegt..." : t.addEmployee}</button>
+              <button type="button" onClick={addCompanyUser} disabled={creatingEmployee} className="bg-cyan-700 text-white px-4 py-3 rounded-lg disabled:opacity-50">{creatingEmployee ? "Wird angelegt..." : t.addEmployee}</button>
               <p className="text-xs text-gray-400">Der Mitarbeiter meldet sich mit seinem Benutzernamen und Passwort an.</p>
             </div>
           )}
           <p>{t.currentEmployees}: <strong>{companyUsers.length}</strong></p>
           <div className="space-y-3">
             {companyUsers.map((member) => (
-              <div key={member.id} className="border rounded p-3 space-y-2">
+              <div key={member.id} className="border border-slate-200 rounded-xl p-3 shadow-sm space-y-2">
                 <strong>{member.full_name || "-"}</strong>
                 <p>{member.email || "-"}</p>
                 <p>{t.role}: {member.role === "owner" ? "Owner" : member.role === "admin" ? t.roleAdmin : member.role === "project_manager" ? t.roleProjectManager : t.roleEmployee}</p>
                 <div className="flex gap-2 flex-wrap">
-                  {member.email && (<button type="button" onClick={() => resetCompanyUserPassword(member.email)} className="bg-gray-700 text-white px-3 py-2 rounded">{t.resetPassword}</button>)}
+                  {member.email && (<button type="button" onClick={() => resetCompanyUserPassword(member.email)} className="bg-gray-700 text-white px-3 py-2.5 rounded-lg">{t.resetPassword}</button>)}
                   {currentCompany && canDelete(currentCompany.role, member.role) && member.user_id !== user?.id && (
-                    <button type="button" onClick={() => deleteCompanyUser(member.id, member.user_id)} className="bg-red-600 text-white px-3 py-2 rounded">🗑️ Löschen</button>
+                    <button type="button" onClick={() => deleteCompanyUser(member.id, member.user_id)} className="bg-red-600 text-white px-3 py-2.5 rounded-lg">🗑️ Löschen</button>
                   )}
                 </div>
               </div>
@@ -5679,7 +5679,7 @@ export default function Home() {
       )}
 
       {activeTab === "firmendaten" && (
-        <section className="border rounded p-4 space-y-4 bg-white text-black">
+        <section className="border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4 bg-white text-black">
           <h2 className="text-xl font-bold">{t.companyData}</h2>
           {companySettings?.company_logo && (<img src={companySettings.company_logo} alt="Firmenlogo" className="h-20 object-contain" />)}
           <div><label className="block text-sm font-medium mb-1">{t.uploadLogo}</label><input type="file" accept="image/*" className="border p-3 w-full text-black bg-white" onChange={(e) => uploadCompanyLogo(e.target.files)} /></div>
@@ -5693,7 +5693,7 @@ export default function Home() {
             <input className="border p-3 text-black bg-white" placeholder={t.website} value={companySettings?.website || ""} onChange={(e) => updateCompanyField("website", e.target.value)} />
             <input className="border p-3 text-black bg-white" placeholder={t.taxNumber} value={companySettings?.tax_number || ""} onChange={(e) => updateCompanyField("tax_number", e.target.value)} />
           </div>
-          <button type="button" onClick={saveCompanySettings} className="bg-cyan-700 text-white px-4 py-3 rounded">{t.saveCompany}</button>
+          <button type="button" onClick={saveCompanySettings} className="bg-cyan-700 text-white px-4 py-3 rounded-lg">{t.saveCompany}</button>
         </section>
       )}
 
@@ -5704,7 +5704,7 @@ export default function Home() {
             <h3 className="text-xl font-bold">📋 {t.copyTitle}</h3>
             <div>
               <label className="block text-sm font-medium mb-1">{t.copySource}</label>
-              <select className="border p-3 w-full rounded text-black bg-white" value={copyModalInstruction?.id || ""} onChange={(e) => selectCopySource(e.target.value)}>
+              <select className="border p-3 w-full rounded-lg text-black bg-white" value={copyModalInstruction?.id || ""} onChange={(e) => selectCopySource(e.target.value)}>
                 <option value="">{t.copySource}</option>
                 {workInstructions.map((inst) => (
                   <option key={inst.id} value={inst.id}>{inst.title}{inst.work_date ? ` (${inst.work_date})` : ""}</option>
@@ -5721,7 +5721,7 @@ export default function Home() {
                   }}>{t.copyAllNone}</button>
                 </div>
                 {(copyModalInstruction.work_instruction_tasks || []).sort((a: any, b: any) => (a.sort_order ?? 0) - (b.sort_order ?? 0)).map((task: any) => (
-                  <label key={task.id} className="flex items-start gap-2 border rounded p-2 cursor-pointer bg-gray-50">
+                  <label key={task.id} className="flex items-start gap-2 border rounded-lg p-2 cursor-pointer bg-gray-50">
                     <input type="checkbox" className="w-4 h-4 mt-1" checked={copySelectedTaskIds.includes(task.id)} onChange={(e) => {
                       if (e.target.checked) setCopySelectedTaskIds((prev) => [...prev, task.id]);
                       else setCopySelectedTaskIds((prev) => prev.filter((id) => id !== task.id));
@@ -5734,8 +5734,8 @@ export default function Home() {
               </div>
             )}
             <div className="flex gap-2 pt-2">
-              <button type="button" onClick={() => setCopyModalOpen(false)} className="flex-1 bg-gray-200 text-gray-800 py-3 rounded font-medium">{t.copyCancel}</button>
-              <button type="button" disabled={!copyModalInstruction || copySelectedTaskIds.length === 0} onClick={applyCopiedSteps} className="flex-1 bg-indigo-600 text-white py-3 rounded font-bold disabled:opacity-50">{t.copyConfirm}</button>
+              <button type="button" onClick={() => setCopyModalOpen(false)} className="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg font-medium">{t.copyCancel}</button>
+              <button type="button" disabled={!copyModalInstruction || copySelectedTaskIds.length === 0} onClick={applyCopiedSteps} className="flex-1 bg-indigo-600 text-white py-3 rounded-lg font-bold disabled:opacity-50">{t.copyConfirm}</button>
             </div>
           </div>
         </div>
@@ -5760,19 +5760,19 @@ export default function Home() {
               <h2 className="text-xl font-bold">{t.transferTitle}</h2>
               <button type="button" onClick={() => setTransferInst(null)} className="text-gray-500 text-3xl leading-none px-2">×</button>
             </div>
-            <button type="button" onClick={() => { const inst = transferInst; setTransferInst(null); createReportFromInstruction(inst); }} className="w-full bg-green-700 text-white px-4 py-3 rounded">➕ {t.newReport}</button>
+            <button type="button" onClick={() => { const inst = transferInst; setTransferInst(null); createReportFromInstruction(inst); }} className="w-full bg-green-700 text-white px-4 py-3 rounded-lg">➕ {t.newReport}</button>
             {savedReports.length > 0 && (
               <div className="space-y-2 pt-2 border-t">
                 {savedReports.map((report) => (
-                  <div key={report.id} className="flex items-center justify-between gap-2 border rounded p-2">
+                  <div key={report.id} className="flex items-center justify-between gap-2 border rounded-lg p-2">
                     <span className="text-sm truncate"><strong>{report.report_name}</strong></span>
-                    <button type="button" onClick={() => { const inst = transferInst; setTransferInst(null); createReportFromInstruction(inst, report); }} className="bg-cyan-600 text-white px-3 py-2 rounded text-sm whitespace-nowrap">{t.transferInsert}</button>
+                    <button type="button" onClick={() => { const inst = transferInst; setTransferInst(null); createReportFromInstruction(inst, report); }} className="bg-cyan-600 text-white px-3 py-2.5 rounded-lg text-sm whitespace-nowrap">{t.transferInsert}</button>
                   </div>
                 ))}
               </div>
             )}
             {savedReports.length === 0 && (<p className="text-sm text-gray-500 text-center py-1">{t.transferNoReports}</p>)}
-            <button type="button" onClick={() => setTransferInst(null)} className="w-full bg-gray-300 text-black px-4 py-2 rounded">{t.copyCancel}</button>
+            <button type="button" onClick={() => setTransferInst(null)} className="w-full bg-gray-300 text-black px-4 py-2.5 rounded-lg">{t.copyCancel}</button>
           </div>
         </div>
       )}
