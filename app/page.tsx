@@ -4616,16 +4616,14 @@ export default function Home() {
     }
     y += 10; if (y < 75) y = 75;
     doc.setFontSize(12); doc.setFont(FONT, "bold"); doc.text(p.dailyReports, marginLeft, y); y += 8;
-    // Tagestexte fuer das PDF sicher in die Anzeige-Sprache bringen (nutzt Cache; verhindert halb-uebersetzte PDFs).
+    // Fuer das PDF die BEREITS in der App angezeigte Uebersetzung verwenden (day.translation).
+    // So steht im PDF genau das, was der Betrachter in seiner Sprache sieht. Liegt keine
+    // Uebersetzung vor (Original ist schon in der Anzeige-Sprache), wird das Original genommen.
     const pdfDayText: string[] = [];
     for (let di = 0; di < days.length; di++) {
       const src = (days[di].description || "").trim();
-      if (!src || uiLanguage === "Deutsch") { pdfDayText[di] = src; continue; }
-      try {
-        const tr = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: src, fromLanguage: "automatisch", toLanguage: uiLanguage }) });
-        const td = await tr.json();
-        pdfDayText[di] = (!td.error && td.translation && td.translation.trim() !== src) ? td.translation : src;
-      } catch { pdfDayText[di] = src; }
+      const trans = (days[di].translation || "").trim();
+      pdfDayText[di] = trans || src;
     }
     for (let di = 0; di < days.length; di++) {
       const day = days[di];
