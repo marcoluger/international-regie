@@ -5567,7 +5567,7 @@ export default function Home() {
                       const entries = weekInstructions.filter((inst) => inst.work_date === dateStr);
                       const isToday = dateStr === todayStr;
                       const dayNo = Number(dateStr.split("-")[2]);
-                      return (<div key={dateStr} onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }} className={`border rounded-lg p-1 min-h-14 min-w-0 cursor-pointer hover:border-cyan-500 transition-colors ${isToday ? "border-cyan-600 bg-cyan-50" : entries.length > 0 ? "bg-green-50 border-green-300" : "bg-white"}`}><div className={`text-xs font-bold ${isToday ? "text-cyan-700" : "text-gray-700"}`}>{dayNo}</div>{entries.length > 0 && <div className="text-xs text-green-700 font-medium">{entries.length} ✓</div>}{entries[0] && <div className="text-xs text-gray-500 truncate">{entries[0].title}</div>}</div>);
+                      return (<div key={dateStr} onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }} className={`border rounded-lg p-2 min-h-24 min-w-0 cursor-pointer hover:border-cyan-500 transition-colors flex flex-col gap-1 ${isToday ? "border-cyan-600 bg-cyan-50" : entries.length > 0 ? "bg-green-50 border-green-300" : "bg-white"}`}><div className={`text-xs font-bold ${isToday ? "text-cyan-700" : "text-gray-700"}`}>{dayNo}{entries.length > 0 ? ` · ${entries.length} ✓` : ""}</div>{entries.map((e: any) => (<div key={e.id} className="text-xs leading-tight bg-white border border-green-200 rounded px-1 py-0.5 text-gray-700 truncate">{getTranslated(e.id, "title", e.title)}</div>))}</div>);
                     })}
                   </div>
                 </section>
