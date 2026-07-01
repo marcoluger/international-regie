@@ -3291,6 +3291,9 @@ export default function Home() {
   const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
   const [changingPassword, setChangingPassword] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  // Aktuelles Anmelde-Token, laufend aus onAuthStateChange gesetzt.
+  // So braucht das Speichern kein getSession() (das kann unter Last haengen).
+  const tokenRef = useRef<string>("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [companySettings, setCompanySettings] = useState<CompanySettings | null>(null);
@@ -3385,6 +3388,7 @@ export default function Home() {
     }
     loadUser();
     const { data: authListener } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      tokenRef.current = session?.access_token || "";
       setUser(session?.user || null);
       if (session?.user) {
         const { data: pwCheck } = await supabase.from("company_users").select("must_change_password").eq("user_id", session.user.id).maybeSingle();
@@ -3548,9 +3552,14 @@ export default function Home() {
   async function updateTaskComment(taskId: string, comment: string) {
     setCommentSaveState(prev => ({ ...prev, [taskId]: "saving" }));
     try {
-      // Anmelde-Token holen, damit die Server-Route den Aufrufer prüfen kann
-      const { data: sessionData } = await supabase.auth.getSession();
-      const token = sessionData?.session?.access_token || "";
+      // Token aus dem Auth-Listener nehmen (nicht getSession(), das kann unter Last haengen).
+      let token = tokenRef.current;
+      if (!token) {
+        try {
+          const s = await dbTimeout(supabase.auth.getSession(), 5000);
+          token = s?.data?.session?.access_token || "";
+        } catch { /* Fallback: ohne Token antwortet die Route mit 401 statt zu haengen */ }
+      }
       // Speichern über Server-Route (Service-Role-Key) -> umgeht RLS, prüft aber Anmeldung + Rolle.
       const res = await withTimeout(
         fetch("/api/update-task-comment", {
@@ -3570,31 +3579,19 @@ export default function Home() {
       }
       setCommentSaveState(prev => ({ ...prev, [taskId]: "saved" }));
       setMessage(t.msgCommentSavedOk);
-      // Sofort in die Anzeige-Sprache übersetzen, damit es ohne Neuladen erscheint
-      const instructionId = workInstructions.find(i => (i.work_instruction_tasks || []).some((tk: any) => tk.id === taskId))?.id;
-      let translated = "";
-      try {
-        const tr = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: comment, fromLanguage: "automatisch", toLanguage: uiLanguage }) });
-        const trData = await tr.json();
-        if (!trData.error && trData.translation) translated = trData.translation;
-      } catch { /* Übersetzung übersprungen */ }
-      if (instructionId && translated) {
-        setInstructionTranslations(prev => ({
-          ...prev,
-          [instructionId]: { ...prev[instructionId], language: uiLanguage, tasks: { ...prev[instructionId]?.tasks, [`comment_${taskId}`]: translated } },
-        }));
-        // Eingabefeld auf die Übersetzung umstellen
-        setTaskComments(prev => { const n = { ...prev }; delete n[taskId]; return n; });
-      } else {
-        setTaskComments(prev => ({ ...prev, [taskId]: comment }));
-      }
+      // Getippten Kommentar sofort anzeigen. Das Speichern wird NICHT von einer
+      // Uebersetzung blockiert; die Anzeige-Uebersetzung laeuft spaeter nicht-blockierend
+      // ueber refreshCommentTranslations (beim Neuladen).
+      setTaskComments(prev => ({ ...prev, [taskId]: comment }));
     } catch (err: any) {
       setCommentSaveState(prev => ({ ...prev, [taskId]: "error:" + String(err?.message || err) }));
       setMessage("Fehler beim Speichern: " + String(err?.message || err));
       return;
     }
-    // Neu laden + Kommentare in die Anzeige-Sprache übersetzen
-    try { if (currentCompany) await loadWorkInstructions(currentCompany.company_id); } catch { /* ignorieren */ }
+    // KEIN Neuladen nach dem Speichern: das Neuladen loeste eine erneute Uebersetzungsrunde
+    // aus, die die bereits angezeigte Uebersetzung der Anweisung zuruecksetzte (alles wieder
+    // deutsch). Der Kommentar ist lokal sichtbar (taskComments) und in der DB gespeichert;
+    // beim naechsten regulaeren Laden ist alles konsistent.
   }
 
   async function updateTaskNote(taskId: string, note: string) {
@@ -3922,22 +3919,38 @@ export default function Home() {
     if (jobs.length === 0) return;
     const fieldUpdates: Record<string, Record<string, string>> = {};
     const taskUpdates: Record<string, Record<string, string>> = {};
-    // PARALLEL übersetzen (statt nacheinander)
-    await Promise.all(jobs.map(async (job) => {
+    // Dedupliziert + gedrosselt: gleicher Text wird nur EINMAL uebersetzt (Anweisungen
+    // wiederholen sich stark), max. CONCURRENCY gleichzeitig -> Verbindungen bleiben frei.
+    const uniqueTexts = new Map<string, { text: string; sourceLang: string }>();
+    for (const job of jobs) {
+      const k = job.sourceLang + "|||" + job.text;
+      if (!uniqueTexts.has(k)) uniqueTexts.set(k, { text: job.text, sourceLang: job.sourceLang });
+    }
+    const translations = new Map<string, string>();
+    const CONCURRENCY = 4;
+    const entries = Array.from(uniqueTexts.entries());
+    const runOne = async (entry: [string, { text: string; sourceLang: string }]) => {
+      const [k, v] = entry;
       try {
-        const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: job.text, fromLanguage: job.sourceLang, toLanguage: targetLang }) });
+        const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: v.text, fromLanguage: v.sourceLang, toLanguage: targetLang }) });
         const data = await res.json();
-        if (!data.error && data.translation) {
-          if (job.inTasks) {
-            if (!taskUpdates[job.instId]) taskUpdates[job.instId] = {};
-            taskUpdates[job.instId][job.storeKey] = data.translation;
-          } else {
-            if (!fieldUpdates[job.instId]) fieldUpdates[job.instId] = {};
-            fieldUpdates[job.instId][job.storeKey] = data.translation;
-          }
-        }
+        if (!data.error && data.translation) translations.set(k, data.translation);
       } catch { /* Übersetzung übersprungen */ }
-    }));
+    };
+    for (let i = 0; i < entries.length; i += CONCURRENCY) {
+      await Promise.all(entries.slice(i, i + CONCURRENCY).map(runOne));
+    }
+    for (const job of jobs) {
+      const tr = translations.get(job.sourceLang + "|||" + job.text);
+      if (!tr) continue;
+      if (job.inTasks) {
+        if (!taskUpdates[job.instId]) taskUpdates[job.instId] = {};
+        taskUpdates[job.instId][job.storeKey] = tr;
+      } else {
+        if (!fieldUpdates[job.instId]) fieldUpdates[job.instId] = {};
+        fieldUpdates[job.instId][job.storeKey] = tr;
+      }
+    }
     const ids = new Set([...Object.keys(fieldUpdates), ...Object.keys(taskUpdates)]);
     if (ids.size > 0) {
       setInstructionTranslations((prev) => {
