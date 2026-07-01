@@ -3606,26 +3606,35 @@ export default function Home() {
     // beim naechsten regulaeren Laden ist alles konsistent.
   }
 
-  function wmoToGerman(code: number): string {
-    if (code === 0) return "klar";
-    if (code === 1) return "überwiegend klar";
-    if (code === 2) return "teils bewölkt";
-    if (code === 3) return "bewölkt";
-    if (code === 45 || code === 48) return "Nebel";
-    if (code >= 51 && code <= 55) return "Nieselregen";
-    if (code === 56 || code === 57) return "gefrierender Nieselregen";
-    if (code >= 61 && code <= 65) return "Regen";
-    if (code === 66 || code === 67) return "gefrierender Regen";
-    if (code >= 71 && code <= 75) return "Schnee";
-    if (code === 77) return "Schneegriesel";
-    if (code >= 80 && code <= 82) return "Regenschauer";
-    if (code === 85 || code === 86) return "Schneeschauer";
-    if (code === 95) return "Gewitter";
-    if (code === 96 || code === 99) return "Gewitter mit Hagel";
-    return "wechselhaft";
+  // Wetter-Zustand (WMO-Code) direkt in der Anzeige-Sprache.
+  function wmoLocalized(code: number, lang: string): string {
+    const cat = code === 0 ? "clear"
+      : (code === 1 || code === 2) ? "partly"
+      : code === 3 ? "cloudy"
+      : (code === 45 || code === 48) ? "fog"
+      : (code >= 51 && code <= 57) ? "drizzle"
+      : (code >= 61 && code <= 67) ? "rain"
+      : (code >= 71 && code <= 77) ? "snow"
+      : (code >= 80 && code <= 82) ? "showers"
+      : (code >= 85 && code <= 86) ? "snow"
+      : (code >= 95) ? "thunder"
+      : "unknown";
+    const m: Record<string, Record<string, string>> = {
+      clear:   { Deutsch:"klar", Rumänisch:"senin", Englisch:"clear", Italienisch:"sereno", Türkisch:"açık", Ungarisch:"derült", Tschechisch:"jasno", Ukrainisch:"ясно", Bulgarisch:"ясно", Serbisch:"vedro", Kroatisch:"vedro", Slowenisch:"jasno", Polnisch:"bezchmurnie" },
+      partly:  { Deutsch:"teils bewölkt", Rumänisch:"parțial înnorat", Englisch:"partly cloudy", Italienisch:"parzialmente nuvoloso", Türkisch:"parçalı bulutlu", Ungarisch:"részben felhős", Tschechisch:"polojasno", Ukrainisch:"мінлива хмарність", Bulgarisch:"частична облачност", Serbisch:"delimično oblačno", Kroatisch:"djelomično oblačno", Slowenisch:"delno oblačno", Polnisch:"częściowe zachmurzenie" },
+      cloudy:  { Deutsch:"bewölkt", Rumänisch:"înnorat", Englisch:"cloudy", Italienisch:"nuvoloso", Türkisch:"bulutlu", Ungarisch:"felhős", Tschechisch:"zataženo", Ukrainisch:"хмарно", Bulgarisch:"облачно", Serbisch:"oblačno", Kroatisch:"oblačno", Slowenisch:"oblačno", Polnisch:"pochmurno" },
+      fog:     { Deutsch:"Nebel", Rumänisch:"ceață", Englisch:"fog", Italienisch:"nebbia", Türkisch:"sis", Ungarisch:"köd", Tschechisch:"mlha", Ukrainisch:"туман", Bulgarisch:"мъгла", Serbisch:"magla", Kroatisch:"magla", Slowenisch:"megla", Polnisch:"mgła" },
+      drizzle: { Deutsch:"Nieselregen", Rumänisch:"burniță", Englisch:"drizzle", Italienisch:"pioviggine", Türkisch:"çisenti", Ungarisch:"szitálás", Tschechisch:"mrholení", Ukrainisch:"мряка", Bulgarisch:"ръмеж", Serbisch:"rosulja", Kroatisch:"rosulja", Slowenisch:"rosenje", Polnisch:"mżawka" },
+      rain:    { Deutsch:"Regen", Rumänisch:"ploaie", Englisch:"rain", Italienisch:"pioggia", Türkisch:"yağmur", Ungarisch:"eső", Tschechisch:"déšť", Ukrainisch:"дощ", Bulgarisch:"дъжд", Serbisch:"kiša", Kroatisch:"kiša", Slowenisch:"dež", Polnisch:"deszcz" },
+      snow:    { Deutsch:"Schnee", Rumänisch:"ninsoare", Englisch:"snow", Italienisch:"neve", Türkisch:"kar", Ungarisch:"hó", Tschechisch:"sníh", Ukrainisch:"сніг", Bulgarisch:"сняг", Serbisch:"sneg", Kroatisch:"snijeg", Slowenisch:"sneg", Polnisch:"śnieg" },
+      showers: { Deutsch:"Regenschauer", Rumänisch:"averse de ploaie", Englisch:"rain showers", Italienisch:"rovesci di pioggia", Türkisch:"sağanak yağış", Ungarisch:"záporeső", Tschechisch:"přeháňky", Ukrainisch:"зливи", Bulgarisch:"превалявания", Serbisch:"pljuskovi", Kroatisch:"pljuskovi", Slowenisch:"plohe", Polnisch:"przelotne opady" },
+      thunder: { Deutsch:"Gewitter", Rumänisch:"furtună", Englisch:"thunderstorm", Italienisch:"temporale", Türkisch:"gök gürültülü fırtına", Ungarisch:"zivatar", Tschechisch:"bouřka", Ukrainisch:"гроза", Bulgarisch:"гръмотевична буря", Serbisch:"grmljavina", Kroatisch:"grmljavina", Slowenisch:"nevihta", Polnisch:"burza" },
+      unknown: { Deutsch:"wechselhaft", Rumänisch:"variabil", Englisch:"variable", Italienisch:"variabile", Türkisch:"değişken", Ungarisch:"változékony", Tschechisch:"proměnlivo", Ukrainisch:"мінливо", Bulgarisch:"променливо", Serbisch:"promenljivo", Kroatisch:"promjenjivo", Slowenisch:"spremenljivo", Polnisch:"zmiennie" },
+    };
+    return (m[cat] && m[cat][lang]) || m[cat]?.Deutsch || "";
   }
 
-  // Holt das aktuelle Wetter am GPS-Standort und gibt eine fertige Textzeile in der Anzeige-Sprache zurueck.
+  // Holt aktuelles Wetter + Ort am GPS-Standort und gibt eine fertige Textzeile in der Anzeige-Sprache zurueck.
   async function fetchWeatherLine(): Promise<string | null> {
     const pos = await new Promise<GeolocationPosition | null>((resolve) => {
       if (!navigator.geolocation) { resolve(null); return; }
@@ -3641,21 +3650,22 @@ export default function Home() {
     } catch { setMessage(t.weatherError); return null; }
     const c = data?.current;
     if (!c) { setMessage(t.weatherError); return null; }
+    const lang2map: Record<string, string> = { Deutsch:"de", Rumänisch:"ro", Englisch:"en", Italienisch:"it", Türkisch:"tr", Ungarisch:"hu", Tschechisch:"cs", Ukrainisch:"uk", Bulgarisch:"bg", Serbisch:"sr", Kroatisch:"hr", Slowenisch:"sl", Polnisch:"pl" };
+    const loc2 = lang2map[uiLanguage] || "de";
+    let ort = "";
+    try {
+      const geo = await withTimeout(fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=${loc2}`), 8000, "Geo-Timeout");
+      const gd = await geo.json();
+      ort = gd?.city || gd?.locality || gd?.principalSubdivision || "";
+    } catch { /* Ort ist optional */ }
     const temp = Math.round(Number(c.temperature_2m));
     const wind = Math.round(Number(c.wind_speed_10m));
     const prec = Number(c.precipitation ?? 0);
-    const cond = wmoToGerman(Number(c.weather_code));
+    const cond = wmoLocalized(Number(c.weather_code), uiLanguage);
     const now = new Date();
     const p2 = (n: number) => String(n).padStart(2, "0");
     const stamp = `${p2(now.getDate())}.${p2(now.getMonth() + 1)}., ${p2(now.getHours())}:${p2(now.getMinutes())}`;
-    let line = `Wetter (${stamp}): ${temp} °C, ${cond}, Wind ${wind} km/h, Niederschlag ${prec} mm`;
-    if (uiLanguage !== "Deutsch") {
-      try {
-        const tr = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: line, fromLanguage: "Deutsch", toLanguage: uiLanguage }) });
-        const td = await tr.json();
-        if (!td.error && td.translation) line = td.translation;
-      } catch { /* Original (Deutsch) belassen */ }
-    }
+    const line = `${t.weather}${ort ? " " + ort : ""} (${stamp}): ${temp} °C, ${cond}, 💨 ${wind} km/h, 🌧️ ${prec} mm`;
     return line;
   }
 
