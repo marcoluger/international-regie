@@ -4547,11 +4547,6 @@ export default function Home() {
           const data = await res.json();
           mergedTasks[task.id] = data.error ? task.task_text : data.translation;
         }
-        if (task.employee_comment?.trim()) {
-          const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: task.employee_comment, fromLanguage: "Deutsch", toLanguage: targetLang }) });
-          const data = await res.json();
-          mergedTasks[`comment_${task.id}`] = data.error ? task.employee_comment : data.translation;
-        }
       }
       setInstructionTranslations(prev => ({ ...prev, [instruction.id]: { ...translatedFields, tasks: mergedTasks, language: targetLang } }));
       setMessage("");
@@ -4559,8 +4554,21 @@ export default function Home() {
       Object.assign(currentTranslations, translatedFields);
     }
 
+    // Kommentare IMMER frisch aus dem aktuellen employee_comment nehmen (enthaelt z. B. das Wetter),
+    // unabhaengig von evtl. veraltetem Uebersetzungs-Cache.
+    const freshComments: Record<string, string> = {};
+    for (const task of instruction.work_instruction_tasks || []) {
+      const cmt = (task.employee_comment || "").trim();
+      if (!cmt) continue;
+      if (uiLanguage === "Deutsch") { freshComments[task.id] = task.employee_comment; continue; }
+      try {
+        const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: task.employee_comment, fromLanguage: "automatisch", toLanguage: uiLanguage }) });
+        const data = await res.json();
+        freshComments[task.id] = (!data.error && data.translation) ? data.translation : task.employee_comment;
+      } catch { freshComments[task.id] = task.employee_comment; }
+    }
     const getTaskText = (taskId: string, fallback: string) => mergedTasks[taskId] || fallback;
-    const getCommentText = (taskId: string, fallback: string) => mergedTasks[`comment_${taskId}`] || fallback;
+    const getCommentText = (taskId: string, fallback: string) => freshComments[taskId] || fallback;
     const getTitleText = () => currentTranslations.title || instruction.title;
     const getProblemsText = () => currentTranslations.problems_text || instruction.problems_text || "";
     const getMaterialText = () => currentTranslations.material || instruction.material || "";
