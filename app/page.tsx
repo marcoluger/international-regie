@@ -3371,7 +3371,6 @@ export default function Home() {
   // ── Aufklappbare Karten (Tagesansicht) und Tage (Regiebericht) ──
   const [openDayCards, setOpenDayCards] = useState<Record<string, boolean>>({});
   const [openReportDays, setOpenReportDays] = useState<Record<string, boolean>>({});
-  const [openWeekDays, setOpenWeekDays] = useState<Record<string, boolean>>({});
   const [reportExpanded, setReportExpanded] = useState(false);
 
   useEffect(() => {
@@ -5557,41 +5556,28 @@ export default function Home() {
               if (!weekDates.includes(i.work_date)) return false;
               return canSeeInstruction(i);
             });
-            if (weekInstructions.length === 0) return (<section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black"><p className="text-gray-500">{t.noInstructionsWeek}</p></section>);
-            return weekDates.map((dateStr, di) => {
-              const dayInstructions = weekInstructions.filter((i) => i.work_date === dateStr);
-              if (dayInstructions.length === 0) return null;
-              return (
-                <section key={dateStr} className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-3">
-                  <div className="flex justify-between items-center bg-gray-100 rounded-lg p-2">
-                    <h3 className="font-bold cursor-pointer select-none" onClick={() => { const willOpen = !openWeekDays[dateStr]; setOpenWeekDays(prev => ({ ...prev, [dateStr]: !prev[dateStr] })); if (willOpen) dayInstructions.forEach((ins: any) => markInstructionRead(ins.id)); }}>{openWeekDays[dateStr] ? "▾" : "▸"} {t.weekdays[di]} — {dateStr}</h3>
-                    <button type="button" onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }} className="text-cyan-700 text-sm hover:underline">→ {t.dayView}</button>
+            const todayStr = new Date().toISOString().split("T")[0];
+            return (
+              <>
+                <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black">
+                  <h3 className="font-bold mb-3">{t.week}: {getCalendarWeek(selectedWeek)}</h3>
+                  <div className="grid grid-cols-7 gap-1 mb-1">{t.weekdays.map((label) => (<div key={label} className="text-center text-xs font-bold text-gray-500 py-1">{label.slice(0, 2)}</div>))}</div>
+                  <div className="grid grid-cols-7 gap-1">
+                    {weekDates.map((dateStr) => {
+                      const entries = weekInstructions.filter((inst) => inst.work_date === dateStr);
+                      const isToday = dateStr === todayStr;
+                      const dayNo = Number(dateStr.split("-")[2]);
+                      return (<div key={dateStr} onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }} className={`border rounded-lg p-1 min-h-14 min-w-0 cursor-pointer hover:border-cyan-500 transition-colors ${isToday ? "border-cyan-600 bg-cyan-50" : entries.length > 0 ? "bg-green-50 border-green-300" : "bg-white"}`}><div className={`text-xs font-bold ${isToday ? "text-cyan-700" : "text-gray-700"}`}>{dayNo}</div>{entries.length > 0 && <div className="text-xs text-green-700 font-medium">{entries.length} ✓</div>}{entries[0] && <div className="text-xs text-gray-500 truncate">{entries[0].title}</div>}</div>);
+                    })}
                   </div>
-                  {openWeekDays[dateStr] && (<>
-                  {dayInstructions.map((instruction) => (
-                    <div key={instruction.id} className="border border-slate-200 rounded-xl p-3 shadow-sm space-y-2">
-                      <div className="flex justify-between"><strong>{getTranslated(instruction.id, "title", instruction.title)}</strong><span className="text-sm text-gray-500">{instruction.project || "-"}</span></div>
-                      <p className="text-sm"><strong>{t.customer}:</strong> {instruction.customer || "-"} | <strong>{t.site}:</strong> {instruction.site || "-"}</p>
-                      {renderReadStatus(instruction)}
-                      {instruction.problems_text && (<div className="bg-yellow-50 border rounded-lg p-2 text-sm"><strong>{t.problemsHints}:</strong> {getTranslated(instruction.id, "problems_text", instruction.problems_text)}</div>)}
-                      <ul className="space-y-1">
-                        {(instruction.work_instruction_tasks || []).sort((a: any, b: any) => a.sort_order - b.sort_order).map((task: any) => (
-                          <li key={task.id} className="flex items-center gap-2 text-sm">
-                            <select className="border rounded-lg p-1 text-xs text-black bg-white" value={task.status || "open"} onChange={(e) => updateTaskStatus(task.id, e.target.value)}>
-                              <option value="open">{t.statusOpen}</option><option value="in_progress">{t.statusInProgress}</option><option value="stopped">{t.statusStopped}</option><option value="completed">{t.statusCompleted}</option>
-                            </select>
-                            <span>{getTranslatedTask(instruction.id, task.id, task.task_text)}</span>{task.note && <span className="text-gray-500">— {task.note}</span>}
-                          </li>
-                        ))}
-                      </ul>
-                      {companyFeatures?.module_auto_reports && (<button type="button" onClick={() => { setTransferInst(instruction); loadReportsFromDatabase(); }} className="bg-green-700 text-white px-3 py-1 rounded-lg text-sm">📋 {t.toReport}</button>)}
-                      <button type="button" onClick={() => createInstructionPDF(instruction)} className="bg-slate-700 text-white px-3 py-1 rounded-lg text-sm">📄 PDF</button>
-                    </div>
-                  ))}
-                  </>)}
                 </section>
-              );
-            });
+                <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-2">
+                  <h3 className="font-bold">{t.workInstructions} ({weekInstructions.length})</h3>
+                  {weekInstructions.length === 0 && <p className="text-gray-500">{t.noInstructionsWeek}</p>}
+                  {weekInstructions.sort((a, b) => (a.work_date || "").localeCompare(b.work_date || "")).map((instruction) => (<div key={instruction.id} className="border border-slate-200 rounded-xl p-3 shadow-sm bg-gray-50"><div onClick={() => { markInstructionRead(instruction.id); setSelectedDayDate(instruction.work_date); setActiveTab("tag"); }} className="cursor-pointer hover:bg-gray-100 flex justify-between items-center"><div><span className="font-medium">{getTranslated(instruction.id, "title", instruction.title)}</span><span className="text-gray-500 text-sm ml-2">{instruction.customer || "-"}</span></div><span className="text-sm text-gray-500">{instruction.work_date}</span></div>{renderReadStatus(instruction)}</div>))}
+                </section>
+              </>
+            );
           })()}
         </div>
       )}
