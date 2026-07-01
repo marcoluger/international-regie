@@ -90,6 +90,7 @@ type CompanyFeatures = {
 
 const texts = {
   Deutsch: {
+    weather: "Wetter", weatherError: "Wetter/Standort nicht verfügbar",
     instructionDoc: "Arbeitsanweisung",
     help: "Anleitung",
     helpEmpty: "Anleitung noch nicht hinterlegt",
@@ -318,6 +319,7 @@ const texts = {
     copyDone: "Arbeitsschritte wurden übernommen.",
   },
   Rumänisch: {
+    weather: "Vreme", weatherError: "Vremea/locația nu este disponibilă",
     instructionDoc: "Instrucțiune de lucru",
     help: "Instrucțiuni",
     helpEmpty: "Instrucțiunile nu sunt încă disponibile",
@@ -546,6 +548,7 @@ const texts = {
     copyDone: "Etapele de lucru au fost preluate.",
   },
   Englisch: {
+    weather: "Weather", weatherError: "Weather/location unavailable",
     instructionDoc: "Work instruction",
     help: "Guide",
     helpEmpty: "Guide not available yet",
@@ -774,6 +777,7 @@ const texts = {
     copyDone: "Work steps have been applied.",
   },
   Italienisch: {
+    weather: "Meteo", weatherError: "Meteo/posizione non disponibile",
     instructionDoc: "Istruzione di lavoro",
     help: "Guida",
     helpEmpty: "Guida non ancora disponibile",
@@ -1002,6 +1006,7 @@ const texts = {
     copyDone: "Le fasi di lavoro sono state applicate.",
   },
   Türkisch: {
+    weather: "Hava", weatherError: "Hava/konum kullanılamıyor",
     instructionDoc: "İş talimatı",
     help: "Kılavuz",
     helpEmpty: "Kılavuz henüz eklenmedi",
@@ -1230,6 +1235,7 @@ const texts = {
     copyDone: "İş adımları alındı.",
   },
   Ungarisch: {
+    weather: "Időjárás", weatherError: "Időjárás/helyzet nem érhető el",
     instructionDoc: "Munkautasítás",
     help: "Útmutató",
     helpEmpty: "Az útmutató még nincs megadva",
@@ -1458,6 +1464,7 @@ const texts = {
     copyDone: "A munkalépések átvéve.",
   },
   Tschechisch: {
+    weather: "Počasí", weatherError: "Počasí/poloha není k dispozici",
     instructionDoc: "Pracovní pokyn",
     help: "Návod",
     helpEmpty: "Návod zatím není k dispozici",
@@ -1686,6 +1693,7 @@ const texts = {
     copyDone: "Pracovní kroky byly převzaty.",
   },
   Ukrainisch: {
+    weather: "Погода", weatherError: "Погода/місцезнаходження недоступні",
     instructionDoc: "Робоча інструкція",
     help: "Інструкція",
     helpEmpty: "Інструкцію ще не додано",
@@ -1914,6 +1922,7 @@ const texts = {
     copyDone: "Робочі кроки перенесено.",
   },
   Bulgarisch: {
+    weather: "Време", weatherError: "Времето/местоположението не е налично",
     instructionDoc: "Работна инструкция",
     help: "Инструкции",
     helpEmpty: "Инструкциите още не са въведени",
@@ -2142,6 +2151,7 @@ const texts = {
     copyDone: "Работните стъпки са прехвърлени.",
   },
   Serbisch: {
+    weather: "Vreme", weatherError: "Vreme/lokacija nije dostupna",
     instructionDoc: "Radni nalog",
     help: "Uputstvo",
     helpEmpty: "Uputstvo još nije uneto",
@@ -2370,6 +2380,7 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Kroatisch: {
+    weather: "Vrijeme", weatherError: "Vrijeme/lokacija nije dostupna",
     instructionDoc: "Radni nalog",
     help: "Upute",
     helpEmpty: "Upute još nisu unesene",
@@ -2598,6 +2609,7 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Slowenisch: {
+    weather: "Vreme", weatherError: "Vreme/lokacija ni na voljo",
     instructionDoc: "Delovni nalog",
     help: "Navodila",
     helpEmpty: "Navodila še niso vnesena",
@@ -2826,6 +2838,7 @@ const texts = {
     copyDone: "Delovni koraki so prevzeti.",
   },
   Polnisch: {
+    weather: "Pogoda", weatherError: "Pogoda/lokalizacja niedostępna",
     instructionDoc: "Instrukcja robocza",
     help: "Instrukcja",
     helpEmpty: "Instrukcja jeszcze nie dodana",
@@ -3591,6 +3604,82 @@ export default function Home() {
     // aus, die die bereits angezeigte Uebersetzung der Anweisung zuruecksetzte (alles wieder
     // deutsch). Der Kommentar ist lokal sichtbar (taskComments) und in der DB gespeichert;
     // beim naechsten regulaeren Laden ist alles konsistent.
+  }
+
+  function wmoToGerman(code: number): string {
+    if (code === 0) return "klar";
+    if (code === 1) return "überwiegend klar";
+    if (code === 2) return "teils bewölkt";
+    if (code === 3) return "bewölkt";
+    if (code === 45 || code === 48) return "Nebel";
+    if (code >= 51 && code <= 55) return "Nieselregen";
+    if (code === 56 || code === 57) return "gefrierender Nieselregen";
+    if (code >= 61 && code <= 65) return "Regen";
+    if (code === 66 || code === 67) return "gefrierender Regen";
+    if (code >= 71 && code <= 75) return "Schnee";
+    if (code === 77) return "Schneegriesel";
+    if (code >= 80 && code <= 82) return "Regenschauer";
+    if (code === 85 || code === 86) return "Schneeschauer";
+    if (code === 95) return "Gewitter";
+    if (code === 96 || code === 99) return "Gewitter mit Hagel";
+    return "wechselhaft";
+  }
+
+  // Holt das aktuelle Wetter am GPS-Standort und gibt eine fertige Textzeile in der Anzeige-Sprache zurueck.
+  async function fetchWeatherLine(): Promise<string | null> {
+    const pos = await new Promise<GeolocationPosition | null>((resolve) => {
+      if (!navigator.geolocation) { resolve(null); return; }
+      navigator.geolocation.getCurrentPosition((p) => resolve(p), () => resolve(null), { timeout: 10000, maximumAge: 300000, enableHighAccuracy: false });
+    });
+    if (!pos) { setMessage(t.weatherError); return null; }
+    const lat = pos.coords.latitude.toFixed(4);
+    const lon = pos.coords.longitude.toFixed(4);
+    let data: any;
+    try {
+      const res = await withTimeout(fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,precipitation,weather_code,wind_speed_10m`), 10000, "Wetter-Timeout");
+      data = await res.json();
+    } catch { setMessage(t.weatherError); return null; }
+    const c = data?.current;
+    if (!c) { setMessage(t.weatherError); return null; }
+    const temp = Math.round(Number(c.temperature_2m));
+    const wind = Math.round(Number(c.wind_speed_10m));
+    const prec = Number(c.precipitation ?? 0);
+    const cond = wmoToGerman(Number(c.weather_code));
+    const now = new Date();
+    const p2 = (n: number) => String(n).padStart(2, "0");
+    const stamp = `${p2(now.getDate())}.${p2(now.getMonth() + 1)}., ${p2(now.getHours())}:${p2(now.getMinutes())}`;
+    let line = `Wetter (${stamp}): ${temp} °C, ${cond}, Wind ${wind} km/h, Niederschlag ${prec} mm`;
+    if (uiLanguage !== "Deutsch") {
+      try {
+        const tr = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: line, fromLanguage: "Deutsch", toLanguage: uiLanguage }) });
+        const td = await tr.json();
+        if (!td.error && td.translation) line = td.translation;
+      } catch { /* Original (Deutsch) belassen */ }
+    }
+    return line;
+  }
+
+  // Wetter in einen Arbeitsanweisungs-Kommentar einfuegen.
+  async function insertWeatherIntoComment(taskId: string, currentVal: string) {
+    setMessage(t.weather + " …");
+    const line = await fetchWeatherLine();
+    if (!line) return;
+    const base = currentVal || "";
+    const sep = base && !base.endsWith("\n") ? "\n" : "";
+    setTaskComments(prev => ({ ...prev, [taskId]: (base + sep + line).slice(0, 1000) }));
+    setCommentSaveState(prev => ({ ...prev, [taskId]: "" }));
+    setMessage("");
+  }
+
+  // Wetter in den Tagestext des Regieberichts einfuegen.
+  async function insertWeatherIntoDay(index: number, currentDesc: string) {
+    setMessage(t.weather + " …");
+    const line = await fetchWeatherLine();
+    if (!line) return;
+    const base = currentDesc || "";
+    const sep = base && !base.endsWith("\n") ? "\n" : "";
+    updateDay(index, "description", base + sep + line);
+    setMessage("");
   }
 
   async function updateTaskNote(taskId: string, note: string) {
@@ -5162,6 +5251,7 @@ export default function Home() {
                 </div>
               </div>
               <textarea className="border p-3 w-full text-black bg-white resize-none overflow-hidden" rows={Math.max(4, (day.description || "").split("\n").length + 1)} placeholder={t.description} value={day.description} onChange={(e) => updateDay(index, "description", e.target.value)} />
+              <button type="button" onClick={() => insertWeatherIntoDay(index, day.description)} title={t.weather} className="bg-cyan-50 text-cyan-700 border border-cyan-200 px-3 py-2 rounded-lg text-sm w-fit">🌦️ {t.weather}</button>
               {companyFeatures?.photos_enabled ? <input type="file" accept="image/*" multiple className="border p-3 w-full text-black bg-white" onChange={(e) => handlePhotos(index, e.target.files)} /> : <div className="border border-slate-200 rounded-xl p-3 shadow-sm bg-gray-50 text-sm text-gray-400">🔒 Foto-Upload ist in deinem Paket nicht aktiviert.</div>}
               {day.photos.length > 0 && (<div className="grid grid-cols-2 gap-3">{day.photos.map((photo, photoIndex) => (<div key={photoIndex} className="border rounded-lg p-2"><img src={photo} alt="Foto" className="w-full h-32 object-cover" /><button type="button" onClick={() => deletePhoto(index, photoIndex)} className="mt-2 bg-red-600 text-white px-2 py-2.5 rounded-lg w-full">{t.deletePhoto}</button></div>))}</div>)}
               {day.translation && (<div className="border p-3 rounded-lg bg-gray-100 text-black"><strong>{t.translation}:</strong><p className="whitespace-pre-wrap break-words mt-1 leading-relaxed">{day.translation}</p></div>)}
@@ -5508,6 +5598,7 @@ export default function Home() {
                             {commentSaveState[task.id] === "saving" && <span className="text-xs text-gray-500">⏳ {t.commentSaving}</span>}
                             {commentSaveState[task.id] === "saved" && <span className="text-xs text-green-700 font-medium">✓ {t.commentSaved}</span>}
                             {commentSaveState[task.id]?.startsWith("error:") && <span className="text-xs text-red-600">{t.commentErrorLabel}: {commentSaveState[task.id].slice(6)}</span>}
+                            <button type="button" onClick={() => insertWeatherIntoComment(task.id, taskComments[task.id] !== undefined ? taskComments[task.id] : getTranslatedComment(instruction.id, task.id, task.employee_comment || ""))} title={t.weather} className="bg-cyan-50 text-cyan-700 border border-cyan-200 px-3 py-2.5 rounded-lg text-sm">🌦️ {t.weather}</button>
                             <button
                               type="button"
                               disabled={commentSaveState[task.id] === "saving"}
