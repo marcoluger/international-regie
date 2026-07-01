@@ -3570,10 +3570,24 @@ export default function Home() {
       }
       setCommentSaveState(prev => ({ ...prev, [taskId]: "saved" }));
       setMessage(t.msgCommentSavedOk);
-      // Getippten Kommentar sofort anzeigen. Das Speichern wird NICHT von einer
-      // Uebersetzung blockiert; die Anzeige-Uebersetzung laeuft spaeter nicht-blockierend
-      // ueber refreshCommentTranslations (beim Neuladen).
-      setTaskComments(prev => ({ ...prev, [taskId]: comment }));
+      // Sofort in die Anzeige-Sprache übersetzen, damit es ohne Neuladen erscheint
+      const instructionId = workInstructions.find(i => (i.work_instruction_tasks || []).some((tk: any) => tk.id === taskId))?.id;
+      let translated = "";
+      try {
+        const tr = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: comment, fromLanguage: "automatisch", toLanguage: uiLanguage }) });
+        const trData = await tr.json();
+        if (!trData.error && trData.translation) translated = trData.translation;
+      } catch { /* Übersetzung übersprungen */ }
+      if (instructionId && translated) {
+        setInstructionTranslations(prev => ({
+          ...prev,
+          [instructionId]: { ...prev[instructionId], language: uiLanguage, tasks: { ...prev[instructionId]?.tasks, [`comment_${taskId}`]: translated } },
+        }));
+        // Eingabefeld auf die Übersetzung umstellen
+        setTaskComments(prev => { const n = { ...prev }; delete n[taskId]; return n; });
+      } else {
+        setTaskComments(prev => ({ ...prev, [taskId]: comment }));
+      }
     } catch (err: any) {
       setCommentSaveState(prev => ({ ...prev, [taskId]: "error:" + String(err?.message || err) }));
       setMessage("Fehler beim Speichern: " + String(err?.message || err));
@@ -3908,11 +3922,8 @@ export default function Home() {
     if (jobs.length === 0) return;
     const fieldUpdates: Record<string, Record<string, string>> = {};
     const taskUpdates: Record<string, Record<string, string>> = {};
-    // Gedrosselt uebersetzen: max. CONCURRENCY gleichzeitig, damit der Browser
-    // Verbindungen fuer andere Aktionen (z. B. Kommentar-Speichern) frei behaelt
-    // und der Server nicht von hunderten Anfragen auf einmal ueberrannt wird.
-    const CONCURRENCY = 4;
-    const runJob = async (job: Job) => {
+    // PARALLEL übersetzen (statt nacheinander)
+    await Promise.all(jobs.map(async (job) => {
       try {
         const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: job.text, fromLanguage: job.sourceLang, toLanguage: targetLang }) });
         const data = await res.json();
@@ -3926,10 +3937,7 @@ export default function Home() {
           }
         }
       } catch { /* Übersetzung übersprungen */ }
-    };
-    for (let i = 0; i < jobs.length; i += CONCURRENCY) {
-      await Promise.all(jobs.slice(i, i + CONCURRENCY).map(runJob));
-    }
+    }));
     const ids = new Set([...Object.keys(fieldUpdates), ...Object.keys(taskUpdates)]);
     if (ids.size > 0) {
       setInstructionTranslations((prev) => {
