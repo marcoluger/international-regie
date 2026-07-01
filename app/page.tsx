@@ -5129,7 +5129,7 @@ export default function Home() {
           {reportExpanded && (<>
           {days.map((day, index) => (
             <section key={day.weekday} className="border rounded p-4 space-y-3 bg-white text-black">
-              <h2 className="text-xl font-bold cursor-pointer select-none" onClick={() => setOpenReportDays(prev => ({ ...prev, [day.weekday]: !prev[day.weekday] }))}>{openReportDays[day.weekday] ? "▾" : "▸"} {t.weekdays[index] || day.weekday}</h2>
+              <h2 className="text-xl font-bold cursor-pointer select-none" onClick={() => setOpenReportDays(prev => ({ ...prev, [day.weekday]: !prev[day.weekday] }))}>{openReportDays[day.weekday] ? "▾" : "▸"} {t.weekdays[index] || day.weekday}{(day.description || day.hours || day.customer || day.projectNumber || day.site || (day.photos && day.photos.length > 0)) ? <span className="inline-block w-3 h-3 rounded-full bg-green-500 ml-2 align-middle"></span> : null}</h2>
               {openReportDays[day.weekday] && (<>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <input type="date" className="border p-3 text-black bg-white" value={day.date} onChange={(e) => { if (index === 0) updateFullWeekFromMonday(e.target.value); else updateDay(index, "date", e.target.value); }} />
