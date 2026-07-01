@@ -3215,7 +3215,7 @@ function getCalendarWeek(dateString: string) {
 
 function TabButton({ label, tabName, activeTab, onClick }: { label: string; tabName: string; activeTab: string; onClick: () => void }) {
   return (
-    <button type="button" onClick={onClick} className={`px-4 py-2 rounded font-medium transition-colors ${activeTab === tabName ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-800 hover:bg-gray-300"}`}>
+    <button type="button" onClick={onClick} className={`px-5 py-3 rounded-full text-sm font-medium transition-colors ${activeTab === tabName ? "bg-cyan-600 text-white shadow-sm" : "bg-white text-slate-600 border border-slate-300 hover:bg-slate-50"}`}>
       {label}
     </button>
   );
@@ -4835,7 +4835,7 @@ export default function Home() {
 
   if (!user) {
     return (
-      <main className="max-w-xl mx-auto p-4 md:p-8 space-y-6 bg-gray-100 min-h-screen text-black">
+      <main className="max-w-xl mx-auto p-4 md:p-8 space-y-6 bg-slate-100 min-h-screen text-black">
         <section className="border rounded p-4 space-y-4 bg-white">
           <h1 className="text-3xl font-bold">{t.loginTitle}</h1>
           {message && <div className="border rounded p-3 bg-yellow-100 text-black">{message}</div>}
@@ -4848,7 +4848,7 @@ export default function Home() {
             <input name="password" autoComplete="current-password" className="border p-3 w-full text-black bg-white pr-12" placeholder={t.password} type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} />
             <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-lg">{showPassword ? "🙈" : "👁️"}</button>
           </div>
-          <button type="submit" className="bg-blue-600 text-white px-4 py-3 rounded w-full">{t.login}</button>
+          <button type="submit" className="bg-cyan-600 text-white px-4 py-3 rounded w-full">{t.login}</button>
           </form>
         </section>
         <footer className="text-center text-xs text-gray-500 mt-6">
@@ -4868,7 +4868,7 @@ export default function Home() {
           {message && <div className="bg-yellow-50 border rounded p-3 text-sm">{message}</div>}
           <input className="border p-3 w-full rounded text-black" placeholder="Neues Passwort (min. 8 Zeichen)" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
           <input className="border p-3 w-full rounded text-black" placeholder="Passwort bestätigen" type="password" value={newPasswordConfirm} onChange={(e) => setNewPasswordConfirm(e.target.value)} />
-          <button type="button" onClick={changePassword} disabled={changingPassword} className="w-full bg-blue-700 text-white py-3 rounded font-bold disabled:opacity-50">{changingPassword ? "Wird gespeichert..." : "Passwort speichern & weiter"}</button>
+          <button type="button" onClick={changePassword} disabled={changingPassword} className="w-full bg-cyan-700 text-white py-3 rounded font-bold disabled:opacity-50">{changingPassword ? "Wird gespeichert..." : "Passwort speichern & weiter"}</button>
         </div>
       </main>
     );
@@ -4891,7 +4891,7 @@ export default function Home() {
     return (
       <main className="max-w-xl mx-auto p-4 md:p-8 min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="bg-white border rounded-xl p-6 space-y-6 w-full shadow-lg">
-          <div className="flex items-center gap-2 mb-2">{[1, 2, 3].map((step) => (<div key={step} className={`flex-1 h-2 rounded-full ${onboardingStep >= step ? "bg-blue-600" : "bg-gray-200"}`} />))}</div>
+          <div className="flex items-center gap-2 mb-2">{[1, 2, 3].map((step) => (<div key={step} className={`flex-1 h-2 rounded-full ${onboardingStep >= step ? "bg-cyan-600" : "bg-gray-200"}`} />))}</div>
           {onboardingStep === 1 && (
             <div className="space-y-4">
               <h2 className="text-2xl font-bold">👋 Willkommen!</h2>
@@ -4904,7 +4904,7 @@ export default function Home() {
                   <input className="border p-3 rounded text-black" placeholder="Ort" value={companySettings?.city || ""} onChange={(e) => updateCompanyField("city", e.target.value)} />
                 </div>
               </div>
-              <button type="button" onClick={() => { if (!companySettings?.company_name?.trim()) { setMessage("Bitte Firmenname eingeben."); return; } setOnboardingStep(2); }} className="w-full bg-blue-700 text-white py-3 rounded font-bold">Weiter →</button>
+              <button type="button" onClick={() => { if (!companySettings?.company_name?.trim()) { setMessage("Bitte Firmenname eingeben."); return; } setOnboardingStep(2); }} className="w-full bg-cyan-700 text-white py-3 rounded font-bold">Weiter →</button>
             </div>
           )}
           {onboardingStep === 2 && (
@@ -4918,7 +4918,7 @@ export default function Home() {
               </div>
               <div className="flex gap-3">
                 <button type="button" onClick={() => setOnboardingStep(1)} className="flex-1 bg-gray-200 text-gray-800 py-3 rounded font-medium">← Zurück</button>
-                <button type="button" onClick={() => setOnboardingStep(3)} className="flex-1 bg-blue-700 text-white py-3 rounded font-bold">Weiter →</button>
+                <button type="button" onClick={() => setOnboardingStep(3)} className="flex-1 bg-cyan-700 text-white py-3 rounded font-bold">Weiter →</button>
               </div>
             </div>
           )}
@@ -4942,17 +4942,17 @@ export default function Home() {
   }
 
   return (
-    <main className="max-w-5xl mx-auto p-4 md:p-8 space-y-6 bg-gray-100 min-h-screen text-black overflow-x-hidden">
-      <header className="bg-white border rounded p-4 space-y-1">
-        <h1 className="text-3xl font-bold">{t.title}</h1>
-        <p className="text-gray-600">{t.subtitle}</p>
-        <p className="text-gray-700 break-words">{t.loggedInAs}: <strong>{user.email}</strong></p>
-        {currentCompany && (<p className="text-gray-700 break-words">{t.firma}: <strong>{currentCompany.companies.name}</strong> | {t.role}: <strong>{currentCompany.role === "owner" ? "Owner" : currentCompany.role === "admin" ? t.roleAdmin : currentCompany.role === "project_manager" ? t.roleProjectManager : t.roleEmployee}</strong></p>)}
-        <div className="flex items-center flex-wrap gap-3 mt-2">
-          <button type="button" onClick={signOut} className="bg-gray-800 text-white px-4 py-2 rounded">{t.logout}</button>
-          <button type="button" onClick={refreshAll} disabled={refreshing} title="Aktualisieren" className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50">{refreshing ? "⏳" : "🔄"}</button>
-          <button type="button" onClick={openHelp} title={t.help} aria-label={t.help} className="bg-gray-200 text-gray-800 px-4 py-2 rounded">❓</button>
-          <select className="border p-2 rounded text-black bg-white text-sm" value={uiLanguage} onChange={(e) => {
+    <main className="max-w-5xl mx-auto p-4 md:p-8 space-y-6 bg-slate-100 min-h-screen text-black overflow-x-hidden">
+      <header className="bg-cyan-600 rounded-2xl p-5 space-y-1 shadow-sm">
+        <h1 className="text-2xl md:text-3xl font-bold text-white">{t.title}</h1>
+        <p className="text-cyan-100 text-sm">{t.subtitle}</p>
+        <p className="text-cyan-50 text-sm break-words">{t.loggedInAs}: <strong className="text-white">{user.email}</strong></p>
+        {currentCompany && (<p className="text-cyan-50 text-sm break-words">{t.firma}: <strong>{currentCompany.companies.name}</strong> | {t.role}: <strong>{currentCompany.role === "owner" ? "Owner" : currentCompany.role === "admin" ? t.roleAdmin : currentCompany.role === "project_manager" ? t.roleProjectManager : t.roleEmployee}</strong></p>)}
+        <div className="flex items-center flex-wrap gap-2 mt-3">
+          <button type="button" onClick={signOut} className="bg-white text-cyan-700 px-4 py-2.5 rounded-lg font-medium">{t.logout}</button>
+          <button type="button" onClick={refreshAll} disabled={refreshing} title="Aktualisieren" className="bg-cyan-700 text-white px-4 py-2.5 rounded-lg disabled:opacity-50">{refreshing ? "⏳" : "🔄"}</button>
+          <button type="button" onClick={openHelp} title={t.help} aria-label={t.help} className="bg-cyan-700 text-white px-4 py-2.5 rounded-lg">❓</button>
+          <select className="p-2.5 rounded-lg text-black bg-white text-sm border-0" value={uiLanguage} onChange={(e) => {
             // Sprache umschalten + pro Benutzer in der DB merken (geraeteuebergreifend).
             const newLang = e.target.value as Language;
             setUiLanguage(newLang);
@@ -5063,7 +5063,7 @@ export default function Home() {
                   <p className="text-gray-500 text-sm">{rangeLabel} · {dashShown.length} {t.projects}</p>
                   <div className="flex gap-2 mt-3">
                     {([["today", t.dashToday], ["tomorrow", t.dashTomorrow], ["week", t.dashWeek], ["nextweek", t.dashNextWeek]] as [string, string][]).map(([val, lbl]) => (
-                      <button key={val} type="button" onClick={() => setDashRange(val)} className={`px-3 py-1 rounded text-sm ${dashRange === val ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-700"}`}>{lbl}</button>
+                      <button key={val} type="button" onClick={() => setDashRange(val)} className={`px-3 py-1 rounded text-sm ${dashRange === val ? "bg-cyan-600 text-white" : "bg-gray-100 text-gray-700"}`}>{lbl}</button>
                     ))}
                   </div>
                 </div>
@@ -5096,7 +5096,7 @@ export default function Home() {
                               <span>{icon}</span>
                               <span className={`flex-1 break-words ${s === "completed" ? "line-through text-gray-400" : ""}`}>{getTranslatedTask(r.inst.id, r.task.id, r.task.task_text)}</span>
                               {r.date && r.date !== today ? (<span className={r.overdue ? "text-xs text-red-600 whitespace-nowrap" : "text-xs text-gray-500 whitespace-nowrap"}>{r.overdue ? t.dashOverdue + ": " : ""}{r.date}</span>) : (r.task.note ? (<span className="text-xs text-gray-500 whitespace-nowrap break-words">{r.task.note}</span>) : null)}
-                              <button type="button" onClick={() => openInstructionFromDashboard(r.inst)} title={t.dashOpen} aria-label={t.dashOpen} className="text-blue-600 hover:text-blue-800 shrink-0 px-1 font-bold">→</button>
+                              <button type="button" onClick={() => openInstructionFromDashboard(r.inst)} title={t.dashOpen} aria-label={t.dashOpen} className="text-cyan-700 hover:text-cyan-800 shrink-0 px-1 font-bold">→</button>
                             </div>
                           );
                         })}
@@ -5202,7 +5202,7 @@ export default function Home() {
             <button type="button" onClick={saveReport} className="bg-orange-600 text-white px-4 py-3 rounded">{currentReportId ? t.updateReport : t.saveReport}</button>
             <button type="button" onClick={() => { newReport(); setMessage(t.msgNewReport); }} className="bg-gray-700 text-white px-4 py-3 rounded">{t.newReport}</button>
           </div>
-          {savedReports.length > 0 && (<div className="space-y-2"><h3 className="font-bold">{t.savedReports}</h3>{savedReports.map((report) => (<div key={report.id} className="border rounded p-3 space-y-2"><strong>{report.report_name}</strong><p className="text-sm text-gray-700">{t.employee}: {report.employee || "-"} | {new Date(report.created_at).toLocaleString("de-DE")}</p><div className="flex gap-2"><button type="button" onClick={() => loadReport(report)} className="bg-blue-600 text-white px-3 py-2 rounded">{t.loadEdit}</button><button type="button" onClick={() => deleteReport(report.id)} className="bg-red-600 text-white px-3 py-2 rounded">{t.delete}</button></div></div>))}</div>)}
+          {savedReports.length > 0 && (<div className="space-y-2"><h3 className="font-bold">{t.savedReports}</h3>{savedReports.map((report) => (<div key={report.id} className="border rounded p-3 space-y-2"><strong>{report.report_name}</strong><p className="text-sm text-gray-700">{t.employee}: {report.employee || "-"} | {new Date(report.created_at).toLocaleString("de-DE")}</p><div className="flex gap-2"><button type="button" onClick={() => loadReport(report)} className="bg-cyan-600 text-white px-3 py-2 rounded">{t.loadEdit}</button><button type="button" onClick={() => deleteReport(report.id)} className="bg-red-600 text-white px-3 py-2 rounded">{t.delete}</button></div></div>))}</div>)}
         </section>
       )}
 
@@ -5218,7 +5218,7 @@ export default function Home() {
               {companyUsers.filter((m: any) => m.role === "project_manager").map((m: any) => (<option key={m.user_id} value={m.full_name || m.email || ""}>{m.full_name || m.email}</option>))}
             </select>
           </div>
-          <button type="button" onClick={saveProject} className="bg-blue-700 text-white px-4 py-3 rounded">{t.saveProject}</button>
+          <button type="button" onClick={saveProject} className="bg-cyan-700 text-white px-4 py-3 rounded">{t.saveProject}</button>
           <div className="space-y-3 mt-4">
             {projects.map((project) => (
               <div key={project.id} className="border rounded p-3 space-y-2">
@@ -5233,7 +5233,7 @@ export default function Home() {
                     {project.project_manager && !companyUsers.some((m: any) => (m.full_name || m.email) === project.project_manager && m.role === "project_manager") && (<option value={project.project_manager}>{project.project_manager}</option>)}
                     {companyUsers.filter((m: any) => m.role === "project_manager").map((m: any) => (<option key={m.user_id} value={m.full_name || m.email || ""}>{m.full_name || m.email}</option>))}
                   </select>
-                  <button type="button" onClick={() => updateProjectManager(project.id, pmEdits[project.id] ?? (project.project_manager || ""))} className="bg-blue-700 text-white px-3 py-1 rounded text-sm">{t.save}</button>
+                  <button type="button" onClick={() => updateProjectManager(project.id, pmEdits[project.id] ?? (project.project_manager || ""))} className="bg-cyan-700 text-white px-3 py-1 rounded text-sm">{t.save}</button>
                   <button type="button" onClick={() => assignPmToProjectInstructions(project.id, pmEdits[project.id] ?? (project.project_manager || ""))} className="bg-green-700 text-white px-3 py-1 rounded text-sm">{t.assignVisibility}</button>
                 </div>
                 ) : (
@@ -5360,14 +5360,14 @@ export default function Home() {
             ))}
             <div className="flex gap-3">
               <button type="button" onClick={() => setInstructionTasks([...instructionTasks, ""])} className="bg-gray-700 text-white px-4 py-3 rounded">{t.addStep}</button>
-              <button type="button" onClick={saveWorkInstruction} className="bg-blue-700 text-white px-4 py-3 rounded">{t.saveInstruction}</button>
+              <button type="button" onClick={saveWorkInstruction} className="bg-cyan-700 text-white px-4 py-3 rounded">{t.saveInstruction}</button>
               {editingInstructionId && (<button type="button" onClick={cancelEditInstruction} className="bg-gray-500 text-white px-4 py-3 rounded">{t.copyCancel}</button>)}
             </div>
           </section>
           ) : (
             <section className="border rounded p-4 bg-yellow-50 text-black"><p className="text-yellow-700 text-sm">🔒 {t.instructionsLocked}</p></section>
           )}
-          <section className="border rounded p-4 bg-blue-50 text-black"><p className="text-blue-700 text-sm">💡 {t.savedInstructions} → {t.tabDay} / {t.tabWeek} / {t.tabMonth}</p></section>
+          <section className="border rounded p-4 bg-cyan-50 text-black"><p className="text-cyan-700 text-sm">💡 {t.savedInstructions} → {t.tabDay} / {t.tabWeek} / {t.tabMonth}</p></section>
           <section className="border rounded p-4 bg-white text-black space-y-3">
             <h2 className="text-xl font-bold cursor-pointer select-none" onClick={() => setOpenInstrList((v) => !v)}>{openInstrList ? "▾" : "▸"} {t.savedInstructions}</h2>
             {openInstrList && (() => {
@@ -5476,7 +5476,7 @@ export default function Home() {
                 {openDayCards[instruction.id] && (<>
                 <p><strong>{t.customer}:</strong> {instruction.customer || "-"}</p>
                 {instruction.problems_text && (<div className="bg-yellow-50 border rounded p-2"><strong>{t.problemsHints}:</strong> {getTranslated(instruction.id, "problems_text", instruction.problems_text)}</div>)}
-                {instruction.material && (<div className="bg-blue-50 border rounded p-2"><strong>{t.material}:</strong> {getTranslated(instruction.id, "material", instruction.material)}</div>)}
+                {instruction.material && (<div className="bg-cyan-50 border rounded p-2"><strong>{t.material}:</strong> {getTranslated(instruction.id, "material", instruction.material)}</div>)}
                 {instruction.werkzeug && (<div className="bg-green-50 border rounded p-2"><strong>{t.werkzeug}:</strong> {getTranslated(instruction.id, "werkzeug", instruction.werkzeug)}</div>)}
                 {(instruction.photos || []).length > 0 && companyFeatures?.photos_enabled && (<div className="grid grid-cols-3 gap-2">{(instruction.photos || []).map((photo: string, i: number) => (<img key={i} src={photo} alt="Foto" className="w-full h-24 object-cover rounded border" />))}</div>)}
                 <ul className="space-y-4 mt-2">
@@ -5516,7 +5516,7 @@ export default function Home() {
                                 const val = taskComments[task.id] !== undefined ? taskComments[task.id] : getTranslatedComment(instruction.id, task.id, task.employee_comment || "");
                                 updateTaskComment(task.id, val);
                               }}
-                              className="bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium disabled:opacity-50"
+                              className="bg-cyan-600 text-white px-4 py-2 rounded text-sm font-medium disabled:opacity-50"
                             >
                               💾 {t.commentSaveBtn}
                             </button>
@@ -5565,7 +5565,7 @@ export default function Home() {
                 <section key={dateStr} className="border rounded p-4 bg-white text-black space-y-3">
                   <div className="flex justify-between items-center bg-gray-100 rounded p-2">
                     <h3 className="font-bold cursor-pointer select-none" onClick={() => { const willOpen = !openWeekDays[dateStr]; setOpenWeekDays(prev => ({ ...prev, [dateStr]: !prev[dateStr] })); if (willOpen) dayInstructions.forEach((ins: any) => markInstructionRead(ins.id)); }}>{openWeekDays[dateStr] ? "▾" : "▸"} {t.weekdays[di]} — {dateStr}</h3>
-                    <button type="button" onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }} className="text-blue-600 text-sm hover:underline">→ {t.dayView}</button>
+                    <button type="button" onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }} className="text-cyan-700 text-sm hover:underline">→ {t.dayView}</button>
                   </div>
                   {openWeekDays[dateStr] && (<>
                   {dayInstructions.map((instruction) => (
@@ -5624,7 +5624,7 @@ export default function Home() {
                       const dateStr = `${selectedMonth}-${String(day).padStart(2, "0")}`;
                       const entries = monthInstructions.filter((inst) => inst.work_date === dateStr);
                       const isToday = dateStr === new Date().toISOString().split("T")[0];
-                      return (<div key={day} onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }} className={`border rounded p-1 min-h-14 min-w-0 cursor-pointer hover:border-blue-400 transition-colors ${isToday ? "border-blue-500 bg-blue-50" : entries.length > 0 ? "bg-green-50 border-green-300" : "bg-white"}`}><div className={`text-xs font-bold ${isToday ? "text-blue-600" : "text-gray-700"}`}>{day}</div>{entries.length > 0 && <div className="text-xs text-green-700 font-medium">{entries.length} ✓</div>}{entries[0] && <div className="text-xs text-gray-500 truncate">{entries[0].title}</div>}</div>);
+                      return (<div key={day} onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }} className={`border rounded p-1 min-h-14 min-w-0 cursor-pointer hover:border-cyan-500 transition-colors ${isToday ? "border-cyan-600 bg-cyan-50" : entries.length > 0 ? "bg-green-50 border-green-300" : "bg-white"}`}><div className={`text-xs font-bold ${isToday ? "text-cyan-700" : "text-gray-700"}`}>{day}</div>{entries.length > 0 && <div className="text-xs text-green-700 font-medium">{entries.length} ✓</div>}{entries[0] && <div className="text-xs text-gray-500 truncate">{entries[0].title}</div>}</div>);
                     })}
                   </div>
                 </section>
@@ -5655,7 +5655,7 @@ export default function Home() {
                   {currentCompany?.role === "owner" && <option value="admin">{t.roleAdmin}</option>}
                 </select>
               </div>
-              <button type="button" onClick={addCompanyUser} disabled={creatingEmployee} className="bg-blue-700 text-white px-4 py-3 rounded disabled:opacity-50">{creatingEmployee ? "Wird angelegt..." : t.addEmployee}</button>
+              <button type="button" onClick={addCompanyUser} disabled={creatingEmployee} className="bg-cyan-700 text-white px-4 py-3 rounded disabled:opacity-50">{creatingEmployee ? "Wird angelegt..." : t.addEmployee}</button>
               <p className="text-xs text-gray-400">Der Mitarbeiter meldet sich mit seinem Benutzernamen und Passwort an.</p>
             </div>
           )}
@@ -5693,7 +5693,7 @@ export default function Home() {
             <input className="border p-3 text-black bg-white" placeholder={t.website} value={companySettings?.website || ""} onChange={(e) => updateCompanyField("website", e.target.value)} />
             <input className="border p-3 text-black bg-white" placeholder={t.taxNumber} value={companySettings?.tax_number || ""} onChange={(e) => updateCompanyField("tax_number", e.target.value)} />
           </div>
-          <button type="button" onClick={saveCompanySettings} className="bg-blue-700 text-white px-4 py-3 rounded">{t.saveCompany}</button>
+          <button type="button" onClick={saveCompanySettings} className="bg-cyan-700 text-white px-4 py-3 rounded">{t.saveCompany}</button>
         </section>
       )}
 
@@ -5715,7 +5715,7 @@ export default function Home() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-medium">{t.copyWhichSteps}</p>
-                  <button type="button" className="text-xs text-blue-600 underline" onClick={() => {
+                  <button type="button" className="text-xs text-cyan-700 underline" onClick={() => {
                     const all = (copyModalInstruction.work_instruction_tasks || []).map((task: any) => task.id);
                     setCopySelectedTaskIds((prev) => prev.length === all.length ? [] : all);
                   }}>{t.copyAllNone}</button>
@@ -5766,7 +5766,7 @@ export default function Home() {
                 {savedReports.map((report) => (
                   <div key={report.id} className="flex items-center justify-between gap-2 border rounded p-2">
                     <span className="text-sm truncate"><strong>{report.report_name}</strong></span>
-                    <button type="button" onClick={() => { const inst = transferInst; setTransferInst(null); createReportFromInstruction(inst, report); }} className="bg-blue-600 text-white px-3 py-2 rounded text-sm whitespace-nowrap">{t.transferInsert}</button>
+                    <button type="button" onClick={() => { const inst = transferInst; setTransferInst(null); createReportFromInstruction(inst, report); }} className="bg-cyan-600 text-white px-3 py-2 rounded text-sm whitespace-nowrap">{t.transferInsert}</button>
                   </div>
                 ))}
               </div>
