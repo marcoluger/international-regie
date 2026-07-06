@@ -3365,6 +3365,9 @@ export default function Home() {
   // Aktuelles Anmelde-Token, laufend aus onAuthStateChange gesetzt.
   // So braucht das Speichern kein getSession() (das kann unter Last haengen).
   const tokenRef = useRef<string>("");
+  // Kennt immer die aktuell gewaehlte Anzeige-Sprache – damit spaet eintreffende
+  // Uebersetzungen einer alten Sprache die neue nicht mehr ueberschreiben koennen.
+  const uiLanguageRef = useRef<Language>("Deutsch");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [companySettings, setCompanySettings] = useState<CompanySettings | null>(null);
@@ -3478,6 +3481,7 @@ export default function Home() {
     .map((i: any) => `${i.id}.${(i.title || "").length}.${(i.problems_text || "").length}.${(i.work_instruction_tasks || []).map((task: any) => `${task.id}:${(task.task_text || "").length}:${(task.employee_comment || "").length}`).join(",")}`)
     .join("|");
   useEffect(() => {
+    uiLanguageRef.current = uiLanguage;
     if (workInstructions.length > 0) {
       refreshCommentTranslations(uiLanguage, workInstructions);
     }
@@ -4085,6 +4089,9 @@ export default function Home() {
       }
     }
     const ids = new Set([...Object.keys(fieldUpdates), ...Object.keys(taskUpdates)]);
+    // Inzwischen wurde die Sprache gewechselt? Dann dieses (veraltete) Ergebnis verwerfen,
+    // damit es die aktuelle Anzeige-Sprache nicht ueberschreibt.
+    if (targetLang !== uiLanguageRef.current) return;
     if (ids.size > 0) {
       setInstructionTranslations((prev) => {
         const next: Record<string, any> = { ...prev };
