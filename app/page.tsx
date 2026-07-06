@@ -3459,6 +3459,9 @@ export default function Home() {
     if (!user?.id) return;
     setRefreshing(true);
     try {
+      // Zuerst Sitzung/Token auffrischen – sonst haengen die Abfragen in der Handy-PWA
+      // (blockierter Token-Refresh nach dem Wiederaufwecken) und liefern leere Daten.
+      await ensureFreshSession();
       // Jeder Ladevorgang ist zeitlich begrenzt (max. 12s), damit der Knopf
       // bei einer haengenden Verbindung nicht ewig auf "Laden" stehen bleibt.
       await dbTimeout(loadCompanyContext(user.id), 12000);
