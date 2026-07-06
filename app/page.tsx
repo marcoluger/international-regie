@@ -3084,6 +3084,64 @@ const pdfTexts = {
   Serbisch: { title: "Regie International", company: "Regie International", report: "Izveštaj", calendarWeek: "Kalendarska nedelja", employee: "Radnik", dailyReports: "Dnevni izveštaji", customer: "Klijent", project: "Projekat", site: "Gradilište", hours: "Sati", startLabel: "Početak", endLabel: "Kraj", pauseLabel: "Pauza", description: "Opis posla", photos: "Fotografije", photo: "Fotografija", summary: "Rezime", totalHours: "Ukupno sati", signatureEmployee: "Potpis radnika", signatureCustomer: "Potpis klijenta / rukovodioca gradilišta", createdAt: "Kreirano" },
 };
 
+// ── Wetter: zentrale Wortlisten + deterministische Umsetzung in jede Anzeige-Sprache ──
+const WEATHER_COND: Record<string, Record<string, string>> = {
+  clear:   { Deutsch:"klar", Rumänisch:"senin", Englisch:"clear", Italienisch:"sereno", Türkisch:"açık", Ungarisch:"derült", Tschechisch:"jasno", Ukrainisch:"ясно", Bulgarisch:"ясно", Serbisch:"vedro", Kroatisch:"vedro", Slowenisch:"jasno", Polnisch:"bezchmurnie" },
+  partly:  { Deutsch:"teils bewölkt", Rumänisch:"parțial înnorat", Englisch:"partly cloudy", Italienisch:"parzialmente nuvoloso", Türkisch:"parçalı bulutlu", Ungarisch:"részben felhős", Tschechisch:"polojasno", Ukrainisch:"мінлива хмарність", Bulgarisch:"частична облачност", Serbisch:"delimično oblačno", Kroatisch:"djelomično oblačno", Slowenisch:"delno oblačno", Polnisch:"częściowe zachmurzenie" },
+  cloudy:  { Deutsch:"bewölkt", Rumänisch:"înnorat", Englisch:"cloudy", Italienisch:"nuvoloso", Türkisch:"bulutlu", Ungarisch:"felhős", Tschechisch:"zataženo", Ukrainisch:"хмарно", Bulgarisch:"облачно", Serbisch:"oblačno", Kroatisch:"oblačno", Slowenisch:"oblačno", Polnisch:"pochmurno" },
+  fog:     { Deutsch:"Nebel", Rumänisch:"ceață", Englisch:"fog", Italienisch:"nebbia", Türkisch:"sis", Ungarisch:"köd", Tschechisch:"mlha", Ukrainisch:"туман", Bulgarisch:"мъгла", Serbisch:"magla", Kroatisch:"magla", Slowenisch:"megla", Polnisch:"mgła" },
+  drizzle: { Deutsch:"Nieselregen", Rumänisch:"burniță", Englisch:"drizzle", Italienisch:"pioviggine", Türkisch:"çisenti", Ungarisch:"szitálás", Tschechisch:"mrholení", Ukrainisch:"мряка", Bulgarisch:"ръмеж", Serbisch:"rosulja", Kroatisch:"rosulja", Slowenisch:"rosenje", Polnisch:"mżawka" },
+  rain:    { Deutsch:"Regen", Rumänisch:"ploaie", Englisch:"rain", Italienisch:"pioggia", Türkisch:"yağmur", Ungarisch:"eső", Tschechisch:"déšť", Ukrainisch:"дощ", Bulgarisch:"дъжд", Serbisch:"kiša", Kroatisch:"kiša", Slowenisch:"dež", Polnisch:"deszcz" },
+  snow:    { Deutsch:"Schnee", Rumänisch:"ninsoare", Englisch:"snow", Italienisch:"neve", Türkisch:"kar", Ungarisch:"hó", Tschechisch:"sníh", Ukrainisch:"сніг", Bulgarisch:"сняг", Serbisch:"sneg", Kroatisch:"snijeg", Slowenisch:"sneg", Polnisch:"śnieg" },
+  showers: { Deutsch:"Regenschauer", Rumänisch:"averse de ploaie", Englisch:"rain showers", Italienisch:"rovesci di pioggia", Türkisch:"sağanak yağış", Ungarisch:"záporeső", Tschechisch:"přeháňky", Ukrainisch:"зливи", Bulgarisch:"превалявания", Serbisch:"pljuskovi", Kroatisch:"pljuskovi", Slowenisch:"plohe", Polnisch:"przelotne opady" },
+  thunder: { Deutsch:"Gewitter", Rumänisch:"furtună", Englisch:"thunderstorm", Italienisch:"temporale", Türkisch:"gök gürültülü fırtına", Ungarisch:"zivatar", Tschechisch:"bouřka", Ukrainisch:"гроза", Bulgarisch:"гръмотевична буря", Serbisch:"grmljavina", Kroatisch:"grmljavina", Slowenisch:"nevihta", Polnisch:"burza" },
+  unknown: { Deutsch:"wechselhaft", Rumänisch:"variabil", Englisch:"variable", Italienisch:"variabile", Türkisch:"değişken", Ungarisch:"változékony", Tschechisch:"proměnlivo", Ukrainisch:"мінливо", Bulgarisch:"променливо", Serbisch:"promenljivo", Kroatisch:"promjenjivo", Slowenisch:"spremenljivo", Polnisch:"zmiennie" },
+};
+const WEATHER_WORD_TO_CAT: Record<string, string> = (() => {
+  const map: Record<string, string> = {};
+  for (const cat in WEATHER_COND) { for (const lang in WEATHER_COND[cat]) { map[WEATHER_COND[cat][lang].toLowerCase()] = cat; } }
+  return map;
+})();
+function wmoCat(code: number): string {
+  return code === 0 ? "clear"
+    : (code === 1 || code === 2) ? "partly"
+    : code === 3 ? "cloudy"
+    : (code === 45 || code === 48) ? "fog"
+    : (code >= 51 && code <= 57) ? "drizzle"
+    : (code >= 61 && code <= 67) ? "rain"
+    : (code >= 71 && code <= 77) ? "snow"
+    : (code >= 80 && code <= 82) ? "showers"
+    : (code >= 85 && code <= 86) ? "snow"
+    : (code >= 95) ? "thunder"
+    : "unknown";
+}
+function wmoLocalizedText(code: number, lang: string): string {
+  const cat = wmoCat(code);
+  return (WEATHER_COND as any)[cat]?.[lang] || (WEATHER_COND as any)[cat]?.Deutsch || "";
+}
+// Trennt Wetterzeilen (erkennbar am Wind-Symbol) vom restlichen Kommentartext.
+function splitWeather(text: string): { body: string; weather: string[] } {
+  const body: string[] = [];
+  const weather: string[] = [];
+  for (const ln of (text || "").split("\n")) {
+    if (ln.indexOf("💨") !== -1) weather.push(ln.trim());
+    else body.push(ln);
+  }
+  return { body: body.join("\n"), weather };
+}
+// Setzt eine Wetterzeile deterministisch in die Ziel-Sprache um (egal, in welcher sie erstellt wurde).
+function localizeWeather(line: string, lang: string): string {
+  if (!line || line.indexOf("💨") === -1) return line;
+  const targetPrefix = ((texts as any)[lang] && (texts as any)[lang].weather) || "Wetter";
+  const m = line.match(/^(🌦️\s*)?(\S+)( .+?)? \(([\d.,: ]+)\): ([\d.,\-]+) °C, (.+?), 💨 ([\d.,\-]+) km\/h, 🌧️ ([\d.,\-]+) mm(.*)$/);
+  if (!m) return line;
+  const marker = m[1] || "";
+  const place = m[3] || "";
+  const cat = WEATHER_WORD_TO_CAT[(m[6] || "").trim().toLowerCase()] || "unknown";
+  const targetCond = (WEATHER_COND as any)[cat]?.[lang] || m[6];
+  return `${marker}${targetPrefix}${place} (${m[4]}): ${m[5]} °C, ${targetCond}, 💨 ${m[7]} km/h, 🌧️ ${m[8]} mm${m[9] || ""}`;
+}
+
 function createEmptyDays(): DayEntry[] {
   return weekdays.map((day) => ({ weekday: day, date: "", customer: "", projectNumber: "", site: "", startTime: "", endTime: "", breakMinutes: "", travelOutStart: "", travelOutEnd: "", travelOutKm: "", travelReturnStart: "", travelReturnEnd: "", travelReturnKm: "", hours: "", description: "", translation: "", photos: [] }));
 }
@@ -3609,34 +3667,6 @@ export default function Home() {
     // beim naechsten regulaeren Laden ist alles konsistent.
   }
 
-  // Wetter-Zustand (WMO-Code) direkt in der Anzeige-Sprache.
-  function wmoLocalized(code: number, lang: string): string {
-    const cat = code === 0 ? "clear"
-      : (code === 1 || code === 2) ? "partly"
-      : code === 3 ? "cloudy"
-      : (code === 45 || code === 48) ? "fog"
-      : (code >= 51 && code <= 57) ? "drizzle"
-      : (code >= 61 && code <= 67) ? "rain"
-      : (code >= 71 && code <= 77) ? "snow"
-      : (code >= 80 && code <= 82) ? "showers"
-      : (code >= 85 && code <= 86) ? "snow"
-      : (code >= 95) ? "thunder"
-      : "unknown";
-    const m: Record<string, Record<string, string>> = {
-      clear:   { Deutsch:"klar", Rumänisch:"senin", Englisch:"clear", Italienisch:"sereno", Türkisch:"açık", Ungarisch:"derült", Tschechisch:"jasno", Ukrainisch:"ясно", Bulgarisch:"ясно", Serbisch:"vedro", Kroatisch:"vedro", Slowenisch:"jasno", Polnisch:"bezchmurnie" },
-      partly:  { Deutsch:"teils bewölkt", Rumänisch:"parțial înnorat", Englisch:"partly cloudy", Italienisch:"parzialmente nuvoloso", Türkisch:"parçalı bulutlu", Ungarisch:"részben felhős", Tschechisch:"polojasno", Ukrainisch:"мінлива хмарність", Bulgarisch:"частична облачност", Serbisch:"delimično oblačno", Kroatisch:"djelomično oblačno", Slowenisch:"delno oblačno", Polnisch:"częściowe zachmurzenie" },
-      cloudy:  { Deutsch:"bewölkt", Rumänisch:"înnorat", Englisch:"cloudy", Italienisch:"nuvoloso", Türkisch:"bulutlu", Ungarisch:"felhős", Tschechisch:"zataženo", Ukrainisch:"хмарно", Bulgarisch:"облачно", Serbisch:"oblačno", Kroatisch:"oblačno", Slowenisch:"oblačno", Polnisch:"pochmurno" },
-      fog:     { Deutsch:"Nebel", Rumänisch:"ceață", Englisch:"fog", Italienisch:"nebbia", Türkisch:"sis", Ungarisch:"köd", Tschechisch:"mlha", Ukrainisch:"туман", Bulgarisch:"мъгла", Serbisch:"magla", Kroatisch:"magla", Slowenisch:"megla", Polnisch:"mgła" },
-      drizzle: { Deutsch:"Nieselregen", Rumänisch:"burniță", Englisch:"drizzle", Italienisch:"pioviggine", Türkisch:"çisenti", Ungarisch:"szitálás", Tschechisch:"mrholení", Ukrainisch:"мряка", Bulgarisch:"ръмеж", Serbisch:"rosulja", Kroatisch:"rosulja", Slowenisch:"rosenje", Polnisch:"mżawka" },
-      rain:    { Deutsch:"Regen", Rumänisch:"ploaie", Englisch:"rain", Italienisch:"pioggia", Türkisch:"yağmur", Ungarisch:"eső", Tschechisch:"déšť", Ukrainisch:"дощ", Bulgarisch:"дъжд", Serbisch:"kiša", Kroatisch:"kiša", Slowenisch:"dež", Polnisch:"deszcz" },
-      snow:    { Deutsch:"Schnee", Rumänisch:"ninsoare", Englisch:"snow", Italienisch:"neve", Türkisch:"kar", Ungarisch:"hó", Tschechisch:"sníh", Ukrainisch:"сніг", Bulgarisch:"сняг", Serbisch:"sneg", Kroatisch:"snijeg", Slowenisch:"sneg", Polnisch:"śnieg" },
-      showers: { Deutsch:"Regenschauer", Rumänisch:"averse de ploaie", Englisch:"rain showers", Italienisch:"rovesci di pioggia", Türkisch:"sağanak yağış", Ungarisch:"záporeső", Tschechisch:"přeháňky", Ukrainisch:"зливи", Bulgarisch:"превалявания", Serbisch:"pljuskovi", Kroatisch:"pljuskovi", Slowenisch:"plohe", Polnisch:"przelotne opady" },
-      thunder: { Deutsch:"Gewitter", Rumänisch:"furtună", Englisch:"thunderstorm", Italienisch:"temporale", Türkisch:"gök gürültülü fırtına", Ungarisch:"zivatar", Tschechisch:"bouřka", Ukrainisch:"гроза", Bulgarisch:"гръмотевична буря", Serbisch:"grmljavina", Kroatisch:"grmljavina", Slowenisch:"nevihta", Polnisch:"burza" },
-      unknown: { Deutsch:"wechselhaft", Rumänisch:"variabil", Englisch:"variable", Italienisch:"variabile", Türkisch:"değişken", Ungarisch:"változékony", Tschechisch:"proměnlivo", Ukrainisch:"мінливо", Bulgarisch:"променливо", Serbisch:"promenljivo", Kroatisch:"promjenjivo", Slowenisch:"spremenljivo", Polnisch:"zmiennie" },
-    };
-    return (m[cat] && m[cat][lang]) || m[cat]?.Deutsch || "";
-  }
-
   // Holt aktuelles Wetter + Ort am GPS-Standort und gibt eine fertige Textzeile in der Anzeige-Sprache zurueck.
   async function fetchWeatherLine(): Promise<string | null> {
     const pos = await new Promise<GeolocationPosition | null>((resolve) => {
@@ -3664,7 +3694,7 @@ export default function Home() {
     const temp = Math.round(Number(c.temperature_2m));
     const wind = Math.round(Number(c.wind_speed_10m));
     const prec = Number(c.precipitation ?? 0);
-    const cond = wmoLocalized(Number(c.weather_code), uiLanguage);
+    const cond = wmoLocalizedText(Number(c.weather_code), uiLanguage);
     const now = new Date();
     const p2 = (n: number) => String(n).padStart(2, "0");
     const stamp = `${p2(now.getDate())}.${p2(now.getMonth() + 1)}., ${p2(now.getHours())}:${p2(now.getMinutes())}`;
@@ -3885,9 +3915,11 @@ export default function Home() {
   }
 
   function getTranslatedComment(instructionId: string, taskId: string, fallback: string): string {
+    const { body, weather } = splitWeather(fallback);
     const trans = instructionTranslations[instructionId];
-    if (trans && trans.language === uiLanguage && trans.tasks?.[`comment_${taskId}`]) return trans.tasks[`comment_${taskId}`];
-    return fallback;
+    const translatedBody = (trans && trans.language === uiLanguage && trans.tasks?.[`comment_${taskId}`]) ? trans.tasks[`comment_${taskId}`] : body;
+    const loc = weather.map((w) => localizeWeather(w, uiLanguage));
+    return [translatedBody, ...loc].filter(Boolean).join("\n");
   }
 
   function getTranslatedTask(instructionId: string, taskId: string, fallback: string): string {
@@ -4009,11 +4041,11 @@ export default function Home() {
         if (taskText && !(sameLang && existing?.tasks?.[task.id])) {
           jobs.push({ instId: inst.id, storeKey: task.id, inTasks: true, text: taskText, sourceLang: "automatisch" });
         }
-        const c = (task.employee_comment || "").trim();
-        if (c && !(sameLang && existing?.tasks?.[`comment_${task.id}`])) {
+        const cBody = splitWeather(task.employee_comment || "").body.trim();
+        if (cBody && !(sameLang && existing?.tasks?.[`comment_${task.id}`])) {
           const declared = task.comment_lang;
           const sourceLang = declared && declared !== targetLang ? declared : "automatisch";
-          jobs.push({ instId: inst.id, storeKey: `comment_${task.id}`, inTasks: true, text: c, sourceLang });
+          jobs.push({ instId: inst.id, storeKey: `comment_${task.id}`, inTasks: true, text: cBody, sourceLang });
         }
       }
     }
@@ -4563,12 +4595,17 @@ export default function Home() {
     for (const task of instruction.work_instruction_tasks || []) {
       const cmt = (task.employee_comment || "").trim();
       if (!cmt) continue;
-      if (uiLanguage === "Deutsch") { freshComments[task.id] = task.employee_comment; continue; }
-      try {
-        const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: task.employee_comment, fromLanguage: "automatisch", toLanguage: uiLanguage }) });
-        const data = await res.json();
-        freshComments[task.id] = (!data.error && data.translation) ? data.translation : task.employee_comment;
-      } catch { freshComments[task.id] = task.employee_comment; }
+      const parts = splitWeather(cmt);
+      const loc = parts.weather.map((w) => localizeWeather(w, uiLanguage));
+      let body = parts.body.trim();
+      if (body && uiLanguage !== "Deutsch") {
+        try {
+          const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: body, fromLanguage: "automatisch", toLanguage: uiLanguage }) });
+          const data = await res.json();
+          if (!data.error && data.translation) body = data.translation;
+        } catch { /* Original belassen */ }
+      }
+      freshComments[task.id] = [body, ...loc].filter(Boolean).join("\n");
     }
     const getTaskText = (taskId: string, fallback: string) => mergedTasks[taskId] || fallback;
     const getCommentText = (taskId: string, fallback: string) => freshComments[taskId] || fallback;
