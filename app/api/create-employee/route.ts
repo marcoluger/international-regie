@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     const limited = await rateLimit(request, "standard");
     if (limited) return limited;
 
-    const { username, password, fullName, role, companyId, companySlug, mustChangePassword, preferredLanguage } = await request.json();
+    const { username, password, fullName, role, companyId, companySlug, mustChangePassword, preferredLanguage, nationality, phone } = await request.json();
 
     if (!username || !password || !companyId) {
       return Response.json({ error: "Pflichtfelder fehlen." }, { status: 400 });
@@ -29,6 +29,13 @@ export async function POST(request: Request) {
     // Mindest-Passwortlaenge serverseitig erzwingen (clientseitiger Check ist umgehbar).
     if (typeof password !== "string" || password.length < 8) {
       return Response.json({ error: "Passwort muss mindestens 8 Zeichen haben." }, { status: 400 });
+    }
+
+    // Nationalitaet + Telefon sind Pflicht.
+    const nat = typeof nationality === "string" ? nationality.trim() : "";
+    const tel = typeof phone === "string" ? phone.trim() : "";
+    if (!nat || !tel) {
+      return Response.json({ error: "Nationalität und Telefonnummer sind Pflicht." }, { status: 400 });
     }
 
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
@@ -121,6 +128,8 @@ export async function POST(request: Request) {
       role: targetRole,
       must_change_password: mustChangePassword ?? true,
       preferred_language: prefLang,
+      nationality: nat,
+      phone: tel,
     });
 
     if (dbError) return Response.json({ error: dbError.message }, { status: 500 });

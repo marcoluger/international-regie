@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     const limited = await rateLimit(request, "standard");
     if (limited) return limited;
 
-    const { userId, role, preferredLanguage } = await request.json();
+    const { userId, role, preferredLanguage, nationality, phone } = await request.json();
     if (!userId) {
       return Response.json({ error: "User ID fehlt." }, { status: 400 });
     }
@@ -37,7 +37,9 @@ export async function POST(request: Request) {
       typeof preferredLanguage === "string" && preferredLanguage.trim()
         ? preferredLanguage.trim()
         : null;
-    if (!wantRole && !wantLang) {
+    const wantNat = typeof nationality === "string" && nationality.trim() ? nationality.trim() : null;
+    const wantPhone = typeof phone === "string" && phone.trim() ? phone.trim() : null;
+    if (!wantRole && !wantLang && !wantNat && !wantPhone) {
       return Response.json({ error: "Nichts zu aendern." }, { status: 400 });
     }
 
@@ -118,9 +120,15 @@ export async function POST(request: Request) {
       updates.role = wantRole;
     }
 
-    // 6) Sprache (optional)
+    // 6) Sprache / Nationalitaet / Telefon (optional)
     if (wantLang) {
       updates.preferred_language = wantLang;
+    }
+    if (wantNat) {
+      updates.nationality = wantNat;
+    }
+    if (wantPhone) {
+      updates.phone = wantPhone;
     }
 
     if (Object.keys(updates).length === 0) {

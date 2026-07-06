@@ -12,6 +12,7 @@ const supabase = createClient(
 );
 
 const languages = ["Deutsch", "Kroatisch", "Slowenisch", "Polnisch", "Rumänisch", "Ukrainisch", "Ungarisch", "Bulgarisch", "Tschechisch", "Türkisch", "Italienisch", "Englisch", "Serbisch"];
+const COUNTRIES = ["Deutschland", "Österreich", "Schweiz", "Rumänien", "Italien", "Türkei", "Ungarn", "Tschechien", "Slowakei", "Ukraine", "Bulgarien", "Serbien", "Kroatien", "Slowenien", "Bosnien und Herzegowina", "Nordmazedonien", "Kosovo", "Albanien", "Polen", "Portugal", "Spanien", "Griechenland", "Andere"];
 const pdfLanguages = ["Deutsch", "Kroatisch", "Slowenisch", "Polnisch", "Englisch"];
 const weekdays = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
 
@@ -3402,9 +3403,13 @@ export default function Home() {
   const [newUserRole, setNewUserRole] = useState("employee");
   const [creatingEmployee, setCreatingEmployee] = useState(false);
   const [newUserLanguage, setNewUserLanguage] = useState<string>("Deutsch");
+  const [newUserNationality, setNewUserNationality] = useState<string>("");
+  const [newUserPhone, setNewUserPhone] = useState<string>("");
   const [editMemberId, setEditMemberId] = useState<string | null>(null);
   const [editRole, setEditRole] = useState<string>("employee");
   const [editLang, setEditLang] = useState<string>("Deutsch");
+  const [editNationality, setEditNationality] = useState<string>("");
+  const [editPhone, setEditPhone] = useState<string>("");
   const [savingEdit, setSavingEdit] = useState(false);
   const [taskComments, setTaskComments] = useState<Record<string, string>>({});
   const [commentSaveState, setCommentSaveState] = useState<Record<string, string>>({});
@@ -3751,14 +3756,15 @@ export default function Home() {
     if (!currentCompany) return;
     if (!newUserName.trim() || !newUserUsername.trim() || !newUserPassword.trim()) { setMessage(t.msgFillRequired); return; }
     if (newUserPassword.length < 8) { setMessage("Passwort muss mindestens 8 Zeichen haben."); return; }
+    if (!newUserNationality.trim() || !newUserPhone.trim()) { setMessage("Nationalität und Telefonnummer sind Pflicht."); return; }
     setCreatingEmployee(true);
     const { data: sessionData } = await supabase.auth.getSession();
     const token = sessionData?.session?.access_token || "";
-    const res = await fetch("/api/create-employee", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ username: newUserUsername, password: newUserPassword, fullName: newUserName, role: newUserRole, companyId: currentCompany.company_id, companySlug: currentCompany.companies.slug, preferredLanguage: newUserLanguage }) });
+    const res = await fetch("/api/create-employee", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ username: newUserUsername, password: newUserPassword, fullName: newUserName, role: newUserRole, companyId: currentCompany.company_id, companySlug: currentCompany.companies.slug, preferredLanguage: newUserLanguage, nationality: newUserNationality, phone: newUserPhone }) });
     const data = await res.json();
     setCreatingEmployee(false);
     if (data.error) { setMessage("Fehler: " + data.error); return; }
-    setNewUserName(""); setNewUserEmail(""); setNewUserUsername(""); setNewUserPassword(""); setNewUserRole("employee"); setNewUserLanguage("Deutsch");
+    setNewUserName(""); setNewUserEmail(""); setNewUserUsername(""); setNewUserPassword(""); setNewUserRole("employee"); setNewUserLanguage("Deutsch"); setNewUserNationality(""); setNewUserPhone("");
     await loadCompanyUsers(currentCompany.company_id);
     setMessage(`✅ Mitarbeiter angelegt. Login: ${data.email}`);
   }
@@ -3810,10 +3816,11 @@ export default function Home() {
   // Rolle und/oder Sprache eines Mitarbeiters aendern (ueber abgesicherte Route).
   async function updateEmployee(member: any) {
     if (!currentCompany) return;
+    if (!editNationality.trim() || !editPhone.trim()) { setMessage("Nationalität und Telefonnummer sind Pflicht."); return; }
     setSavingEdit(true);
     const { data: sessionData } = await supabase.auth.getSession();
     const token = sessionData?.session?.access_token || "";
-    const body: any = { userId: member.user_id, preferredLanguage: editLang };
+    const body: any = { userId: member.user_id, preferredLanguage: editLang, nationality: editNationality, phone: editPhone };
     // Rolle nur mitschicken, wenn geaendert und nicht man selbst.
     if (editRole !== member.role && member.user_id !== user?.id) body.role = editRole;
     const res = await fetch("/api/update-employee", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify(body) });
@@ -5863,6 +5870,11 @@ export default function Home() {
                 <select className="border p-3 text-black bg-white" value={newUserLanguage} onChange={(e) => setNewUserLanguage(e.target.value)}>
                   {getAllowedLanguages(companyFeatures).filter(l => languages.includes(l as Language)).map((lang) => (<option key={lang} value={lang}>🌐 {lang}</option>))}
                 </select>
+                <select className="border p-3 text-black bg-white" value={newUserNationality} onChange={(e) => setNewUserNationality(e.target.value)}>
+                  <option value="">Nationalität *</option>
+                  {COUNTRIES.map((c) => (<option key={c} value={c}>{c}</option>))}
+                </select>
+                <input className="border p-3 text-black bg-white" placeholder="Telefonnummer *" value={newUserPhone} onChange={(e) => setNewUserPhone(e.target.value)} />
               </div>
               <button type="button" onClick={addCompanyUser} disabled={creatingEmployee} className="bg-cyan-700 text-white px-4 py-3 rounded-lg disabled:opacity-50">{creatingEmployee ? "Wird angelegt..." : t.addEmployee}</button>
               <p className="text-xs text-gray-400">Der Mitarbeiter meldet sich mit seinem Benutzernamen und Passwort an.</p>
@@ -5875,10 +5887,11 @@ export default function Home() {
                 <strong>{member.full_name || "-"}</strong>
                 <p>{member.email || "-"}</p>
                 <p>{t.role}: {roleLabel(member.role)}{member.preferred_language ? ` · 🌐 ${member.preferred_language}` : ""}</p>
+                <p className="text-sm text-gray-600">{member.nationality || "-"}{member.phone ? ` · 📞 ${member.phone}` : ""}</p>
                 <div className="flex gap-2 flex-wrap">
                   {member.email && (<button type="button" onClick={() => resetCompanyUserPassword(member.email)} className="bg-gray-700 text-white px-3 py-2.5 rounded-lg">{t.resetPassword}</button>)}
                   {currentCompany && canManageMember(currentCompany.role, member.role) && (
-                    <button type="button" onClick={() => { const open = editMemberId !== member.id; setEditMemberId(open ? member.id : null); if (open) { setEditRole(member.role); setEditLang(member.preferred_language || "Deutsch"); } }} className="bg-cyan-700 text-white px-3 py-2.5 rounded-lg">✏️ {(t as any).editBtn || "Bearbeiten"}</button>
+                    <button type="button" onClick={() => { const open = editMemberId !== member.id; setEditMemberId(open ? member.id : null); if (open) { setEditRole(member.role); setEditLang(member.preferred_language || "Deutsch"); setEditNationality(member.nationality || ""); setEditPhone(member.phone || ""); } }} className="bg-cyan-700 text-white px-3 py-2.5 rounded-lg">✏️ {(t as any).editBtn || "Bearbeiten"}</button>
                   )}
                   {currentCompany && canDelete(currentCompany.role, member.role) && member.user_id !== user?.id && (
                     <button type="button" onClick={() => deleteCompanyUser(member.id, member.user_id)} className="bg-red-600 text-white px-3 py-2.5 rounded-lg">🗑️ Löschen</button>
@@ -5896,6 +5909,13 @@ export default function Home() {
                       <select className="border p-2 rounded-lg text-black bg-white" value={editLang} onChange={(e) => setEditLang(e.target.value)}>
                         {getAllowedLanguages(companyFeatures).filter(l => languages.includes(l as Language)).map((lang) => (<option key={lang} value={lang}>{lang}</option>))}
                       </select>
+                      <label className="text-sm font-medium">Nationalität</label>
+                      <select className="border p-2 rounded-lg text-black bg-white" value={editNationality} onChange={(e) => setEditNationality(e.target.value)}>
+                        <option value="">– bitte wählen –</option>
+                        {COUNTRIES.map((c) => (<option key={c} value={c}>{c}</option>))}
+                      </select>
+                      <label className="text-sm font-medium">📞 Telefon</label>
+                      <input className="border p-2 rounded-lg text-black bg-white" value={editPhone} onChange={(e) => setEditPhone(e.target.value)} />
                     </div>
                     <div className="flex gap-2">
                       <button type="button" disabled={savingEdit} onClick={() => updateEmployee(member)} className="bg-cyan-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50">{savingEdit ? "⏳" : "💾"} {(t as any).saveBtn || "Speichern"}</button>
