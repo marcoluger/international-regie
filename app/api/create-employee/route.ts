@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     const limited = await rateLimit(request, "standard");
     if (limited) return limited;
 
-    const { username, password, fullName, role, companyId, companySlug, mustChangePassword } = await request.json();
+    const { username, password, fullName, role, companyId, companySlug, mustChangePassword, preferredLanguage } = await request.json();
 
     if (!username || !password || !companyId) {
       return Response.json({ error: "Pflichtfelder fehlen." }, { status: 400 });
@@ -78,6 +78,12 @@ export async function POST(request: Request) {
       );
     }
 
+    // Sprache (optional): nur uebernehmen, wenn ein nicht-leerer String kommt.
+    const prefLang =
+      typeof preferredLanguage === "string" && preferredLanguage.trim()
+        ? preferredLanguage.trim()
+        : null;
+
     // Ab hier: Aufrufer ist berechtigt -> wie gehabt anlegen
     const slug = companySlug || companyId.slice(0, 8);
     const cleanUsername = username.toLowerCase().replace(/\s+/g, ".");
@@ -114,6 +120,7 @@ export async function POST(request: Request) {
       full_name: fullName || username,
       role: targetRole,
       must_change_password: mustChangePassword ?? true,
+      preferred_language: prefLang,
     });
 
     if (dbError) return Response.json({ error: dbError.message }, { status: 500 });

@@ -3,26 +3,42 @@ import { rateLimit } from "../../../lib/rateLimit";
 
 export const runtime = "nodejs";
 
-// Wer darf wen löschen? (entspricht canDelete in der App)
-// Owner -> alle außer Owner
+// Wer darf wen bearbeiten?
+// Owner -> jeden
 // Admin -> project_manager, employee
 // Projektleiter -> employee
-function canDelete(myRole: string, targetRole: string): boolean {
-  if (myRole === "owner") return targetRole !== "owner";
+function canManage(myRole: string, targetRole: string): boolean {
+  if (myRole === "owner") return true;
   if (myRole === "admin") return targetRole === "employee" || targetRole === "project_manager";
   if (myRole === "project_manager") return targetRole === "employee";
   return false;
 }
 
+// Welche Rollen darf wer VERGEBEN?
+const ALLOWED_TO_SET: Record<string, string[]> = {
+  owner: ["owner", "admin", "project_manager", "employee"],
+  admin: ["project_manager", "employee"],
+  project_manager: ["employee"],
+};
+
 export async function POST(request: Request) {
   try {
-    // Rate-Limiting (standard; greift nur, wenn Upstash konfiguriert ist)
     const limited = await rateLimit(request, "standard");
     if (limited) return limited;
 
-    const { userId } = await request.json();
+    const { userId, role, preferredLanguage } = await request.json();
     if (!userId) {
       return Response.json({ error: "User ID fehlt." }, { status: 400 });
+    }
+
+    // Es muss mindestens etwas zu aendern geben
+    const wantRole = typeof role === "string" && role.trim() ? role.trim() : null;
+    const wantLang =
+      typeof preferredLanguage === "string" && preferredLanguage.trim()
+        ? preferredLanguage.trim()
+        : null;
+    if (!wantRole && !wantLang) {
+      return Response.json({ error: "Nichts zu aendern." }, { status: 400 });
     }
 
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
@@ -47,11 +63,6 @@ export async function POST(request: Request) {
       return Response.json({ error: "Ungültige oder abgelaufene Sitzung." }, { status: 401 });
     }
 
-    // Sich selbst löschen ist nicht erlaubt
-    if (caller.id === userId) {
-      return Response.json({ error: "Sie können sich nicht selbst löschen." }, { status: 403 });
-    }
-
     // 2) Aufrufer-Rolle/Firma laden
     const { data: callerMember } = await supabaseAdmin
       .from("company_users")
@@ -69,24 +80,58 @@ export async function POST(request: Request) {
       .eq("user_id", userId)
       .maybeSingle();
     if (!targetMember) {
-      return Response.json({ error: "Zu löschender Mitarbeiter nicht gefunden." }, { status: 404 });
+      return Response.json({ error: "Mitarbeiter nicht gefunden." }, { status: 404 });
     }
     if (targetMember.company_id !== callerMember.company_id) {
       return Response.json({ error: "Keine Berechtigung (andere Firma)." }, { status: 403 });
     }
 
-    // 4) Rollenregeln prüfen
-    if (!canDelete(callerMember.role, targetMember.role)) {
-      return Response.json({ error: "Keine Berechtigung, diesen Mitarbeiter zu löschen." }, { status: 403 });
+    // 4) Darf der Aufrufer dieses Ziel ueberhaupt bearbeiten?
+    if (!canManage(callerMember.role, targetMember.role)) {
+      return Response.json({ error: "Keine Berechtigung, diesen Mitarbeiter zu bearbeiten." }, { status: 403 });
     }
 
-    // 5) Löschen – erst Firmen-Eintrag, dann Auth-User
-    await supabaseAdmin.from("company_users").delete().eq("user_id", userId);
+    const updates: Record<string, any> = {};
 
-    const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
-    if (error && !error.message.includes("not found") && !error.message.includes("User not found")) {
-      return Response.json({ error: error.message }, { status: 500 });
+    // 5) Rollenwechsel (optional) – mit Schutzregeln
+    if (wantRole && wantRole !== targetMember.role) {
+      // Sich selbst nicht in der Rolle aendern (Aussperr-Schutz)
+      if (caller.id === userId) {
+        return Response.json({ error: "Die eigene Rolle kann hier nicht geaendert werden." }, { status: 403 });
+      }
+      // Neue Rolle muss der Aufrufer vergeben duerfen
+      const settable = ALLOWED_TO_SET[callerMember.role] || [];
+      if (!settable.includes(wantRole)) {
+        return Response.json({ error: "Keine Berechtigung, diese Rolle zu vergeben." }, { status: 403 });
+      }
+      // Letzten Owner nicht herabstufen
+      if (targetMember.role === "owner" && wantRole !== "owner") {
+        const { count } = await supabaseAdmin
+          .from("company_users")
+          .select("user_id", { count: "exact", head: true })
+          .eq("company_id", callerMember.company_id)
+          .eq("role", "owner");
+        if ((count ?? 0) <= 1) {
+          return Response.json({ error: "Der letzte Owner kann nicht herabgestuft werden." }, { status: 403 });
+        }
+      }
+      updates.role = wantRole;
     }
+
+    // 6) Sprache (optional)
+    if (wantLang) {
+      updates.preferred_language = wantLang;
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return Response.json({ success: true, unchanged: true });
+    }
+
+    const { error: updErr } = await supabaseAdmin
+      .from("company_users")
+      .update(updates)
+      .eq("user_id", userId);
+    if (updErr) return Response.json({ error: updErr.message }, { status: 500 });
 
     return Response.json({ success: true });
   } catch (error) {

@@ -90,7 +90,6 @@ type CompanyFeatures = {
 
 const texts = {
   Deutsch: {
-    weather: "Wetter", weatherError: "Wetter/Standort nicht verfügbar",
     instructionDoc: "Arbeitsanweisung",
     help: "Anleitung",
     helpEmpty: "Anleitung noch nicht hinterlegt",
@@ -319,7 +318,6 @@ const texts = {
     copyDone: "Arbeitsschritte wurden übernommen.",
   },
   Rumänisch: {
-    weather: "Vreme", weatherError: "Vremea/locația nu este disponibilă",
     instructionDoc: "Instrucțiune de lucru",
     help: "Instrucțiuni",
     helpEmpty: "Instrucțiunile nu sunt încă disponibile",
@@ -548,7 +546,6 @@ const texts = {
     copyDone: "Etapele de lucru au fost preluate.",
   },
   Englisch: {
-    weather: "Weather", weatherError: "Weather/location unavailable",
     instructionDoc: "Work instruction",
     help: "Guide",
     helpEmpty: "Guide not available yet",
@@ -777,7 +774,6 @@ const texts = {
     copyDone: "Work steps have been applied.",
   },
   Italienisch: {
-    weather: "Meteo", weatherError: "Meteo/posizione non disponibile",
     instructionDoc: "Istruzione di lavoro",
     help: "Guida",
     helpEmpty: "Guida non ancora disponibile",
@@ -1006,7 +1002,6 @@ const texts = {
     copyDone: "Le fasi di lavoro sono state applicate.",
   },
   Türkisch: {
-    weather: "Hava", weatherError: "Hava/konum kullanılamıyor",
     instructionDoc: "İş talimatı",
     help: "Kılavuz",
     helpEmpty: "Kılavuz henüz eklenmedi",
@@ -1235,7 +1230,6 @@ const texts = {
     copyDone: "İş adımları alındı.",
   },
   Ungarisch: {
-    weather: "Időjárás", weatherError: "Időjárás/helyzet nem érhető el",
     instructionDoc: "Munkautasítás",
     help: "Útmutató",
     helpEmpty: "Az útmutató még nincs megadva",
@@ -1464,7 +1458,6 @@ const texts = {
     copyDone: "A munkalépések átvéve.",
   },
   Tschechisch: {
-    weather: "Počasí", weatherError: "Počasí/poloha není k dispozici",
     instructionDoc: "Pracovní pokyn",
     help: "Návod",
     helpEmpty: "Návod zatím není k dispozici",
@@ -1693,7 +1686,6 @@ const texts = {
     copyDone: "Pracovní kroky byly převzaty.",
   },
   Ukrainisch: {
-    weather: "Погода", weatherError: "Погода/місцезнаходження недоступні",
     instructionDoc: "Робоча інструкція",
     help: "Інструкція",
     helpEmpty: "Інструкцію ще не додано",
@@ -1922,7 +1914,6 @@ const texts = {
     copyDone: "Робочі кроки перенесено.",
   },
   Bulgarisch: {
-    weather: "Време", weatherError: "Времето/местоположението не е налично",
     instructionDoc: "Работна инструкция",
     help: "Инструкции",
     helpEmpty: "Инструкциите още не са въведени",
@@ -2151,7 +2142,6 @@ const texts = {
     copyDone: "Работните стъпки са прехвърлени.",
   },
   Serbisch: {
-    weather: "Vreme", weatherError: "Vreme/lokacija nije dostupna",
     instructionDoc: "Radni nalog",
     help: "Uputstvo",
     helpEmpty: "Uputstvo još nije uneto",
@@ -2380,7 +2370,6 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Kroatisch: {
-    weather: "Vrijeme", weatherError: "Vrijeme/lokacija nije dostupna",
     instructionDoc: "Radni nalog",
     help: "Upute",
     helpEmpty: "Upute još nisu unesene",
@@ -2609,7 +2598,6 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Slowenisch: {
-    weather: "Vreme", weatherError: "Vreme/lokacija ni na voljo",
     instructionDoc: "Delovni nalog",
     help: "Navodila",
     helpEmpty: "Navodila še niso vnesena",
@@ -2838,7 +2826,6 @@ const texts = {
     copyDone: "Delovni koraki so prevzeti.",
   },
   Polnisch: {
-    weather: "Pogoda", weatherError: "Pogoda/lokalizacja niedostępna",
     instructionDoc: "Instrukcja robocza",
     help: "Instrukcja",
     helpEmpty: "Instrukcja jeszcze nie dodana",
@@ -3084,64 +3071,6 @@ const pdfTexts = {
   Serbisch: { title: "Regie International", company: "Regie International", report: "Izveštaj", calendarWeek: "Kalendarska nedelja", employee: "Radnik", dailyReports: "Dnevni izveštaji", customer: "Klijent", project: "Projekat", site: "Gradilište", hours: "Sati", startLabel: "Početak", endLabel: "Kraj", pauseLabel: "Pauza", description: "Opis posla", photos: "Fotografije", photo: "Fotografija", summary: "Rezime", totalHours: "Ukupno sati", signatureEmployee: "Potpis radnika", signatureCustomer: "Potpis klijenta / rukovodioca gradilišta", createdAt: "Kreirano" },
 };
 
-// ── Wetter: zentrale Wortlisten + deterministische Umsetzung in jede Anzeige-Sprache ──
-const WEATHER_COND: Record<string, Record<string, string>> = {
-  clear:   { Deutsch:"klar", Rumänisch:"senin", Englisch:"clear", Italienisch:"sereno", Türkisch:"açık", Ungarisch:"derült", Tschechisch:"jasno", Ukrainisch:"ясно", Bulgarisch:"ясно", Serbisch:"vedro", Kroatisch:"vedro", Slowenisch:"jasno", Polnisch:"bezchmurnie" },
-  partly:  { Deutsch:"teils bewölkt", Rumänisch:"parțial înnorat", Englisch:"partly cloudy", Italienisch:"parzialmente nuvoloso", Türkisch:"parçalı bulutlu", Ungarisch:"részben felhős", Tschechisch:"polojasno", Ukrainisch:"мінлива хмарність", Bulgarisch:"частична облачност", Serbisch:"delimično oblačno", Kroatisch:"djelomično oblačno", Slowenisch:"delno oblačno", Polnisch:"częściowe zachmurzenie" },
-  cloudy:  { Deutsch:"bewölkt", Rumänisch:"înnorat", Englisch:"cloudy", Italienisch:"nuvoloso", Türkisch:"bulutlu", Ungarisch:"felhős", Tschechisch:"zataženo", Ukrainisch:"хмарно", Bulgarisch:"облачно", Serbisch:"oblačno", Kroatisch:"oblačno", Slowenisch:"oblačno", Polnisch:"pochmurno" },
-  fog:     { Deutsch:"Nebel", Rumänisch:"ceață", Englisch:"fog", Italienisch:"nebbia", Türkisch:"sis", Ungarisch:"köd", Tschechisch:"mlha", Ukrainisch:"туман", Bulgarisch:"мъгла", Serbisch:"magla", Kroatisch:"magla", Slowenisch:"megla", Polnisch:"mgła" },
-  drizzle: { Deutsch:"Nieselregen", Rumänisch:"burniță", Englisch:"drizzle", Italienisch:"pioviggine", Türkisch:"çisenti", Ungarisch:"szitálás", Tschechisch:"mrholení", Ukrainisch:"мряка", Bulgarisch:"ръмеж", Serbisch:"rosulja", Kroatisch:"rosulja", Slowenisch:"rosenje", Polnisch:"mżawka" },
-  rain:    { Deutsch:"Regen", Rumänisch:"ploaie", Englisch:"rain", Italienisch:"pioggia", Türkisch:"yağmur", Ungarisch:"eső", Tschechisch:"déšť", Ukrainisch:"дощ", Bulgarisch:"дъжд", Serbisch:"kiša", Kroatisch:"kiša", Slowenisch:"dež", Polnisch:"deszcz" },
-  snow:    { Deutsch:"Schnee", Rumänisch:"ninsoare", Englisch:"snow", Italienisch:"neve", Türkisch:"kar", Ungarisch:"hó", Tschechisch:"sníh", Ukrainisch:"сніг", Bulgarisch:"сняг", Serbisch:"sneg", Kroatisch:"snijeg", Slowenisch:"sneg", Polnisch:"śnieg" },
-  showers: { Deutsch:"Regenschauer", Rumänisch:"averse de ploaie", Englisch:"rain showers", Italienisch:"rovesci di pioggia", Türkisch:"sağanak yağış", Ungarisch:"záporeső", Tschechisch:"přeháňky", Ukrainisch:"зливи", Bulgarisch:"превалявания", Serbisch:"pljuskovi", Kroatisch:"pljuskovi", Slowenisch:"plohe", Polnisch:"przelotne opady" },
-  thunder: { Deutsch:"Gewitter", Rumänisch:"furtună", Englisch:"thunderstorm", Italienisch:"temporale", Türkisch:"gök gürültülü fırtına", Ungarisch:"zivatar", Tschechisch:"bouřka", Ukrainisch:"гроза", Bulgarisch:"гръмотевична буря", Serbisch:"grmljavina", Kroatisch:"grmljavina", Slowenisch:"nevihta", Polnisch:"burza" },
-  unknown: { Deutsch:"wechselhaft", Rumänisch:"variabil", Englisch:"variable", Italienisch:"variabile", Türkisch:"değişken", Ungarisch:"változékony", Tschechisch:"proměnlivo", Ukrainisch:"мінливо", Bulgarisch:"променливо", Serbisch:"promenljivo", Kroatisch:"promjenjivo", Slowenisch:"spremenljivo", Polnisch:"zmiennie" },
-};
-const WEATHER_WORD_TO_CAT: Record<string, string> = (() => {
-  const map: Record<string, string> = {};
-  for (const cat in WEATHER_COND) { for (const lang in WEATHER_COND[cat]) { map[WEATHER_COND[cat][lang].toLowerCase()] = cat; } }
-  return map;
-})();
-function wmoCat(code: number): string {
-  return code === 0 ? "clear"
-    : (code === 1 || code === 2) ? "partly"
-    : code === 3 ? "cloudy"
-    : (code === 45 || code === 48) ? "fog"
-    : (code >= 51 && code <= 57) ? "drizzle"
-    : (code >= 61 && code <= 67) ? "rain"
-    : (code >= 71 && code <= 77) ? "snow"
-    : (code >= 80 && code <= 82) ? "showers"
-    : (code >= 85 && code <= 86) ? "snow"
-    : (code >= 95) ? "thunder"
-    : "unknown";
-}
-function wmoLocalizedText(code: number, lang: string): string {
-  const cat = wmoCat(code);
-  return (WEATHER_COND as any)[cat]?.[lang] || (WEATHER_COND as any)[cat]?.Deutsch || "";
-}
-// Trennt Wetterzeilen (erkennbar am Wind-Symbol) vom restlichen Kommentartext.
-function splitWeather(text: string): { body: string; weather: string[] } {
-  const body: string[] = [];
-  const weather: string[] = [];
-  for (const ln of (text || "").split("\n")) {
-    if (ln.indexOf("💨") !== -1) weather.push(ln.trim());
-    else body.push(ln);
-  }
-  return { body: body.join("\n"), weather };
-}
-// Setzt eine Wetterzeile deterministisch in die Ziel-Sprache um (egal, in welcher sie erstellt wurde).
-function localizeWeather(line: string, lang: string): string {
-  if (!line || line.indexOf("💨") === -1) return line;
-  const targetPrefix = ((texts as any)[lang] && (texts as any)[lang].weather) || "Wetter";
-  const m = line.match(/^(🌦️\s*)?(\S+)( .+?)? \(([\d.,: ]+)\): ([\d.,\-]+) °C, (.+?), 💨 ([\d.,\-]+) km\/h, 🌧️ ([\d.,\-]+) mm(.*)$/);
-  if (!m) return line;
-  const marker = m[1] || "";
-  const place = m[3] || "";
-  const cat = WEATHER_WORD_TO_CAT[(m[6] || "").trim().toLowerCase()] || "unknown";
-  const targetCond = (WEATHER_COND as any)[cat]?.[lang] || m[6];
-  return `${marker}${targetPrefix}${place} (${m[4]}): ${m[5]} °C, ${targetCond}, 💨 ${m[7]} km/h, 🌧️ ${m[8]} mm${m[9] || ""}`;
-}
-
 function createEmptyDays(): DayEntry[] {
   return weekdays.map((day) => ({ weekday: day, date: "", customer: "", projectNumber: "", site: "", startTime: "", endTime: "", breakMinutes: "", travelOutStart: "", travelOutEnd: "", travelOutKm: "", travelReturnStart: "", travelReturnEnd: "", travelReturnKm: "", hours: "", description: "", translation: "", photos: [] }));
 }
@@ -3286,7 +3215,7 @@ function getCalendarWeek(dateString: string) {
 
 function TabButton({ label, tabName, activeTab, onClick }: { label: string; tabName: string; activeTab: string; onClick: () => void }) {
   return (
-    <button type="button" onClick={onClick} className={`px-5 py-3 rounded-full text-sm font-medium transition-colors ${activeTab === tabName ? "bg-cyan-600 text-white shadow-sm" : "bg-white text-slate-600 border border-slate-300 hover:bg-slate-50"}`}>
+    <button type="button" onClick={onClick} className={`px-4 py-2 rounded font-medium transition-colors ${activeTab === tabName ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-800 hover:bg-gray-300"}`}>
       {label}
     </button>
   );
@@ -3335,12 +3264,12 @@ function SignaturePad({ label, value, onChange }: { label: string; value: string
     hasDrawn.current = false; onChange("");
   }
   return (
-    <div className="border border-slate-200 rounded-xl p-3 shadow-sm bg-white">
+    <div className="border rounded p-3 bg-white">
       <div className="flex items-center justify-between mb-2">
         <span className="text-sm font-medium text-gray-700">{label}{value ? <span className="text-xs text-green-600 ml-2">✓ erfasst</span> : null}</span>
         <button type="button" onClick={clear} className="text-xs text-red-600 underline">Löschen</button>
       </div>
-      <canvas ref={canvasRef} width={500} height={150} onPointerDown={start} onPointerMove={move} onPointerUp={end} onPointerLeave={end} className="w-full border rounded-lg bg-gray-50" style={{ touchAction: "none" }} />
+      <canvas ref={canvasRef} width={500} height={150} onPointerDown={start} onPointerMove={move} onPointerUp={end} onPointerLeave={end} className="w-full border rounded bg-gray-50" style={{ touchAction: "none" }} />
     </div>
   );
 }
@@ -3362,12 +3291,6 @@ export default function Home() {
   const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
   const [changingPassword, setChangingPassword] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-  // Aktuelles Anmelde-Token, laufend aus onAuthStateChange gesetzt.
-  // So braucht das Speichern kein getSession() (das kann unter Last haengen).
-  const tokenRef = useRef<string>("");
-  // Kennt immer die aktuell gewaehlte Anzeige-Sprache – damit spaet eintreffende
-  // Uebersetzungen einer alten Sprache die neue nicht mehr ueberschreiben koennen.
-  const uiLanguageRef = useRef<Language>("Deutsch");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [companySettings, setCompanySettings] = useState<CompanySettings | null>(null);
@@ -3401,11 +3324,6 @@ export default function Home() {
   const [newUserPassword, setNewUserPassword] = useState("");
   const [newUserRole, setNewUserRole] = useState("employee");
   const [creatingEmployee, setCreatingEmployee] = useState(false);
-  const [newUserLanguage, setNewUserLanguage] = useState<string>("Deutsch");
-  const [editMemberId, setEditMemberId] = useState<string | null>(null);
-  const [editRole, setEditRole] = useState<string>("employee");
-  const [editLang, setEditLang] = useState<string>("Deutsch");
-  const [savingEdit, setSavingEdit] = useState(false);
   const [taskComments, setTaskComments] = useState<Record<string, string>>({});
   const [commentSaveState, setCommentSaveState] = useState<Record<string, string>>({});
   const [reportInstruction, setReportInstruction] = useState<any>(null);
@@ -3450,6 +3368,7 @@ export default function Home() {
   // ── Aufklappbare Karten (Tagesansicht) und Tage (Regiebericht) ──
   const [openDayCards, setOpenDayCards] = useState<Record<string, boolean>>({});
   const [openReportDays, setOpenReportDays] = useState<Record<string, boolean>>({});
+  const [openWeekDays, setOpenWeekDays] = useState<Record<string, boolean>>({});
   const [reportExpanded, setReportExpanded] = useState(false);
 
   useEffect(() => {
@@ -3466,7 +3385,6 @@ export default function Home() {
     }
     loadUser();
     const { data: authListener } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      tokenRef.current = session?.access_token || "";
       setUser(session?.user || null);
       if (session?.user) {
         const { data: pwCheck } = await supabase.from("company_users").select("must_change_password").eq("user_id", session.user.id).maybeSingle();
@@ -3486,7 +3404,6 @@ export default function Home() {
     .map((i: any) => `${i.id}.${(i.title || "").length}.${(i.problems_text || "").length}.${(i.work_instruction_tasks || []).map((task: any) => `${task.id}:${(task.task_text || "").length}:${(task.employee_comment || "").length}`).join(",")}`)
     .join("|");
   useEffect(() => {
-    uiLanguageRef.current = uiLanguage;
     if (workInstructions.length > 0) {
       refreshCommentTranslations(uiLanguage, workInstructions);
     }
@@ -3526,9 +3443,6 @@ export default function Home() {
     if (!user?.id) return;
     setRefreshing(true);
     try {
-      // Zuerst Sitzung/Token auffrischen – sonst haengen die Abfragen in der Handy-PWA
-      // (blockierter Token-Refresh nach dem Wiederaufwecken) und liefern leere Daten.
-      await ensureFreshSession();
       // Jeder Ladevorgang ist zeitlich begrenzt (max. 12s), damit der Knopf
       // bei einer haengenden Verbindung nicht ewig auf "Laden" stehen bleibt.
       await dbTimeout(loadCompanyContext(user.id), 12000);
@@ -3634,14 +3548,9 @@ export default function Home() {
   async function updateTaskComment(taskId: string, comment: string) {
     setCommentSaveState(prev => ({ ...prev, [taskId]: "saving" }));
     try {
-      // Token aus dem Auth-Listener nehmen (nicht getSession(), das kann unter Last haengen).
-      let token = tokenRef.current;
-      if (!token) {
-        try {
-          const s = await dbTimeout(supabase.auth.getSession(), 5000);
-          token = s?.data?.session?.access_token || "";
-        } catch { /* Fallback: ohne Token antwortet die Route mit 401 statt zu haengen */ }
-      }
+      // Anmelde-Token holen, damit die Server-Route den Aufrufer prüfen kann
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token || "";
       // Speichern über Server-Route (Service-Role-Key) -> umgeht RLS, prüft aber Anmeldung + Rolle.
       const res = await withTimeout(
         fetch("/api/update-task-comment", {
@@ -3670,68 +3579,8 @@ export default function Home() {
       setMessage("Fehler beim Speichern: " + String(err?.message || err));
       return;
     }
-    // KEIN Neuladen nach dem Speichern: das Neuladen loeste eine erneute Uebersetzungsrunde
-    // aus, die die bereits angezeigte Uebersetzung der Anweisung zuruecksetzte (alles wieder
-    // deutsch). Der Kommentar ist lokal sichtbar (taskComments) und in der DB gespeichert;
-    // beim naechsten regulaeren Laden ist alles konsistent.
-  }
-
-  // Holt aktuelles Wetter + Ort am GPS-Standort und gibt eine fertige Textzeile in der Anzeige-Sprache zurueck.
-  async function fetchWeatherLine(): Promise<string | null> {
-    const pos = await new Promise<GeolocationPosition | null>((resolve) => {
-      if (!navigator.geolocation) { resolve(null); return; }
-      navigator.geolocation.getCurrentPosition((p) => resolve(p), () => resolve(null), { timeout: 10000, maximumAge: 300000, enableHighAccuracy: false });
-    });
-    if (!pos) { setMessage(t.weatherError); return null; }
-    const lat = pos.coords.latitude.toFixed(4);
-    const lon = pos.coords.longitude.toFixed(4);
-    let data: any;
-    try {
-      const res = await withTimeout(fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,precipitation,weather_code,wind_speed_10m`), 10000, "Wetter-Timeout");
-      data = await res.json();
-    } catch { setMessage(t.weatherError); return null; }
-    const c = data?.current;
-    if (!c) { setMessage(t.weatherError); return null; }
-    const lang2map: Record<string, string> = { Deutsch:"de", Rumänisch:"ro", Englisch:"en", Italienisch:"it", Türkisch:"tr", Ungarisch:"hu", Tschechisch:"cs", Ukrainisch:"uk", Bulgarisch:"bg", Serbisch:"sr", Kroatisch:"hr", Slowenisch:"sl", Polnisch:"pl" };
-    const loc2 = lang2map[uiLanguage] || "de";
-    let ort = "";
-    try {
-      const geo = await withTimeout(fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=${loc2}`), 8000, "Geo-Timeout");
-      const gd = await geo.json();
-      ort = gd?.city || gd?.locality || gd?.principalSubdivision || "";
-    } catch { /* Ort ist optional */ }
-    const temp = Math.round(Number(c.temperature_2m));
-    const wind = Math.round(Number(c.wind_speed_10m));
-    const prec = Number(c.precipitation ?? 0);
-    const cond = wmoLocalizedText(Number(c.weather_code), uiLanguage);
-    const now = new Date();
-    const p2 = (n: number) => String(n).padStart(2, "0");
-    const stamp = `${p2(now.getDate())}.${p2(now.getMonth() + 1)}., ${p2(now.getHours())}:${p2(now.getMinutes())}`;
-    const line = `${t.weather}${ort ? " " + ort : ""} (${stamp}): ${temp} °C, ${cond}, 💨 ${wind} km/h, 🌧️ ${prec} mm`;
-    return line;
-  }
-
-  // Wetter in einen Arbeitsanweisungs-Kommentar einfuegen.
-  async function insertWeatherIntoComment(taskId: string, currentVal: string) {
-    setMessage(t.weather + " …");
-    const line = await fetchWeatherLine();
-    if (!line) return;
-    const base = currentVal || "";
-    const sep = base && !base.endsWith("\n") ? "\n" : "";
-    setTaskComments(prev => ({ ...prev, [taskId]: (base + sep + line).slice(0, 1000) }));
-    setCommentSaveState(prev => ({ ...prev, [taskId]: "" }));
-    setMessage("");
-  }
-
-  // Wetter in den Tagestext des Regieberichts einfuegen.
-  async function insertWeatherIntoDay(index: number, currentDesc: string) {
-    setMessage(t.weather + " …");
-    const line = await fetchWeatherLine();
-    if (!line) return;
-    const base = currentDesc || "";
-    const sep = base && !base.endsWith("\n") ? "\n" : "";
-    updateDay(index, "description", base + sep + line);
-    setMessage("");
+    // Neu laden + Kommentare in die Anzeige-Sprache übersetzen
+    try { if (currentCompany) await loadWorkInstructions(currentCompany.company_id); } catch { /* ignorieren */ }
   }
 
   async function updateTaskNote(taskId: string, note: string) {
@@ -3754,11 +3603,11 @@ export default function Home() {
     setCreatingEmployee(true);
     const { data: sessionData } = await supabase.auth.getSession();
     const token = sessionData?.session?.access_token || "";
-    const res = await fetch("/api/create-employee", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ username: newUserUsername, password: newUserPassword, fullName: newUserName, role: newUserRole, companyId: currentCompany.company_id, companySlug: currentCompany.companies.slug, preferredLanguage: newUserLanguage }) });
+    const res = await fetch("/api/create-employee", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ username: newUserUsername, password: newUserPassword, fullName: newUserName, role: newUserRole, companyId: currentCompany.company_id, companySlug: currentCompany.companies.slug }) });
     const data = await res.json();
     setCreatingEmployee(false);
     if (data.error) { setMessage("Fehler: " + data.error); return; }
-    setNewUserName(""); setNewUserEmail(""); setNewUserUsername(""); setNewUserPassword(""); setNewUserRole("employee"); setNewUserLanguage("Deutsch");
+    setNewUserName(""); setNewUserEmail(""); setNewUserUsername(""); setNewUserPassword(""); setNewUserRole("employee");
     await loadCompanyUsers(currentCompany.company_id);
     setMessage(`✅ Mitarbeiter angelegt. Login: ${data.email}`);
   }
@@ -3789,40 +3638,6 @@ export default function Home() {
     if (myRole === "admin") return memberRole === "employee" || memberRole === "project_manager";
     if (myRole === "project_manager") return memberRole === "employee";
     return false;
-  }
-
-  // Wer darf wen BEARBEITEN? Owner -> jeden, Admin -> PL/Mitarbeiter, PL -> Mitarbeiter.
-  function canManageMember(myRole: string, memberRole: string): boolean {
-    if (myRole === "owner") return true;
-    if (myRole === "admin") return memberRole === "employee" || memberRole === "project_manager";
-    if (myRole === "project_manager") return memberRole === "employee";
-    return false;
-  }
-  // Welche Rollen darf die eigene Rolle vergeben?
-  function settableRoles(myRole: string): string[] {
-    if (myRole === "owner") return ["owner", "admin", "project_manager", "employee"];
-    if (myRole === "admin") return ["project_manager", "employee"];
-    if (myRole === "project_manager") return ["employee"];
-    return [];
-  }
-  const roleLabel = (r: string) => r === "owner" ? "Owner" : r === "admin" ? t.roleAdmin : r === "project_manager" ? t.roleProjectManager : t.roleEmployee;
-
-  // Rolle und/oder Sprache eines Mitarbeiters aendern (ueber abgesicherte Route).
-  async function updateEmployee(member: any) {
-    if (!currentCompany) return;
-    setSavingEdit(true);
-    const { data: sessionData } = await supabase.auth.getSession();
-    const token = sessionData?.session?.access_token || "";
-    const body: any = { userId: member.user_id, preferredLanguage: editLang };
-    // Rolle nur mitschicken, wenn geaendert und nicht man selbst.
-    if (editRole !== member.role && member.user_id !== user?.id) body.role = editRole;
-    const res = await fetch("/api/update-employee", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify(body) });
-    const data = await res.json().catch(() => ({}));
-    setSavingEdit(false);
-    if (!res.ok || data?.error) { setMessage("Fehler: " + (data?.error || `HTTP ${res.status}`)); return; }
-    setEditMemberId(null);
-    await loadCompanyUsers(currentCompany.company_id);
-    setMessage("✅ Gespeichert.");
   }
 
   async function resetCompanyUserPassword(memberEmail: string) {
@@ -3878,26 +3693,6 @@ export default function Home() {
     const r = teamReports.find((x) => x.id === teamOpenId);
     if (r) translateTeamReport(r);
   }, [uiLanguage]);
-
-  // Mitarbeiter-Bericht als PDF in der aktuellen Anzeige-Sprache (fuer PL/Admin/Owner).
-  async function createTeamPDF(r: SavedReport) {
-    setMessage("⏳ PDF …");
-    try {
-      const pdfDays = await Promise.all((r.days || []).map(async (d: DayEntry) => {
-        const text = (d.description || "").trim();
-        if (!text) return { ...d, translation: "" };
-        try {
-          const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: text, fromLanguage: "automatisch", toLanguage: uiLanguage }) });
-          const data = await res.json();
-          const tr = (!data.error && data.translation && data.translation.trim() !== text) ? data.translation : "";
-          return { ...d, translation: tr };
-        } catch { return { ...d, translation: "" }; }
-      }));
-      await createPDF(false, { days: pdfDays, reportName: r.report_name, employee: r.employee, calendarWeek: "" });
-    } finally {
-      setMessage("");
-    }
-  }
 
   function updateDay(index: number, field: keyof DayEntry, value: string) {
     const copy = [...days]; copy[index] = { ...copy[index], [field]: value }; setDays(copy);
@@ -3978,11 +3773,9 @@ export default function Home() {
   }
 
   function getTranslatedComment(instructionId: string, taskId: string, fallback: string): string {
-    const { body, weather } = splitWeather(fallback);
     const trans = instructionTranslations[instructionId];
-    const translatedBody = (trans && trans.language === uiLanguage && trans.tasks?.[`comment_${taskId}`]) ? trans.tasks[`comment_${taskId}`] : body;
-    const loc = weather.map((w) => localizeWeather(w, uiLanguage));
-    return [translatedBody, ...loc].filter(Boolean).join("\n");
+    if (trans && trans.language === uiLanguage && trans.tasks?.[`comment_${taskId}`]) return trans.tasks[`comment_${taskId}`];
+    return fallback;
   }
 
   function getTranslatedTask(instructionId: string, taskId: string, fallback: string): string {
@@ -4104,53 +3897,34 @@ export default function Home() {
         if (taskText && !(sameLang && existing?.tasks?.[task.id])) {
           jobs.push({ instId: inst.id, storeKey: task.id, inTasks: true, text: taskText, sourceLang: "automatisch" });
         }
-        const cBody = splitWeather(task.employee_comment || "").body.trim();
-        if (cBody && !(sameLang && existing?.tasks?.[`comment_${task.id}`])) {
+        const c = (task.employee_comment || "").trim();
+        if (c && !(sameLang && existing?.tasks?.[`comment_${task.id}`])) {
           const declared = task.comment_lang;
           const sourceLang = declared && declared !== targetLang ? declared : "automatisch";
-          jobs.push({ instId: inst.id, storeKey: `comment_${task.id}`, inTasks: true, text: cBody, sourceLang });
+          jobs.push({ instId: inst.id, storeKey: `comment_${task.id}`, inTasks: true, text: c, sourceLang });
         }
       }
     }
     if (jobs.length === 0) return;
     const fieldUpdates: Record<string, Record<string, string>> = {};
     const taskUpdates: Record<string, Record<string, string>> = {};
-    // Dedupliziert + gedrosselt: gleicher Text wird nur EINMAL uebersetzt (Anweisungen
-    // wiederholen sich stark), max. CONCURRENCY gleichzeitig -> Verbindungen bleiben frei.
-    const uniqueTexts = new Map<string, { text: string; sourceLang: string }>();
-    for (const job of jobs) {
-      const k = job.sourceLang + "|||" + job.text;
-      if (!uniqueTexts.has(k)) uniqueTexts.set(k, { text: job.text, sourceLang: job.sourceLang });
-    }
-    const translations = new Map<string, string>();
-    const CONCURRENCY = 4;
-    const entries = Array.from(uniqueTexts.entries());
-    const runOne = async (entry: [string, { text: string; sourceLang: string }]) => {
-      const [k, v] = entry;
+    // PARALLEL übersetzen (statt nacheinander)
+    await Promise.all(jobs.map(async (job) => {
       try {
-        const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: v.text, fromLanguage: v.sourceLang, toLanguage: targetLang }) });
+        const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: job.text, fromLanguage: job.sourceLang, toLanguage: targetLang }) });
         const data = await res.json();
-        if (!data.error && data.translation) translations.set(k, data.translation);
+        if (!data.error && data.translation) {
+          if (job.inTasks) {
+            if (!taskUpdates[job.instId]) taskUpdates[job.instId] = {};
+            taskUpdates[job.instId][job.storeKey] = data.translation;
+          } else {
+            if (!fieldUpdates[job.instId]) fieldUpdates[job.instId] = {};
+            fieldUpdates[job.instId][job.storeKey] = data.translation;
+          }
+        }
       } catch { /* Übersetzung übersprungen */ }
-    };
-    for (let i = 0; i < entries.length; i += CONCURRENCY) {
-      await Promise.all(entries.slice(i, i + CONCURRENCY).map(runOne));
-    }
-    for (const job of jobs) {
-      const tr = translations.get(job.sourceLang + "|||" + job.text);
-      if (!tr) continue;
-      if (job.inTasks) {
-        if (!taskUpdates[job.instId]) taskUpdates[job.instId] = {};
-        taskUpdates[job.instId][job.storeKey] = tr;
-      } else {
-        if (!fieldUpdates[job.instId]) fieldUpdates[job.instId] = {};
-        fieldUpdates[job.instId][job.storeKey] = tr;
-      }
-    }
+    }));
     const ids = new Set([...Object.keys(fieldUpdates), ...Object.keys(taskUpdates)]);
-    // Inzwischen wurde die Sprache gewechselt? Dann dieses (veraltete) Ergebnis verwerfen,
-    // damit es die aktuelle Anzeige-Sprache nicht ueberschreibt.
-    if (targetLang !== uiLanguageRef.current) return;
     if (ids.size > 0) {
       setInstructionTranslations((prev) => {
         const next: Record<string, any> = { ...prev };
@@ -4381,7 +4155,7 @@ export default function Home() {
 
     const { data: ownerUser } = await supabase.from("company_users").select("user_id").eq("company_id", companyUser.company_id).eq("role", "owner").maybeSingle();
     const ownerUserId = ownerUser?.user_id || userId;
-    const { data } = await supabase.from("company_settings").select("*").eq("user_id", ownerUserId).maybeSingle();
+    const { data } = await supabase.from("company_settings").select("*").eq("user_id", ownerUserId).single();
     const settings = data || { user_id: ownerUserId, company_name: "", company_logo: "", street: "", zip_code: "", city: "", phone: "", email: "", website: "", tax_number: "" };
     setCompanySettings(settings);
   }
@@ -4648,6 +4422,11 @@ export default function Home() {
           const data = await res.json();
           mergedTasks[task.id] = data.error ? task.task_text : data.translation;
         }
+        if (task.employee_comment?.trim()) {
+          const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: task.employee_comment, fromLanguage: "Deutsch", toLanguage: targetLang }) });
+          const data = await res.json();
+          mergedTasks[`comment_${task.id}`] = data.error ? task.employee_comment : data.translation;
+        }
       }
       setInstructionTranslations(prev => ({ ...prev, [instruction.id]: { ...translatedFields, tasks: mergedTasks, language: targetLang } }));
       setMessage("");
@@ -4655,26 +4434,8 @@ export default function Home() {
       Object.assign(currentTranslations, translatedFields);
     }
 
-    // Kommentare IMMER frisch aus dem aktuellen employee_comment nehmen (enthaelt z. B. das Wetter),
-    // unabhaengig von evtl. veraltetem Uebersetzungs-Cache.
-    const freshComments: Record<string, string> = {};
-    for (const task of instruction.work_instruction_tasks || []) {
-      const cmt = (task.employee_comment || "").trim();
-      if (!cmt) continue;
-      const parts = splitWeather(cmt);
-      const loc = parts.weather.map((w) => localizeWeather(w, uiLanguage));
-      let body = parts.body.trim();
-      if (body && uiLanguage !== "Deutsch") {
-        try {
-          const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: body, fromLanguage: "automatisch", toLanguage: uiLanguage }) });
-          const data = await res.json();
-          if (!data.error && data.translation) body = data.translation;
-        } catch { /* Original belassen */ }
-      }
-      freshComments[task.id] = [body, ...loc].filter(Boolean).join("\n");
-    }
     const getTaskText = (taskId: string, fallback: string) => mergedTasks[taskId] || fallback;
-    const getCommentText = (taskId: string, fallback: string) => freshComments[taskId] || fallback;
+    const getCommentText = (taskId: string, fallback: string) => mergedTasks[`comment_${taskId}`] || fallback;
     const getTitleText = () => currentTranslations.title || instruction.title;
     const getProblemsText = () => currentTranslations.problems_text || instruction.problems_text || "";
     const getMaterialText = () => currentTranslations.material || instruction.material || "";
@@ -4774,11 +4535,7 @@ export default function Home() {
     setShowOnboarding(false); setOnboardingDone(true); setMessage("Willkommen! Ihre Firmendaten wurden gespeichert.");
   }
 
-  async function createPDF(sendByEmail = false, src?: { days?: DayEntry[]; reportName?: string; calendarWeek?: string; employee?: string }) {
-    const pdfDays = src?.days ?? days;
-    const pdfReportName = src?.reportName ?? reportName;
-    const pdfCalendarWeek = src?.calendarWeek ?? calendarWeek;
-    const pdfEmployee = src?.employee ?? employee;
+  async function createPDF(sendByEmail = false) {
     const p = pdfTexts[uiLanguage as keyof typeof pdfTexts] || pdfTexts["Deutsch" as keyof typeof pdfTexts];
     const doc = new jsPDF("p", "mm", "a4");
     const FONT = await loadPdfFont(doc);
@@ -4790,7 +4547,7 @@ export default function Home() {
     let y = 15;
     const addFooter = () => { doc.setFontSize(8); doc.setTextColor(120); doc.text(companySettings?.company_name || currentCompany?.companies?.name || p.company, marginLeft, pageHeight - 10); doc.text(`${p.createdAt}: ${new Date().toLocaleDateString("de-DE")}`, pageWidth - marginRight, pageHeight - 10, { align: "right" }); doc.setTextColor(0); };
     const addNewPageIfNeeded = (neededHeight: number) => { if (y + neededHeight > pageHeight - 25) { addFooter(); doc.addPage(); y = 15; } };
-    const qrText = `${p.title} ${pdfCalendarWeek || ""} - ${pdfEmployee}`;
+    const qrText = `${p.title} ${calendarWeek || ""} - ${employee}`;
     const qrImage = await QRCode.toDataURL(qrText);
     let logoBase64 = "";
     if (companySettings?.company_logo) {
@@ -4811,9 +4568,9 @@ export default function Home() {
     if (companySettings?.website) { doc.text(`Web: ${companySettings.website}`, marginLeft, y); y += 5; }
     if (companySettings?.tax_number) { doc.text(`UID: ${companySettings.tax_number}`, marginLeft, y); y += 5; }
     y += 7;
-    doc.text(`${p.report}: ${pdfReportName || "-"}`, marginLeft, y); y += 6;
-    doc.text(`${p.calendarWeek}: ${pdfCalendarWeek || "-"}`, marginLeft, y); y += 6;
-    doc.text(`${p.employee}: ${pdfEmployee || "-"}`, marginLeft, y);
+    doc.text(`${p.report}: ${reportName || "-"}`, marginLeft, y); y += 6;
+    doc.text(`${p.calendarWeek}: ${calendarWeek || "-"}`, marginLeft, y); y += 6;
+    doc.text(`${p.employee}: ${employee || "-"}`, marginLeft, y);
     if (logoBase64) {
       // Logo seitenverhaeltnis-treu einpassen (max. 55 x 30 mm), rechtsbuendig oben
       const maxW = 55, maxH = 30, topY = 8, rightEdge = pageWidth - marginRight;
@@ -4832,17 +4589,19 @@ export default function Home() {
     }
     y += 10; if (y < 75) y = 75;
     doc.setFontSize(12); doc.setFont(FONT, "bold"); doc.text(p.dailyReports, marginLeft, y); y += 8;
-    // Fuer das PDF die BEREITS in der App angezeigte Uebersetzung verwenden (day.translation).
-    // So steht im PDF genau das, was der Betrachter in seiner Sprache sieht. Liegt keine
-    // Uebersetzung vor (Original ist schon in der Anzeige-Sprache), wird das Original genommen.
+    // Tagestexte fuer das PDF sicher in die Anzeige-Sprache bringen (nutzt Cache; verhindert halb-uebersetzte PDFs).
     const pdfDayText: string[] = [];
-    for (let di = 0; di < pdfDays.length; di++) {
-      const src = (pdfDays[di].description || "").trim();
-      const trans = (pdfDays[di].translation || "").trim();
-      pdfDayText[di] = trans || src;
+    for (let di = 0; di < days.length; di++) {
+      const src = (days[di].description || "").trim();
+      if (!src || uiLanguage === "Deutsch") { pdfDayText[di] = src; continue; }
+      try {
+        const tr = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: src, fromLanguage: "automatisch", toLanguage: uiLanguage }) });
+        const td = await tr.json();
+        pdfDayText[di] = (!td.error && td.translation && td.translation.trim() !== src) ? td.translation : src;
+      } catch { pdfDayText[di] = src; }
     }
-    for (let di = 0; di < pdfDays.length; di++) {
-      const day = pdfDays[di];
+    for (let di = 0; di < days.length; di++) {
+      const day = days[di];
       const hasContent = day.description || day.hours || day.customer || day.projectNumber || day.site || day.photos.length > 0;
       if (!hasContent) continue;
       const descriptionText = sanitizePdfText(pdfDayText[di] || day.description || "-");
@@ -4898,19 +4657,13 @@ export default function Home() {
     doc.line(marginLeft, y, marginLeft + 70, y); doc.line(pageWidth - marginRight - 70, y, pageWidth - marginRight, y);
     y += 6; doc.setFontSize(9); doc.text(p.signatureEmployee, marginLeft, y); doc.text(p.signatureCustomer, pageWidth - marginRight - 70, y);
     addFooter();
-    // Dateiname = Berichtsname (z. B. "KW 26 - Jasmin 2.pdf"); falls leer -> Projekt_KW_Mitarbeiter
+    // Dateiname: Projekt_KW_Mitarbeiter (z. B. AU2260027_KW26_Max_Mustermann.pdf)
     const illegal = (s: string) => (s || "").replace(/[\\/:*?"<>|]/g, "");
-    const nameFromReport = illegal(pdfReportName || "").trim();
-    let filename: string;
-    if (nameFromReport) {
-      filename = `${nameFromReport}.pdf`;
-    } else {
-      const projectNumbers = Array.from(new Set((pdfDays || []).map((d: any) => (d.projectNumber || "").trim()).filter(Boolean)));
-      const projectPart = illegal(projectNumbers.length === 0 ? "Projekt" : projectNumbers.join("-")).replace(/\s+/g, "_");
-      const kwPart = illegal(pdfCalendarWeek || "Woche").replace(/\s+/g, "");
-      const employeePart = illegal(pdfEmployee || "Mitarbeiter").replace(/\s+/g, "_");
-      filename = `${projectPart}_${kwPart}_${employeePart}.pdf`;
-    }
+    const projectNumbers = Array.from(new Set((days || []).map((d: any) => (d.projectNumber || "").trim()).filter(Boolean)));
+    const projectPart = illegal(projectNumbers.length === 0 ? "Projekt" : projectNumbers.join("-")).replace(/\s+/g, "_");
+    const kwPart = illegal(calendarWeek || "Woche").replace(/\s+/g, "");
+    const employeePart = illegal(employee || "Mitarbeiter").replace(/\s+/g, "_");
+    const filename = `${projectPart}_${kwPart}_${employeePart}.pdf`;
     if (sendByEmail) {
       if (!companyFeatures?.email_enabled) { setMessage(t.msgEmailNotEnabled); return; }
       if (!emailTo.trim()) { setMessage(t.msgEmailRequired); return; }
@@ -4918,7 +4671,7 @@ export default function Home() {
       const pdfBase64 = doc.output("datauristring").split(",")[1];
       const { data: sessionData } = await supabase.auth.getSession();
       const token = sessionData?.session?.access_token || "";
-      const res = await fetch("/api/send-report", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ to: emailTo, subject: `${p.title} ${pdfCalendarWeek || ""}`, pdfBase64, filename }) });
+      const res = await fetch("/api/send-report", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ to: emailTo, subject: `${p.title} ${calendarWeek || ""}`, pdfBase64, filename }) });
       const data = await res.json();
       if (data.error) { setMessage("Fehler beim E-Mail-Versand: " + data.error); return; }
       setMessage(t.msgEmailSent); return;
@@ -5051,20 +4804,20 @@ export default function Home() {
 
   if (!user) {
     return (
-      <main className="max-w-xl mx-auto p-4 md:p-8 space-y-6 bg-slate-100 min-h-screen text-black">
-        <section className="border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4 bg-white">
+      <main className="max-w-xl mx-auto p-4 md:p-8 space-y-6 bg-gray-100 min-h-screen text-black">
+        <section className="border rounded p-4 space-y-4 bg-white">
           <h1 className="text-3xl font-bold">{t.loginTitle}</h1>
-          {message && <div className="border border-slate-200 rounded-xl p-3 shadow-sm bg-yellow-100 text-black">{message}</div>}
+          {message && <div className="border rounded p-3 bg-yellow-100 text-black">{message}</div>}
           <form onSubmit={(e) => { e.preventDefault(); signIn(); }} autoComplete="on" className="space-y-3">
           <div className="space-y-3">
-            <input name="company" autoComplete="organization" className="border p-3 w-full text-black bg-white rounded-lg" placeholder="Firmenkürzel (z.B. luger)" value={companySlug} onChange={(e) => setCompanySlug(e.target.value)} />
-            <input name="username" autoComplete="username" className="border p-3 w-full text-black bg-white rounded-lg" placeholder="Benutzername (z.B. max)" value={username} onChange={(e) => setUsername(e.target.value)} />
+            <input name="company" autoComplete="organization" className="border p-3 w-full text-black bg-white rounded" placeholder="Firmenkürzel (z.B. luger)" value={companySlug} onChange={(e) => setCompanySlug(e.target.value)} />
+            <input name="username" autoComplete="username" className="border p-3 w-full text-black bg-white rounded" placeholder="Benutzername (z.B. max)" value={username} onChange={(e) => setUsername(e.target.value)} />
           </div>
           <div className="relative">
             <input name="password" autoComplete="current-password" className="border p-3 w-full text-black bg-white pr-12" placeholder={t.password} type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} />
             <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-lg">{showPassword ? "🙈" : "👁️"}</button>
           </div>
-          <button type="submit" className="bg-cyan-600 text-white px-4 py-3 rounded-lg w-full">{t.login}</button>
+          <button type="submit" className="bg-blue-600 text-white px-4 py-3 rounded w-full">{t.login}</button>
           </form>
         </section>
         <footer className="text-center text-xs text-gray-500 mt-6">
@@ -5079,12 +4832,12 @@ export default function Home() {
   if (user && mustChangePassword) {
     return (
       <main className="max-w-md mx-auto p-4 md:p-8 min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-5 w-full shadow-lg">
+        <div className="bg-white border rounded-xl p-6 space-y-5 w-full shadow-lg">
           <div className="text-center"><div className="text-5xl mb-3">🔐</div><h2 className="text-2xl font-bold">Passwort ändern</h2><p className="text-gray-500 text-sm mt-1">Bitte ändern Sie Ihr temporäres Passwort.</p></div>
-          {message && <div className="bg-yellow-50 border border-slate-200 rounded-xl p-3 shadow-sm text-sm">{message}</div>}
-          <input className="border p-3 w-full rounded-lg text-black" placeholder="Neues Passwort (min. 8 Zeichen)" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
-          <input className="border p-3 w-full rounded-lg text-black" placeholder="Passwort bestätigen" type="password" value={newPasswordConfirm} onChange={(e) => setNewPasswordConfirm(e.target.value)} />
-          <button type="button" onClick={changePassword} disabled={changingPassword} className="w-full bg-cyan-700 text-white py-3 rounded-lg font-bold disabled:opacity-50">{changingPassword ? "Wird gespeichert..." : "Passwort speichern & weiter"}</button>
+          {message && <div className="bg-yellow-50 border rounded p-3 text-sm">{message}</div>}
+          <input className="border p-3 w-full rounded text-black" placeholder="Neues Passwort (min. 8 Zeichen)" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+          <input className="border p-3 w-full rounded text-black" placeholder="Passwort bestätigen" type="password" value={newPasswordConfirm} onChange={(e) => setNewPasswordConfirm(e.target.value)} />
+          <button type="button" onClick={changePassword} disabled={changingPassword} className="w-full bg-blue-700 text-white py-3 rounded font-bold disabled:opacity-50">{changingPassword ? "Wird gespeichert..." : "Passwort speichern & weiter"}</button>
         </div>
       </main>
     );
@@ -5093,11 +4846,11 @@ export default function Home() {
   if (user && companyBlocked) {
     return (
       <main className="max-w-md mx-auto p-4 md:p-8 min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-5 w-full shadow-lg text-center">
+        <div className="bg-white border rounded-xl p-6 space-y-5 w-full shadow-lg text-center">
           <div className="text-6xl mb-2">🔒</div>
           <h2 className="text-2xl font-bold text-red-700">Konto gesperrt</h2>
           <p className="text-gray-600">Dieses Firmenkonto ist derzeit gesperrt. Bitte kontaktieren Sie Ihren Anbieter, um den Zugang wieder freizuschalten.</p>
-          <button type="button" onClick={signOut} className="w-full bg-gray-800 text-white py-3 rounded-lg font-bold">Abmelden</button>
+          <button type="button" onClick={signOut} className="w-full bg-gray-800 text-white py-3 rounded font-bold">Abmelden</button>
         </div>
       </main>
     );
@@ -5106,35 +4859,35 @@ export default function Home() {
   if (user && showOnboarding && false) {
     return (
       <main className="max-w-xl mx-auto p-4 md:p-8 min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6 w-full shadow-lg">
-          <div className="flex items-center gap-2 mb-2">{[1, 2, 3].map((step) => (<div key={step} className={`flex-1 h-2 rounded-full ${onboardingStep >= step ? "bg-cyan-600" : "bg-gray-200"}`} />))}</div>
+        <div className="bg-white border rounded-xl p-6 space-y-6 w-full shadow-lg">
+          <div className="flex items-center gap-2 mb-2">{[1, 2, 3].map((step) => (<div key={step} className={`flex-1 h-2 rounded-full ${onboardingStep >= step ? "bg-blue-600" : "bg-gray-200"}`} />))}</div>
           {onboardingStep === 1 && (
             <div className="space-y-4">
               <h2 className="text-2xl font-bold">👋 Willkommen!</h2>
               <p className="text-gray-600">Bitte hinterlegen Sie zuerst Ihre Firmendaten.</p>
               <div className="space-y-3">
-                <input className="border p-3 w-full rounded-lg text-black" placeholder="Firmenname *" value={companySettings?.company_name || ""} onChange={(e) => updateCompanyField("company_name", e.target.value)} />
-                <input className="border p-3 w-full rounded-lg text-black" placeholder="Straße" value={companySettings?.street || ""} onChange={(e) => updateCompanyField("street", e.target.value)} />
+                <input className="border p-3 w-full rounded text-black" placeholder="Firmenname *" value={companySettings?.company_name || ""} onChange={(e) => updateCompanyField("company_name", e.target.value)} />
+                <input className="border p-3 w-full rounded text-black" placeholder="Straße" value={companySettings?.street || ""} onChange={(e) => updateCompanyField("street", e.target.value)} />
                 <div className="grid grid-cols-2 gap-3">
-                  <input className="border p-3 rounded-lg text-black" placeholder="PLZ" value={companySettings?.zip_code || ""} onChange={(e) => updateCompanyField("zip_code", e.target.value)} />
-                  <input className="border p-3 rounded-lg text-black" placeholder="Ort" value={companySettings?.city || ""} onChange={(e) => updateCompanyField("city", e.target.value)} />
+                  <input className="border p-3 rounded text-black" placeholder="PLZ" value={companySettings?.zip_code || ""} onChange={(e) => updateCompanyField("zip_code", e.target.value)} />
+                  <input className="border p-3 rounded text-black" placeholder="Ort" value={companySettings?.city || ""} onChange={(e) => updateCompanyField("city", e.target.value)} />
                 </div>
               </div>
-              <button type="button" onClick={() => { if (!companySettings?.company_name?.trim()) { setMessage("Bitte Firmenname eingeben."); return; } setOnboardingStep(2); }} className="w-full bg-cyan-700 text-white py-3 rounded-lg font-bold">Weiter →</button>
+              <button type="button" onClick={() => { if (!companySettings?.company_name?.trim()) { setMessage("Bitte Firmenname eingeben."); return; } setOnboardingStep(2); }} className="w-full bg-blue-700 text-white py-3 rounded font-bold">Weiter →</button>
             </div>
           )}
           {onboardingStep === 2 && (
             <div className="space-y-4">
               <h2 className="text-2xl font-bold">📞 Kontaktdaten</h2>
               <div className="space-y-3">
-                <input className="border p-3 w-full rounded-lg text-black" placeholder="Telefon" value={companySettings?.phone || ""} onChange={(e) => updateCompanyField("phone", e.target.value)} />
-                <input className="border p-3 w-full rounded-lg text-black" placeholder="E-Mail" value={companySettings?.email || ""} onChange={(e) => updateCompanyField("email", e.target.value)} />
-                <input className="border p-3 w-full rounded-lg text-black" placeholder="Webseite" value={companySettings?.website || ""} onChange={(e) => updateCompanyField("website", e.target.value)} />
-                <input className="border p-3 w-full rounded-lg text-black" placeholder="UID / Steuernummer" value={companySettings?.tax_number || ""} onChange={(e) => updateCompanyField("tax_number", e.target.value)} />
+                <input className="border p-3 w-full rounded text-black" placeholder="Telefon" value={companySettings?.phone || ""} onChange={(e) => updateCompanyField("phone", e.target.value)} />
+                <input className="border p-3 w-full rounded text-black" placeholder="E-Mail" value={companySettings?.email || ""} onChange={(e) => updateCompanyField("email", e.target.value)} />
+                <input className="border p-3 w-full rounded text-black" placeholder="Webseite" value={companySettings?.website || ""} onChange={(e) => updateCompanyField("website", e.target.value)} />
+                <input className="border p-3 w-full rounded text-black" placeholder="UID / Steuernummer" value={companySettings?.tax_number || ""} onChange={(e) => updateCompanyField("tax_number", e.target.value)} />
               </div>
               <div className="flex gap-3">
-                <button type="button" onClick={() => setOnboardingStep(1)} className="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg font-medium">← Zurück</button>
-                <button type="button" onClick={() => setOnboardingStep(3)} className="flex-1 bg-cyan-700 text-white py-3 rounded-lg font-bold">Weiter →</button>
+                <button type="button" onClick={() => setOnboardingStep(1)} className="flex-1 bg-gray-200 text-gray-800 py-3 rounded font-medium">← Zurück</button>
+                <button type="button" onClick={() => setOnboardingStep(3)} className="flex-1 bg-blue-700 text-white py-3 rounded font-bold">Weiter →</button>
               </div>
             </div>
           )}
@@ -5142,12 +4895,12 @@ export default function Home() {
             <div className="space-y-4">
               <h2 className="text-2xl font-bold">🖼️ Firmenlogo</h2>
               <p className="text-gray-600">Optional — kann später hinzugefügt werden.</p>
-              {companySettings?.company_logo && (<img src={companySettings?.company_logo} alt="Logo" className="h-20 object-contain border rounded-lg p-2" />)}
-              <input type="file" accept="image/*" className="border p-3 w-full rounded-lg text-black bg-white" onChange={(e) => uploadCompanyLogo(e.target.files)} />
-              {message && <div className="bg-yellow-50 border border-slate-200 rounded-xl p-3 shadow-sm text-sm">{message}</div>}
+              {companySettings?.company_logo && (<img src={companySettings?.company_logo} alt="Logo" className="h-20 object-contain border rounded p-2" />)}
+              <input type="file" accept="image/*" className="border p-3 w-full rounded text-black bg-white" onChange={(e) => uploadCompanyLogo(e.target.files)} />
+              {message && <div className="bg-yellow-50 border rounded p-3 text-sm">{message}</div>}
               <div className="flex gap-3">
-                <button type="button" onClick={() => setOnboardingStep(2)} className="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg font-medium">← Zurück</button>
-                <button type="button" onClick={saveOnboarding} className="flex-1 bg-green-700 text-white py-3 rounded-lg font-bold">✅ Speichern & Starten</button>
+                <button type="button" onClick={() => setOnboardingStep(2)} className="flex-1 bg-gray-200 text-gray-800 py-3 rounded font-medium">← Zurück</button>
+                <button type="button" onClick={saveOnboarding} className="flex-1 bg-green-700 text-white py-3 rounded font-bold">✅ Speichern & Starten</button>
               </div>
               <button type="button" onClick={() => setShowOnboarding(false)} className="w-full text-gray-400 text-sm underline">Überspringen</button>
             </div>
@@ -5158,24 +4911,24 @@ export default function Home() {
   }
 
   return (
-    <main className="max-w-5xl mx-auto p-4 md:p-8 space-y-6 bg-slate-100 min-h-screen text-black overflow-x-hidden">
-      <header className="bg-cyan-600 rounded-2xl p-5 space-y-1 shadow-sm">
-        <h1 className="text-2xl md:text-3xl font-bold text-white">{t.title}</h1>
-        <p className="text-cyan-100 text-sm">{t.subtitle}</p>
-        <p className="text-cyan-50 text-sm break-words">{t.loggedInAs}: <strong className="text-white">{user.email}</strong></p>
-        {currentCompany && (<p className="text-cyan-50 text-sm break-words">{t.firma}: <strong>{currentCompany.companies.name}</strong> | {t.role}: <strong>{currentCompany.role === "owner" ? "Owner" : currentCompany.role === "admin" ? t.roleAdmin : currentCompany.role === "project_manager" ? t.roleProjectManager : t.roleEmployee}</strong></p>)}
-        <div className="flex items-center flex-wrap gap-2 mt-3">
-          <button type="button" onClick={signOut} className="bg-white text-cyan-700 px-4 py-2.5 rounded-lg font-medium">{t.logout}</button>
-          <button type="button" onClick={refreshAll} disabled={refreshing} title="Aktualisieren" className="bg-cyan-700 text-white px-4 py-2.5 rounded-lg disabled:opacity-50">{refreshing ? "⏳" : "🔄"}</button>
-          <button type="button" onClick={openHelp} title={t.help} aria-label={t.help} className="bg-cyan-700 text-white px-4 py-2.5 rounded-lg">❓</button>
-          {currentCompany?.role !== "employee" && (<select className="p-2.5 rounded-lg text-black bg-white text-sm border-0" value={uiLanguage} onChange={(e) => {
+    <main className="max-w-5xl mx-auto p-4 md:p-8 space-y-6 bg-gray-100 min-h-screen text-black overflow-x-hidden">
+      <header className="bg-white border rounded p-4 space-y-1">
+        <h1 className="text-3xl font-bold">{t.title}</h1>
+        <p className="text-gray-600">{t.subtitle}</p>
+        <p className="text-gray-700 break-words">{t.loggedInAs}: <strong>{user.email}</strong></p>
+        {currentCompany && (<p className="text-gray-700 break-words">{t.firma}: <strong>{currentCompany.companies.name}</strong> | {t.role}: <strong>{currentCompany.role === "owner" ? "Owner" : currentCompany.role === "admin" ? t.roleAdmin : currentCompany.role === "project_manager" ? t.roleProjectManager : t.roleEmployee}</strong></p>)}
+        <div className="flex items-center flex-wrap gap-3 mt-2">
+          <button type="button" onClick={signOut} className="bg-gray-800 text-white px-4 py-2 rounded">{t.logout}</button>
+          <button type="button" onClick={refreshAll} disabled={refreshing} title="Aktualisieren" className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50">{refreshing ? "⏳" : "🔄"}</button>
+          <button type="button" onClick={openHelp} title={t.help} aria-label={t.help} className="bg-gray-200 text-gray-800 px-4 py-2 rounded">❓</button>
+          <select className="border p-2 rounded text-black bg-white text-sm" value={uiLanguage} onChange={(e) => {
             // Sprache umschalten + pro Benutzer in der DB merken (geraeteuebergreifend).
             const newLang = e.target.value as Language;
             setUiLanguage(newLang);
             if (user?.id) { supabase.from("company_users").update({ preferred_language: newLang }).eq("user_id", user.id); }
           }}>
             {getAllowedLanguages(companyFeatures).filter(l => languages.includes(l as Language)).map((lang) => (<option key={lang} value={lang}>🌐 {lang}</option>))}
-          </select>)}
+          </select>
         </div>
       </header>
 
@@ -5203,7 +4956,7 @@ export default function Home() {
         <TabButton label={t.tabMonth}           tabName="monat"              activeTab={activeTab} onClick={() => { setActiveTab("monat"); if (currentCompany) loadWorkInstructions(currentCompany.company_id); }} />
       </nav>
 
-      {message && <div className="border border-slate-200 rounded-xl p-3 shadow-sm bg-yellow-100 text-black">{message}</div>}
+      {message && <div className="border rounded p-3 bg-yellow-100 text-black">{message}</div>}
 
       {activeTab === "dashboard" && (
         <section className="space-y-4">
@@ -5274,20 +5027,20 @@ export default function Home() {
             const dashShown = built.filter((b: any) => b.rows.length > 0);
             return (
               <>
-                <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                <div className="bg-white border rounded-xl p-4 shadow-sm">
                   <h2 className="text-xl font-bold">{t.dashMyProjects}</h2>
                   <p className="text-gray-500 text-sm">{rangeLabel} · {dashShown.length} {t.projects}</p>
                   <div className="flex gap-2 mt-3">
                     {([["today", t.dashToday], ["tomorrow", t.dashTomorrow], ["week", t.dashWeek], ["nextweek", t.dashNextWeek]] as [string, string][]).map(([val, lbl]) => (
-                      <button key={val} type="button" onClick={() => setDashRange(val)} className={`px-3 py-1 rounded-lg text-sm ${dashRange === val ? "bg-cyan-600 text-white" : "bg-gray-100 text-gray-700"}`}>{lbl}</button>
+                      <button key={val} type="button" onClick={() => setDashRange(val)} className={`px-3 py-1 rounded text-sm ${dashRange === val ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-700"}`}>{lbl}</button>
                     ))}
                   </div>
                 </div>
-                {dashShown.length === 0 && (<div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm text-gray-500 text-center shadow-sm">{built.length === 0 ? t.dashNoProjects : t.dashNothingToday}</div>)}
+                {dashShown.length === 0 && (<div className="bg-white border rounded-xl p-6 text-gray-500 text-center shadow-sm">{built.length === 0 ? t.dashNoProjects : t.dashNothingToday}</div>)}
                 {dashShown.map((b) => {
                   const dOpen = openDashProjects[b.key] !== false;
                   return (
-                  <div key={b.key} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
+                  <div key={b.key} className="bg-white border rounded-xl p-4 shadow-sm space-y-3">
                     <div className="flex justify-between items-start gap-3 cursor-pointer select-none" onClick={() => setOpenDashProjects((prev) => ({ ...prev, [b.key]: prev[b.key] === false }))}>
                       <div className="min-w-0">
                         <h3 className="font-bold text-lg break-words">{dOpen ? "▾" : "▸"} {b.g.name}</h3>
@@ -5295,9 +5048,9 @@ export default function Home() {
                         {isManager && b.totalAssign > 0 && (<p className={`text-xs ${b.unread > 0 ? "text-orange-600" : "text-green-600"}`}>{b.unread > 0 ? `👁 ${b.unread} ${t.readUnread}` : `✅ ${t.readAllDone}`}</p>)}
                       </div>
                       {b.stoppedN > 0 ? (
-                        <span className="text-xs text-red-700 bg-red-50 px-2 py-1 rounded-lg whitespace-nowrap">{b.stoppedN} {t.statusStopped}</span>
+                        <span className="text-xs text-red-700 bg-red-50 px-2 py-1 rounded whitespace-nowrap">{b.stoppedN} {t.statusStopped}</span>
                       ) : b.rows.length > 0 ? (
-                        <span className="text-xs text-green-700 bg-green-50 px-2 py-1 rounded-lg whitespace-nowrap">{b.doneN} / {b.winTotal} {t.dashDone}</span>
+                        <span className="text-xs text-green-700 bg-green-50 px-2 py-1 rounded whitespace-nowrap">{b.doneN} / {b.winTotal} {t.dashDone}</span>
                       ) : null}
                     </div>
                     {dOpen && (b.rows.length === 0 ? (
@@ -5312,7 +5065,7 @@ export default function Home() {
                               <span>{icon}</span>
                               <span className={`flex-1 break-words ${s === "completed" ? "line-through text-gray-400" : ""}`}>{getTranslatedTask(r.inst.id, r.task.id, r.task.task_text)}</span>
                               {r.date && r.date !== today ? (<span className={r.overdue ? "text-xs text-red-600 whitespace-nowrap" : "text-xs text-gray-500 whitespace-nowrap"}>{r.overdue ? t.dashOverdue + ": " : ""}{r.date}</span>) : (r.task.note ? (<span className="text-xs text-gray-500 whitespace-nowrap break-words">{r.task.note}</span>) : null)}
-                              <button type="button" onClick={() => openInstructionFromDashboard(r.inst)} title={t.dashOpen} aria-label={t.dashOpen} className="text-cyan-700 hover:text-cyan-800 shrink-0 px-1 font-bold">→</button>
+                              <button type="button" onClick={() => openInstructionFromDashboard(r.inst)} title={t.dashOpen} aria-label={t.dashOpen} className="text-blue-600 hover:text-blue-800 shrink-0 px-1 font-bold">→</button>
                             </div>
                           );
                         })}
@@ -5329,23 +5082,23 @@ export default function Home() {
 
       {activeTab === "regiebericht" && (
         <div className="space-y-4">
-          <section className="border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4 bg-white text-black">
+          <section className="border rounded p-4 space-y-4 bg-white text-black">
             <h2 className="text-xl font-bold">{t.general}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <input className="border p-3 text-black bg-white" placeholder={t.employee} value={employee} onChange={(e) => setEmployee(e.target.value)} />
               <input className="border p-3 bg-gray-200 text-black" value={calendarWeek} readOnly placeholder={t.calendarWeek} />
-              {companyFeatures?.email_enabled ? <input className="border p-3 text-black bg-white md:col-span-2" placeholder={t.recipientEmail} value={emailTo} onChange={(e) => setEmailTo(e.target.value)} /> : <div className="border border-slate-200 rounded-xl p-3 shadow-sm bg-gray-50 text-sm text-gray-400 md:col-span-2">🔒 E-Mail-Versand ist in deinem Paket nicht aktiviert.</div>}
+              {companyFeatures?.email_enabled ? <input className="border p-3 text-black bg-white md:col-span-2" placeholder={t.recipientEmail} value={emailTo} onChange={(e) => setEmailTo(e.target.value)} /> : <div className="border rounded p-3 bg-gray-50 text-sm text-gray-400 md:col-span-2">🔒 E-Mail-Versand ist in deinem Paket nicht aktiviert.</div>}
             </div>
           </section>
-          <section className="border rounded-lg bg-white text-black">
+          <section className="border rounded bg-white text-black">
             <div className="p-4 cursor-pointer select-none flex justify-between items-center" onClick={() => setReportExpanded(v => !v)}>
-              <h2 className="text-xl font-bold">{reportExpanded ? "▾" : "▸"} {t.tabReport}{reportName ? ` — ${t.calendarWeek}: ${reportName}` : (calendarWeek ? ` — ${t.calendarWeek}: ${calendarWeek}` : "")}{reportName ? "" : (employee ? ` — ${employee}` : "")}</h2>
+              <h2 className="text-xl font-bold">{reportExpanded ? "▾" : "▸"} {t.tabReport}{calendarWeek ? ` — ${t.calendarWeek}: ${calendarWeek}` : ""}{employee ? ` — ${employee}` : ""}</h2>
             </div>
           </section>
           {reportExpanded && (<>
           {days.map((day, index) => (
-            <section key={day.weekday} className="border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3 bg-white text-black">
-              <h2 className="text-xl font-bold cursor-pointer select-none" onClick={() => setOpenReportDays(prev => ({ ...prev, [day.weekday]: !prev[day.weekday] }))}>{openReportDays[day.weekday] ? "▾" : "▸"} {t.weekdays[index] || day.weekday}{(day.description || day.hours || day.customer || day.projectNumber || day.site || (day.photos && day.photos.length > 0)) ? <span className="inline-block w-3 h-3 rounded-full bg-green-500 ml-2 align-middle"></span> : null}</h2>
+            <section key={day.weekday} className="border rounded p-4 space-y-3 bg-white text-black">
+              <h2 className="text-xl font-bold cursor-pointer select-none" onClick={() => setOpenReportDays(prev => ({ ...prev, [day.weekday]: !prev[day.weekday] }))}>{openReportDays[day.weekday] ? "▾" : "▸"} {t.weekdays[index] || day.weekday}</h2>
               {openReportDays[day.weekday] && (<>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <input type="date" className="border p-3 text-black bg-white" value={day.date} onChange={(e) => { if (index === 0) updateFullWeekFromMonday(e.target.value); else updateDay(index, "date", e.target.value); }} />
@@ -5379,14 +5132,13 @@ export default function Home() {
                 </div>
               </div>
               <textarea className="border p-3 w-full text-black bg-white resize-none overflow-hidden" rows={Math.max(4, (day.description || "").split("\n").length + 1)} placeholder={t.description} value={day.description} onChange={(e) => updateDay(index, "description", e.target.value)} />
-              <button type="button" onClick={() => insertWeatherIntoDay(index, day.description)} title={t.weather} className="bg-cyan-50 text-cyan-700 border border-cyan-200 px-3 py-2 rounded-lg text-sm w-fit">🌦️ {t.weather}</button>
-              {companyFeatures?.photos_enabled ? <input type="file" accept="image/*" multiple className="border p-3 w-full text-black bg-white" onChange={(e) => handlePhotos(index, e.target.files)} /> : <div className="border border-slate-200 rounded-xl p-3 shadow-sm bg-gray-50 text-sm text-gray-400">🔒 Foto-Upload ist in deinem Paket nicht aktiviert.</div>}
-              {day.photos.length > 0 && (<div className="grid grid-cols-2 gap-3">{day.photos.map((photo, photoIndex) => (<div key={photoIndex} className="border rounded-lg p-2"><img src={photo} alt="Foto" className="w-full h-32 object-cover" /><button type="button" onClick={() => deletePhoto(index, photoIndex)} className="mt-2 bg-red-600 text-white px-2 py-2.5 rounded-lg w-full">{t.deletePhoto}</button></div>))}</div>)}
-              {day.translation && (<div className="border p-3 rounded-lg bg-gray-100 text-black"><strong>{t.translation}:</strong><p className="whitespace-pre-wrap break-words mt-1 leading-relaxed">{day.translation}</p></div>)}
+              {companyFeatures?.photos_enabled ? <input type="file" accept="image/*" multiple className="border p-3 w-full text-black bg-white" onChange={(e) => handlePhotos(index, e.target.files)} /> : <div className="border rounded p-3 bg-gray-50 text-sm text-gray-400">🔒 Foto-Upload ist in deinem Paket nicht aktiviert.</div>}
+              {day.photos.length > 0 && (<div className="grid grid-cols-2 gap-3">{day.photos.map((photo, photoIndex) => (<div key={photoIndex} className="border rounded p-2"><img src={photo} alt="Foto" className="w-full h-32 object-cover" /><button type="button" onClick={() => deletePhoto(index, photoIndex)} className="mt-2 bg-red-600 text-white px-2 py-2 rounded w-full">{t.deletePhoto}</button></div>))}</div>)}
+              {day.translation && (<div className="border p-3 rounded bg-gray-100 text-black"><strong>{t.translation}:</strong><p className="whitespace-pre-wrap break-words mt-1 leading-relaxed">{day.translation}</p></div>)}
               </>)}
             </section>
           ))}
-          <section className="border border-slate-200 rounded-2xl p-4 shadow-sm space-y-2 bg-white text-black">
+          <section className="border rounded p-4 space-y-2 bg-white text-black">
             <h2 className="text-xl font-bold">{t.hoursOverview}</h2>
             <p><strong>{t.total}:</strong> {totalHours.toString().replace(".", ",")} {t.hours}</p>
             {Object.entries(projectTotals).map(([project, total]) => (<p key={project}><strong>{t.projectNumber} {project}:</strong> {total.toString().replace(".", ",")} {t.hours}{travelKmByProject[project] ? ` · ${formatKm(travelKmByProject[project])} ${t.km}` : ""}</p>))}
@@ -5394,7 +5146,7 @@ export default function Home() {
           </section>
           </>)}
           {companyFeatures?.signature_enabled && (
-            <section className="border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3 bg-white text-black">
+            <section className="border rounded p-4 space-y-3 bg-white text-black">
               <h2 className="text-xl font-bold">✍️ Unterschriften</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <SignaturePad label={pdfTexts[uiLanguage as keyof typeof pdfTexts]?.signatureEmployee || "Unterschrift Mitarbeiter"} value={sigEmployee} onChange={setSigEmployee} />
@@ -5403,28 +5155,28 @@ export default function Home() {
             </section>
           )}
           <div className="flex flex-wrap gap-4">
-            <button type="button" onClick={saveReport} className="bg-orange-600 text-white px-4 py-3 rounded-lg">{currentReportId ? t.update : t.save}</button>
-            {reportLoaded && <button type="button" onClick={saveAsNewReport} className="bg-amber-700 text-white px-4 py-3 rounded-lg">{t.saveAsNew}</button>}
-            <button type="button" onClick={() => createPDF(false)} className="bg-green-600 text-white px-4 py-3 rounded-lg">{t.downloadPdf}</button>
-            {companyFeatures?.email_enabled && <button type="button" onClick={() => createPDF(true)} className="bg-purple-600 text-white px-4 py-3 rounded-lg">{t.sendPdf}</button>}
+            <button type="button" onClick={saveReport} className="bg-orange-600 text-white px-4 py-3 rounded">{currentReportId ? t.update : t.save}</button>
+            {reportLoaded && <button type="button" onClick={saveAsNewReport} className="bg-amber-700 text-white px-4 py-3 rounded">{t.saveAsNew}</button>}
+            <button type="button" onClick={() => createPDF(false)} className="bg-green-600 text-white px-4 py-3 rounded">{t.downloadPdf}</button>
+            {companyFeatures?.email_enabled && <button type="button" onClick={() => createPDF(true)} className="bg-purple-600 text-white px-4 py-3 rounded">{t.sendPdf}</button>}
           </div>
         </div>
       )}
 
       {activeTab === "berichte" && (
-        <section className="border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4 bg-white text-black">
+        <section className="border rounded p-4 space-y-4 bg-white text-black">
           <h2 className="text-xl font-bold">{t.saveLoad}</h2>
           <input className="border p-3 w-full text-black bg-white" placeholder={t.reportName} value={reportName} onChange={(e) => setReportName(e.target.value)} />
           <div className="flex flex-wrap gap-3">
-            <button type="button" onClick={saveReport} className="bg-orange-600 text-white px-4 py-3 rounded-lg">{currentReportId ? t.updateReport : t.saveReport}</button>
-            <button type="button" onClick={() => { newReport(); setMessage(t.msgNewReport); }} className="bg-gray-700 text-white px-4 py-3 rounded-lg">{t.newReport}</button>
+            <button type="button" onClick={saveReport} className="bg-orange-600 text-white px-4 py-3 rounded">{currentReportId ? t.updateReport : t.saveReport}</button>
+            <button type="button" onClick={() => { newReport(); setMessage(t.msgNewReport); }} className="bg-gray-700 text-white px-4 py-3 rounded">{t.newReport}</button>
           </div>
-          {savedReports.length > 0 && (<div className="space-y-2"><h3 className="font-bold">{t.savedReports}</h3>{savedReports.map((report) => (<div key={report.id} className="border border-slate-200 rounded-xl p-3 shadow-sm space-y-2"><strong>{report.report_name}</strong><p className="text-sm text-gray-700">{t.employee}: {report.employee || "-"} | {new Date(report.created_at).toLocaleString("de-DE")}</p><div className="flex gap-2"><button type="button" onClick={() => loadReport(report)} className="bg-cyan-600 text-white px-3 py-2.5 rounded-lg">{t.loadEdit}</button><button type="button" onClick={() => deleteReport(report.id)} className="bg-red-600 text-white px-3 py-2.5 rounded-lg">{t.delete}</button></div></div>))}</div>)}
+          {savedReports.length > 0 && (<div className="space-y-2"><h3 className="font-bold">{t.savedReports}</h3>{savedReports.map((report) => (<div key={report.id} className="border rounded p-3 space-y-2"><strong>{report.report_name}</strong><p className="text-sm text-gray-700">{t.employee}: {report.employee || "-"} | {new Date(report.created_at).toLocaleString("de-DE")}</p><div className="flex gap-2"><button type="button" onClick={() => loadReport(report)} className="bg-blue-600 text-white px-3 py-2 rounded">{t.loadEdit}</button><button type="button" onClick={() => deleteReport(report.id)} className="bg-red-600 text-white px-3 py-2 rounded">{t.delete}</button></div></div>))}</div>)}
         </section>
       )}
 
       {activeTab === "projekte" && (
-        <section className="border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4 bg-white text-black">
+        <section className="border rounded p-4 space-y-4 bg-white text-black">
           <h2 className="text-xl font-bold">{t.projectsTab}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <input className="border p-3 w-full" placeholder={t.projectName} value={projectName} onChange={(e) => setProjectName(e.target.value)} />
@@ -5435,55 +5187,55 @@ export default function Home() {
               {companyUsers.filter((m: any) => m.role === "project_manager").map((m: any) => (<option key={m.user_id} value={m.full_name || m.email || ""}>{m.full_name || m.email}</option>))}
             </select>
           </div>
-          <button type="button" onClick={saveProject} className="bg-cyan-700 text-white px-4 py-3 rounded-lg">{t.saveProject}</button>
+          <button type="button" onClick={saveProject} className="bg-blue-700 text-white px-4 py-3 rounded">{t.saveProject}</button>
           <div className="space-y-3 mt-4">
             {projects.map((project) => (
-              <div key={project.id} className="border border-slate-200 rounded-xl p-3 shadow-sm space-y-2">
+              <div key={project.id} className="border rounded p-3 space-y-2">
                 <strong>{project.name}</strong>
                 <p>{t.customer}: {project.customer || "-"}</p>
                 <p>{t.site}: {project.site || "-"}</p>
                 {(currentCompany?.role === "owner" || currentCompany?.role === "admin") ? (
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-sm font-medium">{t.projectManager}:</span>
-                  <select className="border p-2 rounded-lg text-sm" value={pmEdits[project.id] ?? (project.project_manager || "")} onChange={(e) => setPmEdits((prev) => ({ ...prev, [project.id]: e.target.value }))}>
+                  <select className="border p-2 rounded text-sm" value={pmEdits[project.id] ?? (project.project_manager || "")} onChange={(e) => setPmEdits((prev) => ({ ...prev, [project.id]: e.target.value }))}>
                     <option value="">—</option>
                     {project.project_manager && !companyUsers.some((m: any) => (m.full_name || m.email) === project.project_manager && m.role === "project_manager") && (<option value={project.project_manager}>{project.project_manager}</option>)}
                     {companyUsers.filter((m: any) => m.role === "project_manager").map((m: any) => (<option key={m.user_id} value={m.full_name || m.email || ""}>{m.full_name || m.email}</option>))}
                   </select>
-                  <button type="button" onClick={() => updateProjectManager(project.id, pmEdits[project.id] ?? (project.project_manager || ""))} className="bg-cyan-700 text-white px-3 py-1 rounded-lg text-sm">{t.save}</button>
-                  <button type="button" onClick={() => assignPmToProjectInstructions(project.id, pmEdits[project.id] ?? (project.project_manager || ""))} className="bg-green-700 text-white px-3 py-1 rounded-lg text-sm">{t.assignVisibility}</button>
+                  <button type="button" onClick={() => updateProjectManager(project.id, pmEdits[project.id] ?? (project.project_manager || ""))} className="bg-blue-700 text-white px-3 py-1 rounded text-sm">{t.save}</button>
+                  <button type="button" onClick={() => assignPmToProjectInstructions(project.id, pmEdits[project.id] ?? (project.project_manager || ""))} className="bg-green-700 text-white px-3 py-1 rounded text-sm">{t.assignVisibility}</button>
                 </div>
                 ) : (
                 <p>{t.projectManager}: {project.project_manager || "-"}</p>
                 )}
                 <div className="flex gap-2">
-                  <button type="button" onClick={() => setSelectedProjectDetailId(project.id === selectedProjectDetailId ? "" : project.id)} className="bg-gray-700 text-white px-3 py-2.5 rounded-lg">{project.id === selectedProjectDetailId ? t.closeProject : t.openProject}</button>
-                  <button type="button" onClick={() => deleteProject(project.id)} className="bg-red-600 text-white px-3 py-2.5 rounded-lg">{t.deleteProject}</button>
+                  <button type="button" onClick={() => setSelectedProjectDetailId(project.id === selectedProjectDetailId ? "" : project.id)} className="bg-gray-700 text-white px-3 py-2 rounded">{project.id === selectedProjectDetailId ? t.closeProject : t.openProject}</button>
+                  <button type="button" onClick={() => deleteProject(project.id)} className="bg-red-600 text-white px-3 py-2 rounded">{t.deleteProject}</button>
                 </div>
                 {selectedProjectDetailId === project.id && (
-                  <div className="border border-slate-200 rounded-xl p-3 shadow-sm bg-gray-50 space-y-3 mt-2">
+                  <div className="border rounded p-3 bg-gray-50 space-y-3 mt-2">
                     {(() => {
                       const tasks = workInstructions.filter((i) => i.project_id === project.id).flatMap((i) => i.work_instruction_tasks || []);
                       const completedCount = tasks.filter((t: any) => t.status === "completed").length;
                       const progressPercent = tasks.length > 0 ? Math.round((completedCount / tasks.length) * 100) : 0;
-                      return (<div className="border border-slate-200 rounded-xl p-3 shadow-sm bg-gray-100"><p>{t.statusOpen}: {tasks.filter((t: any) => (t.status || "open") === "open").length}</p><p>{t.statusInProgress}: {tasks.filter((t: any) => t.status === "in_progress").length}</p><p>{t.statusStopped}: {tasks.filter((t: any) => t.status === "stopped").length}</p><p>{t.statusCompleted}: {completedCount}</p><p className="font-bold mt-2">{t.progress}: {progressPercent}%</p><div className="w-full bg-gray-300 rounded-lg h-4 mt-1"><div className="bg-green-600 h-4 rounded-lg" style={{ width: `${progressPercent}%` }} /></div></div>);
+                      return (<div className="border rounded p-3 bg-gray-100"><p>{t.statusOpen}: {tasks.filter((t: any) => (t.status || "open") === "open").length}</p><p>{t.statusInProgress}: {tasks.filter((t: any) => t.status === "in_progress").length}</p><p>{t.statusStopped}: {tasks.filter((t: any) => t.status === "stopped").length}</p><p>{t.statusCompleted}: {completedCount}</p><p className="font-bold mt-2">{t.progress}: {progressPercent}%</p><div className="w-full bg-gray-300 rounded h-4 mt-1"><div className="bg-green-600 h-4 rounded" style={{ width: `${progressPercent}%` }} /></div></div>);
                     })()}
                     <h4 className="font-bold">{t.workInstructions}</h4>
                     {workInstructions.filter((i) => i.project_id === project.id).map((instruction) => (
-                      <div key={instruction.id} className="border border-slate-200 rounded-xl p-3 shadow-sm bg-white space-y-2">
+                      <div key={instruction.id} className="border rounded p-3 bg-white space-y-2">
                         <strong>{getTranslated(instruction.id, "title", instruction.title)}</strong>
                         <p><strong>{t.date}:</strong> {instruction.work_date || "-"}</p>
                         <p><strong>{t.customer}:</strong> {instruction.customer || "-"}</p>
                         <p><strong>{t.site}:</strong> {instruction.site || "-"}</p>
                         {instruction.problems_text && <p><strong>{t.problems}:</strong> {getTranslated(instruction.id, "problems_text", instruction.problems_text)}</p>}
                         {(instruction.work_instruction_tasks || []).length > 0 && (<ul className="list-disc pl-6 space-y-1">{instruction.work_instruction_tasks.map((task: any) => (<li key={task.id}>{task.status === "completed" ? t.statusCompleted : task.status === "in_progress" ? t.statusInProgress : task.status === "stopped" ? t.statusStopped : t.statusOpen}{" "}{getTranslatedTask(instruction.id, task.id, task.task_text)}{task.note && <div className="text-sm text-gray-600 ml-2">{t.feedbackLabel}: {task.note}</div>}</li>))}</ul>)}
-                        {companyFeatures?.module_auto_reports ? (<button type="button" onClick={() => { setTransferInst(instruction); loadReportsFromDatabase(); }} className="bg-green-700 text-white px-3 py-2.5 rounded-lg">{t.toReport}</button>) : (<p className="text-sm text-gray-500">{t.autoReportLocked}</p>)}
-                        <button type="button" onClick={() => createInstructionPDF(instruction)} className="bg-slate-700 text-white px-3 py-2.5 rounded-lg text-sm">📄 PDF</button>
+                        {companyFeatures?.module_auto_reports ? (<button type="button" onClick={() => { setTransferInst(instruction); loadReportsFromDatabase(); }} className="bg-green-700 text-white px-3 py-2 rounded">{t.toReport}</button>) : (<p className="text-sm text-gray-500">{t.autoReportLocked}</p>)}
+                        <button type="button" onClick={() => createInstructionPDF(instruction)} className="bg-slate-700 text-white px-3 py-2 rounded text-sm">📄 PDF</button>
                       </div>
                     ))}
                     {workInstructions.filter((i) => i.project_id === project.id).length === 0 && <p className="text-gray-600">{t.noInstructions}</p>}
                     <h4 className="font-bold mt-2">{t.reportsTab}</h4>
-                    {savedReports.filter((r: any) => r.project_id === project.id).map((report: any) => (<div key={report.id} className="border border-slate-200 rounded-xl p-3 shadow-sm bg-white"><strong>{report.report_name}</strong><p>{t.employee}: {report.employee || "-"}</p></div>))}
+                    {savedReports.filter((r: any) => r.project_id === project.id).map((report: any) => (<div key={report.id} className="border rounded p-3 bg-white"><strong>{report.report_name}</strong><p>{t.employee}: {report.employee || "-"}</p></div>))}
                     {savedReports.filter((r: any) => r.project_id === project.id).length === 0 && <p className="text-gray-600">{t.noReports}</p>}
                   </div>
                 )}
@@ -5497,7 +5249,7 @@ export default function Home() {
       {activeTab === "arbeitsanweisungen" && (
         <div className="space-y-4">
           {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") ? (
-          <section className="border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4 bg-white text-black">
+          <section className="border rounded p-4 space-y-4 bg-white text-black">
             <h2 className="text-xl font-bold">{editingInstructionId ? "✏️ " + (instructionTitle || t.newInstruction) : t.newInstruction}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <input className="border p-3 text-black bg-white" placeholder={t.instructionTitle} value={instructionTitle} onChange={(e) => setInstructionTitle(e.target.value)} />
@@ -5511,7 +5263,7 @@ export default function Home() {
             </div>
             {/* Mitarbeiter zuweisen – Mehrfachauswahl */}
             {companyUsers.filter(m => m.role === "employee").length > 0 && (
-              <div className="border border-slate-200 rounded-xl p-3 shadow-sm bg-gray-50 space-y-2">
+              <div className="border rounded p-3 bg-gray-50 space-y-2">
                 <h3 className="font-bold text-sm">👤 {t.assignEmployees}</h3>
                 {companyUsers.filter(m => m.role === "employee").map((m) => (
                   <label key={m.user_id} className="flex items-center gap-2 cursor-pointer">
@@ -5534,7 +5286,7 @@ export default function Home() {
             )}
             {/* Projektleiter zuweisen – Mehrfachauswahl */}
             {companyUsers.filter(m => m.role === "project_manager").length > 0 && (
-              <div className="border border-slate-200 rounded-xl p-3 shadow-sm bg-gray-50 space-y-2">
+              <div className="border rounded p-3 bg-gray-50 space-y-2">
                 <h3 className="font-bold text-sm">👷 {t.assignProjectManager}</h3>
                 {companyUsers.filter(m => m.role === "project_manager").map((m) => (
                   <label key={m.user_id} className="flex items-center gap-2 cursor-pointer">
@@ -5562,30 +5314,30 @@ export default function Home() {
               <div>
                 <h3 className="font-bold mb-2">{t.photos}</h3>
                 <input type="file" accept="image/*" multiple className="border p-3 w-full text-black bg-white" onChange={(e) => handleInstructionPhotos(e.target.files)} />
-                {instructionPhotos.length > 0 && (<div className="grid grid-cols-3 gap-2 mt-2">{instructionPhotos.map((photo, i) => (<div key={i} className="relative"><img src={photo} alt="Foto" className="w-full h-24 object-cover rounded-lg" /><button type="button" onClick={() => setInstructionPhotos((prev) => prev.filter((_, idx) => idx !== i))} className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 text-xs">✕</button></div>))}</div>)}
+                {instructionPhotos.length > 0 && (<div className="grid grid-cols-3 gap-2 mt-2">{instructionPhotos.map((photo, i) => (<div key={i} className="relative"><img src={photo} alt="Foto" className="w-full h-24 object-cover rounded" /><button type="button" onClick={() => setInstructionPhotos((prev) => prev.filter((_, idx) => idx !== i))} className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 text-xs">✕</button></div>))}</div>)}
               </div>
             )}
             <div className="flex items-center justify-between flex-wrap gap-2">
               <h3 className="font-bold">{t.workSteps}</h3>
-              <button type="button" onClick={openCopyModal} className="bg-indigo-600 text-white px-3 py-2.5 rounded-lg text-sm">📋 {t.copyInstruction}</button>
+              <button type="button" onClick={openCopyModal} className="bg-indigo-600 text-white px-3 py-2 rounded text-sm">📋 {t.copyInstruction}</button>
             </div>
             {instructionTasks.map((task, index) => (
-              <div key={index} className="border border-slate-200 rounded-xl p-3 shadow-sm space-y-2 bg-gray-50">
+              <div key={index} className="border rounded p-3 space-y-2 bg-gray-50">
                 <input className="border p-3 w-full text-black bg-white" placeholder={`${t.workSteps} ${index + 1}`} value={task} onChange={(e) => { const copy = [...instructionTasks]; copy[index] = e.target.value; setInstructionTasks(copy); }} />
-                {companyFeatures?.photos_enabled && (<><input type="file" accept="image/*" multiple className="border p-2 w-full text-black bg-white text-sm" onChange={(e) => handleInstructionTaskPhotos(index, e.target.files)} />{(instructionTaskPhotos[index] || []).length > 0 && (<div className="grid grid-cols-3 gap-2">{(instructionTaskPhotos[index] || []).map((photo, pi) => (<div key={pi} className="relative"><img src={photo} alt="Foto" className="w-full h-20 object-cover rounded-lg" /><button type="button" onClick={() => setInstructionTaskPhotos((prev) => ({ ...prev, [index]: (prev[index] || []).filter((_, idx) => idx !== pi) }))} className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 text-xs">✕</button></div>))}</div>)}</>)}
+                {companyFeatures?.photos_enabled && (<><input type="file" accept="image/*" multiple className="border p-2 w-full text-black bg-white text-sm" onChange={(e) => handleInstructionTaskPhotos(index, e.target.files)} />{(instructionTaskPhotos[index] || []).length > 0 && (<div className="grid grid-cols-3 gap-2">{(instructionTaskPhotos[index] || []).map((photo, pi) => (<div key={pi} className="relative"><img src={photo} alt="Foto" className="w-full h-20 object-cover rounded" /><button type="button" onClick={() => setInstructionTaskPhotos((prev) => ({ ...prev, [index]: (prev[index] || []).filter((_, idx) => idx !== pi) }))} className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 text-xs">✕</button></div>))}</div>)}</>)}
               </div>
             ))}
             <div className="flex gap-3">
-              <button type="button" onClick={() => setInstructionTasks([...instructionTasks, ""])} className="bg-gray-700 text-white px-4 py-3 rounded-lg">{t.addStep}</button>
-              <button type="button" onClick={saveWorkInstruction} className="bg-cyan-700 text-white px-4 py-3 rounded-lg">{t.saveInstruction}</button>
-              {editingInstructionId && (<button type="button" onClick={cancelEditInstruction} className="bg-gray-500 text-white px-4 py-3 rounded-lg">{t.copyCancel}</button>)}
+              <button type="button" onClick={() => setInstructionTasks([...instructionTasks, ""])} className="bg-gray-700 text-white px-4 py-3 rounded">{t.addStep}</button>
+              <button type="button" onClick={saveWorkInstruction} className="bg-blue-700 text-white px-4 py-3 rounded">{t.saveInstruction}</button>
+              {editingInstructionId && (<button type="button" onClick={cancelEditInstruction} className="bg-gray-500 text-white px-4 py-3 rounded">{t.copyCancel}</button>)}
             </div>
           </section>
           ) : (
-            <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-yellow-50 text-black"><p className="text-yellow-700 text-sm">🔒 {t.instructionsLocked}</p></section>
+            <section className="border rounded p-4 bg-yellow-50 text-black"><p className="text-yellow-700 text-sm">🔒 {t.instructionsLocked}</p></section>
           )}
-          <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-cyan-50 text-black"><p className="text-cyan-700 text-sm">💡 {t.savedInstructions} → {t.tabDay} / {t.tabWeek} / {t.tabMonth}</p></section>
-          <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-3">
+          <section className="border rounded p-4 bg-blue-50 text-black"><p className="text-blue-700 text-sm">💡 {t.savedInstructions} → {t.tabDay} / {t.tabWeek} / {t.tabMonth}</p></section>
+          <section className="border rounded p-4 bg-white text-black space-y-3">
             <h2 className="text-xl font-bold cursor-pointer select-none" onClick={() => setOpenInstrList((v) => !v)}>{openInstrList ? "▾" : "▸"} {t.savedInstructions}</h2>
             {openInstrList && (() => {
               const allInstructions = workInstructions.filter(canSeeInstruction);
@@ -5593,7 +5345,7 @@ export default function Home() {
               return (
                 <ul className="space-y-2">
                   {allInstructions.map((instruction) => (
-                    <li key={instruction.id} className="border border-slate-200 rounded-xl p-3 shadow-sm">
+                    <li key={instruction.id} className="border rounded p-3">
                       <div className="flex justify-between items-start cursor-pointer select-none gap-2" onClick={() => setOpenInstrCards((prev) => ({ ...prev, [instruction.id]: !prev[instruction.id] }))}>
                         <div>
                           <p className="font-bold">{openInstrCards[instruction.id] ? "▾" : "▸"} {instruction.title || "-"}</p>
@@ -5607,9 +5359,9 @@ export default function Home() {
                         <div className="mt-2 space-y-2">
                           <p className="text-sm text-gray-600">{t.site}: {instruction.site || "-"}</p>
                           <div className="flex gap-2 flex-wrap">
-                            <button type="button" onClick={() => createInstructionPDF(instruction)} className="bg-slate-700 text-white px-3 py-2.5 rounded-lg text-sm">📄 PDF</button>
-                            {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => startEditInstruction(instruction)} className="bg-amber-600 text-white px-3 py-2.5 rounded-lg text-sm">✏️ {t.loadEdit}</button>)}
-                            {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => deleteWorkInstruction(instruction.id)} className="bg-red-600 text-white px-3 py-2.5 rounded-lg text-sm">{t.deleteInstruction}</button>)}
+                            <button type="button" onClick={() => createInstructionPDF(instruction)} className="bg-slate-700 text-white px-3 py-2 rounded text-sm">📄 PDF</button>
+                            {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => startEditInstruction(instruction)} className="bg-amber-600 text-white px-3 py-2 rounded text-sm">✏️ {t.loadEdit}</button>)}
+                            {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => deleteWorkInstruction(instruction.id)} className="bg-red-600 text-white px-3 py-2 rounded text-sm">{t.deleteInstruction}</button>)}
                           </div>
                         </div>
                       )}
@@ -5631,13 +5383,13 @@ export default function Home() {
         }
         const entries = Object.entries(groups);
         return (
-          <section className="border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4 bg-white text-black">
+          <section className="border rounded p-4 space-y-4 bg-white text-black">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold">👁 {t.teamReports}</h2>
-              <button type="button" onClick={loadTeamReports} className="bg-gray-200 px-3 py-2.5 rounded-lg text-sm">🔄</button>
+              <button type="button" onClick={loadTeamReports} className="bg-gray-200 px-3 py-2 rounded text-sm">🔄</button>
             </div>
             {teamLoading ? (<p className="text-gray-500">⏳ ...</p>) : entries.length === 0 ? (<p className="text-gray-500">{t.teamNoReports}</p>) : entries.map(([uid, group]) => (
-              <div key={uid} className="border rounded-lg overflow-hidden">
+              <div key={uid} className="border rounded overflow-hidden">
                 <div className="bg-gray-100 px-3 py-2 font-bold">{group.name} ({group.reports.length})</div>
                 <div className="divide-y">
                   {group.reports.map((r) => (
@@ -5649,7 +5401,7 @@ export default function Home() {
                       {teamOpenId === r.id && (
                         <div className="space-y-2 pt-1">
                           {(r.days || []).map((d, di) => ({ d, di })).filter((x) => x.d.description || x.d.customer || x.d.projectNumber || x.d.site || x.d.hours).map(({ d, di }) => (
-                            <div key={di} className="border rounded-lg p-2 bg-gray-50 text-sm space-y-1">
+                            <div key={di} className="border rounded p-2 bg-gray-50 text-sm space-y-1">
                               <p className="font-semibold">{(() => { const wi = weekdays.indexOf(d.weekday); return (wi >= 0 && t.weekdays[wi]) ? t.weekdays[wi] : d.weekday; })()}{d.date ? ` – ${d.date}` : ""}</p>
                               <p>{t.customer}: {d.customer || "-"} | {t.projectNumber}: {d.projectNumber || "-"}</p>
                               <p>{t.site}: {d.site || "-"} | {t.hours}: {d.hours || "-"}</p>
@@ -5657,7 +5409,6 @@ export default function Home() {
                               {d.description && (<p className="whitespace-pre-wrap break-words">{(teamTrans[r.id] && teamTrans[r.id].lang === uiLanguage && teamTrans[r.id].days[di]) || d.description}</p>)}
                             </div>
                           ))}
-                          <div className="pt-1"><button type="button" onClick={() => createTeamPDF(r)} className="bg-cyan-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium">📄 {(t as any).pdf || "PDF"}</button></div>
                         </div>
                       )}
                     </div>
@@ -5671,18 +5422,18 @@ export default function Home() {
 
       {activeTab === "tag" && (
         <div className="space-y-4">
-          <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-3">
+          <section className="border rounded p-4 bg-white text-black space-y-3">
             <h2 className="text-xl font-bold">{t.dayView}</h2>
-            <input type="date" className="border p-3 rounded-lg text-black bg-white" value={selectedDayDate} onChange={(e) => setSelectedDayDate(e.target.value)} />
+            <input type="date" className="border p-3 rounded text-black bg-white" value={selectedDayDate} onChange={(e) => setSelectedDayDate(e.target.value)} />
           </section>
           {(() => {
             const dayInstructions = workInstructions.filter((i) => {
               if (i.work_date !== selectedDayDate) return false;
               return canSeeInstruction(i);
             });
-            if (dayInstructions.length === 0) return (<section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black"><p className="text-gray-500">{t.noInstructionsDay}</p></section>);
+            if (dayInstructions.length === 0) return (<section className="border rounded p-4 bg-white text-black"><p className="text-gray-500">{t.noInstructionsDay}</p></section>);
             return dayInstructions.map((instruction) => (
-              <section key={instruction.id} className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-2">
+              <section key={instruction.id} className="border rounded p-4 bg-white text-black space-y-2">
                 <div className="flex justify-between items-start cursor-pointer select-none" onClick={() => { const willOpen = !openDayCards[instruction.id]; setOpenDayCards(prev => ({ ...prev, [instruction.id]: !prev[instruction.id] })); if (willOpen) markInstructionRead(instruction.id); }}>
                   <div>
                     <h3 className="font-bold text-lg">{openDayCards[instruction.id] ? "▾" : "▸"} {getTranslated(instruction.id, "title", instruction.title)}</h3>
@@ -5693,26 +5444,26 @@ export default function Home() {
                 {renderReadStatus(instruction)}
                 {openDayCards[instruction.id] && (<>
                 <p><strong>{t.customer}:</strong> {instruction.customer || "-"}</p>
-                {instruction.problems_text && (<div className="bg-yellow-50 border rounded-lg p-2"><strong>{t.problemsHints}:</strong> {getTranslated(instruction.id, "problems_text", instruction.problems_text)}</div>)}
-                {instruction.material && (<div className="bg-cyan-50 border rounded-lg p-2"><strong>{t.material}:</strong> {getTranslated(instruction.id, "material", instruction.material)}</div>)}
-                {instruction.werkzeug && (<div className="bg-green-50 border rounded-lg p-2"><strong>{t.werkzeug}:</strong> {getTranslated(instruction.id, "werkzeug", instruction.werkzeug)}</div>)}
-                {(instruction.photos || []).length > 0 && companyFeatures?.photos_enabled && (<div className="grid grid-cols-3 gap-2">{(instruction.photos || []).map((photo: string, i: number) => (<img key={i} src={photo} alt="Foto" className="w-full h-24 object-cover rounded-lg border" />))}</div>)}
+                {instruction.problems_text && (<div className="bg-yellow-50 border rounded p-2"><strong>{t.problemsHints}:</strong> {getTranslated(instruction.id, "problems_text", instruction.problems_text)}</div>)}
+                {instruction.material && (<div className="bg-blue-50 border rounded p-2"><strong>{t.material}:</strong> {getTranslated(instruction.id, "material", instruction.material)}</div>)}
+                {instruction.werkzeug && (<div className="bg-green-50 border rounded p-2"><strong>{t.werkzeug}:</strong> {getTranslated(instruction.id, "werkzeug", instruction.werkzeug)}</div>)}
+                {(instruction.photos || []).length > 0 && companyFeatures?.photos_enabled && (<div className="grid grid-cols-3 gap-2">{(instruction.photos || []).map((photo: string, i: number) => (<img key={i} src={photo} alt="Foto" className="w-full h-24 object-cover rounded border" />))}</div>)}
                 <ul className="space-y-4 mt-2">
                   {(instruction.work_instruction_tasks || []).sort((a: any, b: any) => a.sort_order - b.sort_order).map((task: any) => (
-                    <li key={task.id} className="border border-slate-200 rounded-xl p-3 shadow-sm bg-gray-50 space-y-3">
+                    <li key={task.id} className="border rounded-lg p-3 bg-gray-50 space-y-3">
                       <div className="flex items-center gap-2">
-                        <select className="border rounded-lg p-1 text-sm text-black bg-white" value={task.status || "open"} onChange={(e) => updateTaskStatus(task.id, e.target.value)}>
+                        <select className="border rounded p-1 text-sm text-black bg-white" value={task.status || "open"} onChange={(e) => updateTaskStatus(task.id, e.target.value)}>
                           <option value="open">{t.statusOpen}</option><option value="in_progress">{t.statusInProgress}</option><option value="stopped">{t.statusStopped}</option><option value="completed">{t.statusCompleted}</option>
                         </select>
                         <span className="font-medium">{getTranslatedTask(instruction.id, task.id, task.task_text)}</span>
                       </div>
                       {task.note && <p className="text-sm text-gray-600 ml-2">{t.feedbackLabel}: {task.note}</p>}
-                      {(task.photos || []).length > 0 && companyFeatures?.photos_enabled && (<div className="grid grid-cols-3 gap-1">{(task.photos || []).map((photo: string, pi: number) => (<img key={pi} src={photo} alt="Foto" className="w-full h-16 object-cover rounded-lg" />))}</div>)}
+                      {(task.photos || []).length > 0 && companyFeatures?.photos_enabled && (<div className="grid grid-cols-3 gap-1">{(task.photos || []).map((photo: string, pi: number) => (<img key={pi} src={photo} alt="Foto" className="w-full h-16 object-cover rounded" />))}</div>)}
                       {/* Mitarbeiter-Kommentar */}
                       <div className="border-t pt-2 space-y-2">
                         <p className="text-sm font-medium text-gray-700">💬 {t.commentLabel} (max. 1000 {t.charsLabel}):</p>
                         <textarea
-                          className="border p-2 w-full rounded-lg text-sm text-black bg-white"
+                          className="border p-2 w-full rounded text-sm text-black bg-white"
                           rows={5}
                           maxLength={1000}
                           placeholder={t.commentPlaceholder}
@@ -5727,7 +5478,6 @@ export default function Home() {
                             {commentSaveState[task.id] === "saving" && <span className="text-xs text-gray-500">⏳ {t.commentSaving}</span>}
                             {commentSaveState[task.id] === "saved" && <span className="text-xs text-green-700 font-medium">✓ {t.commentSaved}</span>}
                             {commentSaveState[task.id]?.startsWith("error:") && <span className="text-xs text-red-600">{t.commentErrorLabel}: {commentSaveState[task.id].slice(6)}</span>}
-                            <button type="button" onClick={() => insertWeatherIntoComment(task.id, taskComments[task.id] !== undefined ? taskComments[task.id] : getTranslatedComment(instruction.id, task.id, task.employee_comment || ""))} title={t.weather} className="bg-cyan-50 text-cyan-700 border border-cyan-200 px-3 py-2.5 rounded-lg text-sm">🌦️ {t.weather}</button>
                             <button
                               type="button"
                               disabled={commentSaveState[task.id] === "saving"}
@@ -5735,7 +5485,7 @@ export default function Home() {
                                 const val = taskComments[task.id] !== undefined ? taskComments[task.id] : getTranslatedComment(instruction.id, task.id, task.employee_comment || "");
                                 updateTaskComment(task.id, val);
                               }}
-                              className="bg-cyan-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50"
+                              className="bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium disabled:opacity-50"
                             >
                               💾 {t.commentSaveBtn}
                             </button>
@@ -5746,10 +5496,10 @@ export default function Home() {
                   ))}
                 </ul>
                 <div className="flex gap-2 pt-2 border-t flex-wrap">
-                  {companyFeatures?.module_auto_reports && (<button type="button" onClick={() => { setTransferInst(instruction); loadReportsFromDatabase(); }} className="bg-green-700 text-white px-3 py-2.5 rounded-lg text-sm">📋 {t.toReport}</button>)}
-                  <button type="button" onClick={() => createInstructionPDF(instruction)} className="bg-slate-700 text-white px-3 py-2.5 rounded-lg text-sm">📄 PDF</button>
-                  {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => startEditInstruction(instruction)} className="bg-amber-600 text-white px-3 py-2.5 rounded-lg text-sm">✏️ {t.loadEdit}</button>)}
-                  {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => deleteWorkInstruction(instruction.id)} className="bg-red-600 text-white px-3 py-2.5 rounded-lg text-sm">{t.deleteInstruction}</button>)}
+                  {companyFeatures?.module_auto_reports && (<button type="button" onClick={() => { setTransferInst(instruction); loadReportsFromDatabase(); }} className="bg-green-700 text-white px-3 py-2 rounded text-sm">📋 {t.toReport}</button>)}
+                  <button type="button" onClick={() => createInstructionPDF(instruction)} className="bg-slate-700 text-white px-3 py-2 rounded text-sm">📄 PDF</button>
+                  {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => startEditInstruction(instruction)} className="bg-amber-600 text-white px-3 py-2 rounded text-sm">✏️ {t.loadEdit}</button>)}
+                  {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => deleteWorkInstruction(instruction.id)} className="bg-red-600 text-white px-3 py-2 rounded text-sm">{t.deleteInstruction}</button>)}
                 </div>
                 </>)}
               </section>
@@ -5760,9 +5510,9 @@ export default function Home() {
 
       {activeTab === "woche" && (
         <div className="space-y-4">
-          <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-3">
+          <section className="border rounded p-4 bg-white text-black space-y-3">
             <h2 className="text-xl font-bold">{t.weekView}</h2>
-            <div className="flex items-center gap-3"><label className="text-sm font-medium">{t.selectDate}:</label><input type="date" className="border p-3 rounded-lg text-black bg-white" value={selectedWeek} onChange={(e) => setSelectedWeek(e.target.value)} /></div>
+            <div className="flex items-center gap-3"><label className="text-sm font-medium">{t.selectDate}:</label><input type="date" className="border p-3 rounded text-black bg-white" value={selectedWeek} onChange={(e) => setSelectedWeek(e.target.value)} /></div>
             <p className="text-sm text-gray-500">{t.week}: {getCalendarWeek(selectedWeek)}</p>
           </section>
           {(() => {
@@ -5776,37 +5526,50 @@ export default function Home() {
               if (!weekDates.includes(i.work_date)) return false;
               return canSeeInstruction(i);
             });
-            const todayStr = new Date().toISOString().split("T")[0];
-            return (
-              <>
-                <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black">
-                  <h3 className="font-bold mb-3">{t.week}: {getCalendarWeek(selectedWeek)}</h3>
-                  <div className="grid grid-cols-7 gap-1 mb-1">{t.weekdays.map((label) => (<div key={label} className="text-center text-xs font-bold text-gray-500 py-1">{label.slice(0, 2)}</div>))}</div>
-                  <div className="grid grid-cols-7 gap-1">
-                    {weekDates.map((dateStr) => {
-                      const entries = weekInstructions.filter((inst) => inst.work_date === dateStr);
-                      const isToday = dateStr === todayStr;
-                      const dayNo = Number(dateStr.split("-")[2]);
-                      return (<div key={dateStr} onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }} className={`border rounded-lg p-2 min-h-24 min-w-0 cursor-pointer hover:border-cyan-500 transition-colors flex flex-col gap-1 ${isToday ? "border-cyan-600 bg-cyan-50" : entries.length > 0 ? "bg-green-50 border-green-300" : "bg-white"}`}><div className={`text-xs font-bold ${isToday ? "text-cyan-700" : "text-gray-700"}`}>{dayNo}{entries.length > 0 ? ` · ${entries.length} ✓` : ""}</div>{entries.map((e: any) => (<div key={e.id} className="text-xs leading-tight bg-white border border-green-200 rounded px-1 py-0.5 text-gray-700 truncate">{getTranslated(e.id, "title", e.title)}</div>))}</div>);
-                    })}
+            if (weekInstructions.length === 0) return (<section className="border rounded p-4 bg-white text-black"><p className="text-gray-500">{t.noInstructionsWeek}</p></section>);
+            return weekDates.map((dateStr, di) => {
+              const dayInstructions = weekInstructions.filter((i) => i.work_date === dateStr);
+              if (dayInstructions.length === 0) return null;
+              return (
+                <section key={dateStr} className="border rounded p-4 bg-white text-black space-y-3">
+                  <div className="flex justify-between items-center bg-gray-100 rounded p-2">
+                    <h3 className="font-bold cursor-pointer select-none" onClick={() => { const willOpen = !openWeekDays[dateStr]; setOpenWeekDays(prev => ({ ...prev, [dateStr]: !prev[dateStr] })); if (willOpen) dayInstructions.forEach((ins: any) => markInstructionRead(ins.id)); }}>{openWeekDays[dateStr] ? "▾" : "▸"} {t.weekdays[di]} — {dateStr}</h3>
+                    <button type="button" onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }} className="text-blue-600 text-sm hover:underline">→ {t.dayView}</button>
                   </div>
+                  {openWeekDays[dateStr] && (<>
+                  {dayInstructions.map((instruction) => (
+                    <div key={instruction.id} className="border rounded p-3 space-y-2">
+                      <div className="flex justify-between"><strong>{getTranslated(instruction.id, "title", instruction.title)}</strong><span className="text-sm text-gray-500">{instruction.project || "-"}</span></div>
+                      <p className="text-sm"><strong>{t.customer}:</strong> {instruction.customer || "-"} | <strong>{t.site}:</strong> {instruction.site || "-"}</p>
+                      {renderReadStatus(instruction)}
+                      {instruction.problems_text && (<div className="bg-yellow-50 border rounded p-2 text-sm"><strong>{t.problemsHints}:</strong> {getTranslated(instruction.id, "problems_text", instruction.problems_text)}</div>)}
+                      <ul className="space-y-1">
+                        {(instruction.work_instruction_tasks || []).sort((a: any, b: any) => a.sort_order - b.sort_order).map((task: any) => (
+                          <li key={task.id} className="flex items-center gap-2 text-sm">
+                            <select className="border rounded p-1 text-xs text-black bg-white" value={task.status || "open"} onChange={(e) => updateTaskStatus(task.id, e.target.value)}>
+                              <option value="open">{t.statusOpen}</option><option value="in_progress">{t.statusInProgress}</option><option value="stopped">{t.statusStopped}</option><option value="completed">{t.statusCompleted}</option>
+                            </select>
+                            <span>{getTranslatedTask(instruction.id, task.id, task.task_text)}</span>{task.note && <span className="text-gray-500">— {task.note}</span>}
+                          </li>
+                        ))}
+                      </ul>
+                      {companyFeatures?.module_auto_reports && (<button type="button" onClick={() => { setTransferInst(instruction); loadReportsFromDatabase(); }} className="bg-green-700 text-white px-3 py-1 rounded text-sm">📋 {t.toReport}</button>)}
+                      <button type="button" onClick={() => createInstructionPDF(instruction)} className="bg-slate-700 text-white px-3 py-1 rounded text-sm">📄 PDF</button>
+                    </div>
+                  ))}
+                  </>)}
                 </section>
-                <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-2">
-                  <h3 className="font-bold">{t.workInstructions} ({weekInstructions.length})</h3>
-                  {weekInstructions.length === 0 && <p className="text-gray-500">{t.noInstructionsWeek}</p>}
-                  {weekInstructions.sort((a, b) => (a.work_date || "").localeCompare(b.work_date || "")).map((instruction) => (<div key={instruction.id} className="border border-slate-200 rounded-xl p-3 shadow-sm bg-gray-50"><div onClick={() => { markInstructionRead(instruction.id); setSelectedDayDate(instruction.work_date); setActiveTab("tag"); }} className="cursor-pointer hover:bg-gray-100 flex justify-between items-center"><div><span className="font-medium">{getTranslated(instruction.id, "title", instruction.title)}</span><span className="text-gray-500 text-sm ml-2">{instruction.customer || "-"}</span></div><span className="text-sm text-gray-500">{instruction.work_date}</span></div>{renderReadStatus(instruction)}</div>))}
-                </section>
-              </>
-            );
+              );
+            });
           })()}
         </div>
       )}
 
       {activeTab === "monat" && (
         <div className="space-y-4">
-          <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-3">
+          <section className="border rounded p-4 bg-white text-black space-y-3">
             <h2 className="text-xl font-bold">{t.monthView}</h2>
-            <input type="month" className="border p-3 rounded-lg text-black bg-white" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} />
+            <input type="month" className="border p-3 rounded text-black bg-white" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} />
           </section>
           {(() => {
             const monthInstructions = workInstructions.filter((i) => {
@@ -5821,7 +5584,7 @@ export default function Home() {
             for (let d = 1; d <= daysInMonth; d++) cells.push(d);
             return (
               <>
-                <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black">
+                <section className="border rounded p-4 bg-white text-black">
                   <h3 className="font-bold mb-3">{selectedMonth}</h3>
                   <div className="grid grid-cols-7 gap-1 mb-1">{t.weekdays.map((label) => (<div key={label} className="text-center text-xs font-bold text-gray-500 py-1">{label.slice(0, 2)}</div>))}</div>
                   <div className="grid grid-cols-7 gap-1">
@@ -5830,14 +5593,14 @@ export default function Home() {
                       const dateStr = `${selectedMonth}-${String(day).padStart(2, "0")}`;
                       const entries = monthInstructions.filter((inst) => inst.work_date === dateStr);
                       const isToday = dateStr === new Date().toISOString().split("T")[0];
-                      return (<div key={day} onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }} className={`border rounded-lg p-1 min-h-14 min-w-0 cursor-pointer hover:border-cyan-500 transition-colors ${isToday ? "border-cyan-600 bg-cyan-50" : entries.length > 0 ? "bg-green-50 border-green-300" : "bg-white"}`}><div className={`text-xs font-bold ${isToday ? "text-cyan-700" : "text-gray-700"}`}>{day}</div>{entries.length > 0 && <div className="text-xs text-green-700 font-medium">{entries.length} ✓</div>}{entries[0] && <div className="text-xs text-gray-500 truncate">{getTranslated(entries[0].id, "title", entries[0].title)}</div>}</div>);
+                      return (<div key={day} onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }} className={`border rounded p-1 min-h-14 min-w-0 cursor-pointer hover:border-blue-400 transition-colors ${isToday ? "border-blue-500 bg-blue-50" : entries.length > 0 ? "bg-green-50 border-green-300" : "bg-white"}`}><div className={`text-xs font-bold ${isToday ? "text-blue-600" : "text-gray-700"}`}>{day}</div>{entries.length > 0 && <div className="text-xs text-green-700 font-medium">{entries.length} ✓</div>}{entries[0] && <div className="text-xs text-gray-500 truncate">{entries[0].title}</div>}</div>);
                     })}
                   </div>
                 </section>
-                <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-2">
+                <section className="border rounded p-4 bg-white text-black space-y-2">
                   <h3 className="font-bold">{t.workInstructions} ({monthInstructions.length})</h3>
                   {monthInstructions.length === 0 && <p className="text-gray-500">{t.noInstructionsMonth}</p>}
-                  {monthInstructions.sort((a, b) => (a.work_date || "").localeCompare(b.work_date || "")).map((instruction) => (<div key={instruction.id} className="border border-slate-200 rounded-xl p-3 shadow-sm bg-gray-50"><div onClick={() => { markInstructionRead(instruction.id); setSelectedDayDate(instruction.work_date); setActiveTab("tag"); }} className="cursor-pointer hover:bg-gray-100 flex justify-between items-center"><div><span className="font-medium">{getTranslated(instruction.id, "title", instruction.title)}</span><span className="text-gray-500 text-sm ml-2">{instruction.customer || "-"}</span></div><span className="text-sm text-gray-500">{instruction.work_date}</span></div>{renderReadStatus(instruction)}</div>))}
+                  {monthInstructions.sort((a, b) => (a.work_date || "").localeCompare(b.work_date || "")).map((instruction) => (<div key={instruction.id} className="border rounded p-3 bg-gray-50"><div onClick={() => { markInstructionRead(instruction.id); setSelectedDayDate(instruction.work_date); setActiveTab("tag"); }} className="cursor-pointer hover:bg-gray-100 flex justify-between items-center"><div><span className="font-medium">{getTranslated(instruction.id, "title", instruction.title)}</span><span className="text-gray-500 text-sm ml-2">{instruction.customer || "-"}</span></div><span className="text-sm text-gray-500">{instruction.work_date}</span></div>{renderReadStatus(instruction)}</div>))}
                 </section>
               </>
             );
@@ -5846,10 +5609,10 @@ export default function Home() {
       )}
 
       {activeTab === "mitarbeiter" && (
-        <section className="border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4 bg-white text-black">
+        <section className="border rounded p-4 space-y-4 bg-white text-black">
           <h2 className="text-xl font-bold">{t.employeeManagement}</h2>
           {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
-            <div className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-gray-50 space-y-3">
+            <div className="border rounded p-4 bg-gray-50 space-y-3">
               <h3 className="font-bold">Neuen Mitarbeiter anlegen</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <input className="border p-3 text-black bg-white" placeholder="Vollständiger Name *" value={newUserName} onChange={(e) => setNewUserName(e.target.value)} />
@@ -5860,49 +5623,24 @@ export default function Home() {
                   {(currentCompany?.role === "owner" || currentCompany?.role === "admin") && <option value="project_manager">{t.roleProjectManager}</option>}
                   {currentCompany?.role === "owner" && <option value="admin">{t.roleAdmin}</option>}
                 </select>
-                <select className="border p-3 text-black bg-white" value={newUserLanguage} onChange={(e) => setNewUserLanguage(e.target.value)}>
-                  {getAllowedLanguages(companyFeatures).filter(l => languages.includes(l as Language)).map((lang) => (<option key={lang} value={lang}>🌐 {lang}</option>))}
-                </select>
               </div>
-              <button type="button" onClick={addCompanyUser} disabled={creatingEmployee} className="bg-cyan-700 text-white px-4 py-3 rounded-lg disabled:opacity-50">{creatingEmployee ? "Wird angelegt..." : t.addEmployee}</button>
+              <button type="button" onClick={addCompanyUser} disabled={creatingEmployee} className="bg-blue-700 text-white px-4 py-3 rounded disabled:opacity-50">{creatingEmployee ? "Wird angelegt..." : t.addEmployee}</button>
               <p className="text-xs text-gray-400">Der Mitarbeiter meldet sich mit seinem Benutzernamen und Passwort an.</p>
             </div>
           )}
           <p>{t.currentEmployees}: <strong>{companyUsers.length}</strong></p>
           <div className="space-y-3">
             {companyUsers.map((member) => (
-              <div key={member.id} className="border border-slate-200 rounded-xl p-3 shadow-sm space-y-2">
+              <div key={member.id} className="border rounded p-3 space-y-2">
                 <strong>{member.full_name || "-"}</strong>
                 <p>{member.email || "-"}</p>
-                <p>{t.role}: {roleLabel(member.role)}{member.preferred_language ? ` · 🌐 ${member.preferred_language}` : ""}</p>
+                <p>{t.role}: {member.role === "owner" ? "Owner" : member.role === "admin" ? t.roleAdmin : member.role === "project_manager" ? t.roleProjectManager : t.roleEmployee}</p>
                 <div className="flex gap-2 flex-wrap">
-                  {member.email && (<button type="button" onClick={() => resetCompanyUserPassword(member.email)} className="bg-gray-700 text-white px-3 py-2.5 rounded-lg">{t.resetPassword}</button>)}
-                  {currentCompany && canManageMember(currentCompany.role, member.role) && (
-                    <button type="button" onClick={() => { const open = editMemberId !== member.id; setEditMemberId(open ? member.id : null); if (open) { setEditRole(member.role); setEditLang(member.preferred_language || "Deutsch"); } }} className="bg-cyan-700 text-white px-3 py-2.5 rounded-lg">✏️ {(t as any).editBtn || "Bearbeiten"}</button>
-                  )}
+                  {member.email && (<button type="button" onClick={() => resetCompanyUserPassword(member.email)} className="bg-gray-700 text-white px-3 py-2 rounded">{t.resetPassword}</button>)}
                   {currentCompany && canDelete(currentCompany.role, member.role) && member.user_id !== user?.id && (
-                    <button type="button" onClick={() => deleteCompanyUser(member.id, member.user_id)} className="bg-red-600 text-white px-3 py-2.5 rounded-lg">🗑️ Löschen</button>
+                    <button type="button" onClick={() => deleteCompanyUser(member.id, member.user_id)} className="bg-red-600 text-white px-3 py-2 rounded">🗑️ Löschen</button>
                   )}
                 </div>
-                {editMemberId === member.id && currentCompany && (
-                  <div className="border-t pt-2 mt-1 space-y-2">
-                    <div className="flex flex-col gap-2">
-                      <label className="text-sm font-medium">{t.role}</label>
-                      <select className="border p-2 rounded-lg text-black bg-white" value={editRole} disabled={member.user_id === user?.id} onChange={(e) => setEditRole(e.target.value)}>
-                        {Array.from(new Set([member.role, ...settableRoles(currentCompany.role)])).map((r) => (<option key={r} value={r}>{roleLabel(r)}</option>))}
-                      </select>
-                      {member.user_id === user?.id && <span className="text-xs text-gray-400">Die eigene Rolle kann hier nicht geändert werden.</span>}
-                      <label className="text-sm font-medium">🌐 {(t as any).languageLabel || "Sprache"}</label>
-                      <select className="border p-2 rounded-lg text-black bg-white" value={editLang} onChange={(e) => setEditLang(e.target.value)}>
-                        {getAllowedLanguages(companyFeatures).filter(l => languages.includes(l as Language)).map((lang) => (<option key={lang} value={lang}>{lang}</option>))}
-                      </select>
-                    </div>
-                    <div className="flex gap-2">
-                      <button type="button" disabled={savingEdit} onClick={() => updateEmployee(member)} className="bg-cyan-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50">{savingEdit ? "⏳" : "💾"} {(t as any).saveBtn || "Speichern"}</button>
-                      <button type="button" onClick={() => setEditMemberId(null)} className="bg-gray-200 px-4 py-2.5 rounded-lg text-sm">{(t as any).cancelBtn || "Abbrechen"}</button>
-                    </div>
-                  </div>
-                )}
               </div>
             ))}
           </div>
@@ -5910,7 +5648,7 @@ export default function Home() {
       )}
 
       {activeTab === "firmendaten" && (
-        <section className="border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4 bg-white text-black">
+        <section className="border rounded p-4 space-y-4 bg-white text-black">
           <h2 className="text-xl font-bold">{t.companyData}</h2>
           {companySettings?.company_logo && (<img src={companySettings.company_logo} alt="Firmenlogo" className="h-20 object-contain" />)}
           <div><label className="block text-sm font-medium mb-1">{t.uploadLogo}</label><input type="file" accept="image/*" className="border p-3 w-full text-black bg-white" onChange={(e) => uploadCompanyLogo(e.target.files)} /></div>
@@ -5924,7 +5662,7 @@ export default function Home() {
             <input className="border p-3 text-black bg-white" placeholder={t.website} value={companySettings?.website || ""} onChange={(e) => updateCompanyField("website", e.target.value)} />
             <input className="border p-3 text-black bg-white" placeholder={t.taxNumber} value={companySettings?.tax_number || ""} onChange={(e) => updateCompanyField("tax_number", e.target.value)} />
           </div>
-          <button type="button" onClick={saveCompanySettings} className="bg-cyan-700 text-white px-4 py-3 rounded-lg">{t.saveCompany}</button>
+          <button type="button" onClick={saveCompanySettings} className="bg-blue-700 text-white px-4 py-3 rounded">{t.saveCompany}</button>
         </section>
       )}
 
@@ -5935,7 +5673,7 @@ export default function Home() {
             <h3 className="text-xl font-bold">📋 {t.copyTitle}</h3>
             <div>
               <label className="block text-sm font-medium mb-1">{t.copySource}</label>
-              <select className="border p-3 w-full rounded-lg text-black bg-white" value={copyModalInstruction?.id || ""} onChange={(e) => selectCopySource(e.target.value)}>
+              <select className="border p-3 w-full rounded text-black bg-white" value={copyModalInstruction?.id || ""} onChange={(e) => selectCopySource(e.target.value)}>
                 <option value="">{t.copySource}</option>
                 {workInstructions.map((inst) => (
                   <option key={inst.id} value={inst.id}>{inst.title}{inst.work_date ? ` (${inst.work_date})` : ""}</option>
@@ -5946,13 +5684,13 @@ export default function Home() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-medium">{t.copyWhichSteps}</p>
-                  <button type="button" className="text-xs text-cyan-700 underline" onClick={() => {
+                  <button type="button" className="text-xs text-blue-600 underline" onClick={() => {
                     const all = (copyModalInstruction.work_instruction_tasks || []).map((task: any) => task.id);
                     setCopySelectedTaskIds((prev) => prev.length === all.length ? [] : all);
                   }}>{t.copyAllNone}</button>
                 </div>
                 {(copyModalInstruction.work_instruction_tasks || []).sort((a: any, b: any) => (a.sort_order ?? 0) - (b.sort_order ?? 0)).map((task: any) => (
-                  <label key={task.id} className="flex items-start gap-2 border rounded-lg p-2 cursor-pointer bg-gray-50">
+                  <label key={task.id} className="flex items-start gap-2 border rounded p-2 cursor-pointer bg-gray-50">
                     <input type="checkbox" className="w-4 h-4 mt-1" checked={copySelectedTaskIds.includes(task.id)} onChange={(e) => {
                       if (e.target.checked) setCopySelectedTaskIds((prev) => [...prev, task.id]);
                       else setCopySelectedTaskIds((prev) => prev.filter((id) => id !== task.id));
@@ -5965,8 +5703,8 @@ export default function Home() {
               </div>
             )}
             <div className="flex gap-2 pt-2">
-              <button type="button" onClick={() => setCopyModalOpen(false)} className="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg font-medium">{t.copyCancel}</button>
-              <button type="button" disabled={!copyModalInstruction || copySelectedTaskIds.length === 0} onClick={applyCopiedSteps} className="flex-1 bg-indigo-600 text-white py-3 rounded-lg font-bold disabled:opacity-50">{t.copyConfirm}</button>
+              <button type="button" onClick={() => setCopyModalOpen(false)} className="flex-1 bg-gray-200 text-gray-800 py-3 rounded font-medium">{t.copyCancel}</button>
+              <button type="button" disabled={!copyModalInstruction || copySelectedTaskIds.length === 0} onClick={applyCopiedSteps} className="flex-1 bg-indigo-600 text-white py-3 rounded font-bold disabled:opacity-50">{t.copyConfirm}</button>
             </div>
           </div>
         </div>
@@ -5991,19 +5729,19 @@ export default function Home() {
               <h2 className="text-xl font-bold">{t.transferTitle}</h2>
               <button type="button" onClick={() => setTransferInst(null)} className="text-gray-500 text-3xl leading-none px-2">×</button>
             </div>
-            <button type="button" onClick={() => { const inst = transferInst; setTransferInst(null); createReportFromInstruction(inst); }} className="w-full bg-green-700 text-white px-4 py-3 rounded-lg">➕ {t.newReport}</button>
+            <button type="button" onClick={() => { const inst = transferInst; setTransferInst(null); createReportFromInstruction(inst); }} className="w-full bg-green-700 text-white px-4 py-3 rounded">➕ {t.newReport}</button>
             {savedReports.length > 0 && (
               <div className="space-y-2 pt-2 border-t">
                 {savedReports.map((report) => (
-                  <div key={report.id} className="flex items-center justify-between gap-2 border rounded-lg p-2">
+                  <div key={report.id} className="flex items-center justify-between gap-2 border rounded p-2">
                     <span className="text-sm truncate"><strong>{report.report_name}</strong></span>
-                    <button type="button" onClick={() => { const inst = transferInst; setTransferInst(null); createReportFromInstruction(inst, report); }} className="bg-cyan-600 text-white px-3 py-2.5 rounded-lg text-sm whitespace-nowrap">{t.transferInsert}</button>
+                    <button type="button" onClick={() => { const inst = transferInst; setTransferInst(null); createReportFromInstruction(inst, report); }} className="bg-blue-600 text-white px-3 py-2 rounded text-sm whitespace-nowrap">{t.transferInsert}</button>
                   </div>
                 ))}
               </div>
             )}
             {savedReports.length === 0 && (<p className="text-sm text-gray-500 text-center py-1">{t.transferNoReports}</p>)}
-            <button type="button" onClick={() => setTransferInst(null)} className="w-full bg-gray-300 text-black px-4 py-2.5 rounded-lg">{t.copyCancel}</button>
+            <button type="button" onClick={() => setTransferInst(null)} className="w-full bg-gray-300 text-black px-4 py-2 rounded">{t.copyCancel}</button>
           </div>
         </div>
       )}
