@@ -483,6 +483,7 @@ export default function AdminPage() {
                       <Toggle label="📸 Foto-Upload"        value={!!features.photos_enabled}      onChange={(v) => updateFeature(company.id, "photos_enabled", v)} />
                       <Toggle label="✉️ E-Mail-Versand"      value={!!features.email_enabled}       onChange={(v) => updateFeature(company.id, "email_enabled", v)} />
                       <Toggle label="✍️ Unterschriften"     value={!!features.signature_enabled}   onChange={(v) => updateFeature(company.id, "signature_enabled", v)} />
+                      <Toggle label="💬 Feedback / Test"     value={!!features.feedback_enabled}    onChange={(v) => updateFeature(company.id, "feedback_enabled", v)} />
                     </div>
                   </div>
                   <div>
