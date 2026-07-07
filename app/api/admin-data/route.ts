@@ -191,9 +191,23 @@ export async function POST(request: Request) {
       await supabaseAdmin.auth.admin.deleteUser(u.user_id);
     }
     await supabaseAdmin.from("company_features").delete().eq("company_id", companyId);
+    await supabaseAdmin.from("feedback").delete().eq("company_id", companyId);
     await supabaseAdmin.from("company_users").delete().eq("company_id", companyId);
     await supabaseAdmin.from("companies").delete().eq("id", companyId);
     return Response.json({ success: true });
+  }
+
+  if (action === "getFeedback") {
+    const { companyId } = body;
+    if (!companyId) return Response.json({ error: "companyId fehlt." }, { status: 400 });
+    const { data, error } = await supabaseAdmin
+      .from("feedback")
+      .select("id, user_name, answers, created_at")
+      .eq("company_id", companyId)
+      .order("created_at", { ascending: false })
+      .limit(500);
+    if (error) return Response.json({ error: error.message }, { status: 500 });
+    return Response.json({ feedback: data || [] });
   }
 
   if (action === "setCompanyStatus") {

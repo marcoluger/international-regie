@@ -37,6 +37,9 @@ function Toggle({ label, value, onChange }: { label: string; value: boolean; onC
   );
 }
 
+// Die 10 Testpunkte (Reihenfolge = Index der gespeicherten Antworten) – fuer die Betreiber-Ansicht.
+const FEEDBACK_POINTS = ["Anmeldung & Passwort", "Arbeitsanweisung & Kommentar", "Wetter-Funktion", "Übersetzungen", "Regiebericht erstellen", "PDF-Export", "Kalenderansichten", "Live-Übersetzer", "Bedienung am Handy", "Gesamteindruck & Fehler"];
+
 export default function AdminPage() {
   const [adminEmail, setAdminEmail] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
@@ -51,6 +54,9 @@ export default function AdminPage() {
   const [savingData, setSavingData] = useState<string | null>(null);
   const [nameMap, setNameMap] = useState<Record<string, string>>({});
   const [settingsMap, setSettingsMap] = useState<Record<string, any>>({});
+  const [feedbackMap, setFeedbackMap] = useState<Record<string, any[]>>({});
+  const [openFeedbackId, setOpenFeedbackId] = useState<string | null>(null);
+  const [loadingFeedback, setLoadingFeedback] = useState<string | null>(null);
 
   const [newCompanyName, setNewCompanyName] = useState("");
   const [newCompanySlug, setNewCompanySlug] = useState("");
@@ -209,6 +215,23 @@ export default function AdminPage() {
     if (data.error) { setMessage("Fehler: " + data.error); return; }
     setMessage("✅ Einstellungen gespeichert.");
     loadAll();
+  }
+
+  // Feedback einer Firma laden + Bereich auf-/zuklappen.
+  async function toggleFeedback(companyId: string) {
+    if (openFeedbackId === companyId) { setOpenFeedbackId(null); return; }
+    setOpenFeedbackId(companyId);
+    setLoadingFeedback(companyId);
+    try {
+      const res = await fetch("/api/admin-data", { method: "POST", headers: await authHeaders(), body: JSON.stringify({ action: "getFeedback", companyId }) });
+      const data = await res.json();
+      if (data.error) { setMessage("Fehler: " + data.error); return; }
+      setFeedbackMap((prev) => ({ ...prev, [companyId]: data.feedback || [] }));
+    } catch (e: any) {
+      setMessage("Fehler: " + String(e?.message || e));
+    } finally {
+      setLoadingFeedback(null);
+    }
   }
 
   async function createCompany() {
@@ -510,6 +533,19 @@ export default function AdminPage() {
                               <span className={`text-xs px-2 py-1 rounded font-bold ${u.role === "owner" ? "bg-orange-100 text-orange-700" : u.role === "admin" ? "bg-purple-100 text-purple-700" : u.role === "project_manager" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"}`}>{u.role}</span>
                               <button type="button" onClick={() => resetUserPassword(u.user_id, u.full_name, u.email)} className="bg-gray-700 text-white px-2 py-1 rounded text-xs">🔑 Passwort</button>
                             </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <button type="button" onClick={() => toggleFeedback(company.id)} className="bg-cyan-700 text-white px-4 py-2.5 rounded font-bold text-sm">💬 Feedback ansehen {openFeedbackId === company.id ? "▲" : "▼"}</button>
+                    {openFeedbackId === company.id && (
+                      <div className="mt-2 space-y-2">
+                        {loadingFeedback === company.id ? (<p className="text-gray-400 text-sm">⏳ Lädt…</p>) : (feedbackMap[company.id] || []).length === 0 ? (<p className="text-gray-400 text-sm">Noch kein Feedback.</p>) : (feedbackMap[company.id] || []).map((f: any) => (
+                          <div key={f.id} className="border rounded p-3 bg-gray-50 text-sm space-y-1">
+                            <p className="font-semibold">{f.user_name || "?"} · {new Date(f.created_at).toLocaleString("de-DE")}</p>
+                            {FEEDBACK_POINTS.map((pt, i) => (((f.answers?.[i] || "").trim()) ? (<p key={i} className="break-words"><strong>{pt}:</strong> {f.answers[i]}</p>) : null))}
                           </div>
                         ))}
                       </div>
