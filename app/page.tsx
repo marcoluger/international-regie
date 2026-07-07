@@ -91,6 +91,7 @@ type CompanyFeatures = {
 
 const texts = {
   Deutsch: {
+    translatorHint: "Hinweis: Übersetzung per KI – nicht immer 100 % korrekt.",
     translatorTab: "Übersetzer", translatorTitle: "Live-Übersetzer", translatorPlaceholder: "Text eingeben…", translatorBtn: "Übersetzen", translatorSwap: "Sprachen tauschen",
     weather: "Wetter", weatherError: "Wetter/Standort nicht verfügbar",
     instructionDoc: "Arbeitsanweisung",
@@ -321,6 +322,7 @@ const texts = {
     copyDone: "Arbeitsschritte wurden übernommen.",
   },
   Rumänisch: {
+    translatorHint: "Notă: Traducere realizată de IA – nu întotdeauna 100% corectă.",
     translatorTab: "Traducător", translatorTitle: "Traducător live", translatorPlaceholder: "Introduceți textul…", translatorBtn: "Traduce", translatorSwap: "Schimbă limbile",
     weather: "Vreme", weatherError: "Vremea/locația nu este disponibilă",
     instructionDoc: "Instrucțiune de lucru",
@@ -551,6 +553,7 @@ const texts = {
     copyDone: "Etapele de lucru au fost preluate.",
   },
   Englisch: {
+    translatorHint: "Note: AI translation – not always 100% accurate.",
     translatorTab: "Translator", translatorTitle: "Live translator", translatorPlaceholder: "Enter text…", translatorBtn: "Translate", translatorSwap: "Swap languages",
     weather: "Weather", weatherError: "Weather/location unavailable",
     instructionDoc: "Work instruction",
@@ -781,6 +784,7 @@ const texts = {
     copyDone: "Work steps have been applied.",
   },
   Italienisch: {
+    translatorHint: "Nota: Traduzione tramite IA – non sempre corretta al 100%.",
     translatorTab: "Traduttore", translatorTitle: "Traduttore live", translatorPlaceholder: "Inserisci il testo…", translatorBtn: "Traduci", translatorSwap: "Scambia lingue",
     weather: "Meteo", weatherError: "Meteo/posizione non disponibile",
     instructionDoc: "Istruzione di lavoro",
@@ -1011,6 +1015,7 @@ const texts = {
     copyDone: "Le fasi di lavoro sono state applicate.",
   },
   Türkisch: {
+    translatorHint: "Not: Çeviri yapay zeka ile yapılır – her zaman %100 doğru değildir.",
     translatorTab: "Çevirmen", translatorTitle: "Canlı çevirmen", translatorPlaceholder: "Metin girin…", translatorBtn: "Çevir", translatorSwap: "Dilleri değiştir",
     weather: "Hava", weatherError: "Hava/konum kullanılamıyor",
     instructionDoc: "İş talimatı",
@@ -1241,6 +1246,7 @@ const texts = {
     copyDone: "İş adımları alındı.",
   },
   Ungarisch: {
+    translatorHint: "Megjegyzés: A fordítást MI készíti – nem mindig 100%-osan pontos.",
     translatorTab: "Fordító", translatorTitle: "Élő fordító", translatorPlaceholder: "Írja be a szöveget…", translatorBtn: "Fordítás", translatorSwap: "Nyelvek cseréje",
     weather: "Időjárás", weatherError: "Időjárás/helyzet nem érhető el",
     instructionDoc: "Munkautasítás",
@@ -1471,6 +1477,7 @@ const texts = {
     copyDone: "A munkalépések átvéve.",
   },
   Tschechisch: {
+    translatorHint: "Poznámka: Překlad pomocí AI – ne vždy 100% správný.",
     translatorTab: "Překladač", translatorTitle: "Živý překladač", translatorPlaceholder: "Zadejte text…", translatorBtn: "Přeložit", translatorSwap: "Prohodit jazyky",
     weather: "Počasí", weatherError: "Počasí/poloha není k dispozici",
     instructionDoc: "Pracovní pokyn",
@@ -1701,6 +1708,7 @@ const texts = {
     copyDone: "Pracovní kroky byly převzaty.",
   },
   Ukrainisch: {
+    translatorHint: "Примітка: Переклад виконує ШІ – не завжди 100% точний.",
     translatorTab: "Перекладач", translatorTitle: "Живий перекладач", translatorPlaceholder: "Введіть текст…", translatorBtn: "Перекласти", translatorSwap: "Поміняти мови",
     weather: "Погода", weatherError: "Погода/місцезнаходження недоступні",
     instructionDoc: "Робоча інструкція",
@@ -1931,6 +1939,7 @@ const texts = {
     copyDone: "Робочі кроки перенесено.",
   },
   Bulgarisch: {
+    translatorHint: "Забележка: Преводът е от ИИ – не винаги 100% точен.",
     translatorTab: "Преводач", translatorTitle: "Жив преводач", translatorPlaceholder: "Въведете текст…", translatorBtn: "Преведи", translatorSwap: "Размяна на езици",
     weather: "Време", weatherError: "Времето/местоположението не е налично",
     instructionDoc: "Работна инструкция",
@@ -2161,6 +2170,7 @@ const texts = {
     copyDone: "Работните стъпки са прехвърлени.",
   },
   Serbisch: {
+    translatorHint: "Napomena: Prevod pravi veštačka inteligencija – nije uvek 100% tačan.",
     translatorTab: "Prevodilac", translatorTitle: "Prevodilac uživo", translatorPlaceholder: "Unesite tekst…", translatorBtn: "Prevedi", translatorSwap: "Zameni jezike",
     weather: "Vreme", weatherError: "Vreme/lokacija nije dostupna",
     instructionDoc: "Radni nalog",
@@ -2391,6 +2401,7 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Kroatisch: {
+    translatorHint: "Napomena: Prijevod radi umjetna inteligencija – nije uvijek 100% točan.",
     translatorTab: "Prevoditelj", translatorTitle: "Prevoditelj uživo", translatorPlaceholder: "Unesite tekst…", translatorBtn: "Prevedi", translatorSwap: "Zamijeni jezike",
     weather: "Vrijeme", weatherError: "Vrijeme/lokacija nije dostupna",
     instructionDoc: "Radni nalog",
@@ -2621,6 +2632,7 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Slowenisch: {
+    translatorHint: "Opomba: Prevod naredi umetna inteligenca – ni vedno 100 % pravilen.",
     translatorTab: "Prevajalnik", translatorTitle: "Živi prevajalnik", translatorPlaceholder: "Vnesite besedilo…", translatorBtn: "Prevedi", translatorSwap: "Zamenjaj jezika",
     weather: "Vreme", weatherError: "Vreme/lokacija ni na voljo",
     instructionDoc: "Delovni nalog",
@@ -2851,6 +2863,7 @@ const texts = {
     copyDone: "Delovni koraki so prevzeti.",
   },
   Polnisch: {
+    translatorHint: "Uwaga: Tłumaczenie wykonuje AI – nie zawsze w 100% poprawne.",
     translatorTab: "Tłumacz", translatorTitle: "Tłumacz na żywo", translatorPlaceholder: "Wpisz tekst…", translatorBtn: "Przetłumacz", translatorSwap: "Zamień języki",
     weather: "Pogoda", weatherError: "Pogoda/lokalizacja niedostępna",
     instructionDoc: "Instrukcja robocza",
@@ -5741,6 +5754,7 @@ export default function Home() {
             </div>
             <textarea className="border p-3 w-full text-black bg-white rounded-lg resize-none" rows={5} placeholder={t.translatorPlaceholder} value={transInput} onChange={(e) => setTransInput(e.target.value)} />
             <button type="button" onClick={runLiveTranslate} disabled={transLoading || !transInput.trim()} className="bg-cyan-600 text-white px-5 py-3 rounded-lg font-medium disabled:opacity-50">{transLoading ? "⏳ …" : "🌐 " + t.translatorBtn}</button>
+            <p className="text-xs text-gray-400">⚠️ {t.translatorHint}</p>
             {transOutput && (
               <div className="border border-slate-200 rounded-lg p-3 bg-gray-50 space-y-1">
                 <p className="text-xs text-gray-500">{transTo}</p>
