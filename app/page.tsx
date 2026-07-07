@@ -88,6 +88,7 @@ type CompanyFeatures = {
   max_photos?: number;
   allowed_languages: string[];
   feedback_enabled?: boolean;
+  translator_enabled?: boolean;
 };
 
 const texts = {
@@ -5568,7 +5569,9 @@ export default function Home() {
         <TabButton label={t.tabDay}             tabName="tag"                activeTab={activeTab} onClick={() => { setActiveTab("tag"); if (currentCompany) loadWorkInstructions(currentCompany.company_id); }} />
         <TabButton label={t.tabWeek}            tabName="woche"              activeTab={activeTab} onClick={() => { setActiveTab("woche"); if (currentCompany) loadWorkInstructions(currentCompany.company_id); }} />
         <TabButton label={t.tabMonth}           tabName="monat"              activeTab={activeTab} onClick={() => { setActiveTab("monat"); if (currentCompany) loadWorkInstructions(currentCompany.company_id); }} />
+        {companyFeatures?.translator_enabled && (
         <TabButton label={`🌐 ${t.translatorTab}`} tabName="uebersetzer" activeTab={activeTab} onClick={() => setActiveTab("uebersetzer")} />
+        )}
         {companyFeatures?.feedback_enabled && (
         <TabButton label={`💬 ${t.feedbackTab}`} tabName="feedback" activeTab={activeTab} onClick={() => { setActiveTab("feedback"); if (currentCompany && (currentCompany.role === "owner" || currentCompany.role === "admin" || currentCompany.role === "project_manager")) loadFeedback(); }} />
         )}
@@ -6075,7 +6078,7 @@ export default function Home() {
         </div>
       )}
 
-      {activeTab === "uebersetzer" && (
+      {activeTab === "uebersetzer" && companyFeatures?.translator_enabled && (
         <div className="space-y-4">
           <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-3">
             <h2 className="text-xl font-bold">🌐 {t.translatorTitle}</h2>
