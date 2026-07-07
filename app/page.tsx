@@ -3388,6 +3388,7 @@ export default function Home() {
   const [savedReports, setSavedReports] = useState<SavedReport[]>([]);
   const [teamReports, setTeamReports] = useState<SavedReport[]>([]);
   const [teamOpenId, setTeamOpenId] = useState<string | null>(null);
+  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
   const [teamLoading, setTeamLoading] = useState(false);
   const [teamTrans, setTeamTrans] = useState<Record<string, { lang: string; days: Record<number, string> }>>({});
   const [days, setDays] = useState<DayEntry[]>(createEmptyDays());
@@ -5651,7 +5652,11 @@ export default function Home() {
             </div>
             {teamLoading ? (<p className="text-gray-500">⏳ ...</p>) : entries.length === 0 ? (<p className="text-gray-500">{t.teamNoReports}</p>) : entries.map(([uid, group]) => (
               <div key={uid} className="border rounded-lg overflow-hidden">
-                <div className="bg-gray-100 px-3 py-2 font-bold">{group.name} ({group.reports.length})</div>
+                <button type="button" onClick={() => setCollapsedGroups((prev) => ({ ...prev, [uid]: !prev[uid] }))} className="w-full bg-gray-100 px-3 py-2 font-bold flex justify-between items-center gap-2">
+                  <span>{group.name} ({group.reports.length})</span>
+                  <span className="text-gray-400">{collapsedGroups[uid] ? "▼" : "▲"}</span>
+                </button>
+                {!collapsedGroups[uid] && (
                 <div className="divide-y">
                   {group.reports.map((r) => (
                     <div key={r.id} className="p-3 space-y-2">
@@ -5676,6 +5681,7 @@ export default function Home() {
                     </div>
                   ))}
                 </div>
+                )}
               </div>
             ))}
           </section>
