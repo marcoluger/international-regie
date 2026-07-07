@@ -3411,6 +3411,7 @@ export default function Home() {
   const [editNationality, setEditNationality] = useState<string>("");
   const [editPhone, setEditPhone] = useState<string>("");
   const [savingEdit, setSavingEdit] = useState(false);
+  const [showOverview, setShowOverview] = useState(false);
   const [taskComments, setTaskComments] = useState<Record<string, string>>({});
   const [commentSaveState, setCommentSaveState] = useState<Record<string, string>>({});
   const [reportInstruction, setReportInstruction] = useState<any>(null);
@@ -3813,23 +3814,28 @@ export default function Home() {
   }
   const roleLabel = (r: string) => r === "owner" ? "Owner" : r === "admin" ? t.roleAdmin : r === "project_manager" ? t.roleProjectManager : t.roleEmployee;
 
-  // Rolle und/oder Sprache eines Mitarbeiters aendern (ueber abgesicherte Route).
+  // Rolle/Sprache/Nationalitaet/Telefon eines Mitarbeiters aendern (ueber abgesicherte Route).
   async function updateEmployee(member: any) {
     if (!currentCompany) return;
-    if (!editNationality.trim() || !editPhone.trim()) { setMessage("Nationalität und Telefonnummer sind Pflicht."); return; }
+    if (!editNationality.trim() || !editPhone.trim()) { setMessage("Bitte Nationalität und Telefonnummer ausfüllen."); return; }
     setSavingEdit(true);
-    const { data: sessionData } = await supabase.auth.getSession();
-    const token = sessionData?.session?.access_token || "";
-    const body: any = { userId: member.user_id, preferredLanguage: editLang, nationality: editNationality, phone: editPhone };
-    // Rolle nur mitschicken, wenn geaendert und nicht man selbst.
-    if (editRole !== member.role && member.user_id !== user?.id) body.role = editRole;
-    const res = await fetch("/api/update-employee", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify(body) });
-    const data = await res.json().catch(() => ({}));
-    setSavingEdit(false);
-    if (!res.ok || data?.error) { setMessage("Fehler: " + (data?.error || `HTTP ${res.status}`)); return; }
-    setEditMemberId(null);
-    await loadCompanyUsers(currentCompany.company_id);
-    setMessage("✅ Gespeichert.");
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token || "";
+      const body: any = { userId: member.user_id, preferredLanguage: editLang, nationality: editNationality.trim(), phone: editPhone.trim() };
+      // Rolle nur mitschicken, wenn geaendert und nicht man selbst.
+      if (editRole !== member.role && member.user_id !== user?.id) body.role = editRole;
+      const res = await fetch("/api/update-employee", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify(body) });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data?.error) { setMessage("Fehler: " + (data?.error || `HTTP ${res.status}`)); return; }
+      setEditMemberId(null);
+      await loadCompanyUsers(currentCompany.company_id);
+      setMessage("✅ Gespeichert.");
+    } catch (e: any) {
+      setMessage("Fehler beim Speichern: " + String(e?.message || e));
+    } finally {
+      setSavingEdit(false);
+    }
   }
 
   async function resetCompanyUserPassword(memberEmail: string) {
@@ -5880,7 +5886,36 @@ export default function Home() {
               <p className="text-xs text-gray-400">Der Mitarbeiter meldet sich mit seinem Benutzernamen und Passwort an.</p>
             </div>
           )}
-          <p>{t.currentEmployees}: <strong>{companyUsers.length}</strong></p>
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <p>{t.currentEmployees}: <strong>{companyUsers.length}</strong></p>
+            <button type="button" onClick={() => setShowOverview(v => !v)} className="bg-cyan-700 text-white px-4 py-2.5 rounded-lg text-sm">📋 {(t as any).overviewBtn || "Übersicht"} {showOverview ? "▲" : "▼"}</button>
+          </div>
+          {showOverview && (
+            <div className="border border-slate-200 rounded-xl overflow-x-auto">
+              <table className="w-full text-sm text-left border-collapse">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="px-3 py-2 font-bold">{(t as any).nameLabel || "Name"}</th>
+                    <th className="px-3 py-2 font-bold">{t.role}</th>
+                    <th className="px-3 py-2 font-bold">🌐 {(t as any).languageLabel || "Sprache"}</th>
+                    <th className="px-3 py-2 font-bold">{(t as any).nationalityLabel || "Nationalität"}</th>
+                    <th className="px-3 py-2 font-bold">📞 {(t as any).phoneLabel || "Telefon"}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[...companyUsers].sort((a: any, b: any) => (a.full_name || a.email || "").localeCompare(b.full_name || b.email || "")).map((m: any) => (
+                    <tr key={m.id} className="border-t border-slate-200">
+                      <td className="px-3 py-2">{m.full_name || m.email || "-"}</td>
+                      <td className="px-3 py-2">{roleLabel(m.role)}</td>
+                      <td className="px-3 py-2">{m.preferred_language || "-"}</td>
+                      <td className="px-3 py-2">{m.nationality || "-"}</td>
+                      <td className="px-3 py-2">{m.phone || "-"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
           <div className="space-y-3">
             {companyUsers.map((member) => (
               <div key={member.id} className="border border-slate-200 rounded-xl p-3 shadow-sm space-y-2">
