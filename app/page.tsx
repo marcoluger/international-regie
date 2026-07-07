@@ -3734,6 +3734,9 @@ export default function Home() {
   const [projectName, setProjectName] = useState("");
   const [projectCustomer, setProjectCustomer] = useState("");
   const [projectSite, setProjectSite] = useState("");
+  const [projectStreet, setProjectStreet] = useState("");
+  const [projectZip, setProjectZip] = useState("");
+  const [projectCity, setProjectCity] = useState("");
   const [projectManager, setProjectManager] = useState("");
   const [pmEdits, setPmEdits] = useState<Record<string, string>>({});
   const [selectedProjectId, setSelectedProjectId] = useState("");
@@ -4879,12 +4882,18 @@ export default function Home() {
     setProjects(data || []);
   }
 
+  // Baut aus Baustelle + Straße + PLZ + Ort eine Adresszeile (fuer Arbeitsanweisung/Bericht/PDF).
+  function formatProjectAddress(p: any): string {
+    const zc = [p?.zip, p?.city].filter(Boolean).map((x: any) => String(x).trim()).join(" ");
+    return [p?.site, p?.street, zc].map((x: any) => (x || "").toString().trim()).filter(Boolean).join(", ");
+  }
+
   async function saveProject() {
     if (!currentCompany) return;
     await ensureFreshSession();
-    const { error } = await dbTimeout(supabase.from("projects").insert({ company_id: currentCompany.company_id, name: projectName, customer: projectCustomer, site: projectSite, project_manager: projectManager }));
+    const { error } = await dbTimeout(supabase.from("projects").insert({ company_id: currentCompany.company_id, name: projectName, customer: projectCustomer, site: projectSite, street: projectStreet, zip: projectZip, city: projectCity, project_manager: projectManager }));
     if (error) { setMessage("Fehler beim Speichern: " + error.message); return; }
-    setProjectName(""); setProjectCustomer(""); setProjectSite(""); setProjectManager("");
+    setProjectName(""); setProjectCustomer(""); setProjectSite(""); setProjectStreet(""); setProjectZip(""); setProjectCity(""); setProjectManager("");
     await loadProjects(); setMessage(t.msgProjectSaved);
   }
 
@@ -5804,6 +5813,11 @@ export default function Home() {
             <input className="border p-3 w-full" placeholder={t.projectName} value={projectName} onChange={(e) => setProjectName(e.target.value)} />
             <input className="border p-3 w-full" placeholder={t.customer} value={projectCustomer} onChange={(e) => setProjectCustomer(e.target.value)} />
             <input className="border p-3 w-full" placeholder={t.site} value={projectSite} onChange={(e) => setProjectSite(e.target.value)} />
+            <input className="border p-3 w-full" placeholder={t.street} value={projectStreet} onChange={(e) => setProjectStreet(e.target.value)} />
+            <div className="grid grid-cols-2 gap-2">
+              <input className="border p-3 w-full" placeholder={t.zip} value={projectZip} onChange={(e) => setProjectZip(e.target.value)} />
+              <input className="border p-3 w-full" placeholder={t.city} value={projectCity} onChange={(e) => setProjectCity(e.target.value)} />
+            </div>
             <select className="border p-3 w-full" value={projectManager} onChange={(e) => setProjectManager(e.target.value)}>
               <option value="">{t.projectManager}</option>
               {companyUsers.filter((m: any) => m.role === "project_manager").map((m: any) => (<option key={m.user_id} value={m.full_name || m.email || ""}>{m.full_name || m.email}</option>))}
@@ -5816,6 +5830,7 @@ export default function Home() {
                 <strong>{project.name}</strong>
                 <p>{t.customer}: {project.customer || "-"}</p>
                 <p>{t.site}: {project.site || "-"}</p>
+                {(project.street || project.zip || project.city) && (<p className="text-sm text-gray-600">{[project.street, [project.zip, project.city].filter(Boolean).join(" ")].filter(Boolean).join(", ")}</p>)}
                 {(currentCompany?.role === "owner" || currentCompany?.role === "admin") ? (
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-sm font-medium">{t.projectManager}:</span>
@@ -5875,7 +5890,7 @@ export default function Home() {
             <h2 className="text-xl font-bold">{editingInstructionId ? "✏️ " + (instructionTitle || t.newInstruction) : t.newInstruction}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <input className="border p-3 text-black bg-white" placeholder={t.instructionTitle} value={instructionTitle} onChange={(e) => setInstructionTitle(e.target.value)} />
-              <select className="border p-3 text-black bg-white" value={selectedProjectId} onChange={(e) => { const pid = e.target.value; setSelectedProjectId(pid); const sp = projects.find((p) => p.id === pid); if (sp) { setInstructionProject(sp.name || ""); setInstructionCustomer(sp.customer || ""); setInstructionSite(sp.site || ""); } }}>
+              <select className="border p-3 text-black bg-white" value={selectedProjectId} onChange={(e) => { const pid = e.target.value; setSelectedProjectId(pid); const sp = projects.find((p) => p.id === pid); if (sp) { setInstructionProject(sp.name || ""); setInstructionCustomer(sp.customer || ""); setInstructionSite(formatProjectAddress(sp)); } }}>
                 <option value="">{t.selectProject}</option>
                 {projects.map((project) => <option key={project.id} value={project.id}>{project.name}</option>)}
               </select>
