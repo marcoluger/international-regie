@@ -91,6 +91,7 @@ type CompanyFeatures = {
 
 const texts = {
   Deutsch: {
+    translatorTab: "Übersetzer", translatorTitle: "Live-Übersetzer", translatorPlaceholder: "Text eingeben…", translatorBtn: "Übersetzen", translatorSwap: "Sprachen tauschen",
     weather: "Wetter", weatherError: "Wetter/Standort nicht verfügbar",
     instructionDoc: "Arbeitsanweisung",
     help: "Anleitung",
@@ -320,6 +321,7 @@ const texts = {
     copyDone: "Arbeitsschritte wurden übernommen.",
   },
   Rumänisch: {
+    translatorTab: "Traducător", translatorTitle: "Traducător live", translatorPlaceholder: "Introduceți textul…", translatorBtn: "Traduce", translatorSwap: "Schimbă limbile",
     weather: "Vreme", weatherError: "Vremea/locația nu este disponibilă",
     instructionDoc: "Instrucțiune de lucru",
     help: "Instrucțiuni",
@@ -549,6 +551,7 @@ const texts = {
     copyDone: "Etapele de lucru au fost preluate.",
   },
   Englisch: {
+    translatorTab: "Translator", translatorTitle: "Live translator", translatorPlaceholder: "Enter text…", translatorBtn: "Translate", translatorSwap: "Swap languages",
     weather: "Weather", weatherError: "Weather/location unavailable",
     instructionDoc: "Work instruction",
     help: "Guide",
@@ -778,6 +781,7 @@ const texts = {
     copyDone: "Work steps have been applied.",
   },
   Italienisch: {
+    translatorTab: "Traduttore", translatorTitle: "Traduttore live", translatorPlaceholder: "Inserisci il testo…", translatorBtn: "Traduci", translatorSwap: "Scambia lingue",
     weather: "Meteo", weatherError: "Meteo/posizione non disponibile",
     instructionDoc: "Istruzione di lavoro",
     help: "Guida",
@@ -1007,6 +1011,7 @@ const texts = {
     copyDone: "Le fasi di lavoro sono state applicate.",
   },
   Türkisch: {
+    translatorTab: "Çevirmen", translatorTitle: "Canlı çevirmen", translatorPlaceholder: "Metin girin…", translatorBtn: "Çevir", translatorSwap: "Dilleri değiştir",
     weather: "Hava", weatherError: "Hava/konum kullanılamıyor",
     instructionDoc: "İş talimatı",
     help: "Kılavuz",
@@ -1236,6 +1241,7 @@ const texts = {
     copyDone: "İş adımları alındı.",
   },
   Ungarisch: {
+    translatorTab: "Fordító", translatorTitle: "Élő fordító", translatorPlaceholder: "Írja be a szöveget…", translatorBtn: "Fordítás", translatorSwap: "Nyelvek cseréje",
     weather: "Időjárás", weatherError: "Időjárás/helyzet nem érhető el",
     instructionDoc: "Munkautasítás",
     help: "Útmutató",
@@ -1465,6 +1471,7 @@ const texts = {
     copyDone: "A munkalépések átvéve.",
   },
   Tschechisch: {
+    translatorTab: "Překladač", translatorTitle: "Živý překladač", translatorPlaceholder: "Zadejte text…", translatorBtn: "Přeložit", translatorSwap: "Prohodit jazyky",
     weather: "Počasí", weatherError: "Počasí/poloha není k dispozici",
     instructionDoc: "Pracovní pokyn",
     help: "Návod",
@@ -1694,6 +1701,7 @@ const texts = {
     copyDone: "Pracovní kroky byly převzaty.",
   },
   Ukrainisch: {
+    translatorTab: "Перекладач", translatorTitle: "Живий перекладач", translatorPlaceholder: "Введіть текст…", translatorBtn: "Перекласти", translatorSwap: "Поміняти мови",
     weather: "Погода", weatherError: "Погода/місцезнаходження недоступні",
     instructionDoc: "Робоча інструкція",
     help: "Інструкція",
@@ -1923,6 +1931,7 @@ const texts = {
     copyDone: "Робочі кроки перенесено.",
   },
   Bulgarisch: {
+    translatorTab: "Преводач", translatorTitle: "Жив преводач", translatorPlaceholder: "Въведете текст…", translatorBtn: "Преведи", translatorSwap: "Размяна на езици",
     weather: "Време", weatherError: "Времето/местоположението не е налично",
     instructionDoc: "Работна инструкция",
     help: "Инструкции",
@@ -2152,6 +2161,7 @@ const texts = {
     copyDone: "Работните стъпки са прехвърлени.",
   },
   Serbisch: {
+    translatorTab: "Prevodilac", translatorTitle: "Prevodilac uživo", translatorPlaceholder: "Unesite tekst…", translatorBtn: "Prevedi", translatorSwap: "Zameni jezike",
     weather: "Vreme", weatherError: "Vreme/lokacija nije dostupna",
     instructionDoc: "Radni nalog",
     help: "Uputstvo",
@@ -2381,6 +2391,7 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Kroatisch: {
+    translatorTab: "Prevoditelj", translatorTitle: "Prevoditelj uživo", translatorPlaceholder: "Unesite tekst…", translatorBtn: "Prevedi", translatorSwap: "Zamijeni jezike",
     weather: "Vrijeme", weatherError: "Vrijeme/lokacija nije dostupna",
     instructionDoc: "Radni nalog",
     help: "Upute",
@@ -2610,6 +2621,7 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Slowenisch: {
+    translatorTab: "Prevajalnik", translatorTitle: "Živi prevajalnik", translatorPlaceholder: "Vnesite besedilo…", translatorBtn: "Prevedi", translatorSwap: "Zamenjaj jezika",
     weather: "Vreme", weatherError: "Vreme/lokacija ni na voljo",
     instructionDoc: "Delovni nalog",
     help: "Navodila",
@@ -2839,6 +2851,7 @@ const texts = {
     copyDone: "Delovni koraki so prevzeti.",
   },
   Polnisch: {
+    translatorTab: "Tłumacz", translatorTitle: "Tłumacz na żywo", translatorPlaceholder: "Wpisz tekst…", translatorBtn: "Przetłumacz", translatorSwap: "Zamień języki",
     weather: "Pogoda", weatherError: "Pogoda/lokalizacja niedostępna",
     instructionDoc: "Instrukcja robocza",
     help: "Instrukcja",
@@ -3389,6 +3402,11 @@ export default function Home() {
   const [teamReports, setTeamReports] = useState<SavedReport[]>([]);
   const [teamOpenId, setTeamOpenId] = useState<string | null>(null);
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
+  const [transFrom, setTransFrom] = useState<string>("Deutsch");
+  const [transTo, setTransTo] = useState<string>("Kroatisch");
+  const [transInput, setTransInput] = useState<string>("");
+  const [transOutput, setTransOutput] = useState<string>("");
+  const [transLoading, setTransLoading] = useState(false);
   const [teamLoading, setTeamLoading] = useState(false);
   const [teamTrans, setTeamTrans] = useState<Record<string, { lang: string; days: Record<number, string> }>>({});
   const [days, setDays] = useState<DayEntry[]>(createEmptyDays());
@@ -3910,6 +3928,25 @@ export default function Home() {
       await createPDF(false, { days: pdfDays, reportName: r.report_name, employee: r.employee, calendarWeek: "" });
     } finally {
       setMessage("");
+    }
+  }
+
+  // Live-Uebersetzer: freien Text von transFrom nach transTo uebersetzen (nutzt Cache).
+  async function runLiveTranslate() {
+    const text = transInput.trim();
+    if (!text) { setTransOutput(""); return; }
+    if (transFrom === transTo) { setTransOutput(text); return; }
+    setTransLoading(true);
+    setTransOutput("");
+    try {
+      const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: text, fromLanguage: transFrom, toLanguage: transTo }) });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data?.error) { setMessage("Fehler: " + (data?.error || `HTTP ${res.status}`)); return; }
+      setTransOutput(data.translation || "");
+    } catch (e: any) {
+      setMessage("Fehler bei der Übersetzung: " + String(e?.message || e));
+    } finally {
+      setTransLoading(false);
     }
   }
 
@@ -5215,6 +5252,7 @@ export default function Home() {
         <TabButton label={t.tabDay}             tabName="tag"                activeTab={activeTab} onClick={() => { setActiveTab("tag"); if (currentCompany) loadWorkInstructions(currentCompany.company_id); }} />
         <TabButton label={t.tabWeek}            tabName="woche"              activeTab={activeTab} onClick={() => { setActiveTab("woche"); if (currentCompany) loadWorkInstructions(currentCompany.company_id); }} />
         <TabButton label={t.tabMonth}           tabName="monat"              activeTab={activeTab} onClick={() => { setActiveTab("monat"); if (currentCompany) loadWorkInstructions(currentCompany.company_id); }} />
+        <TabButton label={`🌐 ${t.translatorTab}`} tabName="uebersetzer" activeTab={activeTab} onClick={() => setActiveTab("uebersetzer")} />
       </nav>
 
       {message && <div className="border border-slate-200 rounded-xl p-3 shadow-sm bg-yellow-100 text-black">{message}</div>}
@@ -5687,6 +5725,31 @@ export default function Home() {
           </section>
         );
       })()}
+
+      {activeTab === "uebersetzer" && (
+        <div className="space-y-4">
+          <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-3">
+            <h2 className="text-xl font-bold">🌐 {t.translatorTitle}</h2>
+            <div className="flex items-center gap-2 flex-wrap">
+              <select className="border p-3 rounded-lg text-black bg-white" value={transFrom} onChange={(e) => setTransFrom(e.target.value)}>
+                {languages.map((l) => (<option key={l} value={l}>{l}</option>))}
+              </select>
+              <button type="button" onClick={() => { const f = transFrom; setTransFrom(transTo); setTransTo(f); setTransInput(transOutput || transInput); setTransOutput(""); }} className="bg-gray-200 px-3 py-3 rounded-lg" title={t.translatorSwap}>↔</button>
+              <select className="border p-3 rounded-lg text-black bg-white" value={transTo} onChange={(e) => setTransTo(e.target.value)}>
+                {languages.map((l) => (<option key={l} value={l}>{l}</option>))}
+              </select>
+            </div>
+            <textarea className="border p-3 w-full text-black bg-white rounded-lg resize-none" rows={5} placeholder={t.translatorPlaceholder} value={transInput} onChange={(e) => setTransInput(e.target.value)} />
+            <button type="button" onClick={runLiveTranslate} disabled={transLoading || !transInput.trim()} className="bg-cyan-600 text-white px-5 py-3 rounded-lg font-medium disabled:opacity-50">{transLoading ? "⏳ …" : "🌐 " + t.translatorBtn}</button>
+            {transOutput && (
+              <div className="border border-slate-200 rounded-lg p-3 bg-gray-50 space-y-1">
+                <p className="text-xs text-gray-500">{transTo}</p>
+                <p className="whitespace-pre-wrap break-words">{transOutput}</p>
+              </div>
+            )}
+          </section>
+        </div>
+      )}
 
       {activeTab === "tag" && (
         <div className="space-y-4">
