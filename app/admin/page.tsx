@@ -545,7 +545,7 @@ export default function AdminPage() {
                       <div className="mt-2 space-y-2">
                         {loadingFeedback === company.id ? (<p className="text-gray-400 text-sm">⏳ Lädt…</p>) : (feedbackMap[company.id] || []).length === 0 ? (<p className="text-gray-400 text-sm">Noch kein Feedback.</p>) : (feedbackMap[company.id] || []).map((f: any) => (
                           <div key={f.id} className="border rounded p-3 bg-gray-50 text-sm space-y-1">
-                            <p className="font-semibold">{f.user_name || "?"} · {new Date(f.created_at).toLocaleString("de-DE")}</p>
+                            <p className="font-semibold">{f.user_name || "?"}{f.role ? ` (${f.role === "owner" ? "Owner" : f.role === "admin" ? "Admin" : f.role === "project_manager" ? "Projektleiter" : "Mitarbeiter"})` : ""} · {new Date(f.created_at).toLocaleString("de-DE")}</p>
                             {FEEDBACK_POINTS.map((pt, i) => (((f.answers?.[i] || "").trim()) ? (<p key={i} className="break-words"><strong>{pt}:</strong> {f.answers[i]}</p>) : null))}
                           </div>
                         ))}

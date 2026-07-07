@@ -54,6 +54,7 @@ export async function POST(request: Request) {
       company_id: member.company_id,
       user_id: caller.id,
       user_name: member.full_name || member.email || "?",
+      role: member.role,
       answers,
     });
     if (error) return Response.json({ error: error.message }, { status: 500 });
@@ -79,7 +80,7 @@ export async function GET(request: Request) {
 
     const { data, error } = await supabaseAdmin
       .from("feedback")
-      .select("id, user_name, answers, created_at")
+      .select("id, user_name, role, answers, created_at")
       .eq("company_id", member.company_id)
       .order("created_at", { ascending: false })
       .limit(500);

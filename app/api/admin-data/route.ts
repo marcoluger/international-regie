@@ -202,7 +202,7 @@ export async function POST(request: Request) {
     if (!companyId) return Response.json({ error: "companyId fehlt." }, { status: 400 });
     const { data, error } = await supabaseAdmin
       .from("feedback")
-      .select("id, user_name, answers, created_at")
+      .select("id, user_name, role, answers, created_at")
       .eq("company_id", companyId)
       .order("created_at", { ascending: false })
       .limit(500);

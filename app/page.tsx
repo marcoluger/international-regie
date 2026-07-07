@@ -6084,7 +6084,7 @@ export default function Home() {
               </div>
               {feedbackList.length === 0 ? (<p className="text-gray-500">{t.feedbackNone}</p>) : feedbackList.map((f: any) => (
                 <div key={f.id} className="border border-slate-200 rounded-xl p-3 bg-gray-50 space-y-1">
-                  <p className="font-semibold text-sm">{f.user_name || "?"} · {new Date(f.created_at).toLocaleString("de-DE")}</p>
+                  <p className="font-semibold text-sm">{f.user_name || "?"}{f.role ? ` (${roleLabel(f.role)})` : ""} · {new Date(f.created_at).toLocaleString("de-DE")}</p>
                   {t.feedbackPoints.map((pt: string, i: number) => (((f.answers?.[i] || "").trim()) ? (<p key={i} className="text-sm break-words"><strong>{pt}:</strong> {f.answers[i]}</p>) : null))}
                 </div>
               ))}
