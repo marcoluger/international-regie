@@ -3561,6 +3561,15 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentSignature, uiLanguage]);
 
+  // Live-Uebersetzer: Von-/Zu-Sprache auf die freigeschalteten Sprachen begrenzen.
+  useEffect(() => {
+    const allowed = getAllowedLanguages(companyFeatures).filter((l) => languages.includes(l as Language));
+    if (allowed.length === 0) return;
+    if (!allowed.includes(transFrom)) setTransFrom(allowed[0]);
+    if (!allowed.includes(transTo)) { const alt = allowed.find((l) => l !== (allowed.includes(transFrom) ? transFrom : allowed[0])); setTransTo(alt || allowed[0]); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [companyFeatures]);
+
   // Gelbe Meldung nach 10 Sekunden automatisch ausblenden.
   useEffect(() => {
     if (!message) return;
@@ -5838,11 +5847,11 @@ export default function Home() {
             <h2 className="text-xl font-bold">🌐 {t.translatorTitle}</h2>
             <div className="flex items-center gap-2 flex-wrap">
               <select className="border p-3 rounded-lg text-black bg-white" value={transFrom} onChange={(e) => setTransFrom(e.target.value)}>
-                {languages.map((l) => (<option key={l} value={l}>{l}</option>))}
+                {getAllowedLanguages(companyFeatures).filter(l => languages.includes(l as Language)).map((l) => (<option key={l} value={l}>{l}</option>))}
               </select>
               <button type="button" onClick={() => { const f = transFrom; setTransFrom(transTo); setTransTo(f); setTransInput(transOutput || transInput); setTransOutput(""); }} className="bg-gray-200 px-3 py-3 rounded-lg" title={t.translatorSwap}>↔</button>
               <select className="border p-3 rounded-lg text-black bg-white" value={transTo} onChange={(e) => setTransTo(e.target.value)}>
-                {languages.map((l) => (<option key={l} value={l}>{l}</option>))}
+                {getAllowedLanguages(companyFeatures).filter(l => languages.includes(l as Language)).map((l) => (<option key={l} value={l}>{l}</option>))}
               </select>
             </div>
             <textarea className="border p-3 w-full text-black bg-white rounded-lg resize-none" rows={5} placeholder={t.translatorPlaceholder} value={transInput} onChange={(e) => setTransInput(e.target.value)} />
