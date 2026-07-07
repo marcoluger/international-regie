@@ -91,10 +91,6 @@ type CompanyFeatures = {
 
 const texts = {
   Deutsch: {
-    feedbackTab: "Feedback", feedbackTitle: "Tester-Feedback", feedbackIntro: "Bitte zu jedem Punkt kurz dein Feedback eintragen.", feedbackSend: "Feedback senden", feedbackThanks: "Danke für dein Feedback!", feedbackReview: "Abgegebenes Feedback", feedbackNone: "Noch kein Feedback vorhanden.",
-    feedbackPoints: ["Anmeldung & Passwort", "Arbeitsanweisung & Kommentar", "Wetter-Funktion", "Übersetzungen", "Regiebericht erstellen", "PDF-Export", "Kalenderansichten", "Live-Übersetzer", "Bedienung am Handy", "Gesamteindruck & Fehler"],
-    translatorHint: "Hinweis: Übersetzung per KI – nicht immer 100 % korrekt.",
-    translatorTab: "Übersetzer", translatorTitle: "Live-Übersetzer", translatorPlaceholder: "Text eingeben…", translatorBtn: "Übersetzen", translatorSwap: "Sprachen tauschen",
     weather: "Wetter", weatherError: "Wetter/Standort nicht verfügbar",
     instructionDoc: "Arbeitsanweisung",
     help: "Anleitung",
@@ -324,10 +320,6 @@ const texts = {
     copyDone: "Arbeitsschritte wurden übernommen.",
   },
   Rumänisch: {
-    feedbackTab: "Feedback", feedbackTitle: "Feedback tester", feedbackIntro: "Te rugăm să adaugi pe scurt feedback pentru fiecare punct.", feedbackSend: "Trimite feedback", feedbackThanks: "Mulțumim pentru feedback!", feedbackReview: "Feedback primit", feedbackNone: "Încă nu există feedback.",
-    feedbackPoints: ["Autentificare & parolă", "Instrucțiune & comentariu", "Funcția meteo", "Traduceri", "Creare raport", "Export PDF", "Vizualizări calendar", "Traducător live", "Utilizare pe telefon", "Impresie generală & erori"],
-    translatorHint: "Notă: Traducere realizată de IA – nu întotdeauna 100% corectă.",
-    translatorTab: "Traducător", translatorTitle: "Traducător live", translatorPlaceholder: "Introduceți textul…", translatorBtn: "Traduce", translatorSwap: "Schimbă limbile",
     weather: "Vreme", weatherError: "Vremea/locația nu este disponibilă",
     instructionDoc: "Instrucțiune de lucru",
     help: "Instrucțiuni",
@@ -557,10 +549,6 @@ const texts = {
     copyDone: "Etapele de lucru au fost preluate.",
   },
   Englisch: {
-    feedbackTab: "Feedback", feedbackTitle: "Tester feedback", feedbackIntro: "Please add short feedback for each point.", feedbackSend: "Send feedback", feedbackThanks: "Thanks for your feedback!", feedbackReview: "Submitted feedback", feedbackNone: "No feedback yet.",
-    feedbackPoints: ["Login & password", "Work instruction & comment", "Weather feature", "Translations", "Create report", "PDF export", "Calendar views", "Live translator", "Mobile usability", "Overall & bugs"],
-    translatorHint: "Note: AI translation – not always 100% accurate.",
-    translatorTab: "Translator", translatorTitle: "Live translator", translatorPlaceholder: "Enter text…", translatorBtn: "Translate", translatorSwap: "Swap languages",
     weather: "Weather", weatherError: "Weather/location unavailable",
     instructionDoc: "Work instruction",
     help: "Guide",
@@ -790,10 +778,6 @@ const texts = {
     copyDone: "Work steps have been applied.",
   },
   Italienisch: {
-    feedbackTab: "Feedback", feedbackTitle: "Feedback tester", feedbackIntro: "Aggiungi un breve feedback per ogni punto.", feedbackSend: "Invia feedback", feedbackThanks: "Grazie per il tuo feedback!", feedbackReview: "Feedback ricevuti", feedbackNone: "Ancora nessun feedback.",
-    feedbackPoints: ["Accesso & password", "Istruzione & commento", "Funzione meteo", "Traduzioni", "Creare rapporto", "Esportazione PDF", "Viste calendario", "Traduttore live", "Uso su cellulare", "Impressione generale & errori"],
-    translatorHint: "Nota: Traduzione tramite IA – non sempre corretta al 100%.",
-    translatorTab: "Traduttore", translatorTitle: "Traduttore live", translatorPlaceholder: "Inserisci il testo…", translatorBtn: "Traduci", translatorSwap: "Scambia lingue",
     weather: "Meteo", weatherError: "Meteo/posizione non disponibile",
     instructionDoc: "Istruzione di lavoro",
     help: "Guida",
@@ -1023,10 +1007,6 @@ const texts = {
     copyDone: "Le fasi di lavoro sono state applicate.",
   },
   Türkisch: {
-    feedbackTab: "Geri bildirim", feedbackTitle: "Test geri bildirimi", feedbackIntro: "Lütfen her madde için kısa geri bildirim yazın.", feedbackSend: "Geri bildirim gönder", feedbackThanks: "Geri bildiriminiz için teşekkürler!", feedbackReview: "Gönderilen geri bildirimler", feedbackNone: "Henüz geri bildirim yok.",
-    feedbackPoints: ["Giriş & şifre", "İş talimatı & yorum", "Hava durumu", "Çeviriler", "Rapor oluşturma", "PDF dışa aktarma", "Takvim görünümleri", "Canlı çevirmen", "Telefonda kullanım", "Genel izlenim & hatalar"],
-    translatorHint: "Not: Çeviri yapay zeka ile yapılır – her zaman %100 doğru değildir.",
-    translatorTab: "Çevirmen", translatorTitle: "Canlı çevirmen", translatorPlaceholder: "Metin girin…", translatorBtn: "Çevir", translatorSwap: "Dilleri değiştir",
     weather: "Hava", weatherError: "Hava/konum kullanılamıyor",
     instructionDoc: "İş talimatı",
     help: "Kılavuz",
@@ -1256,10 +1236,6 @@ const texts = {
     copyDone: "İş adımları alındı.",
   },
   Ungarisch: {
-    feedbackTab: "Visszajelzés", feedbackTitle: "Tesztelői visszajelzés", feedbackIntro: "Kérjük, minden ponthoz írjon rövid visszajelzést.", feedbackSend: "Visszajelzés küldése", feedbackThanks: "Köszönjük a visszajelzést!", feedbackReview: "Beérkezett visszajelzések", feedbackNone: "Még nincs visszajelzés.",
-    feedbackPoints: ["Bejelentkezés & jelszó", "Munkautasítás & megjegyzés", "Időjárás funkció", "Fordítások", "Jelentés készítése", "PDF exportálás", "Naptárnézetek", "Élő fordító", "Használat telefonon", "Összbenyomás & hibák"],
-    translatorHint: "Megjegyzés: A fordítást MI készíti – nem mindig 100%-osan pontos.",
-    translatorTab: "Fordító", translatorTitle: "Élő fordító", translatorPlaceholder: "Írja be a szöveget…", translatorBtn: "Fordítás", translatorSwap: "Nyelvek cseréje",
     weather: "Időjárás", weatherError: "Időjárás/helyzet nem érhető el",
     instructionDoc: "Munkautasítás",
     help: "Útmutató",
@@ -1489,10 +1465,6 @@ const texts = {
     copyDone: "A munkalépések átvéve.",
   },
   Tschechisch: {
-    feedbackTab: "Zpětná vazba", feedbackTitle: "Zpětná vazba testera", feedbackIntro: "Ke každému bodu prosím napište krátkou zpětnou vazbu.", feedbackSend: "Odeslat zpětnou vazbu", feedbackThanks: "Děkujeme za zpětnou vazbu!", feedbackReview: "Odeslaná zpětná vazba", feedbackNone: "Zatím žádná zpětná vazba.",
-    feedbackPoints: ["Přihlášení & heslo", "Pracovní pokyn & komentář", "Funkce počasí", "Překlady", "Vytvoření výkazu", "Export PDF", "Zobrazení kalendáře", "Živý překladač", "Použití na mobilu", "Celkový dojem & chyby"],
-    translatorHint: "Poznámka: Překlad pomocí AI – ne vždy 100% správný.",
-    translatorTab: "Překladač", translatorTitle: "Živý překladač", translatorPlaceholder: "Zadejte text…", translatorBtn: "Přeložit", translatorSwap: "Prohodit jazyky",
     weather: "Počasí", weatherError: "Počasí/poloha není k dispozici",
     instructionDoc: "Pracovní pokyn",
     help: "Návod",
@@ -1722,10 +1694,6 @@ const texts = {
     copyDone: "Pracovní kroky byly převzaty.",
   },
   Ukrainisch: {
-    feedbackTab: "Відгук", feedbackTitle: "Відгук тестувальника", feedbackIntro: "Будь ласка, додайте короткий відгук до кожного пункту.", feedbackSend: "Надіслати відгук", feedbackThanks: "Дякуємо за відгук!", feedbackReview: "Надіслані відгуки", feedbackNone: "Відгуків поки немає.",
-    feedbackPoints: ["Вхід і пароль", "Інструкція та коментар", "Функція погоди", "Переклади", "Створення звіту", "Експорт PDF", "Види календаря", "Живий перекладач", "Використання на телефоні", "Загальне враження та помилки"],
-    translatorHint: "Примітка: Переклад виконує ШІ – не завжди 100% точний.",
-    translatorTab: "Перекладач", translatorTitle: "Живий перекладач", translatorPlaceholder: "Введіть текст…", translatorBtn: "Перекласти", translatorSwap: "Поміняти мови",
     weather: "Погода", weatherError: "Погода/місцезнаходження недоступні",
     instructionDoc: "Робоча інструкція",
     help: "Інструкція",
@@ -1955,10 +1923,6 @@ const texts = {
     copyDone: "Робочі кроки перенесено.",
   },
   Bulgarisch: {
-    feedbackTab: "Отзиви", feedbackTitle: "Обратна връзка от тестер", feedbackIntro: "Моля, добавете кратка обратна връзка за всяка точка.", feedbackSend: "Изпрати обратна връзка", feedbackThanks: "Благодарим за обратната връзка!", feedbackReview: "Изпратени отзиви", feedbackNone: "Все още няма обратна връзка.",
-    feedbackPoints: ["Вход и парола", "Инструкция и коментар", "Функция за времето", "Преводи", "Създаване на отчет", "Експорт в PDF", "Изгледи на календара", "Жив преводач", "Използване на телефон", "Общо впечатление и грешки"],
-    translatorHint: "Забележка: Преводът е от ИИ – не винаги 100% точен.",
-    translatorTab: "Преводач", translatorTitle: "Жив преводач", translatorPlaceholder: "Въведете текст…", translatorBtn: "Преведи", translatorSwap: "Размяна на езици",
     weather: "Време", weatherError: "Времето/местоположението не е налично",
     instructionDoc: "Работна инструкция",
     help: "Инструкции",
@@ -2188,10 +2152,6 @@ const texts = {
     copyDone: "Работните стъпки са прехвърлени.",
   },
   Serbisch: {
-    feedbackTab: "Povratne informacije", feedbackTitle: "Povratne informacije testera", feedbackIntro: "Molimo dodajte kratku povratnu informaciju za svaku tačku.", feedbackSend: "Pošalji povratne informacije", feedbackThanks: "Hvala na povratnim informacijama!", feedbackReview: "Poslate povratne informacije", feedbackNone: "Još nema povratnih informacija.",
-    feedbackPoints: ["Prijava i lozinka", "Radni nalog i komentar", "Funkcija vremena", "Prevodi", "Kreiranje izveštaja", "PDF izvoz", "Prikazi kalendara", "Prevodilac uživo", "Korišćenje na telefonu", "Ukupni utisak i greške"],
-    translatorHint: "Napomena: Prevod pravi veštačka inteligencija – nije uvek 100% tačan.",
-    translatorTab: "Prevodilac", translatorTitle: "Prevodilac uživo", translatorPlaceholder: "Unesite tekst…", translatorBtn: "Prevedi", translatorSwap: "Zameni jezike",
     weather: "Vreme", weatherError: "Vreme/lokacija nije dostupna",
     instructionDoc: "Radni nalog",
     help: "Uputstvo",
@@ -2421,10 +2381,6 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Kroatisch: {
-    feedbackTab: "Povratne informacije", feedbackTitle: "Povratne informacije testera", feedbackIntro: "Molimo dodajte kratku povratnu informaciju za svaku točku.", feedbackSend: "Pošalji povratne informacije", feedbackThanks: "Hvala na povratnim informacijama!", feedbackReview: "Poslane povratne informacije", feedbackNone: "Još nema povratnih informacija.",
-    feedbackPoints: ["Prijava i lozinka", "Radni nalog i komentar", "Funkcija vremena", "Prijevodi", "Izrada izvještaja", "PDF izvoz", "Prikazi kalendara", "Prevoditelj uživo", "Korištenje na mobitelu", "Ukupni dojam i greške"],
-    translatorHint: "Napomena: Prijevod radi umjetna inteligencija – nije uvijek 100% točan.",
-    translatorTab: "Prevoditelj", translatorTitle: "Prevoditelj uživo", translatorPlaceholder: "Unesite tekst…", translatorBtn: "Prevedi", translatorSwap: "Zamijeni jezike",
     weather: "Vrijeme", weatherError: "Vrijeme/lokacija nije dostupna",
     instructionDoc: "Radni nalog",
     help: "Upute",
@@ -2654,10 +2610,6 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Slowenisch: {
-    feedbackTab: "Povratne informacije", feedbackTitle: "Povratne informacije preizkuševalca", feedbackIntro: "Prosimo, dodajte kratko povratno informacijo za vsako točko.", feedbackSend: "Pošlji povratne informacije", feedbackThanks: "Hvala za povratne informacije!", feedbackReview: "Oddane povratne informacije", feedbackNone: "Še ni povratnih informacij.",
-    feedbackPoints: ["Prijava in geslo", "Delovni nalog in komentar", "Funkcija vremena", "Prevodi", "Ustvarjanje poročila", "Izvoz PDF", "Pogledi koledarja", "Živi prevajalnik", "Uporaba na telefonu", "Splošni vtis in napake"],
-    translatorHint: "Opomba: Prevod naredi umetna inteligenca – ni vedno 100 % pravilen.",
-    translatorTab: "Prevajalnik", translatorTitle: "Živi prevajalnik", translatorPlaceholder: "Vnesite besedilo…", translatorBtn: "Prevedi", translatorSwap: "Zamenjaj jezika",
     weather: "Vreme", weatherError: "Vreme/lokacija ni na voljo",
     instructionDoc: "Delovni nalog",
     help: "Navodila",
@@ -2887,10 +2839,6 @@ const texts = {
     copyDone: "Delovni koraki so prevzeti.",
   },
   Polnisch: {
-    feedbackTab: "Opinie", feedbackTitle: "Opinia testera", feedbackIntro: "Prosimy o krótką opinię do każdego punktu.", feedbackSend: "Wyślij opinię", feedbackThanks: "Dziękujemy za opinię!", feedbackReview: "Przesłane opinie", feedbackNone: "Brak opinii.",
-    feedbackPoints: ["Logowanie i hasło", "Instrukcja i komentarz", "Funkcja pogody", "Tłumaczenia", "Tworzenie raportu", "Eksport PDF", "Widoki kalendarza", "Tłumacz na żywo", "Obsługa na telefonie", "Ogólne wrażenie i błędy"],
-    translatorHint: "Uwaga: Tłumaczenie wykonuje AI – nie zawsze w 100% poprawne.",
-    translatorTab: "Tłumacz", translatorTitle: "Tłumacz na żywo", translatorPlaceholder: "Wpisz tekst…", translatorBtn: "Przetłumacz", translatorSwap: "Zamień języki",
     weather: "Pogoda", weatherError: "Pogoda/lokalizacja niedostępna",
     instructionDoc: "Instrukcja robocza",
     help: "Instrukcja",
@@ -3440,15 +3388,6 @@ export default function Home() {
   const [savedReports, setSavedReports] = useState<SavedReport[]>([]);
   const [teamReports, setTeamReports] = useState<SavedReport[]>([]);
   const [teamOpenId, setTeamOpenId] = useState<string | null>(null);
-  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
-  const [transFrom, setTransFrom] = useState<string>("Deutsch");
-  const [transTo, setTransTo] = useState<string>("Kroatisch");
-  const [transInput, setTransInput] = useState<string>("");
-  const [transOutput, setTransOutput] = useState<string>("");
-  const [transLoading, setTransLoading] = useState(false);
-  const [feedbackAnswers, setFeedbackAnswers] = useState<string[]>(Array(10).fill(""));
-  const [feedbackSending, setFeedbackSending] = useState(false);
-  const [feedbackList, setFeedbackList] = useState<any[]>([]);
   const [teamLoading, setTeamLoading] = useState(false);
   const [teamTrans, setTeamTrans] = useState<Record<string, { lang: string; days: Record<number, string> }>>({});
   const [days, setDays] = useState<DayEntry[]>(createEmptyDays());
@@ -3472,7 +3411,6 @@ export default function Home() {
   const [editNationality, setEditNationality] = useState<string>("");
   const [editPhone, setEditPhone] = useState<string>("");
   const [savingEdit, setSavingEdit] = useState(false);
-  const [showOverview, setShowOverview] = useState(false);
   const [taskComments, setTaskComments] = useState<Record<string, string>>({});
   const [commentSaveState, setCommentSaveState] = useState<Record<string, string>>({});
   const [reportInstruction, setReportInstruction] = useState<any>(null);
@@ -3875,28 +3813,23 @@ export default function Home() {
   }
   const roleLabel = (r: string) => r === "owner" ? "Owner" : r === "admin" ? t.roleAdmin : r === "project_manager" ? t.roleProjectManager : t.roleEmployee;
 
-  // Rolle/Sprache/Nationalitaet/Telefon eines Mitarbeiters aendern (ueber abgesicherte Route).
+  // Rolle und/oder Sprache eines Mitarbeiters aendern (ueber abgesicherte Route).
   async function updateEmployee(member: any) {
     if (!currentCompany) return;
-    if (!editNationality.trim() || !editPhone.trim()) { setMessage("Bitte Nationalität und Telefonnummer ausfüllen."); return; }
+    if (!editNationality.trim() || !editPhone.trim()) { setMessage("Nationalität und Telefonnummer sind Pflicht."); return; }
     setSavingEdit(true);
-    try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const token = sessionData?.session?.access_token || "";
-      const body: any = { userId: member.user_id, preferredLanguage: editLang, nationality: editNationality.trim(), phone: editPhone.trim() };
-      // Rolle nur mitschicken, wenn geaendert und nicht man selbst.
-      if (editRole !== member.role && member.user_id !== user?.id) body.role = editRole;
-      const res = await fetch("/api/update-employee", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify(body) });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok || data?.error) { setMessage("Fehler: " + (data?.error || `HTTP ${res.status}`)); return; }
-      setEditMemberId(null);
-      await loadCompanyUsers(currentCompany.company_id);
-      setMessage("✅ Gespeichert.");
-    } catch (e: any) {
-      setMessage("Fehler beim Speichern: " + String(e?.message || e));
-    } finally {
-      setSavingEdit(false);
-    }
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData?.session?.access_token || "";
+    const body: any = { userId: member.user_id, preferredLanguage: editLang, nationality: editNationality, phone: editPhone };
+    // Rolle nur mitschicken, wenn geaendert und nicht man selbst.
+    if (editRole !== member.role && member.user_id !== user?.id) body.role = editRole;
+    const res = await fetch("/api/update-employee", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify(body) });
+    const data = await res.json().catch(() => ({}));
+    setSavingEdit(false);
+    if (!res.ok || data?.error) { setMessage("Fehler: " + (data?.error || `HTTP ${res.status}`)); return; }
+    setEditMemberId(null);
+    await loadCompanyUsers(currentCompany.company_id);
+    setMessage("✅ Gespeichert.");
   }
 
   async function resetCompanyUserPassword(memberEmail: string) {
@@ -3971,54 +3904,6 @@ export default function Home() {
     } finally {
       setMessage("");
     }
-  }
-
-  // Live-Uebersetzer: freien Text von transFrom nach transTo uebersetzen (nutzt Cache).
-  async function runLiveTranslate() {
-    const text = transInput.trim();
-    if (!text) { setTransOutput(""); return; }
-    if (transFrom === transTo) { setTransOutput(text); return; }
-    setTransLoading(true);
-    setTransOutput("");
-    try {
-      const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: text, fromLanguage: transFrom, toLanguage: transTo }) });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok || data?.error) { setMessage("Fehler: " + (data?.error || `HTTP ${res.status}`)); return; }
-      setTransOutput(data.translation || "");
-    } catch (e: any) {
-      setMessage("Fehler bei der Übersetzung: " + String(e?.message || e));
-    } finally {
-      setTransLoading(false);
-    }
-  }
-
-  // Feedback abgeben (Tester) bzw. laden (Owner/Admin/PL).
-  async function submitFeedback() {
-    if (!feedbackAnswers.some((a) => a && a.trim())) { setMessage("Bitte mindestens ein Feld ausfüllen."); return; }
-    setFeedbackSending(true);
-    try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const token = sessionData?.session?.access_token || "";
-      const res = await fetch("/api/feedback", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ answers: feedbackAnswers }) });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok || data?.error) { setMessage("Fehler: " + (data?.error || `HTTP ${res.status}`)); return; }
-      setFeedbackAnswers(Array(10).fill(""));
-      setMessage("✅ " + t.feedbackThanks);
-      if (currentCompany && (currentCompany.role === "owner" || currentCompany.role === "admin" || currentCompany.role === "project_manager")) loadFeedback();
-    } catch (e: any) {
-      setMessage("Fehler beim Senden: " + String(e?.message || e));
-    } finally {
-      setFeedbackSending(false);
-    }
-  }
-  async function loadFeedback() {
-    try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const token = sessionData?.session?.access_token || "";
-      const res = await fetch("/api/feedback", { method: "GET", headers: { Authorization: `Bearer ${token}` } });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok && Array.isArray(data.feedback)) setFeedbackList(data.feedback);
-    } catch { /* still ignorieren */ }
   }
 
   function updateDay(index: number, field: keyof DayEntry, value: string) {
@@ -5286,7 +5171,6 @@ export default function Home() {
         <p className="text-cyan-100 text-sm">{t.subtitle}</p>
         <p className="text-cyan-50 text-sm break-words">{t.loggedInAs}: <strong className="text-white">{user.email}</strong></p>
         {currentCompany && (<p className="text-cyan-50 text-sm break-words">{t.firma}: <strong>{currentCompany.companies.name}</strong> | {t.role}: <strong>{currentCompany.role === "owner" ? "Owner" : currentCompany.role === "admin" ? t.roleAdmin : currentCompany.role === "project_manager" ? t.roleProjectManager : t.roleEmployee}</strong></p>)}
-        <p className="text-cyan-100 text-xs break-words mt-1">⚠️ {t.translatorHint}</p>
         <div className="flex items-center flex-wrap gap-2 mt-3">
           <button type="button" onClick={signOut} className="bg-white text-cyan-700 px-4 py-2.5 rounded-lg font-medium">{t.logout}</button>
           <button type="button" onClick={refreshAll} disabled={refreshing} title="Aktualisieren" className="bg-cyan-700 text-white px-4 py-2.5 rounded-lg disabled:opacity-50">{refreshing ? "⏳" : "🔄"}</button>
@@ -5324,8 +5208,6 @@ export default function Home() {
         <TabButton label={t.tabDay}             tabName="tag"                activeTab={activeTab} onClick={() => { setActiveTab("tag"); if (currentCompany) loadWorkInstructions(currentCompany.company_id); }} />
         <TabButton label={t.tabWeek}            tabName="woche"              activeTab={activeTab} onClick={() => { setActiveTab("woche"); if (currentCompany) loadWorkInstructions(currentCompany.company_id); }} />
         <TabButton label={t.tabMonth}           tabName="monat"              activeTab={activeTab} onClick={() => { setActiveTab("monat"); if (currentCompany) loadWorkInstructions(currentCompany.company_id); }} />
-        <TabButton label={`🌐 ${t.translatorTab}`} tabName="uebersetzer" activeTab={activeTab} onClick={() => setActiveTab("uebersetzer")} />
-        <TabButton label={`💬 ${t.feedbackTab}`} tabName="feedback" activeTab={activeTab} onClick={() => { setActiveTab("feedback"); if (currentCompany && (currentCompany.role === "owner" || currentCompany.role === "admin" || currentCompany.role === "project_manager")) loadFeedback(); }} />
       </nav>
 
       {message && <div className="border border-slate-200 rounded-xl p-3 shadow-sm bg-yellow-100 text-black">{message}</div>}
@@ -5763,11 +5645,7 @@ export default function Home() {
             </div>
             {teamLoading ? (<p className="text-gray-500">⏳ ...</p>) : entries.length === 0 ? (<p className="text-gray-500">{t.teamNoReports}</p>) : entries.map(([uid, group]) => (
               <div key={uid} className="border rounded-lg overflow-hidden">
-                <button type="button" onClick={() => setCollapsedGroups((prev) => ({ ...prev, [uid]: !prev[uid] }))} className="w-full bg-gray-100 px-3 py-2 font-bold flex justify-between items-center gap-2">
-                  <span>{group.name} ({group.reports.length})</span>
-                  <span className="text-gray-400">{collapsedGroups[uid] ? "▼" : "▲"}</span>
-                </button>
-                {!collapsedGroups[uid] && (
+                <div className="bg-gray-100 px-3 py-2 font-bold">{group.name} ({group.reports.length})</div>
                 <div className="divide-y">
                   {group.reports.map((r) => (
                     <div key={r.id} className="p-3 space-y-2">
@@ -5792,68 +5670,11 @@ export default function Home() {
                     </div>
                   ))}
                 </div>
-                )}
               </div>
             ))}
           </section>
         );
       })()}
-
-      {activeTab === "feedback" && (
-        <div className="space-y-4">
-          <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-3">
-            <h2 className="text-xl font-bold">💬 {t.feedbackTitle}</h2>
-            <p className="text-sm text-gray-500">{t.feedbackIntro}</p>
-            {t.feedbackPoints.map((pt: string, i: number) => (
-              <div key={i} className="space-y-1">
-                <label className="text-sm font-medium">{i + 1}. {pt}</label>
-                <textarea rows={2} value={feedbackAnswers[i] || ""} onChange={(e) => { const c = [...feedbackAnswers]; c[i] = e.target.value; setFeedbackAnswers(c); }} className="border p-2 w-full rounded-lg text-black bg-white resize-none" />
-              </div>
-            ))}
-            <button type="button" onClick={submitFeedback} disabled={feedbackSending} className="bg-cyan-600 text-white px-5 py-3 rounded-lg font-medium disabled:opacity-50">{feedbackSending ? "⏳ …" : "💬 " + t.feedbackSend}</button>
-          </section>
-          {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
-            <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-3">
-              <div className="flex justify-between items-center">
-                <h3 className="font-bold">{t.feedbackReview} ({feedbackList.length})</h3>
-                <button type="button" onClick={loadFeedback} className="bg-gray-200 px-3 py-2.5 rounded-lg text-sm">🔄</button>
-              </div>
-              {feedbackList.length === 0 ? (<p className="text-gray-500">{t.feedbackNone}</p>) : feedbackList.map((f: any) => (
-                <div key={f.id} className="border border-slate-200 rounded-xl p-3 bg-gray-50 space-y-1">
-                  <p className="font-semibold text-sm">{f.user_name || "?"} · {new Date(f.created_at).toLocaleString("de-DE")}</p>
-                  {t.feedbackPoints.map((pt: string, i: number) => (((f.answers?.[i] || "").trim()) ? (<p key={i} className="text-sm break-words"><strong>{pt}:</strong> {f.answers[i]}</p>) : null))}
-                </div>
-              ))}
-            </section>
-          )}
-        </div>
-      )}
-
-      {activeTab === "uebersetzer" && (
-        <div className="space-y-4">
-          <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-3">
-            <h2 className="text-xl font-bold">🌐 {t.translatorTitle}</h2>
-            <div className="flex items-center gap-2 flex-wrap">
-              <select className="border p-3 rounded-lg text-black bg-white" value={transFrom} onChange={(e) => setTransFrom(e.target.value)}>
-                {languages.map((l) => (<option key={l} value={l}>{l}</option>))}
-              </select>
-              <button type="button" onClick={() => { const f = transFrom; setTransFrom(transTo); setTransTo(f); setTransInput(transOutput || transInput); setTransOutput(""); }} className="bg-gray-200 px-3 py-3 rounded-lg" title={t.translatorSwap}>↔</button>
-              <select className="border p-3 rounded-lg text-black bg-white" value={transTo} onChange={(e) => setTransTo(e.target.value)}>
-                {languages.map((l) => (<option key={l} value={l}>{l}</option>))}
-              </select>
-            </div>
-            <textarea className="border p-3 w-full text-black bg-white rounded-lg resize-none" rows={5} placeholder={t.translatorPlaceholder} value={transInput} onChange={(e) => setTransInput(e.target.value)} />
-            <button type="button" onClick={runLiveTranslate} disabled={transLoading || !transInput.trim()} className="bg-cyan-600 text-white px-5 py-3 rounded-lg font-medium disabled:opacity-50">{transLoading ? "⏳ …" : "🌐 " + t.translatorBtn}</button>
-            <p className="text-xs text-gray-400">⚠️ {t.translatorHint}</p>
-            {transOutput && (
-              <div className="border border-slate-200 rounded-lg p-3 bg-gray-50 space-y-1">
-                <p className="text-xs text-gray-500">{transTo}</p>
-                <p className="whitespace-pre-wrap break-words">{transOutput}</p>
-              </div>
-            )}
-          </section>
-        </div>
-      )}
 
       {activeTab === "tag" && (
         <div className="space-y-4">
@@ -6059,36 +5880,7 @@ export default function Home() {
               <p className="text-xs text-gray-400">Der Mitarbeiter meldet sich mit seinem Benutzernamen und Passwort an.</p>
             </div>
           )}
-          <div className="flex items-center justify-between flex-wrap gap-2">
-            <p>{t.currentEmployees}: <strong>{companyUsers.length}</strong></p>
-            <button type="button" onClick={() => setShowOverview(v => !v)} className="bg-cyan-700 text-white px-4 py-2.5 rounded-lg text-sm">📋 {(t as any).overviewBtn || "Übersicht"} {showOverview ? "▲" : "▼"}</button>
-          </div>
-          {showOverview && (
-            <div className="border border-slate-200 rounded-xl overflow-x-auto">
-              <table className="w-full text-sm text-left border-collapse">
-                <thead>
-                  <tr className="bg-gray-100">
-                    <th className="px-3 py-2 font-bold">{(t as any).nameLabel || "Name"}</th>
-                    <th className="px-3 py-2 font-bold">{t.role}</th>
-                    <th className="px-3 py-2 font-bold">🌐 {(t as any).languageLabel || "Sprache"}</th>
-                    <th className="px-3 py-2 font-bold">{(t as any).nationalityLabel || "Nationalität"}</th>
-                    <th className="px-3 py-2 font-bold">📞 {(t as any).phoneLabel || "Telefon"}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[...companyUsers].sort((a: any, b: any) => (a.full_name || a.email || "").localeCompare(b.full_name || b.email || "")).map((m: any) => (
-                    <tr key={m.id} className="border-t border-slate-200">
-                      <td className="px-3 py-2">{m.full_name || m.email || "-"}</td>
-                      <td className="px-3 py-2">{roleLabel(m.role)}</td>
-                      <td className="px-3 py-2">{m.preferred_language || "-"}</td>
-                      <td className="px-3 py-2">{m.nationality || "-"}</td>
-                      <td className="px-3 py-2">{m.phone || "-"}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+          <p>{t.currentEmployees}: <strong>{companyUsers.length}</strong></p>
           <div className="space-y-3">
             {companyUsers.map((member) => (
               <div key={member.id} className="border border-slate-200 rounded-xl p-3 shadow-sm space-y-2">
