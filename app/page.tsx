@@ -3720,6 +3720,9 @@ export default function Home() {
   const [instructionProject, setInstructionProject] = useState("");
   const [instructionCustomer, setInstructionCustomer] = useState("");
   const [instructionSite, setInstructionSite] = useState("");
+  const [instructionStreet, setInstructionStreet] = useState("");
+  const [instructionZip, setInstructionZip] = useState("");
+  const [instructionCity, setInstructionCity] = useState("");
   const [instructionDescription, setInstructionDescription] = useState("");
   const [instructionTasks, setInstructionTasks] = useState<string[]>([""]);
   const [instructionPhotos, setInstructionPhotos] = useState<string[]>([]);
@@ -4544,6 +4547,9 @@ export default function Home() {
     setInstructionProject(instruction.project || "");
     setInstructionCustomer(instruction.customer || "");
     setInstructionSite(instruction.site || "");
+    setInstructionStreet(instruction.street || "");
+    setInstructionZip(instruction.zip || "");
+    setInstructionCity(instruction.city || "");
     setInstructionDescription(instruction.description || "");
     setInstructionProblems(instruction.problems_text || "");
     setInstructionMaterial(instruction.material || "");
@@ -4567,7 +4573,7 @@ export default function Home() {
   // Bearbeiten abbrechen und Formular leeren.
   function cancelEditInstruction() {
     setEditingInstructionId(null);
-    setInstructionTitle(""); setInstructionProject(""); setInstructionCustomer(""); setInstructionSite(""); setInstructionDescription(""); setInstructionTasks([""]); setInstructionProblems(""); setInstructionMaterial(""); setInstructionWerkzeug(""); setInstructionPhotos([]); setInstructionTaskPhotos({}); setInstructionTaskStatuses({}); setAssignedUserIds([]); setSelectedProjectId(""); setInstructionDate("");
+    setInstructionTitle(""); setInstructionProject(""); setInstructionCustomer(""); setInstructionSite(""); setInstructionStreet(""); setInstructionZip(""); setInstructionCity(""); setInstructionDescription(""); setInstructionTasks([""]); setInstructionProblems(""); setInstructionMaterial(""); setInstructionWerkzeug(""); setInstructionPhotos([]); setInstructionTaskPhotos({}); setInstructionTaskStatuses({}); setAssignedUserIds([]); setSelectedProjectId(""); setInstructionDate("");
     setMessage("");
   }
 
@@ -4576,7 +4582,7 @@ export default function Home() {
     if (!currentCompany) { setMessage(t.msgNoFirm); return; }
     if (!instructionTitle.trim()) { setMessage(t.msgNoTitle); return; }
     await ensureFreshSession();
-    const instructionPayload = { company_id: currentCompany.company_id, project_id: selectedProjectId || null, work_date: instructionDate || null, assigned_user_ids: assignedUserIds, title: instructionTitle, project: instructionProject, customer: instructionCustomer, site: instructionSite, description: instructionDescription, problems_text: instructionProblems, material: instructionMaterial, werkzeug: instructionWerkzeug, photos: instructionPhotos };
+    const instructionPayload = { company_id: currentCompany.company_id, project_id: selectedProjectId || null, work_date: instructionDate || null, assigned_user_ids: assignedUserIds, title: instructionTitle, project: instructionProject, customer: instructionCustomer, site: instructionSite, street: instructionStreet, zip: instructionZip, city: instructionCity, description: instructionDescription, problems_text: instructionProblems, material: instructionMaterial, werkzeug: instructionWerkzeug, photos: instructionPhotos };
     let instruction: any; let error: any;
     if (editingInstructionId) {
       const upd = await dbTimeout(supabase.from("work_instructions").update(instructionPayload).eq("id", editingInstructionId).select().single());
@@ -4603,7 +4609,7 @@ export default function Home() {
       const { error: taskError } = await dbTimeout(supabase.from("work_instruction_tasks").insert(taskRows));
       if (taskError) { setMessage("Arbeitsanweisung gespeichert, aber Schritte nicht: " + taskError.message); return; }
     }
-    setInstructionTitle(""); setInstructionProject(""); setInstructionCustomer(""); setInstructionSite(""); setInstructionDescription(""); setInstructionTasks([""]); setInstructionProblems(""); setInstructionMaterial(""); setInstructionWerkzeug(""); setInstructionPhotos([]); setInstructionTaskPhotos({}); setInstructionTaskStatuses({}); setAssignedUserIds([]); setEditingInstructionId(null);
+    setInstructionTitle(""); setInstructionProject(""); setInstructionCustomer(""); setInstructionSite(""); setInstructionStreet(""); setInstructionZip(""); setInstructionCity(""); setInstructionDescription(""); setInstructionTasks([""]); setInstructionProblems(""); setInstructionMaterial(""); setInstructionWerkzeug(""); setInstructionPhotos([]); setInstructionTaskPhotos({}); setInstructionTaskStatuses({}); setAssignedUserIds([]); setEditingInstructionId(null);
     await loadWorkInstructions(currentCompany.company_id);
     setMessage(t.msgInstructionSaved);
   }
@@ -5091,7 +5097,7 @@ export default function Home() {
       if (idx < 0) idx = baseDays.findIndex((d) => !(d.description || "").trim());
       if (idx < 0) idx = 0;
       const existingDesc = (baseDays[idx].description || "").trim();
-      baseDays[idx] = { ...baseDays[idx], customer: baseDays[idx].customer || instruction.customer || "", projectNumber: baseDays[idx].projectNumber || instruction.project || "", site: baseDays[idx].site || instruction.site || "", description: existingDesc ? `${existingDesc}\n─────\n${description}` : description };
+      baseDays[idx] = { ...baseDays[idx], customer: baseDays[idx].customer || instruction.customer || "", projectNumber: baseDays[idx].projectNumber || instruction.project || "", site: baseDays[idx].site || formatProjectAddress(instruction) || "", description: existingDesc ? `${existingDesc}\n─────\n${description}` : description };
       setDays(baseDays); setCurrentReportId(targetReport.id); setReportName(targetReport.report_name || ""); setReportLoaded(true); setReportVersion((v) => v + 1); setReportInstruction(instruction); setActiveTab("regiebericht"); setMessage(t.msgReportPrepared);
       return;
     }
@@ -5108,7 +5114,7 @@ export default function Home() {
     }
     const targetIndex = targetDate ? copy.findIndex((day) => day.date === targetDate) : 0;
     const indexToUse = targetIndex >= 0 ? targetIndex : 0;
-    copy[indexToUse] = { ...copy[indexToUse], customer: instruction.customer || "", projectNumber: instruction.project || "", site: instruction.site || "", description, photos: [] };
+    copy[indexToUse] = { ...copy[indexToUse], customer: instruction.customer || "", projectNumber: instruction.project || "", site: formatProjectAddress(instruction) || "", description, photos: [] };
     setDays(copy); setCurrentReportId(null); setReportName(""); setReportLoaded(false); setReportVersion((v) => v + 1); setReportInstruction(instruction); setActiveTab("regiebericht"); setMessage(t.msgReportPrepared);
   }
 
@@ -5365,7 +5371,7 @@ export default function Home() {
     }
     y += 10; if (y < 78) y = 78;
     doc.setFontSize(10);
-    doc.text(sanitizePdfText(`${p.site}: ${inst.site || "-"}`), marginLeft, y); y += 6;
+    doc.text(sanitizePdfText(`${p.site}: ${formatProjectAddress(inst) || "-"}`), marginLeft, y); y += 6;
     doc.text(sanitizePdfText(`${t.date}: ${inst.work_date || "-"}`), marginLeft, y); y += 8;
     const block = async (label: string, value: string) => {
       const v = (value || "").trim();
@@ -5864,6 +5870,8 @@ export default function Home() {
                         <p><strong>{t.date}:</strong> {instruction.work_date || "-"}</p>
                         <p><strong>{t.customer}:</strong> {instruction.customer || "-"}</p>
                         <p><strong>{t.site}:</strong> {instruction.site || "-"}</p>
+                        {instruction.street && <p><strong>{t.street}:</strong> {instruction.street}</p>}
+                        {(instruction.zip || instruction.city) && <p><strong>{t.zip} / {t.city}:</strong> {[instruction.zip, instruction.city].filter(Boolean).join(" ")}</p>}
                         {instruction.problems_text && <p><strong>{t.problems}:</strong> {getTranslated(instruction.id, "problems_text", instruction.problems_text)}</p>}
                         {(instruction.work_instruction_tasks || []).length > 0 && (<ul className="list-disc pl-6 space-y-1">{instruction.work_instruction_tasks.map((task: any) => (<li key={task.id}>{task.status === "completed" ? t.statusCompleted : task.status === "in_progress" ? t.statusInProgress : task.status === "stopped" ? t.statusStopped : t.statusOpen}{" "}{getTranslatedTask(instruction.id, task.id, task.task_text)}{task.note && <div className="text-sm text-gray-600 ml-2">{t.feedbackLabel}: {task.note}</div>}</li>))}</ul>)}
                         {companyFeatures?.module_auto_reports ? (<button type="button" onClick={() => { setTransferInst(instruction); loadReportsFromDatabase(); }} className="bg-green-700 text-white px-3 py-2.5 rounded-lg">{t.toReport}</button>) : (<p className="text-sm text-gray-500">{t.autoReportLocked}</p>)}
@@ -5890,12 +5898,17 @@ export default function Home() {
             <h2 className="text-xl font-bold">{editingInstructionId ? "✏️ " + (instructionTitle || t.newInstruction) : t.newInstruction}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <input className="border p-3 text-black bg-white" placeholder={t.instructionTitle} value={instructionTitle} onChange={(e) => setInstructionTitle(e.target.value)} />
-              <select className="border p-3 text-black bg-white" value={selectedProjectId} onChange={(e) => { const pid = e.target.value; setSelectedProjectId(pid); const sp = projects.find((p) => p.id === pid); if (sp) { setInstructionProject(sp.name || ""); setInstructionCustomer(sp.customer || ""); setInstructionSite(formatProjectAddress(sp)); } }}>
+              <select className="border p-3 text-black bg-white" value={selectedProjectId} onChange={(e) => { const pid = e.target.value; setSelectedProjectId(pid); const sp = projects.find((p) => p.id === pid); if (sp) { setInstructionProject(sp.name || ""); setInstructionCustomer(sp.customer || ""); setInstructionSite(sp.site || ""); setInstructionStreet(sp.street || ""); setInstructionZip(sp.zip || ""); setInstructionCity(sp.city || ""); } }}>
                 <option value="">{t.selectProject}</option>
                 {projects.map((project) => <option key={project.id} value={project.id}>{project.name}</option>)}
               </select>
               <input className="border p-3 text-black bg-white" placeholder={t.customer} value={instructionCustomer} onChange={(e) => setInstructionCustomer(e.target.value)} />
               <input className="border p-3 text-black bg-white" placeholder={t.site} value={instructionSite} onChange={(e) => setInstructionSite(e.target.value)} />
+              <input className="border p-3 text-black bg-white" placeholder={t.street} value={instructionStreet} onChange={(e) => setInstructionStreet(e.target.value)} />
+              <div className="grid grid-cols-2 gap-2">
+                <input className="border p-3 text-black bg-white" placeholder={t.zip} value={instructionZip} onChange={(e) => setInstructionZip(e.target.value)} />
+                <input className="border p-3 text-black bg-white" placeholder={t.city} value={instructionCity} onChange={(e) => setInstructionCity(e.target.value)} />
+              </div>
               <input type="date" className="border p-3 text-black bg-white" value={instructionDate} onChange={(e) => setInstructionDate(e.target.value)} />
             </div>
             {/* Mitarbeiter zuweisen – Mehrfachauswahl */}
@@ -5995,6 +6008,7 @@ export default function Home() {
                       {openInstrCards[instruction.id] && (
                         <div className="mt-2 space-y-2">
                           <p className="text-sm text-gray-600">{t.site}: {instruction.site || "-"}</p>
+                          {(instruction.street || instruction.zip || instruction.city) && (<p className="text-sm text-gray-600">{[instruction.street, [instruction.zip, instruction.city].filter(Boolean).join(" ")].filter(Boolean).join(", ")}</p>)}
                           <div className="flex gap-2 flex-wrap">
                             <button type="button" onClick={() => createInstructionPDF(instruction)} className="bg-slate-700 text-white px-3 py-2.5 rounded-lg text-sm">📄 PDF</button>
                             {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => startEditInstruction(instruction)} className="bg-amber-600 text-white px-3 py-2.5 rounded-lg text-sm">✏️ {t.loadEdit}</button>)}
@@ -6136,7 +6150,7 @@ export default function Home() {
                 <div className="flex justify-between items-start cursor-pointer select-none" onClick={() => { const willOpen = !openDayCards[instruction.id]; setOpenDayCards(prev => ({ ...prev, [instruction.id]: !prev[instruction.id] })); if (willOpen) markInstructionRead(instruction.id); }}>
                   <div>
                     <h3 className="font-bold text-lg">{openDayCards[instruction.id] ? "▾" : "▸"} {getTranslated(instruction.id, "title", instruction.title)}</h3>
-                    <p className="text-sm text-gray-600 ml-5"><strong>{t.project}:</strong> {instruction.project || "-"} &nbsp;·&nbsp; <strong>{t.site}:</strong> {instruction.site || "-"}</p>
+                    <p className="text-sm text-gray-600 ml-5"><strong>{t.project}:</strong> {instruction.project || "-"} &nbsp;·&nbsp; <strong>{t.site}:</strong> {instruction.site || "-"}{(instruction.street || instruction.zip || instruction.city) ? `, ${[instruction.street, [instruction.zip, instruction.city].filter(Boolean).join(" ")].filter(Boolean).join(", ")}` : ""}</p>
                   </div>
                   <span className="text-sm text-gray-500">{instruction.work_date}</span>
                 </div>
