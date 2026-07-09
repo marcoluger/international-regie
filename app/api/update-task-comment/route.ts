@@ -1,143 +1,71 @@
-import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { rateLimit } from "../../../lib/rateLimit";
 
-// /api/translate
-// Uebersetzt Text von fromLanguage nach toLanguage – in BEIDE Richtungen.
-// Mit Datenbank-Cache: jeder Text wird pro Zielsprache nur EINMAL an OpenAI geschickt,
-// danach kommt das Ergebnis aus der Tabelle translation_cache (spart OpenAI-Anfragen).
-// Body (POST): { description, fromLanguage, toLanguage }  ->  { translation } | { error }
+export const runtime = "nodejs";
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-  process.env.SUPABASE_SERVICE_ROLE_KEY || ""
-);
+// /api/update-task-comment
+// Speichert den Kommentar eines Arbeitsschritts (work_instruction_tasks.employee_comment).
+// Body (POST): { taskId, comment, lang } -> { success } | { error }
+// Nutzt den Service-Role-Key (umgeht RLS), prueft aber die Anmeldung.
 
-function getApiKey(): string | null {
-  const names = ["OPENAI_API_KEY", "OPENAI_KEY", "OPENAI_SECRET_KEY", "OPENAI_APIKEY", "OPEN_AI_API_KEY"];
-  for (const n of names) {
-    const v = process.env[n];
-    if (v && v.trim()) return v;
-  }
-  return null;
-}
-
-// Stabiler Schluessel pro (Quelle|Ziel|Text)
-async function hashKey(s: string): Promise<string> {
+export async function POST(request: Request) {
   try {
-    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
-    return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
-  } catch {
-    let h = 0;
-    for (let i = 0; i < s.length; i++) { h = (h * 31 + s.charCodeAt(i)) | 0; }
-    return "fb_" + (h >>> 0).toString(16) + "_" + s.length;
-  }
-}
-
-async function cacheGet(key: string): Promise<string | null> {
-  try {
-    const { data } = await supabaseAdmin
-      .from("translation_cache")
-      .select("translation")
-      .eq("cache_key", key)
-      .maybeSingle();
-    return data?.translation ?? null;
-  } catch {
-    return null;
-  }
-}
-
-async function cacheSet(key: string, translation: string): Promise<void> {
-  try {
-    await supabaseAdmin
-      .from("translation_cache")
-      .upsert({ cache_key: key, translation }, { onConflict: "cache_key" });
-  } catch {
-    /* Cache ist optional – Fehler hier ignorieren */
-  }
-}
-
-export async function POST(req: Request) {
-  try {
-    const body = await req.json();
-    const description: string = body?.description ?? "";
-    const fromLanguage: string = body?.fromLanguage ?? "Deutsch";
-    const toLanguage: string = body?.toLanguage ?? "Deutsch";
-
-    // Nichts zu uebersetzen
-    if (!description || !description.trim()) {
-      return NextResponse.json({ translation: "" });
-    }
-    // Gleiche Sprache -> Originaltext zurueckgeben
-    if (!toLanguage || fromLanguage === toLanguage) {
-      return NextResponse.json({ translation: description });
-    }
-
-    // Schritt 1: Cache pruefen – kein OpenAI-Aufruf, wenn schon vorhanden.
-    // WICHTIG: Cache-Treffer werden NICHT rate-limitiert (sonst bricht der Sprachwechsel-Schwung).
-    const cacheKey = await hashKey(`${fromLanguage}|||${toLanguage}|||${description}`);
-    const cached = await cacheGet(cacheKey);
-    if (cached != null) {
-      return NextResponse.json({ translation: cached, cached: true });
-    }
-
-    const key = getApiKey();
-    if (!key) {
-      return NextResponse.json({ error: "Kein OpenAI-API-Key gefunden." }, { status: 500 });
-    }
-
-    // Rate-Limiting NUR fuer echte OpenAI-Aufrufe (greift nur, wenn Upstash konfiguriert ist).
-    const limited = await rateLimit(req, "translate");
+    // Rate-Limiting (greift nur, wenn Upstash konfiguriert ist)
+    const limited = await rateLimit(request, "standard");
     if (limited) return limited;
 
-    // Schritt 2: OpenAI aufrufen – mit Timeout, damit die Route NIE haengt (sonst wird die
-    // Funktion irgendwann von der Plattform gekillt und der Client bekommt keine Antwort).
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 25000);
-    let res: Response;
-    try {
-      res = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          temperature: 0,
-          messages: [
-            {
-              role: "system",
-              content:
-                `Du bist ein professioneller Uebersetzer fuer Bau- und Handwerks-Regieberichte. ` +
-                `Uebersetze den folgenden Text von ${fromLanguage} nach ${toLanguage}. ` +
-                `Erkenne die Ausgangssprache notfalls selbst, falls sie abweicht. ` +
-                `Gib ausschliesslich die reine Uebersetzung zurueck – ohne Anfuehrungszeichen, ohne Erklaerungen, ohne Zusaetze. ` +
-                `Behalte Fachbegriffe, Mengen, Masse und Eigennamen sinngemaess bei.`,
-            },
-            { role: "user", content: description },
-          ],
-        }),
-        signal: controller.signal,
-      });
-    } catch (e: any) {
-      clearTimeout(timeoutId);
-      const msg = e?.name === "AbortError" ? "Uebersetzung hat zu lange gedauert (Timeout)." : String(e?.message || e);
-      return NextResponse.json({ error: msg }, { status: 504 });
+    const { taskId, comment, lang } = await request.json();
+    if (!taskId) {
+      return Response.json({ error: "taskId fehlt." }, { status: 400 });
     }
-    clearTimeout(timeoutId);
-
-    const data = await res.json();
-    if (!res.ok) {
-      const status = res.status === 429 ? 429 : 500;
-      return NextResponse.json({ error: data?.error?.message || "Uebersetzung fehlgeschlagen." }, { status });
-    }
-    const translation: string = data?.choices?.[0]?.message?.content?.trim() || description;
-
-    // Schritt 3: Nur echte Uebersetzungen cachen
-    if (translation && translation !== description) {
-      await cacheSet(cacheKey, translation);
+    if (typeof comment !== "string") {
+      return Response.json({ error: "Kommentar fehlt." }, { status: 400 });
     }
 
-    return NextResponse.json({ translation });
-  } catch (err: any) {
-    return NextResponse.json({ error: String(err?.message || err) }, { status: 500 });
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+    if (!url || !serviceKey) {
+      return Response.json({ error: "Server-Konfiguration fehlt." }, { status: 500 });
+    }
+
+    const supabaseAdmin = createClient(url, serviceKey, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+
+    // 1) AUTHENTIFIZIERUNG: gueltige Sitzung verlangen
+    const authHeader = request.headers.get("authorization") || "";
+    const token = authHeader.replace(/^Bearer\s+/i, "").trim();
+    if (!token) {
+      return Response.json({ error: "Nicht angemeldet." }, { status: 401 });
+    }
+    const { data: userData, error: userErr } = await supabaseAdmin.auth.getUser(token);
+    const caller = userData?.user;
+    if (userErr || !caller) {
+      return Response.json({ error: "Ungueltige oder abgelaufene Sitzung." }, { status: 401 });
+    }
+
+    // 2) SPEICHERN – auf max. 1000 Zeichen begrenzen
+    const cleanComment = comment.slice(0, 1000);
+    const updatePayload: Record<string, any> = { employee_comment: cleanComment };
+    if (typeof lang === "string" && lang.trim()) updatePayload.comment_lang = lang.trim();
+
+    const { data, error } = await supabaseAdmin
+      .from("work_instruction_tasks")
+      .update(updatePayload)
+      .eq("id", taskId)
+      .select("id");
+
+    // Echten DB-Fehler zurueckgeben (nicht mehr still "200")
+    if (error) {
+      return Response.json({ error: error.message }, { status: 500 });
+    }
+    // Kein Treffer -> die taskId existiert nicht (sonst wuerde man einen Fehler nie sehen)
+    if (!data || data.length === 0) {
+      return Response.json({ error: "Arbeitsschritt nicht gefunden (taskId ohne Treffer)." }, { status: 404 });
+    }
+
+    return Response.json({ success: true });
+  } catch (error) {
+    return Response.json({ error: String(error) }, { status: 500 });
   }
 }
