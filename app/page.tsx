@@ -4536,11 +4536,15 @@ export default function Home() {
       setInstructionTranslations((prev) => {
         const next: Record<string, any> = { ...prev };
         for (const id of ids) {
+          // WICHTIG: Nur Eintraege der GLEICHEN Sprache weiterverwenden. Sonst blieben Texte
+          // einer frueheren Ziel-Sprache (z. B. Englisch) stehen und wuerden faelschlich als
+          // Uebersetzung der aktuellen Sprache angezeigt (gemischte Sprachen in der Anzeige).
+          const base = next[id]?.language === targetLang ? next[id] : {};
           next[id] = {
-            ...next[id],
+            ...base,
             ...(fieldUpdates[id] || {}),
             language: targetLang,
-            tasks: { ...next[id]?.tasks, ...(taskUpdates[id] || {}) },
+            tasks: { ...(base?.tasks || {}), ...(taskUpdates[id] || {}) },
           };
         }
         return next;
