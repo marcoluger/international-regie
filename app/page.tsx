@@ -4902,6 +4902,14 @@ export default function Home() {
     return [p?.site, p?.street, zc].map((x: any) => (x || "").toString().trim()).filter(Boolean).join(", ");
   }
 
+  // Liefert die Projekte, die in einem Bericht vorkommen (fuer die Anzeige hinter dem Namen).
+  function reportProjects(r: any): string {
+    const list = (r?.days || [])
+      .map((d: any) => (d?.projectNumber || "").toString().trim())
+      .filter(Boolean);
+    return Array.from(new Set(list)).join(", ");
+  }
+
   async function saveProject() {
     if (!currentCompany) return;
     await ensureFreshSession();
@@ -5818,7 +5826,7 @@ export default function Home() {
             <button type="button" onClick={saveReport} className="bg-orange-600 text-white px-4 py-3 rounded-lg">{currentReportId ? t.updateReport : t.saveReport}</button>
             <button type="button" onClick={() => { newReport(); setMessage(t.msgNewReport); }} className="bg-gray-700 text-white px-4 py-3 rounded-lg">{t.newReport}</button>
           </div>
-          {savedReports.length > 0 && (<div className="space-y-2"><h3 className="font-bold">{t.savedReports}</h3>{savedReports.map((report) => (<div key={report.id} className="border border-slate-200 rounded-xl p-3 shadow-sm space-y-2"><strong>{report.report_name}</strong><p className="text-sm text-gray-700">{t.employee}: {report.employee || "-"} | {new Date(report.created_at).toLocaleString("de-DE")}</p><div className="flex gap-2"><button type="button" onClick={() => loadReport(report)} className="bg-cyan-600 text-white px-3 py-2.5 rounded-lg">{t.loadEdit}</button><button type="button" onClick={() => deleteReport(report.id)} className="bg-red-600 text-white px-3 py-2.5 rounded-lg">{t.delete}</button></div></div>))}</div>)}
+          {savedReports.length > 0 && (<div className="space-y-2"><h3 className="font-bold">{t.savedReports}</h3>{savedReports.map((report) => (<div key={report.id} className="border border-slate-200 rounded-xl p-3 shadow-sm space-y-2"><strong>{report.report_name}</strong>{reportProjects(report) ? <span className="text-xs text-cyan-700"> · {reportProjects(report)}</span> : null}<p className="text-sm text-gray-700">{t.employee}: {report.employee || "-"} | {new Date(report.created_at).toLocaleString("de-DE")}</p><div className="flex gap-2"><button type="button" onClick={() => loadReport(report)} className="bg-cyan-600 text-white px-3 py-2.5 rounded-lg">{t.loadEdit}</button><button type="button" onClick={() => deleteReport(report.id)} className="bg-red-600 text-white px-3 py-2.5 rounded-lg">{t.delete}</button></div></div>))}</div>)}
         </section>
       )}
 
@@ -5890,7 +5898,7 @@ export default function Home() {
                     ))}
                     {workInstructions.filter((i) => i.project_id === project.id).length === 0 && <p className="text-gray-600">{t.noInstructions}</p>}
                     <h4 className="font-bold mt-2">{t.reportsTab}</h4>
-                    {savedReports.filter((r: any) => r.project_id === project.id).map((report: any) => (<div key={report.id} className="border border-slate-200 rounded-xl p-3 shadow-sm bg-white"><strong>{report.report_name}</strong><p>{t.employee}: {report.employee || "-"}</p></div>))}
+                    {savedReports.filter((r: any) => r.project_id === project.id).map((report: any) => (<div key={report.id} className="border border-slate-200 rounded-xl p-3 shadow-sm bg-white"><strong>{report.report_name}</strong>{reportProjects(report) ? <span className="text-xs text-cyan-700"> · {reportProjects(report)}</span> : null}<p>{t.employee}: {report.employee || "-"}</p></div>))}
                     {savedReports.filter((r: any) => r.project_id === project.id).length === 0 && <p className="text-gray-600">{t.noReports}</p>}
                   </div>
                 )}
@@ -6060,16 +6068,17 @@ export default function Home() {
                   {group.reports.map((r) => (
                     <div key={r.id} className="p-3 space-y-2">
                       <button type="button" onClick={() => { const willOpen = teamOpenId !== r.id; setTeamOpenId(willOpen ? r.id : null); if (willOpen) translateTeamReport(r); }} className="w-full text-left flex justify-between items-center gap-2">
-                        <span className="truncate"><strong>{r.report_name}</strong> <span className="text-xs text-gray-500">{new Date(r.created_at).toLocaleString("de-DE")}</span></span>
+                        <span className="truncate"><strong>{r.report_name}</strong>{reportProjects(r) ? <span className="text-xs text-cyan-700"> · {reportProjects(r)}</span> : null} <span className="text-xs text-gray-500">{new Date(r.created_at).toLocaleString("de-DE")}</span></span>
                         <span className="text-gray-400">{teamOpenId === r.id ? "▲" : "▼"}</span>
                       </button>
                       {teamOpenId === r.id && (
                         <div className="space-y-2 pt-1">
-                          {(r.days || []).map((d, di) => ({ d, di })).filter((x) => x.d.description || x.d.customer || x.d.projectNumber || x.d.site || x.d.hours || ((x.d.photos || []).length > 0)).map(({ d, di }) => (
+                          {(r.days || []).map((d, di) => ({ d, di })).filter((x) => x.d.description || x.d.customer || x.d.projectNumber || x.d.site || x.d.hours || x.d.startTime || x.d.endTime || x.d.travelOutStart || x.d.travelReturnStart || x.d.travelOutKm || x.d.travelReturnKm || ((x.d.photos || []).length > 0)).map(({ d, di }) => (
                             <div key={di} className="border rounded-lg p-2 bg-gray-50 text-sm space-y-1">
                               <p className="font-semibold">{(() => { const wi = weekdays.indexOf(d.weekday); return (wi >= 0 && t.weekdays[wi]) ? t.weekdays[wi] : d.weekday; })()}{d.date ? ` – ${d.date}` : ""}</p>
                               <p>{t.customer}: {d.customer || "-"} | {t.projectNumber}: {d.projectNumber || "-"}</p>
                               <p>{t.site}: {d.site || "-"} | {t.hours}: {d.hours || "-"}</p>
+                              {(d.startTime || d.endTime || d.breakMinutes) && (<p>{t.startTime}: {d.startTime || "-"} | {t.endTime}: {d.endTime || "-"} | {t.breakLabel}: {d.breakMinutes ? `${d.breakMinutes} min` : "-"}</p>)}
                               {(d.travelOutStart || d.travelOutEnd || d.travelOutKm || d.travelReturnStart || d.travelReturnEnd || d.travelReturnKm) && (<p className="text-xs text-gray-600">{t.travelTime}: {t.travelOut} {d.travelOutStart || "-"}–{d.travelOutEnd || "-"} {d.travelOutKm ? d.travelOutKm + " km" : ""} | {t.travelReturn} {d.travelReturnStart || "-"}–{d.travelReturnEnd || "-"} {d.travelReturnKm ? d.travelReturnKm + " km" : ""}</p>)}
                               {d.description && (<p className="whitespace-pre-wrap break-words">{(teamTrans[r.id] && teamTrans[r.id].lang === uiLanguage && teamTrans[r.id].days[di]) || d.description}</p>)}
                               {(d.photos || []).length > 0 && (
@@ -6521,7 +6530,7 @@ export default function Home() {
               <div className="space-y-2 pt-2 border-t">
                 {savedReports.map((report) => (
                   <div key={report.id} className="flex items-center justify-between gap-2 border rounded-lg p-2">
-                    <span className="text-sm truncate"><strong>{report.report_name}</strong></span>
+                    <span className="text-sm truncate"><strong>{report.report_name}</strong>{reportProjects(report) ? <span className="text-xs text-cyan-700"> · {reportProjects(report)}</span> : null}</span>
                     <button type="button" onClick={() => { const inst = transferInst; setTransferInst(null); createReportFromInstruction(inst, report); }} className="bg-cyan-600 text-white px-3 py-2.5 rounded-lg text-sm whitespace-nowrap">{t.transferInsert}</button>
                   </div>
                 ))}
