@@ -72,9 +72,13 @@ export async function POST(request: Request) {
     }
 
     // 4) Eigenen Eintrag ersetzen – jeder Mitarbeiter hat genau EINEN Kommentar je Schritt,
-    // die Kommentare der anderen bleiben erhalten.
+    // die Kommentare der anderen bleiben erhalten. Alt-Eintraege ohne Benutzer-ID werden
+    // ueber den Namen zugeordnet, damit kein Doppel-Eintrag entsteht.
     const cleanComment = comment.slice(0, 1000);
-    list = list.filter((c: any) => c?.user_id !== caller.id);
+    const isMine = (c: any) =>
+      (c?.user_id && c.user_id === caller.id) ||
+      (!c?.user_id && c?.name && authorName && c.name === authorName);
+    list = list.filter((c: any) => !isMine(c));
     if (cleanComment.trim()) {
       list.push({
         user_id: caller.id,

@@ -3989,7 +3989,7 @@ export default function Home() {
         ...inst,
         work_instruction_tasks: (inst.work_instruction_tasks || []).map((tk: any) => {
           if (tk.id !== taskId) return tk;
-          const others = (Array.isArray(tk.comments) ? tk.comments : []).filter((c: any) => c.user_id !== user?.id);
+          const others = taskCommentList(tk).filter((c: any) => !isMyComment(c));
           const next = comment.trim()
             ? [...others, { user_id: user?.id, name: myName, text: comment, lang: uiLanguage }]
             : others;
@@ -4370,9 +4370,19 @@ export default function Home() {
   function commentKey(taskId: string, entry: any): string {
     return `comment_${taskId}_${entry?.user_id || entry?.name || "x"}`;
   }
+  // Anzeigename des angemeldeten Benutzers (fuer die Zuordnung von Kommentaren).
+  function myDisplayName(): string {
+    return (companyUsers.find((m: any) => m.user_id === user?.id)?.full_name) || user?.email || "";
+  }
+  // Gehoert dieser Kommentar mir? (per Benutzer-ID, bei Altdaten ersatzweise per Name)
+  function isMyComment(c: any): boolean {
+    if (c?.user_id && user?.id) return c.user_id === user.id;
+    if (!c?.user_id && c?.name) return c.name === myDisplayName();
+    return false;
+  }
   // Eigener Kommentar (des angemeldeten Benutzers) an einem Arbeitsschritt.
   function ownComment(task: any): any | null {
-    return taskCommentList(task).find((c: any) => c.user_id && c.user_id === user?.id) || null;
+    return taskCommentList(task).find((c: any) => isMyComment(c)) || null;
   }
 
   function getTranslated(instructionId: string, field: string, fallback: string): string {
@@ -5093,9 +5103,7 @@ export default function Home() {
     // bleiben in der Arbeitsanweisung (Tagesansicht) und wandern NICHT in den Bericht.
     const freshComments: Record<string, string> = {};
     for (const task of instruction.work_instruction_tasks || []) {
-      const mine = taskCommentList(task).filter(
-        (c: any) => ((c?.user_id && c.user_id === user?.id) || !c?.user_id) && (c?.text || "").trim()
-      );
+      const mine = taskCommentList(task).filter((c: any) => isMyComment(c) && (c?.text || "").trim());
       if (mine.length === 0) continue;
       const lines: string[] = [];
       for (const entry of mine) {
@@ -6250,7 +6258,7 @@ export default function Home() {
                       {(task.photos || []).length > 0 && companyFeatures?.photos_enabled && (<div className="grid grid-cols-3 gap-1">{(task.photos || []).map((photo: string, pi: number) => (<img key={pi} src={photo} alt="Foto" className="w-full h-16 object-cover rounded-lg" />))}</div>)}
                       {/* Kommentare: je Mitarbeiter ein eigener Eintrag */}
                       <div className="border-t pt-2 space-y-2">
-                        {taskCommentList(task).filter((c: any) => !(c.user_id && c.user_id === user?.id)).map((c: any, ci: number) => (
+                        {taskCommentList(task).filter((c: any) => !isMyComment(c)).map((c: any, ci: number) => (
                           <div key={ci} className="bg-gray-50 border rounded-lg p-2">
                             <p className="text-xs font-medium text-cyan-700">💬 {c.name || "?"}</p>
                             <p className="text-sm whitespace-pre-wrap break-words">{getTranslatedComment(instruction.id, task.id, c)}</p>
