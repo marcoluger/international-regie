@@ -6264,7 +6264,7 @@ export default function Home() {
                             <p className="text-sm whitespace-pre-wrap break-words">{getTranslatedComment(instruction.id, task.id, c)}</p>
                           </div>
                         ))}
-                        <p className="text-sm font-medium text-gray-700">💬 {t.commentLabel} (max. 1000 {t.charsLabel}):</p>
+                        <p className="text-sm font-medium text-gray-700">💬 {t.commentLabel} (max. 1000 {t.charsLabel}):{myDisplayName() ? <span className="ml-1 font-normal text-cyan-700">— {myDisplayName()}</span> : null}</p>
                         <textarea
                           className="border p-2 w-full rounded-lg text-sm text-black bg-white"
                           rows={5}
