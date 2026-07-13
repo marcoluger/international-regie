@@ -5237,7 +5237,9 @@ export default function Home() {
       doc.setFontSize(11); doc.setFont(FONT, "bold"); doc.text(`${wdLabel} - ${day.date || "-"}`, marginLeft + 3, y + 6); y += 13;
       doc.setFont(FONT, "normal"); doc.setFontSize(9);
       doc.text(`${p.customer}: ${day.customer || "-"}`, marginLeft + 3, y); doc.text(`${p.project}: ${day.projectNumber || "-"}`, marginLeft + 80, y); y += 6;
-      doc.text(`${p.site}: ${day.site || "-"}`, marginLeft + 3, y); doc.text(`${p.hours}: ${day.hours || "-"}`, marginLeft + 80, y); y += 6;
+      doc.text(`${p.hours}: ${day.hours || "-"}`, marginLeft + 3, y); y += 6;
+      const siteLines = doc.splitTextToSize(sanitizePdfText(`${p.site}: ${day.site || "-"}`), pageWidth - marginLeft - marginRight - 6);
+      siteLines.forEach((ln: string) => { doc.text(ln, marginLeft + 3, y); y += 6; });
       if (day.startTime || day.endTime || day.breakMinutes) { doc.text(`${p.startLabel}: ${day.startTime || "-"}   ${p.endLabel}: ${day.endTime || "-"}   ${p.pauseLabel}: ${day.breakMinutes ? day.breakMinutes + " min" : "-"}`, marginLeft + 3, y); y += 6; }
       if (day.travelOutStart || day.travelOutEnd || day.travelOutKm || day.travelReturnStart || day.travelReturnEnd || day.travelReturnKm) {
         doc.text(sanitizePdfText(`${t.travelTime}:`), marginLeft + 3, y); y += 6;
