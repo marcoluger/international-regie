@@ -44,10 +44,20 @@ export async function POST(request: Request) {
       return Response.json({ error: "Ungueltige oder abgelaufene Sitzung." }, { status: 401 });
     }
 
-    // 2) SPEICHERN – auf max. 1000 Zeichen begrenzen
+    // 2) Name des Absenders serverseitig ermitteln (nicht vom Client uebernehmen)
+    const { data: member } = await supabaseAdmin
+      .from("company_users")
+      .select("full_name, email")
+      .eq("user_id", caller.id)
+      .maybeSingle();
+    const authorName = member?.full_name || member?.email || "";
+
+    // 3) SPEICHERN – auf max. 1000 Zeichen begrenzen
     const cleanComment = comment.slice(0, 1000);
     const updatePayload: Record<string, any> = { employee_comment: cleanComment };
     if (typeof lang === "string" && lang.trim()) updatePayload.comment_lang = lang.trim();
+    // Autor nur setzen, wenn ein Kommentar dasteht (beim Leeren wieder entfernen)
+    updatePayload.comment_by = cleanComment.trim() ? authorName : null;
 
     const { data, error } = await supabaseAdmin
       .from("work_instruction_tasks")

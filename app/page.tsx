@@ -3983,6 +3983,14 @@ export default function Home() {
       // Uebersetzung blockiert; die Anzeige-Uebersetzung laeuft spaeter nicht-blockierend
       // ueber refreshCommentTranslations (beim Neuladen).
       setTaskComments(prev => ({ ...prev, [taskId]: comment }));
+      // Autor-Namen sofort lokal anzeigen (Server speichert ihn ebenfalls).
+      const myName = (companyUsers.find((m: any) => m.user_id === user?.id)?.full_name) || user?.email || "";
+      setWorkInstructions(prev => prev.map((inst: any) => ({
+        ...inst,
+        work_instruction_tasks: (inst.work_instruction_tasks || []).map((tk: any) =>
+          tk.id === taskId ? { ...tk, comment_by: comment.trim() ? myName : null } : tk
+        ),
+      })));
     } catch (err: any) {
       setCommentSaveState(prev => ({ ...prev, [taskId]: "error:" + String(err?.message || err) }));
       setMessage("Fehler beim Speichern: " + String(err?.message || err));
@@ -6176,7 +6184,7 @@ export default function Home() {
                       {(task.photos || []).length > 0 && companyFeatures?.photos_enabled && (<div className="grid grid-cols-3 gap-1">{(task.photos || []).map((photo: string, pi: number) => (<img key={pi} src={photo} alt="Foto" className="w-full h-16 object-cover rounded-lg" />))}</div>)}
                       {/* Mitarbeiter-Kommentar */}
                       <div className="border-t pt-2 space-y-2">
-                        <p className="text-sm font-medium text-gray-700">💬 {t.commentLabel} (max. 1000 {t.charsLabel}):</p>
+                        <p className="text-sm font-medium text-gray-700">💬 {t.commentLabel} (max. 1000 {t.charsLabel}):{task.comment_by ? <span className="ml-1 font-normal text-cyan-700">— {task.comment_by}</span> : null}</p>
                         <textarea
                           className="border p-2 w-full rounded-lg text-sm text-black bg-white"
                           rows={5}
