@@ -52,16 +52,42 @@ export async function POST(request: Request) {
       .maybeSingle();
     const authorName = member?.full_name || member?.email || "";
 
-    // 3) SPEICHERN – auf max. 1000 Zeichen begrenzen
+    // 3) Bestehende Kommentarliste des Arbeitsschritts laden
+    const { data: row, error: readErr } = await supabaseAdmin
+      .from("work_instruction_tasks")
+      .select("id, comments, employee_comment, comment_by, comment_lang")
+      .eq("id", taskId)
+      .maybeSingle();
+    if (readErr) {
+      return Response.json({ error: readErr.message }, { status: 500 });
+    }
+    if (!row) {
+      return Response.json({ error: "Arbeitsschritt nicht gefunden (taskId ohne Treffer)." }, { status: 404 });
+    }
+
+    let list: any[] = Array.isArray(row.comments) ? row.comments : [];
+    // Altdaten (einzelner Kommentar) einmalig in die Liste uebernehmen
+    if (list.length === 0 && (row.employee_comment || "").trim()) {
+      list = [{ user_id: null, name: row.comment_by || "", text: row.employee_comment, lang: row.comment_lang || "" }];
+    }
+
+    // 4) Eigenen Eintrag ersetzen – jeder Mitarbeiter hat genau EINEN Kommentar je Schritt,
+    // die Kommentare der anderen bleiben erhalten.
     const cleanComment = comment.slice(0, 1000);
-    const updatePayload: Record<string, any> = { employee_comment: cleanComment };
-    if (typeof lang === "string" && lang.trim()) updatePayload.comment_lang = lang.trim();
-    // Autor nur setzen, wenn ein Kommentar dasteht (beim Leeren wieder entfernen)
-    updatePayload.comment_by = cleanComment.trim() ? authorName : null;
+    list = list.filter((c: any) => c?.user_id !== caller.id);
+    if (cleanComment.trim()) {
+      list.push({
+        user_id: caller.id,
+        name: authorName,
+        text: cleanComment,
+        lang: typeof lang === "string" && lang.trim() ? lang.trim() : null,
+        at: new Date().toISOString(),
+      });
+    }
 
     const { data, error } = await supabaseAdmin
       .from("work_instruction_tasks")
-      .update(updatePayload)
+      .update({ comments: list })
       .eq("id", taskId)
       .select("id");
 
