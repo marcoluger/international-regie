@@ -71,23 +71,21 @@ export async function POST(request: Request) {
       list = [{ user_id: null, name: row.comment_by || "", text: row.employee_comment, lang: row.comment_lang || "" }];
     }
 
-    // 4) Eigenen Eintrag ersetzen – jeder Mitarbeiter hat genau EINEN Kommentar je Schritt,
-    // die Kommentare der anderen bleiben erhalten. Alt-Eintraege ohne Benutzer-ID werden
-    // ueber den Namen zugeordnet, damit kein Doppel-Eintrag entsteht.
+    // 4) Neuen Beitrag ANHAENGEN (Chat-Verlauf). Bestehende Beitraege – eigene wie fremde –
+    // bleiben erhalten. Aeltester zuerst; maximal 200 Beitraege je Arbeitsschritt.
     const cleanComment = comment.slice(0, 1000);
-    const isMine = (c: any) =>
-      (c?.user_id && c.user_id === caller.id) ||
-      (!c?.user_id && c?.name && authorName && c.name === authorName);
-    list = list.filter((c: any) => !isMine(c));
-    if (cleanComment.trim()) {
-      list.push({
-        user_id: caller.id,
-        name: authorName,
-        text: cleanComment,
-        lang: typeof lang === "string" && lang.trim() ? lang.trim() : null,
-        at: new Date().toISOString(),
-      });
+    if (!cleanComment.trim()) {
+      return Response.json({ error: "Kommentar ist leer." }, { status: 400 });
     }
+    list.push({
+      id: (globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`),
+      user_id: caller.id,
+      name: authorName,
+      text: cleanComment,
+      lang: typeof lang === "string" && lang.trim() ? lang.trim() : null,
+      at: new Date().toISOString(),
+    });
+    if (list.length > 200) list = list.slice(list.length - 200);
 
     const { data, error } = await supabaseAdmin
       .from("work_instruction_tasks")

@@ -3982,18 +3982,16 @@ export default function Home() {
       // Getippten Kommentar sofort anzeigen. Das Speichern wird NICHT von einer
       // Uebersetzung blockiert; die Anzeige-Uebersetzung laeuft spaeter nicht-blockierend
       // ueber refreshCommentTranslations (beim Neuladen).
-      setTaskComments(prev => ({ ...prev, [taskId]: comment }));
-      // Eigenen Eintrag sofort lokal in die Kommentarliste schreiben (Server speichert ebenso).
-      const myName = (companyUsers.find((m: any) => m.user_id === user?.id)?.full_name) || user?.email || "";
+      // Chat: Eingabefeld leeren, Beitrag lokal an den Verlauf anhaengen.
+      setTaskComments(prev => ({ ...prev, [taskId]: "" }));
+      const myName = myDisplayName();
       setWorkInstructions(prev => prev.map((inst: any) => ({
         ...inst,
         work_instruction_tasks: (inst.work_instruction_tasks || []).map((tk: any) => {
           if (tk.id !== taskId) return tk;
-          const others = taskCommentList(tk).filter((c: any) => !isMyComment(c));
-          const next = comment.trim()
-            ? [...others, { user_id: user?.id, name: myName, text: comment, lang: uiLanguage }]
-            : others;
-          return { ...tk, comments: next };
+          const list = taskCommentList(tk);
+          const entry = { id: `local-${Date.now()}`, user_id: user?.id, name: myName, text: comment, lang: uiLanguage, at: new Date().toISOString() };
+          return { ...tk, comments: [...list, entry] };
         }),
       })));
     } catch (err: any) {
@@ -4368,7 +4366,8 @@ export default function Home() {
   }
   // Schluessel fuer die Uebersetzung eines einzelnen Kommentars.
   function commentKey(taskId: string, entry: any): string {
-    return `comment_${taskId}_${entry?.user_id || entry?.name || "x"}`;
+    const idPart = entry?.id || `${entry?.name || "x"}_${(entry?.text || "").length}`;
+    return `comment_${taskId}_${idPart}`;
   }
   // Anzeigename des angemeldeten Benutzers (fuer die Zuordnung von Kommentaren).
   function myDisplayName(): string {
@@ -6258,9 +6257,9 @@ export default function Home() {
                       {(task.photos || []).length > 0 && companyFeatures?.photos_enabled && (<div className="grid grid-cols-3 gap-1">{(task.photos || []).map((photo: string, pi: number) => (<img key={pi} src={photo} alt="Foto" className="w-full h-16 object-cover rounded-lg" />))}</div>)}
                       {/* Kommentare: je Mitarbeiter ein eigener Eintrag */}
                       <div className="border-t pt-2 space-y-2">
-                        {taskCommentList(task).filter((c: any) => !isMyComment(c)).map((c: any, ci: number) => (
-                          <div key={ci} className="bg-gray-50 border rounded-lg p-2">
-                            <p className="text-xs font-medium text-cyan-700">💬 {c.name || "?"}</p>
+                        {taskCommentList(task).map((c: any, ci: number) => (
+                          <div key={c.id || ci} className={`border rounded-lg p-2 ${isMyComment(c) ? "bg-cyan-50 border-cyan-200" : "bg-gray-50"}`}>
+                            <p className="text-xs font-medium text-cyan-700">💬 {c.name || "?"}{c.at ? <span className="ml-1 font-normal text-gray-400">{new Date(c.at).toLocaleString("de-DE")}</span> : null}</p>
                             <p className="text-sm whitespace-pre-wrap break-words">{getTranslatedComment(instruction.id, task.id, c)}</p>
                           </div>
                         ))}
@@ -6270,23 +6269,23 @@ export default function Home() {
                           rows={5}
                           maxLength={1000}
                           placeholder={t.commentPlaceholder}
-                          value={taskComments[task.id] !== undefined ? taskComments[task.id] : (getTranslatedComment(instruction.id, task.id, ownComment(task)))}
+                          value={taskComments[task.id] || ""}
                           onChange={(e) => { setTaskComments(prev => ({ ...prev, [task.id]: e.target.value.slice(0, 1000) })); setCommentSaveState(prev => ({ ...prev, [task.id]: "" })); }}
                         />
                         <div className="flex items-center justify-between gap-2">
                           <span className="text-xs text-gray-500">
-                            {((taskComments[task.id] !== undefined ? taskComments[task.id] : getTranslatedComment(instruction.id, task.id, ownComment(task))) || "").length} / 1000 {t.charsLabel}
+                            {(taskComments[task.id] || "").length} / 1000 {t.charsLabel}
                           </span>
                           <div className="flex items-center gap-2">
                             {commentSaveState[task.id] === "saving" && <span className="text-xs text-gray-500">⏳ {t.commentSaving}</span>}
                             {commentSaveState[task.id] === "saved" && <span className="text-xs text-green-700 font-medium">✓ {t.commentSaved}</span>}
                             {commentSaveState[task.id]?.startsWith("error:") && <span className="text-xs text-red-600">{t.commentErrorLabel}: {commentSaveState[task.id].slice(6)}</span>}
-                            <button type="button" onClick={() => insertWeatherIntoComment(task.id, taskComments[task.id] !== undefined ? taskComments[task.id] : getTranslatedComment(instruction.id, task.id, ownComment(task)))} title={t.weather} className="bg-cyan-50 text-cyan-700 border border-cyan-200 px-3 py-2.5 rounded-lg text-sm">🌦️ {t.weather}</button>
+                            <button type="button" onClick={() => insertWeatherIntoComment(task.id, taskComments[task.id] || "")} title={t.weather} className="bg-cyan-50 text-cyan-700 border border-cyan-200 px-3 py-2.5 rounded-lg text-sm">🌦️ {t.weather}</button>
                             <button
                               type="button"
-                              disabled={commentSaveState[task.id] === "saving"}
+                              disabled={commentSaveState[task.id] === "saving" || !(taskComments[task.id] || "").trim()}
                               onClick={() => {
-                                const val = taskComments[task.id] !== undefined ? taskComments[task.id] : getTranslatedComment(instruction.id, task.id, ownComment(task));
+                                const val = taskComments[task.id] || "";
                                 updateTaskComment(task.id, val);
                               }}
                               className="bg-cyan-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50"
