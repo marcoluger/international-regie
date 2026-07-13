@@ -5097,15 +5097,14 @@ export default function Home() {
       Object.assign(currentTranslations, translatedFields);
     }
 
-    // Kommentare fuer den Regiebericht: NUR der EIGENE Kommentar des Erstellers.
-    // Der Regiebericht gehoert dem jeweiligen Mitarbeiter – Kommentare der anderen
-    // bleiben in der Arbeitsanweisung (Tagesansicht) und wandern NICHT in den Bericht.
+    // Kommentare fuer den Regiebericht: der KOMPLETTE Verlauf des Arbeitsschritts
+    // (alle Beitraege, jeweils mit Name), uebersetzt in die Sprache des Erstellers.
     const freshComments: Record<string, string> = {};
     for (const task of instruction.work_instruction_tasks || []) {
-      const mine = taskCommentList(task).filter((c: any) => isMyComment(c) && (c?.text || "").trim());
-      if (mine.length === 0) continue;
+      const entries = taskCommentList(task).filter((c: any) => (c?.text || "").trim());
+      if (entries.length === 0) continue;
       const lines: string[] = [];
-      for (const entry of mine) {
+      for (const entry of entries) {
         const parts = splitWeather((entry.text || "").trim());
         const loc = parts.weather.map((w) => localizeWeather(w, uiLanguage));
         let body = parts.body.trim();
@@ -5117,7 +5116,8 @@ export default function Home() {
           } catch { /* Original belassen */ }
         }
         const text = [body, ...loc].filter(Boolean).join("\n");
-        if (text) lines.push(text);
+        if (!text) continue;
+        lines.push(entry.name ? `${entry.name}: ${text}` : text);
       }
       if (lines.length > 0) freshComments[task.id] = lines.join("\n");
     }
