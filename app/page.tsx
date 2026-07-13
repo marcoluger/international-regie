@@ -6065,13 +6065,22 @@ export default function Home() {
                       </button>
                       {teamOpenId === r.id && (
                         <div className="space-y-2 pt-1">
-                          {(r.days || []).map((d, di) => ({ d, di })).filter((x) => x.d.description || x.d.customer || x.d.projectNumber || x.d.site || x.d.hours).map(({ d, di }) => (
+                          {(r.days || []).map((d, di) => ({ d, di })).filter((x) => x.d.description || x.d.customer || x.d.projectNumber || x.d.site || x.d.hours || ((x.d.photos || []).length > 0)).map(({ d, di }) => (
                             <div key={di} className="border rounded-lg p-2 bg-gray-50 text-sm space-y-1">
                               <p className="font-semibold">{(() => { const wi = weekdays.indexOf(d.weekday); return (wi >= 0 && t.weekdays[wi]) ? t.weekdays[wi] : d.weekday; })()}{d.date ? ` – ${d.date}` : ""}</p>
                               <p>{t.customer}: {d.customer || "-"} | {t.projectNumber}: {d.projectNumber || "-"}</p>
                               <p>{t.site}: {d.site || "-"} | {t.hours}: {d.hours || "-"}</p>
                               {(d.travelOutStart || d.travelOutEnd || d.travelOutKm || d.travelReturnStart || d.travelReturnEnd || d.travelReturnKm) && (<p className="text-xs text-gray-600">{t.travelTime}: {t.travelOut} {d.travelOutStart || "-"}–{d.travelOutEnd || "-"} {d.travelOutKm ? d.travelOutKm + " km" : ""} | {t.travelReturn} {d.travelReturnStart || "-"}–{d.travelReturnEnd || "-"} {d.travelReturnKm ? d.travelReturnKm + " km" : ""}</p>)}
                               {d.description && (<p className="whitespace-pre-wrap break-words">{(teamTrans[r.id] && teamTrans[r.id].lang === uiLanguage && teamTrans[r.id].days[di]) || d.description}</p>)}
+                              {(d.photos || []).length > 0 && (
+                                <div className="grid grid-cols-3 gap-2 pt-1">
+                                  {(d.photos || []).map((photo: string, pi: number) => (
+                                    <a key={pi} href={photo} target="_blank" rel="noopener noreferrer">
+                                      <img src={photo} alt="Foto" className="w-full h-20 object-cover rounded-lg border" />
+                                    </a>
+                                  ))}
+                                </div>
+                              )}
                             </div>
                           ))}
                           <div className="pt-1"><button type="button" onClick={() => createTeamPDF(r)} className="bg-cyan-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium">📄 {(t as any).pdf || "PDF"}</button></div>
