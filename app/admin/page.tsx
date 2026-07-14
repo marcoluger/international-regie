@@ -228,7 +228,28 @@ export default function AdminPage() {
       const res = await fetch("/api/admin-data", { method: "POST", headers: await authHeaders(), body: JSON.stringify({ action: "getContract", companyId }) });
       const data = await res.json();
       if (data.error) { setMessage("Fehler: " + data.error); return; }
-      setContractMap((prev) => ({ ...prev, [companyId]: data.contract || {} }));
+      // Vorbelegen mit den bereits bekannten Daten (nur leere Felder, nichts ueberschreiben).
+      const st = settingsMap[companyId] || {};
+      const ft = featuresMap[companyId] || {};
+      const comp = companies.find((x: any) => x.id === companyId);
+      const existing = data.contract || {};
+      const prefilled = {
+        active: true,
+        vat_rate: 19,
+        payment_terms: 14,
+        payment_method: "Überweisung",
+        customer_country: "DE",
+        ...existing,
+        customer_name:   existing.customer_name   || st.company_name || comp?.name || "",
+        customer_street: existing.customer_street || st.street        || "",
+        customer_zip:    existing.customer_zip    || st.zip_code      || "",
+        customer_city:   existing.customer_city   || st.city          || "",
+        vat_id:          existing.vat_id          || st.tax_number    || "",
+        invoice_email:   existing.invoice_email   || st.email         || "",
+        package:         existing.package         || ft.package_name  || "",
+        start_date:      existing.start_date      || (comp?.created_at ? String(comp.created_at).slice(0, 10) : ""),
+      };
+      setContractMap((prev) => ({ ...prev, [companyId]: prefilled }));
     } catch (e: any) {
       setMessage("Fehler: " + String(e?.message || e));
     }
