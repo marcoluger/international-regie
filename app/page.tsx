@@ -3751,6 +3751,7 @@ export default function Home() {
   const [projectCity, setProjectCity] = useState("");
   const [projectManager, setProjectManager] = useState("");
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
+  const [editingCommentId, setEditingCommentId] = useState<Record<string, string>>({});
   const [pmEdits, setPmEdits] = useState<Record<string, string>>({});
   const [selectedProjectId, setSelectedProjectId] = useState("");
   const [selectedProjectDetailId, setSelectedProjectDetailId] = useState("");
@@ -3959,7 +3960,47 @@ export default function Home() {
     refreshCommentTranslations(uiLanguage, instrs);
   }
 
-  async function updateTaskComment(taskId: string, comment: string) {
+  // Eigenen Chat-Beitrag loeschen (die Route laesst nur eigene Beitraege zu).
+  async function deleteTaskComment(taskId: string, commentId: string) {
+    if (typeof window !== "undefined" && !window.confirm((t as any).commentDeleteAsk || "Diesen Beitrag löschen?")) return;
+    setCommentSaveState(prev => ({ ...prev, [taskId]: "saving" }));
+    try {
+      let token = tokenRef.current;
+      if (!token) {
+        try {
+          const sess = await dbTimeout(supabase.auth.getSession(), 5000);
+          token = sess?.data?.session?.access_token || "";
+        } catch { /* Route antwortet dann mit 401 */ }
+      }
+      const res = await withTimeout(
+        fetch("/api/update-task-comment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ taskId, commentId, action: "delete" }),
+        }),
+        15000,
+        "Zeitüberschreitung beim Löschen (15s). Bitte erneut versuchen."
+      );
+      const data = await res.json();
+      if (!res.ok || data?.error) {
+        const msg = data?.error || `HTTP ${res.status}`;
+        setCommentSaveState(prev => ({ ...prev, [taskId]: "error:" + msg }));
+        setMessage("Fehler beim Löschen: " + msg);
+        return;
+      }
+      setCommentSaveState(prev => ({ ...prev, [taskId]: "saved" }));
+      setWorkInstructions(prev => prev.map((inst: any) => ({
+        ...inst,
+        work_instruction_tasks: (inst.work_instruction_tasks || []).map((tk: any) =>
+          tk.id === taskId ? { ...tk, comments: taskCommentList(tk).filter((c: any) => c.id !== commentId) } : tk
+        ),
+      })));
+    } catch (e: any) {
+      setCommentSaveState(prev => ({ ...prev, [taskId]: "error:" + String(e?.message || e) }));
+    }
+  }
+
+  async function updateTaskComment(taskId: string, comment: string, commentId?: string) {
     setCommentSaveState(prev => ({ ...prev, [taskId]: "saving" }));
     try {
       // Token aus dem Auth-Listener nehmen (nicht getSession(), das kann unter Last haengen).
@@ -3975,7 +4016,7 @@ export default function Home() {
         fetch("/api/update-task-comment", {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ taskId, comment, lang: uiLanguage }),
+          body: JSON.stringify({ taskId, comment, lang: uiLanguage, commentId: commentId || undefined }),
         }),
         15000,
         "Zeitüberschreitung beim Speichern (15s). Bitte erneut versuchen."
@@ -3994,12 +4035,20 @@ export default function Home() {
       // ueber refreshCommentTranslations (beim Neuladen).
       // Chat: Eingabefeld leeren (neuer Beitrag). Privat: eigener Text bleibt im Feld stehen.
       setTaskComments(prev => ({ ...prev, [taskId]: chatOn ? "" : comment }));
+      setEditingCommentId(prev => { const n = { ...prev }; delete n[taskId]; return n; });
       const myName = myDisplayName();
       setWorkInstructions(prev => prev.map((inst: any) => ({
         ...inst,
         work_instruction_tasks: (inst.work_instruction_tasks || []).map((tk: any) => {
           if (tk.id !== taskId) return tk;
           const list = taskCommentList(tk);
+          if (commentId) {
+            // Bearbeiteten Beitrag ersetzen (oder entfernen, wenn geleert)
+            const next = comment.trim()
+              ? list.map((c: any) => (c.id === commentId ? { ...c, text: comment, lang: uiLanguage, edited_at: new Date().toISOString() } : c))
+              : list.filter((c: any) => c.id !== commentId);
+            return { ...tk, comments: next };
+          }
           const base = chatOn ? list : list.filter((c: any) => !isMyComment(c));
           const entry = { id: `local-${Date.now()}`, user_id: user?.id, name: myName, text: comment, lang: uiLanguage, at: new Date().toISOString() };
           const next = comment.trim() ? [...base, entry] : base;
@@ -6298,7 +6347,15 @@ export default function Home() {
                       <div className="border-t pt-2 space-y-2">
                         {taskCommentList(task).filter((c: any) => chatOn || isMyComment(c)).map((c: any, ci: number) => (
                           <div key={c.id || ci} className={`border rounded-lg p-2 ${isMyComment(c) ? "bg-cyan-50 border-cyan-200" : "bg-gray-50"}`}>
-                            <p className="text-xs font-medium text-cyan-700">💬 {c.name || "?"}{c.at ? <span className="ml-1 font-normal text-gray-400">{new Date(c.at).toLocaleString("de-DE")}</span> : null}</p>
+                            <div className="flex items-start justify-between gap-2">
+                              <p className="text-xs font-medium text-cyan-700">💬 {c.name || "?"}{c.at ? <span className="ml-1 font-normal text-gray-400">{new Date(c.at).toLocaleString("de-DE")}</span> : null}{c.edited_at ? <span className="ml-1 font-normal text-gray-400">({(t as any).commentEdited || "bearbeitet"})</span> : null}</p>
+                              {chatOn && isMyComment(c) && c.id && !readOnlyUser && (
+                                <span className="flex gap-1 shrink-0">
+                                  <button type="button" title={(t as any).editBtn || "Bearbeiten"} onClick={() => { setTaskComments(prev => ({ ...prev, [task.id]: c.text || "" })); setEditingCommentId(prev => ({ ...prev, [task.id]: c.id })); }} className="text-xs px-2 py-1 rounded bg-white border">✏️</button>
+                                  <button type="button" title={t.delete} onClick={() => deleteTaskComment(task.id, c.id)} className="text-xs px-2 py-1 rounded bg-white border text-red-600">🗑️</button>
+                                </span>
+                              )}
+                            </div>
                             <p className="text-sm whitespace-pre-wrap break-words">{getTranslatedComment(instruction.id, task.id, c)}</p>
                           </div>
                         ))}
@@ -6328,12 +6385,15 @@ export default function Home() {
                               disabled={commentSaveState[task.id] === "saving" || (chatOn && !(taskComments[task.id] || "").trim())}
                               onClick={() => {
                                 const val = taskComments[task.id] !== undefined ? taskComments[task.id] : (chatOn ? "" : (ownComment(task)?.text || ""));
-                                updateTaskComment(task.id, val);
+                                updateTaskComment(task.id, val, editingCommentId[task.id]);
                               }}
                               className="bg-cyan-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50"
                             >
-                              💾 {t.commentSaveBtn}
+                              💾 {editingCommentId[task.id] ? ((t as any).update || t.update) : t.commentSaveBtn}
                             </button>
+                            {editingCommentId[task.id] && (
+                              <button type="button" onClick={() => { setEditingCommentId(prev => { const n = { ...prev }; delete n[task.id]; return n; }); setTaskComments(prev => ({ ...prev, [task.id]: "" })); }} className="bg-gray-200 px-3 py-2.5 rounded-lg text-sm">{(t as any).cancelBtn || "Abbrechen"}</button>
+                            )}
                           </div>
                         </div>
                         </>)}

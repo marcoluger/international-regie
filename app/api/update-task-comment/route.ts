@@ -14,11 +14,12 @@ export async function POST(request: Request) {
     const limited = await rateLimit(request, "standard");
     if (limited) return limited;
 
-    const { taskId, comment, lang } = await request.json();
+    const { taskId, comment, lang, commentId, action } = await request.json();
     if (!taskId) {
       return Response.json({ error: "taskId fehlt." }, { status: 400 });
     }
-    if (typeof comment !== "string") {
+    const isDelete = action === "delete";
+    if (!isDelete && typeof comment !== "string") {
       return Response.json({ error: "Kommentar fehlt." }, { status: 400 });
     }
 
@@ -93,12 +94,34 @@ export async function POST(request: Request) {
       list = [{ user_id: null, name: row.comment_by || "", text: row.employee_comment, lang: row.comment_lang || "" }];
     }
 
-    const cleanComment = comment.slice(0, 1000);
+    const cleanComment = typeof comment === "string" ? comment.slice(0, 1000) : "";
     const isMine = (c: any) =>
       (c?.user_id && c.user_id === caller.id) ||
       (!c?.user_id && c?.name && authorName && c.name === authorName);
 
-    if (chatMode) {
+    if (isDelete) {
+      // Eigenen Beitrag loeschen (nur eigene!)
+      if (!commentId) return Response.json({ error: "commentId fehlt." }, { status: 400 });
+      const target = list.find((c: any) => c?.id === commentId);
+      if (!target) return Response.json({ error: "Beitrag nicht gefunden." }, { status: 404 });
+      if (!isMine(target)) return Response.json({ error: "Nur eigene Beitraege koennen geloescht werden." }, { status: 403 });
+      list = list.filter((c: any) => c?.id !== commentId);
+    } else if (commentId) {
+      // Eigenen Beitrag bearbeiten (nur eigene!)
+      const idx = list.findIndex((c: any) => c?.id === commentId);
+      if (idx < 0) return Response.json({ error: "Beitrag nicht gefunden." }, { status: 404 });
+      if (!isMine(list[idx])) return Response.json({ error: "Nur eigene Beitraege koennen geaendert werden." }, { status: 403 });
+      if (!cleanComment.trim()) {
+        list = list.filter((c: any) => c?.id !== commentId);
+      } else {
+        list[idx] = {
+          ...list[idx],
+          text: cleanComment,
+          lang: typeof lang === "string" && lang.trim() ? lang.trim() : list[idx].lang || null,
+          edited_at: new Date().toISOString(),
+        };
+      }
+    } else if (chatMode) {
       // CHAT: neuen Beitrag ANHAENGEN, nichts ueberschreiben.
       if (!cleanComment.trim()) {
         return Response.json({ error: "Kommentar ist leer." }, { status: 400 });
