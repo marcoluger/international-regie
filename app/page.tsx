@@ -5671,7 +5671,7 @@ export default function Home() {
         {companyFeatures?.translator_enabled && (
         <TabButton label={`🌐 ${t.translatorTab}`} tabName="uebersetzer" activeTab={activeTab} onClick={() => setActiveTab("uebersetzer")} />
         )}
-        {companyFeatures?.feedback_enabled && (
+        {companyFeatures?.feedback_enabled && !readOnlyUser && (
         <TabButton label={`💬 ${t.feedbackTab}`} tabName="feedback" activeTab={activeTab} onClick={() => { setActiveTab("feedback"); if (currentCompany && (currentCompany.role === "owner" || currentCompany.role === "admin" || currentCompany.role === "project_manager")) loadFeedback(); }} />
         )}
       </nav>
@@ -6171,7 +6171,7 @@ export default function Home() {
         );
       })()}
 
-      {activeTab === "feedback" && companyFeatures?.feedback_enabled && (
+      {activeTab === "feedback" && companyFeatures?.feedback_enabled && !readOnlyUser && (
         <div className="space-y-4">
           <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-3">
             <h2 className="text-xl font-bold">💬 {t.feedbackTitle}</h2>
