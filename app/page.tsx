@@ -95,6 +95,7 @@ type CompanyFeatures = {
 
 const texts = {
   Deutsch: {
+    editBtn: "Bearbeiten", cancelBtn: "Abbrechen", saveBtn: "Speichern", overviewBtn: "Übersicht", languageLabel: "Sprache", nationalityLabel: "Nationalität", phoneLabel: "Telefon", nameLabel: "Name", readOnlyLabel: "Nur lesen (Arbeitsanweisung nicht bearbeitbar)", readOnlyHint: "Nur lesen – Schreiben ist für dieses Konto gesperrt.", commentEdited: "bearbeitet", commentDeleteAsk: "Diesen Beitrag löschen?",
     feedbackTab: "Feedback", feedbackTitle: "Tester-Feedback", feedbackIntro: "Bitte zu jedem Punkt kurz dein Feedback eintragen.", feedbackSend: "Feedback senden", feedbackThanks: "Danke für dein Feedback!", feedbackReview: "Abgegebenes Feedback", feedbackNone: "Noch kein Feedback vorhanden.",
     feedbackPoints: ["Anmeldung & Passwort", "Arbeitsanweisung & Kommentar", "Wetter-Funktion", "Übersetzungen", "Regiebericht erstellen", "PDF-Export", "Kalenderansichten", "Live-Übersetzer", "Bedienung am Handy", "Gesamteindruck & Fehler"],
     translatorHint: "Hinweis: Übersetzung per KI – nicht immer 100 % korrekt.",
@@ -328,6 +329,7 @@ const texts = {
     copyDone: "Arbeitsschritte wurden übernommen.",
   },
   Spanisch: {
+    editBtn: "Editar", cancelBtn: "Cancelar", saveBtn: "Guardar", overviewBtn: "Resumen", languageLabel: "Idioma", nationalityLabel: "Nacionalidad", phoneLabel: "Teléfono", nameLabel: "Nombre", readOnlyLabel: "Solo lectura (la instrucción no se puede editar)", readOnlyHint: "Solo lectura: la escritura está bloqueada para esta cuenta.", commentEdited: "editado", commentDeleteAsk: "¿Eliminar esta entrada?",
     feedbackTab: "Comentarios", feedbackTitle: "Comentarios del tester", feedbackIntro: "Por favor, añade un breve comentario para cada punto.", feedbackSend: "Enviar comentarios", feedbackThanks: "¡Gracias por tus comentarios!", feedbackReview: "Comentarios recibidos", feedbackNone: "Aún no hay comentarios.",
     feedbackPoints: ["Inicio de sesión y contraseña", "Instrucción de trabajo y comentario", "Función meteorológica", "Traducciones", "Crear informe", "Exportar PDF", "Vistas de calendario", "Traductor en vivo", "Uso en el móvil", "Impresión general y errores"],
     translatorHint: "Nota: traducción con IA, no siempre 100 % correcta.",
@@ -561,6 +563,7 @@ const texts = {
     copyDone: "Los pasos de trabajo se han aplicado.",
   },
   Rumänisch: {
+    editBtn: "Editează", cancelBtn: "Anulează", saveBtn: "Salvează", overviewBtn: "Prezentare generală", languageLabel: "Limbă", nationalityLabel: "Naționalitate", phoneLabel: "Telefon", nameLabel: "Nume", readOnlyLabel: "Doar citire (instrucțiunea nu poate fi editată)", readOnlyHint: "Doar citire – scrierea este blocată pentru acest cont.", commentEdited: "editat", commentDeleteAsk: "Ștergeți această înregistrare?",
     feedbackTab: "Feedback", feedbackTitle: "Feedback tester", feedbackIntro: "Te rugăm să adaugi pe scurt feedback pentru fiecare punct.", feedbackSend: "Trimite feedback", feedbackThanks: "Mulțumim pentru feedback!", feedbackReview: "Feedback primit", feedbackNone: "Încă nu există feedback.",
     feedbackPoints: ["Autentificare & parolă", "Instrucțiune & comentariu", "Funcția meteo", "Traduceri", "Creare raport", "Export PDF", "Vizualizări calendar", "Traducător live", "Utilizare pe telefon", "Impresie generală & erori"],
     translatorHint: "Notă: Traducere realizată de IA – nu întotdeauna 100% corectă.",
@@ -794,6 +797,7 @@ const texts = {
     copyDone: "Etapele de lucru au fost preluate.",
   },
   Englisch: {
+    editBtn: "Edit", cancelBtn: "Cancel", saveBtn: "Save", overviewBtn: "Overview", languageLabel: "Language", nationalityLabel: "Nationality", phoneLabel: "Phone", nameLabel: "Name", readOnlyLabel: "Read only (work instruction cannot be edited)", readOnlyHint: "Read only – writing is disabled for this account.", commentEdited: "edited", commentDeleteAsk: "Delete this entry?",
     feedbackTab: "Feedback", feedbackTitle: "Tester feedback", feedbackIntro: "Please add short feedback for each point.", feedbackSend: "Send feedback", feedbackThanks: "Thanks for your feedback!", feedbackReview: "Submitted feedback", feedbackNone: "No feedback yet.",
     feedbackPoints: ["Login & password", "Work instruction & comment", "Weather feature", "Translations", "Create report", "PDF export", "Calendar views", "Live translator", "Mobile usability", "Overall & bugs"],
     translatorHint: "Note: AI translation – not always 100% accurate.",
@@ -1027,6 +1031,7 @@ const texts = {
     copyDone: "Work steps have been applied.",
   },
   Italienisch: {
+    editBtn: "Modifica", cancelBtn: "Annulla", saveBtn: "Salva", overviewBtn: "Panoramica", languageLabel: "Lingua", nationalityLabel: "Nazionalità", phoneLabel: "Telefono", nameLabel: "Nome", readOnlyLabel: "Sola lettura (istruzione non modificabile)", readOnlyHint: "Sola lettura – la scrittura è bloccata per questo account.", commentEdited: "modificato", commentDeleteAsk: "Eliminare questo contributo?",
     feedbackTab: "Feedback", feedbackTitle: "Feedback tester", feedbackIntro: "Aggiungi un breve feedback per ogni punto.", feedbackSend: "Invia feedback", feedbackThanks: "Grazie per il tuo feedback!", feedbackReview: "Feedback ricevuti", feedbackNone: "Ancora nessun feedback.",
     feedbackPoints: ["Accesso & password", "Istruzione & commento", "Funzione meteo", "Traduzioni", "Creare rapporto", "Esportazione PDF", "Viste calendario", "Traduttore live", "Uso su cellulare", "Impressione generale & errori"],
     translatorHint: "Nota: Traduzione tramite IA – non sempre corretta al 100%.",
@@ -1260,6 +1265,7 @@ const texts = {
     copyDone: "Le fasi di lavoro sono state applicate.",
   },
   Türkisch: {
+    editBtn: "Düzenle", cancelBtn: "İptal", saveBtn: "Kaydet", overviewBtn: "Genel bakış", languageLabel: "Dil", nationalityLabel: "Uyruk", phoneLabel: "Telefon", nameLabel: "Ad", readOnlyLabel: "Salt okunur (iş talimatı düzenlenemez)", readOnlyHint: "Salt okunur – bu hesap için yazma engellendi.", commentEdited: "düzenlendi", commentDeleteAsk: "Bu kayıt silinsin mi?",
     feedbackTab: "Geri bildirim", feedbackTitle: "Test geri bildirimi", feedbackIntro: "Lütfen her madde için kısa geri bildirim yazın.", feedbackSend: "Geri bildirim gönder", feedbackThanks: "Geri bildiriminiz için teşekkürler!", feedbackReview: "Gönderilen geri bildirimler", feedbackNone: "Henüz geri bildirim yok.",
     feedbackPoints: ["Giriş & şifre", "İş talimatı & yorum", "Hava durumu", "Çeviriler", "Rapor oluşturma", "PDF dışa aktarma", "Takvim görünümleri", "Canlı çevirmen", "Telefonda kullanım", "Genel izlenim & hatalar"],
     translatorHint: "Not: Çeviri yapay zeka ile yapılır – her zaman %100 doğru değildir.",
@@ -1493,6 +1499,7 @@ const texts = {
     copyDone: "İş adımları alındı.",
   },
   Ungarisch: {
+    editBtn: "Szerkesztés", cancelBtn: "Mégse", saveBtn: "Mentés", overviewBtn: "Áttekintés", languageLabel: "Nyelv", nationalityLabel: "Nemzetiség", phoneLabel: "Telefon", nameLabel: "Név", readOnlyLabel: "Csak olvasás (a munkautasítás nem szerkeszthető)", readOnlyHint: "Csak olvasás – az írás ehhez a fiókhoz le van tiltva.", commentEdited: "szerkesztve", commentDeleteAsk: "Törli ezt a bejegyzést?",
     feedbackTab: "Visszajelzés", feedbackTitle: "Tesztelői visszajelzés", feedbackIntro: "Kérjük, minden ponthoz írjon rövid visszajelzést.", feedbackSend: "Visszajelzés küldése", feedbackThanks: "Köszönjük a visszajelzést!", feedbackReview: "Beérkezett visszajelzések", feedbackNone: "Még nincs visszajelzés.",
     feedbackPoints: ["Bejelentkezés & jelszó", "Munkautasítás & megjegyzés", "Időjárás funkció", "Fordítások", "Jelentés készítése", "PDF exportálás", "Naptárnézetek", "Élő fordító", "Használat telefonon", "Összbenyomás & hibák"],
     translatorHint: "Megjegyzés: A fordítást MI készíti – nem mindig 100%-osan pontos.",
@@ -1726,6 +1733,7 @@ const texts = {
     copyDone: "A munkalépések átvéve.",
   },
   Tschechisch: {
+    editBtn: "Upravit", cancelBtn: "Zrušit", saveBtn: "Uložit", overviewBtn: "Přehled", languageLabel: "Jazyk", nationalityLabel: "Národnost", phoneLabel: "Telefon", nameLabel: "Jméno", readOnlyLabel: "Pouze čtení (pracovní pokyn nelze upravovat)", readOnlyHint: "Pouze čtení – zápis je pro tento účet zakázán.", commentEdited: "upraveno", commentDeleteAsk: "Smazat tento příspěvek?",
     feedbackTab: "Zpětná vazba", feedbackTitle: "Zpětná vazba testera", feedbackIntro: "Ke každému bodu prosím napište krátkou zpětnou vazbu.", feedbackSend: "Odeslat zpětnou vazbu", feedbackThanks: "Děkujeme za zpětnou vazbu!", feedbackReview: "Odeslaná zpětná vazba", feedbackNone: "Zatím žádná zpětná vazba.",
     feedbackPoints: ["Přihlášení & heslo", "Pracovní pokyn & komentář", "Funkce počasí", "Překlady", "Vytvoření výkazu", "Export PDF", "Zobrazení kalendáře", "Živý překladač", "Použití na mobilu", "Celkový dojem & chyby"],
     translatorHint: "Poznámka: Překlad pomocí AI – ne vždy 100% správný.",
@@ -1959,6 +1967,7 @@ const texts = {
     copyDone: "Pracovní kroky byly převzaty.",
   },
   Ukrainisch: {
+    editBtn: "Редагувати", cancelBtn: "Скасувати", saveBtn: "Зберегти", overviewBtn: "Огляд", languageLabel: "Мова", nationalityLabel: "Національність", phoneLabel: "Телефон", nameLabel: "Ім’я", readOnlyLabel: "Лише читання (інструкцію не можна редагувати)", readOnlyHint: "Лише читання – запис для цього облікового запису заблоковано.", commentEdited: "відредаговано", commentDeleteAsk: "Видалити цей запис?",
     feedbackTab: "Відгук", feedbackTitle: "Відгук тестувальника", feedbackIntro: "Будь ласка, додайте короткий відгук до кожного пункту.", feedbackSend: "Надіслати відгук", feedbackThanks: "Дякуємо за відгук!", feedbackReview: "Надіслані відгуки", feedbackNone: "Відгуків поки немає.",
     feedbackPoints: ["Вхід і пароль", "Інструкція та коментар", "Функція погоди", "Переклади", "Створення звіту", "Експорт PDF", "Види календаря", "Живий перекладач", "Використання на телефоні", "Загальне враження та помилки"],
     translatorHint: "Примітка: Переклад виконує ШІ – не завжди 100% точний.",
@@ -2192,6 +2201,7 @@ const texts = {
     copyDone: "Робочі кроки перенесено.",
   },
   Bulgarisch: {
+    editBtn: "Редактиране", cancelBtn: "Отказ", saveBtn: "Запази", overviewBtn: "Преглед", languageLabel: "Език", nationalityLabel: "Националност", phoneLabel: "Телефон", nameLabel: "Име", readOnlyLabel: "Само четене (инструкцията не може да се редактира)", readOnlyHint: "Само четене – писането е забранено за този акаунт.", commentEdited: "редактирано", commentDeleteAsk: "Да се изтрие ли този запис?",
     feedbackTab: "Отзиви", feedbackTitle: "Обратна връзка от тестер", feedbackIntro: "Моля, добавете кратка обратна връзка за всяка точка.", feedbackSend: "Изпрати обратна връзка", feedbackThanks: "Благодарим за обратната връзка!", feedbackReview: "Изпратени отзиви", feedbackNone: "Все още няма обратна връзка.",
     feedbackPoints: ["Вход и парола", "Инструкция и коментар", "Функция за времето", "Преводи", "Създаване на отчет", "Експорт в PDF", "Изгледи на календара", "Жив преводач", "Използване на телефон", "Общо впечатление и грешки"],
     translatorHint: "Забележка: Преводът е от ИИ – не винаги 100% точен.",
@@ -2425,6 +2435,7 @@ const texts = {
     copyDone: "Работните стъпки са прехвърлени.",
   },
   Serbisch: {
+    editBtn: "Izmeni", cancelBtn: "Otkaži", saveBtn: "Sačuvaj", overviewBtn: "Pregled", languageLabel: "Jezik", nationalityLabel: "Nacionalnost", phoneLabel: "Telefon", nameLabel: "Ime", readOnlyLabel: "Samo čitanje (radni nalog se ne može menjati)", readOnlyHint: "Samo čitanje – pisanje je onemogućeno za ovaj nalog.", commentEdited: "izmenjeno", commentDeleteAsk: "Obrisati ovaj unos?",
     feedbackTab: "Povratne informacije", feedbackTitle: "Povratne informacije testera", feedbackIntro: "Molimo dodajte kratku povratnu informaciju za svaku tačku.", feedbackSend: "Pošalji povratne informacije", feedbackThanks: "Hvala na povratnim informacijama!", feedbackReview: "Poslate povratne informacije", feedbackNone: "Još nema povratnih informacija.",
     feedbackPoints: ["Prijava i lozinka", "Radni nalog i komentar", "Funkcija vremena", "Prevodi", "Kreiranje izveštaja", "PDF izvoz", "Prikazi kalendara", "Prevodilac uživo", "Korišćenje na telefonu", "Ukupni utisak i greške"],
     translatorHint: "Napomena: Prevod pravi veštačka inteligencija – nije uvek 100% tačan.",
@@ -2658,6 +2669,7 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Kroatisch: {
+    editBtn: "Uredi", cancelBtn: "Odustani", saveBtn: "Spremi", overviewBtn: "Pregled", languageLabel: "Jezik", nationalityLabel: "Nacionalnost", phoneLabel: "Telefon", nameLabel: "Ime", readOnlyLabel: "Samo čitanje (radni nalog se ne može uređivati)", readOnlyHint: "Samo čitanje – pisanje je onemogućeno za ovaj račun.", commentEdited: "uređeno", commentDeleteAsk: "Izbrisati ovaj unos?",
     feedbackTab: "Povratne informacije", feedbackTitle: "Povratne informacije testera", feedbackIntro: "Molimo dodajte kratku povratnu informaciju za svaku točku.", feedbackSend: "Pošalji povratne informacije", feedbackThanks: "Hvala na povratnim informacijama!", feedbackReview: "Poslane povratne informacije", feedbackNone: "Još nema povratnih informacija.",
     feedbackPoints: ["Prijava i lozinka", "Radni nalog i komentar", "Funkcija vremena", "Prijevodi", "Izrada izvještaja", "PDF izvoz", "Prikazi kalendara", "Prevoditelj uživo", "Korištenje na mobitelu", "Ukupni dojam i greške"],
     translatorHint: "Napomena: Prijevod radi umjetna inteligencija – nije uvijek 100% točan.",
@@ -2891,6 +2903,7 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Slowenisch: {
+    editBtn: "Uredi", cancelBtn: "Prekliči", saveBtn: "Shrani", overviewBtn: "Pregled", languageLabel: "Jezik", nationalityLabel: "Narodnost", phoneLabel: "Telefon", nameLabel: "Ime", readOnlyLabel: "Samo branje (delovnega naloga ni mogoče urejati)", readOnlyHint: "Samo branje – pisanje je za ta račun onemogočeno.", commentEdited: "urejeno", commentDeleteAsk: "Izbrisati ta vnos?",
     feedbackTab: "Povratne informacije", feedbackTitle: "Povratne informacije preizkuševalca", feedbackIntro: "Prosimo, dodajte kratko povratno informacijo za vsako točko.", feedbackSend: "Pošlji povratne informacije", feedbackThanks: "Hvala za povratne informacije!", feedbackReview: "Oddane povratne informacije", feedbackNone: "Še ni povratnih informacij.",
     feedbackPoints: ["Prijava in geslo", "Delovni nalog in komentar", "Funkcija vremena", "Prevodi", "Ustvarjanje poročila", "Izvoz PDF", "Pogledi koledarja", "Živi prevajalnik", "Uporaba na telefonu", "Splošni vtis in napake"],
     translatorHint: "Opomba: Prevod naredi umetna inteligenca – ni vedno 100 % pravilen.",
@@ -3124,6 +3137,7 @@ const texts = {
     copyDone: "Delovni koraki so prevzeti.",
   },
   Polnisch: {
+    editBtn: "Edytuj", cancelBtn: "Anuluj", saveBtn: "Zapisz", overviewBtn: "Przegląd", languageLabel: "Język", nationalityLabel: "Narodowość", phoneLabel: "Telefon", nameLabel: "Imię", readOnlyLabel: "Tylko odczyt (instrukcji nie można edytować)", readOnlyHint: "Tylko odczyt – pisanie jest zablokowane dla tego konta.", commentEdited: "edytowano", commentDeleteAsk: "Usunąć ten wpis?",
     feedbackTab: "Opinie", feedbackTitle: "Opinia testera", feedbackIntro: "Prosimy o krótką opinię do każdego punktu.", feedbackSend: "Wyślij opinię", feedbackThanks: "Dziękujemy za opinię!", feedbackReview: "Przesłane opinie", feedbackNone: "Brak opinii.",
     feedbackPoints: ["Logowanie i hasło", "Instrukcja i komentarz", "Funkcja pogody", "Tłumaczenia", "Tworzenie raportu", "Eksport PDF", "Widoki kalendarza", "Tłumacz na żywo", "Obsługa na telefonie", "Ogólne wrażenie i błędy"],
     translatorHint: "Uwaga: Tłumaczenie wykonuje AI – nie zawsze w 100% poprawne.",
@@ -3962,7 +3976,7 @@ export default function Home() {
 
   // Eigenen Chat-Beitrag loeschen (die Route laesst nur eigene Beitraege zu).
   async function deleteTaskComment(taskId: string, commentId: string) {
-    if (typeof window !== "undefined" && !window.confirm((t as any).commentDeleteAsk || "Diesen Beitrag löschen?")) return;
+    if (typeof window !== "undefined" && !window.confirm(t.commentDeleteAsk)) return;
     setCommentSaveState(prev => ({ ...prev, [taskId]: "saving" }));
     try {
       let token = tokenRef.current;
@@ -5970,7 +5984,7 @@ export default function Home() {
 
       {activeTab === "projekte" && (
         <section className="border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4 bg-white text-black">
-          <h2 className="text-xl font-bold">{t.projectsTab}{editingProjectId ? <span className="ml-2 text-sm font-normal text-amber-700">✏️ {(t as any).editBtn || "Bearbeiten"}</span> : null}</h2>
+          <h2 className="text-xl font-bold">{t.projectsTab}{editingProjectId ? <span className="ml-2 text-sm font-normal text-amber-700">✏️ {t.editBtn}</span> : null}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <input className="border p-3 w-full" placeholder={t.projectName} value={projectName} onChange={(e) => setProjectName(e.target.value)} />
             <input className="border p-3 w-full" placeholder={t.customer} value={projectCustomer} onChange={(e) => setProjectCustomer(e.target.value)} />
@@ -5987,7 +6001,7 @@ export default function Home() {
           </div>
           <div className="flex gap-2 flex-wrap">
             <button type="button" onClick={saveProject} className="bg-cyan-700 text-white px-4 py-3 rounded-lg">{editingProjectId ? `💾 ${t.update}` : t.saveProject}</button>
-            {editingProjectId && (<button type="button" onClick={resetProjectForm} className="bg-gray-200 px-4 py-3 rounded-lg">{(t as any).cancelBtn || "Abbrechen"}</button>)}
+            {editingProjectId && (<button type="button" onClick={resetProjectForm} className="bg-gray-200 px-4 py-3 rounded-lg">{t.cancelBtn}</button>)}
           </div>
           <div className="space-y-3 mt-4">
             {projects.map((project) => (
@@ -6012,7 +6026,7 @@ export default function Home() {
                 )}
                 <div className="flex gap-2">
                   <button type="button" onClick={() => setSelectedProjectDetailId(project.id === selectedProjectDetailId ? "" : project.id)} className="bg-gray-700 text-white px-3 py-2.5 rounded-lg">{project.id === selectedProjectDetailId ? t.closeProject : t.openProject}</button>
-                  {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => startEditProject(project)} className="bg-amber-600 text-white px-3 py-2.5 rounded-lg">✏️ {(t as any).editBtn || "Bearbeiten"}</button>)}
+                  {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => startEditProject(project)} className="bg-amber-600 text-white px-3 py-2.5 rounded-lg">✏️ {t.editBtn}</button>)}
                   <button type="button" onClick={() => deleteProject(project.id)} className="bg-red-600 text-white px-3 py-2.5 rounded-lg">{t.deleteProject}</button>
                 </div>
                 {selectedProjectDetailId === project.id && (
@@ -6234,7 +6248,7 @@ export default function Home() {
                               )}
                             </div>
                           ))}
-                          <div className="pt-1"><button type="button" onClick={() => createTeamPDF(r)} className="bg-cyan-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium">📄 {(t as any).pdf || "PDF"}</button></div>
+                          <div className="pt-1"><button type="button" onClick={() => createTeamPDF(r)} className="bg-cyan-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium">📄 {"PDF"}</button></div>
                         </div>
                       )}
                     </div>
@@ -6348,10 +6362,10 @@ export default function Home() {
                         {taskCommentList(task).filter((c: any) => chatOn || isMyComment(c)).map((c: any, ci: number) => (
                           <div key={c.id || ci} className={`border rounded-lg p-2 ${isMyComment(c) ? "bg-cyan-50 border-cyan-200" : "bg-gray-50"}`}>
                             <div className="flex items-start justify-between gap-2">
-                              <p className="text-xs font-medium text-cyan-700">💬 {c.name || "?"}{c.at ? <span className="ml-1 font-normal text-gray-400">{new Date(c.at).toLocaleString("de-DE")}</span> : null}{c.edited_at ? <span className="ml-1 font-normal text-gray-400">({(t as any).commentEdited || "bearbeitet"})</span> : null}</p>
+                              <p className="text-xs font-medium text-cyan-700">💬 {c.name || "?"}{c.at ? <span className="ml-1 font-normal text-gray-400">{new Date(c.at).toLocaleString("de-DE")}</span> : null}{c.edited_at ? <span className="ml-1 font-normal text-gray-400">({t.commentEdited})</span> : null}</p>
                               {chatOn && isMyComment(c) && c.id && !readOnlyUser && (
                                 <span className="flex gap-1 shrink-0">
-                                  <button type="button" title={(t as any).editBtn || "Bearbeiten"} onClick={() => { setTaskComments(prev => ({ ...prev, [task.id]: c.text || "" })); setEditingCommentId(prev => ({ ...prev, [task.id]: c.id })); }} className="text-xs px-2 py-1 rounded bg-white border">✏️</button>
+                                  <button type="button" title={t.editBtn} onClick={() => { setTaskComments(prev => ({ ...prev, [task.id]: c.text || "" })); setEditingCommentId(prev => ({ ...prev, [task.id]: c.id })); }} className="text-xs px-2 py-1 rounded bg-white border">✏️</button>
                                   <button type="button" title={t.delete} onClick={() => deleteTaskComment(task.id, c.id)} className="text-xs px-2 py-1 rounded bg-white border text-red-600">🗑️</button>
                                 </span>
                               )}
@@ -6360,7 +6374,7 @@ export default function Home() {
                           </div>
                         ))}
                         {readOnlyUser ? (
-                          <p className="text-xs text-gray-500">👁️ {(t as any).readOnlyHint || "Nur lesen – Schreiben ist für dieses Konto gesperrt."}</p>
+                          <p className="text-xs text-gray-500">👁️ {t.readOnlyHint}</p>
                         ) : (<>
                         <p className="text-sm font-medium text-gray-700">💬 {t.commentLabel} (max. 1000 {t.charsLabel}):{myDisplayName() ? <span className="ml-1 font-normal text-cyan-700">— {myDisplayName()}</span> : null}</p>
                         <textarea
@@ -6389,10 +6403,10 @@ export default function Home() {
                               }}
                               className="bg-cyan-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50"
                             >
-                              💾 {editingCommentId[task.id] ? ((t as any).update || t.update) : t.commentSaveBtn}
+                              💾 {editingCommentId[task.id] ? (t.update) : t.commentSaveBtn}
                             </button>
                             {editingCommentId[task.id] && (
-                              <button type="button" onClick={() => { setEditingCommentId(prev => { const n = { ...prev }; delete n[task.id]; return n; }); setTaskComments(prev => ({ ...prev, [task.id]: "" })); }} className="bg-gray-200 px-3 py-2.5 rounded-lg text-sm">{(t as any).cancelBtn || "Abbrechen"}</button>
+                              <button type="button" onClick={() => { setEditingCommentId(prev => { const n = { ...prev }; delete n[task.id]; return n; }); setTaskComments(prev => ({ ...prev, [task.id]: "" })); }} className="bg-gray-200 px-3 py-2.5 rounded-lg text-sm">{t.cancelBtn}</button>
                             )}
                           </div>
                         </div>
@@ -6527,7 +6541,7 @@ export default function Home() {
               </div>
               <label className="flex items-center gap-2 text-sm font-medium">
                 <input type="checkbox" checked={newUserReadOnly} onChange={(e) => setNewUserReadOnly(e.target.checked)} />
-                👁️ {(t as any).readOnlyLabel || "Nur lesen (Arbeitsanweisung nicht bearbeitbar)"}
+                👁️ {t.readOnlyLabel}
               </label>
               <button type="button" onClick={addCompanyUser} disabled={creatingEmployee} className="bg-cyan-700 text-white px-4 py-3 rounded-lg disabled:opacity-50">{creatingEmployee ? "Wird angelegt..." : t.addEmployee}</button>
               <p className="text-xs text-gray-400">Der Mitarbeiter meldet sich mit seinem Benutzernamen und Passwort an.</p>
@@ -6535,18 +6549,18 @@ export default function Home() {
           )}
           <div className="flex items-center justify-between flex-wrap gap-2">
             <p>{t.currentEmployees}: <strong>{companyUsers.length}</strong></p>
-            <button type="button" onClick={() => setShowOverview(v => !v)} className="bg-cyan-700 text-white px-4 py-2.5 rounded-lg text-sm">📋 {(t as any).overviewBtn || "Übersicht"} {showOverview ? "▲" : "▼"}</button>
+            <button type="button" onClick={() => setShowOverview(v => !v)} className="bg-cyan-700 text-white px-4 py-2.5 rounded-lg text-sm">📋 {t.overviewBtn} {showOverview ? "▲" : "▼"}</button>
           </div>
           {showOverview && (
             <div className="border border-slate-200 rounded-xl overflow-x-auto">
               <table className="w-full text-sm text-left border-collapse">
                 <thead>
                   <tr className="bg-gray-100">
-                    <th className="px-3 py-2 font-bold">{(t as any).nameLabel || "Name"}</th>
+                    <th className="px-3 py-2 font-bold">{t.nameLabel}</th>
                     <th className="px-3 py-2 font-bold">{t.role}</th>
-                    <th className="px-3 py-2 font-bold">🌐 {(t as any).languageLabel || "Sprache"}</th>
-                    <th className="px-3 py-2 font-bold">{(t as any).nationalityLabel || "Nationalität"}</th>
-                    <th className="px-3 py-2 font-bold">📞 {(t as any).phoneLabel || "Telefon"}</th>
+                    <th className="px-3 py-2 font-bold">🌐 {t.languageLabel}</th>
+                    <th className="px-3 py-2 font-bold">{t.nationalityLabel}</th>
+                    <th className="px-3 py-2 font-bold">📞 {t.phoneLabel}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -6573,7 +6587,7 @@ export default function Home() {
                 <div className="flex gap-2 flex-wrap">
                   {member.email && (<button type="button" onClick={() => resetCompanyUserPassword(member.email)} className="bg-gray-700 text-white px-3 py-2.5 rounded-lg">{t.resetPassword}</button>)}
                   {currentCompany && canManageMember(currentCompany.role, member.role) && (
-                    <button type="button" onClick={() => { const open = editMemberId !== member.id; setEditMemberId(open ? member.id : null); if (open) { setEditRole(member.role); setEditLang(member.preferred_language || "Deutsch"); setEditNationality(member.nationality || ""); setEditPhone(member.phone || ""); setEditReadOnly(!!member.read_only); } }} className="bg-cyan-700 text-white px-3 py-2.5 rounded-lg">✏️ {(t as any).editBtn || "Bearbeiten"}</button>
+                    <button type="button" onClick={() => { const open = editMemberId !== member.id; setEditMemberId(open ? member.id : null); if (open) { setEditRole(member.role); setEditLang(member.preferred_language || "Deutsch"); setEditNationality(member.nationality || ""); setEditPhone(member.phone || ""); setEditReadOnly(!!member.read_only); } }} className="bg-cyan-700 text-white px-3 py-2.5 rounded-lg">✏️ {t.editBtn}</button>
                   )}
                   {currentCompany && canDelete(currentCompany.role, member.role) && member.user_id !== user?.id && (
                     <button type="button" onClick={() => deleteCompanyUser(member.id, member.user_id)} className="bg-red-600 text-white px-3 py-2.5 rounded-lg">🗑️ Löschen</button>
@@ -6587,7 +6601,7 @@ export default function Home() {
                         {Array.from(new Set([member.role, ...settableRoles(currentCompany.role)])).map((r) => (<option key={r} value={r}>{roleLabel(r)}</option>))}
                       </select>
                       {member.user_id === user?.id && <span className="text-xs text-gray-400">Die eigene Rolle kann hier nicht geändert werden.</span>}
-                      <label className="text-sm font-medium">🌐 {(t as any).languageLabel || "Sprache"}</label>
+                      <label className="text-sm font-medium">🌐 {t.languageLabel}</label>
                       <select className="border p-2 rounded-lg text-black bg-white" value={editLang} onChange={(e) => setEditLang(e.target.value)}>
                         {getAllowedLanguages(companyFeatures).filter(l => languages.includes(l as Language)).map((lang) => (<option key={lang} value={lang}>{lang}</option>))}
                       </select>
@@ -6600,12 +6614,12 @@ export default function Home() {
                       <input className="border p-2 rounded-lg text-black bg-white" value={editPhone} onChange={(e) => setEditPhone(e.target.value)} />
                       <label className="flex items-center gap-2 text-sm font-medium mt-1">
                         <input type="checkbox" checked={editReadOnly} onChange={(e) => setEditReadOnly(e.target.checked)} />
-                        👁️ {(t as any).readOnlyLabel || "Nur lesen (Arbeitsanweisung nicht bearbeitbar)"}
+                        👁️ {t.readOnlyLabel}
                       </label>
                     </div>
                     <div className="flex gap-2">
-                      <button type="button" disabled={savingEdit} onClick={() => updateEmployee(member)} className="bg-cyan-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50">{savingEdit ? "⏳" : "💾"} {(t as any).saveBtn || "Speichern"}</button>
-                      <button type="button" onClick={() => setEditMemberId(null)} className="bg-gray-200 px-4 py-2.5 rounded-lg text-sm">{(t as any).cancelBtn || "Abbrechen"}</button>
+                      <button type="button" disabled={savingEdit} onClick={() => updateEmployee(member)} className="bg-cyan-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50">{savingEdit ? "⏳" : "💾"} {t.saveBtn}</button>
+                      <button type="button" onClick={() => setEditMemberId(null)} className="bg-gray-200 px-4 py-2.5 rounded-lg text-sm">{t.cancelBtn}</button>
                     </div>
                   </div>
                 )}
