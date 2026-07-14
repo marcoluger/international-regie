@@ -3922,7 +3922,7 @@ export default function Home() {
     const { data: companyData, error: companyError } = await supabase.from("companies").select("id, name, slug, status").eq("id", companyUser.company_id).single();
     if (companyError) { setMessage("Fehler beim Laden der Firmendaten: " + companyError.message); return; }
     setCompanyBlocked((companyData.status || "active") !== "active");
-    const company: CurrentCompany = { company_id: companyUser.company_id, role: companyUser.role, companies: { id: companyData.id, name: companyData.name, slug: companyData.slug || "" } };
+    const company: CurrentCompany = { company_id: companyUser.company_id, role: companyUser.role, read_only: !!(companyUser as any).read_only, companies: { id: companyData.id, name: companyData.name, slug: companyData.slug || "" } };
     setCurrentCompany(company);
     const { data: features } = await supabase.from("company_features").select("*").eq("company_id", companyUser.company_id).maybeSingle();
     if (features) {
