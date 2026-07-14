@@ -52,7 +52,23 @@ export async function POST(request: Request) {
       .maybeSingle();
     const authorName = member?.full_name || member?.email || "";
 
-    // 3) Bestehende Kommentarliste des Arbeitsschritts laden
+    // 3a) Ist das Chat-Modul fuer die Firma des Aufrufers freigeschaltet?
+    const { data: callerMember } = await supabaseAdmin
+      .from("company_users")
+      .select("company_id")
+      .eq("user_id", caller.id)
+      .maybeSingle();
+    let chatMode = false;
+    if (callerMember?.company_id) {
+      const { data: feat } = await supabaseAdmin
+        .from("company_features")
+        .select("comments_enabled")
+        .eq("company_id", callerMember.company_id)
+        .maybeSingle();
+      chatMode = !!feat?.comments_enabled;
+    }
+
+    // 3b) Bestehende Kommentarliste des Arbeitsschritts laden
     const { data: row, error: readErr } = await supabaseAdmin
       .from("work_instruction_tasks")
       .select("id, comments, employee_comment, comment_by, comment_lang")
@@ -71,21 +87,39 @@ export async function POST(request: Request) {
       list = [{ user_id: null, name: row.comment_by || "", text: row.employee_comment, lang: row.comment_lang || "" }];
     }
 
-    // 4) Neuen Beitrag ANHAENGEN (Chat-Verlauf). Bestehende Beitraege – eigene wie fremde –
-    // bleiben erhalten. Aeltester zuerst; maximal 200 Beitraege je Arbeitsschritt.
     const cleanComment = comment.slice(0, 1000);
-    if (!cleanComment.trim()) {
-      return Response.json({ error: "Kommentar ist leer." }, { status: 400 });
+    const isMine = (c: any) =>
+      (c?.user_id && c.user_id === caller.id) ||
+      (!c?.user_id && c?.name && authorName && c.name === authorName);
+
+    if (chatMode) {
+      // CHAT: neuen Beitrag ANHAENGEN, nichts ueberschreiben.
+      if (!cleanComment.trim()) {
+        return Response.json({ error: "Kommentar ist leer." }, { status: 400 });
+      }
+      list.push({
+        id: (globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`),
+        user_id: caller.id,
+        name: authorName,
+        text: cleanComment,
+        lang: typeof lang === "string" && lang.trim() ? lang.trim() : null,
+        at: new Date().toISOString(),
+      });
+      if (list.length > 200) list = list.slice(list.length - 200);
+    } else {
+      // PRIVAT (Modul aus): jeder hat GENAU EINEN eigenen Kommentar; fremde bleiben unberuehrt.
+      list = list.filter((c: any) => !isMine(c));
+      if (cleanComment.trim()) {
+        list.push({
+          id: (globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`),
+          user_id: caller.id,
+          name: authorName,
+          text: cleanComment,
+          lang: typeof lang === "string" && lang.trim() ? lang.trim() : null,
+          at: new Date().toISOString(),
+        });
+      }
     }
-    list.push({
-      id: (globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`),
-      user_id: caller.id,
-      name: authorName,
-      text: cleanComment,
-      lang: typeof lang === "string" && lang.trim() ? lang.trim() : null,
-      at: new Date().toISOString(),
-    });
-    if (list.length > 200) list = list.slice(list.length - 200);
 
     const { data, error } = await supabaseAdmin
       .from("work_instruction_tasks")

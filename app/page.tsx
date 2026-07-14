@@ -89,6 +89,7 @@ type CompanyFeatures = {
   allowed_languages: string[];
   feedback_enabled?: boolean;
   translator_enabled?: boolean;
+  comments_enabled?: boolean;
 };
 
 const texts = {
@@ -3690,6 +3691,8 @@ export default function Home() {
   const [days, setDays] = useState<DayEntry[]>(createEmptyDays());
   const [currentCompany, setCurrentCompany] = useState<CurrentCompany | null>(null);
   const [companyFeatures, setCompanyFeatures] = useState<CompanyFeatures | null>(null);
+  // Modul "Kommentar-Chat": AN = offener Verlauf fuer alle, AUS = privater Kommentar je Person.
+  const chatOn = !!companyFeatures?.comments_enabled;
   const firstDate = days.find((day) => day.date)?.date || "";
   const calendarWeek = getCalendarWeek(firstDate);
   const [companyUsers, setCompanyUsers] = useState<any[]>([]);
@@ -3982,16 +3985,18 @@ export default function Home() {
       // Getippten Kommentar sofort anzeigen. Das Speichern wird NICHT von einer
       // Uebersetzung blockiert; die Anzeige-Uebersetzung laeuft spaeter nicht-blockierend
       // ueber refreshCommentTranslations (beim Neuladen).
-      // Chat: Eingabefeld leeren, Beitrag lokal an den Verlauf anhaengen.
-      setTaskComments(prev => ({ ...prev, [taskId]: "" }));
+      // Chat: Eingabefeld leeren (neuer Beitrag). Privat: eigener Text bleibt im Feld stehen.
+      setTaskComments(prev => ({ ...prev, [taskId]: chatOn ? "" : comment }));
       const myName = myDisplayName();
       setWorkInstructions(prev => prev.map((inst: any) => ({
         ...inst,
         work_instruction_tasks: (inst.work_instruction_tasks || []).map((tk: any) => {
           if (tk.id !== taskId) return tk;
           const list = taskCommentList(tk);
+          const base = chatOn ? list : list.filter((c: any) => !isMyComment(c));
           const entry = { id: `local-${Date.now()}`, user_id: user?.id, name: myName, text: comment, lang: uiLanguage, at: new Date().toISOString() };
-          return { ...tk, comments: [...list, entry] };
+          const next = comment.trim() ? [...base, entry] : base;
+          return { ...tk, comments: next };
         }),
       })));
     } catch (err: any) {
@@ -5101,7 +5106,7 @@ export default function Home() {
     // (alle Beitraege, jeweils mit Name), uebersetzt in die Sprache des Erstellers.
     const freshComments: Record<string, string> = {};
     for (const task of instruction.work_instruction_tasks || []) {
-      const entries = taskCommentList(task).filter((c: any) => (c?.text || "").trim());
+      const entries = taskCommentList(task).filter((c: any) => (chatOn || isMyComment(c)) && (c?.text || "").trim());
       if (entries.length === 0) continue;
       const lines: string[] = [];
       for (const entry of entries) {
@@ -5117,7 +5122,7 @@ export default function Home() {
         }
         const text = [body, ...loc].filter(Boolean).join("\n");
         if (!text) continue;
-        lines.push(entry.name ? `${entry.name}: ${text}` : text);
+        lines.push(chatOn && entry.name ? `${entry.name}: ${text}` : text);
       }
       if (lines.length > 0) freshComments[task.id] = lines.join("\n");
     }
@@ -5473,9 +5478,10 @@ export default function Home() {
           for (const line of doc.splitTextToSize(noteTr, contentWidth - 6)) { addNewPageIfNeeded(6); doc.text(line, marginLeft + 6, y); y += 5; }
         }
         for (const entry of taskCommentList(task)) {
+          if (!chatOn && !isMyComment(entry)) continue;
           const raw = (entry?.text || "").trim();
           if (!raw) continue;
-          const who = entry?.name ? `${entry.name}: ` : "";
+          const who = chatOn && entry?.name ? `${entry.name}: ` : "";
           const cTr = sanitizePdfText(`${t.commentLabel}: ${who}${await tr(raw)}`);
           for (const line of doc.splitTextToSize(cTr, contentWidth - 6)) { addNewPageIfNeeded(6); doc.text(line, marginLeft + 6, y); y += 5; }
         }
@@ -6255,9 +6261,10 @@ export default function Home() {
                       </div>
                       {task.note && <p className="text-sm text-gray-600 ml-2">{t.feedbackLabel}: {task.note}</p>}
                       {(task.photos || []).length > 0 && companyFeatures?.photos_enabled && (<div className="grid grid-cols-3 gap-1">{(task.photos || []).map((photo: string, pi: number) => (<img key={pi} src={photo} alt="Foto" className="w-full h-16 object-cover rounded-lg" />))}</div>)}
-                      {/* Kommentare: je Mitarbeiter ein eigener Eintrag */}
+                      {/* Kommentare. Modul AN = offener Chat (alle sehen alles),
+                          Modul AUS = privater Kommentar (jeder sieht nur seinen eigenen). */}
                       <div className="border-t pt-2 space-y-2">
-                        {taskCommentList(task).map((c: any, ci: number) => (
+                        {taskCommentList(task).filter((c: any) => chatOn || isMyComment(c)).map((c: any, ci: number) => (
                           <div key={c.id || ci} className={`border rounded-lg p-2 ${isMyComment(c) ? "bg-cyan-50 border-cyan-200" : "bg-gray-50"}`}>
                             <p className="text-xs font-medium text-cyan-700">💬 {c.name || "?"}{c.at ? <span className="ml-1 font-normal text-gray-400">{new Date(c.at).toLocaleString("de-DE")}</span> : null}</p>
                             <p className="text-sm whitespace-pre-wrap break-words">{getTranslatedComment(instruction.id, task.id, c)}</p>
@@ -6269,23 +6276,23 @@ export default function Home() {
                           rows={5}
                           maxLength={1000}
                           placeholder={t.commentPlaceholder}
-                          value={taskComments[task.id] || ""}
+                          value={taskComments[task.id] !== undefined ? taskComments[task.id] : (chatOn ? "" : (ownComment(task)?.text || ""))}
                           onChange={(e) => { setTaskComments(prev => ({ ...prev, [task.id]: e.target.value.slice(0, 1000) })); setCommentSaveState(prev => ({ ...prev, [task.id]: "" })); }}
                         />
                         <div className="flex items-center justify-between gap-2">
                           <span className="text-xs text-gray-500">
-                            {(taskComments[task.id] || "").length} / 1000 {t.charsLabel}
+                            {((taskComments[task.id] !== undefined ? taskComments[task.id] : (chatOn ? "" : (ownComment(task)?.text || ""))) || "").length} / 1000 {t.charsLabel}
                           </span>
                           <div className="flex items-center gap-2">
                             {commentSaveState[task.id] === "saving" && <span className="text-xs text-gray-500">⏳ {t.commentSaving}</span>}
                             {commentSaveState[task.id] === "saved" && <span className="text-xs text-green-700 font-medium">✓ {t.commentSaved}</span>}
                             {commentSaveState[task.id]?.startsWith("error:") && <span className="text-xs text-red-600">{t.commentErrorLabel}: {commentSaveState[task.id].slice(6)}</span>}
-                            <button type="button" onClick={() => insertWeatherIntoComment(task.id, taskComments[task.id] || "")} title={t.weather} className="bg-cyan-50 text-cyan-700 border border-cyan-200 px-3 py-2.5 rounded-lg text-sm">🌦️ {t.weather}</button>
+                            <button type="button" onClick={() => insertWeatherIntoComment(task.id, taskComments[task.id] !== undefined ? taskComments[task.id] : (chatOn ? "" : (ownComment(task)?.text || "")))} title={t.weather} className="bg-cyan-50 text-cyan-700 border border-cyan-200 px-3 py-2.5 rounded-lg text-sm">🌦️ {t.weather}</button>
                             <button
                               type="button"
-                              disabled={commentSaveState[task.id] === "saving" || !(taskComments[task.id] || "").trim()}
+                              disabled={commentSaveState[task.id] === "saving" || (chatOn && !(taskComments[task.id] || "").trim())}
                               onClick={() => {
-                                const val = taskComments[task.id] || "";
+                                const val = taskComments[task.id] !== undefined ? taskComments[task.id] : (chatOn ? "" : (ownComment(task)?.text || ""));
                                 updateTaskComment(task.id, val);
                               }}
                               className="bg-cyan-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50"
