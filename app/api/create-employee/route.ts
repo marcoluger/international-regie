@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     const limited = await rateLimit(request, "standard");
     if (limited) return limited;
 
-    const { username, password, fullName, role, companyId, companySlug, mustChangePassword, preferredLanguage, nationality, phone } = await request.json();
+    const { username, password, fullName, role, companyId, companySlug, mustChangePassword, preferredLanguage, nationality, phone, readOnly } = await request.json();
 
     if (!username || !password || !companyId) {
       return Response.json({ error: "Pflichtfelder fehlen." }, { status: 400 });
@@ -130,6 +130,7 @@ export async function POST(request: Request) {
       preferred_language: prefLang,
       nationality: nat,
       phone: tel,
+      read_only: readOnly === true,
     });
 
     if (dbError) return Response.json({ error: dbError.message }, { status: 500 });

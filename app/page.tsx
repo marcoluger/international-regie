@@ -3709,6 +3709,7 @@ export default function Home() {
   const [newUserLanguage, setNewUserLanguage] = useState<string>("Deutsch");
   const [newUserNationality, setNewUserNationality] = useState<string>("");
   const [newUserPhone, setNewUserPhone] = useState<string>("");
+  const [newUserReadOnly, setNewUserReadOnly] = useState<boolean>(false);
   const [editMemberId, setEditMemberId] = useState<string | null>(null);
   const [editRole, setEditRole] = useState<string>("employee");
   const [editLang, setEditLang] = useState<string>("Deutsch");
@@ -4095,11 +4096,11 @@ export default function Home() {
     setCreatingEmployee(true);
     const { data: sessionData } = await supabase.auth.getSession();
     const token = sessionData?.session?.access_token || "";
-    const res = await fetch("/api/create-employee", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ username: newUserUsername, password: newUserPassword, fullName: newUserName, role: newUserRole, companyId: currentCompany.company_id, companySlug: currentCompany.companies.slug, preferredLanguage: newUserLanguage, nationality: newUserNationality, phone: newUserPhone }) });
+    const res = await fetch("/api/create-employee", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ username: newUserUsername, password: newUserPassword, fullName: newUserName, role: newUserRole, companyId: currentCompany.company_id, companySlug: currentCompany.companies.slug, preferredLanguage: newUserLanguage, nationality: newUserNationality, phone: newUserPhone, readOnly: newUserReadOnly }) });
     const data = await res.json();
     setCreatingEmployee(false);
     if (data.error) { setMessage("Fehler: " + data.error); return; }
-    setNewUserName(""); setNewUserEmail(""); setNewUserUsername(""); setNewUserPassword(""); setNewUserRole("employee"); setNewUserLanguage("Deutsch"); setNewUserNationality(""); setNewUserPhone("");
+    setNewUserName(""); setNewUserEmail(""); setNewUserUsername(""); setNewUserPassword(""); setNewUserRole("employee"); setNewUserLanguage("Deutsch"); setNewUserNationality(""); setNewUserPhone(""); setNewUserReadOnly(false);
     await loadCompanyUsers(currentCompany.company_id);
     setMessage(`✅ Mitarbeiter angelegt. Login: ${data.email}`);
   }
@@ -6464,6 +6465,10 @@ export default function Home() {
                 </select>
                 <input className="border p-3 text-black bg-white" placeholder="Telefonnummer *" value={newUserPhone} onChange={(e) => setNewUserPhone(e.target.value)} />
               </div>
+              <label className="flex items-center gap-2 text-sm font-medium">
+                <input type="checkbox" checked={newUserReadOnly} onChange={(e) => setNewUserReadOnly(e.target.checked)} />
+                👁️ {(t as any).readOnlyLabel || "Nur lesen (Arbeitsanweisung nicht bearbeitbar)"}
+              </label>
               <button type="button" onClick={addCompanyUser} disabled={creatingEmployee} className="bg-cyan-700 text-white px-4 py-3 rounded-lg disabled:opacity-50">{creatingEmployee ? "Wird angelegt..." : t.addEmployee}</button>
               <p className="text-xs text-gray-400">Der Mitarbeiter meldet sich mit seinem Benutzernamen und Passwort an.</p>
             </div>
