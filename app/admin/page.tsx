@@ -56,6 +56,9 @@ export default function AdminPage() {
   const [settingsMap, setSettingsMap] = useState<Record<string, any>>({});
   const [feedbackMap, setFeedbackMap] = useState<Record<string, any[]>>({});
   const [openFeedbackId, setOpenFeedbackId] = useState<string | null>(null);
+  const [openContractId, setOpenContractId] = useState<string | null>(null);
+  const [contractMap, setContractMap] = useState<Record<string, any>>({});
+  const [savingContract, setSavingContract] = useState<string | null>(null);
   const [loadingFeedback, setLoadingFeedback] = useState<string | null>(null);
 
   const [newCompanyName, setNewCompanyName] = useState("");
@@ -215,6 +218,36 @@ export default function AdminPage() {
     if (data.error) { setMessage("Fehler: " + data.error); return; }
     setMessage("✅ Einstellungen gespeichert.");
     loadAll();
+  }
+
+  // Vertragsdaten einer Firma laden + Bereich auf-/zuklappen.
+  async function toggleContract(companyId: string) {
+    if (openContractId === companyId) { setOpenContractId(null); return; }
+    setOpenContractId(companyId);
+    try {
+      const res = await fetch("/api/admin-data", { method: "POST", headers: await authHeaders(), body: JSON.stringify({ action: "getContract", companyId }) });
+      const data = await res.json();
+      if (data.error) { setMessage("Fehler: " + data.error); return; }
+      setContractMap((prev) => ({ ...prev, [companyId]: data.contract || {} }));
+    } catch (e: any) {
+      setMessage("Fehler: " + String(e?.message || e));
+    }
+  }
+  function setContractField(companyId: string, field: string, value: any) {
+    setContractMap((prev) => ({ ...prev, [companyId]: { ...(prev[companyId] || {}), [field]: value } }));
+  }
+  async function saveContract(companyId: string) {
+    setSavingContract(companyId);
+    try {
+      const res = await fetch("/api/admin-data", { method: "POST", headers: await authHeaders(), body: JSON.stringify({ action: "saveContract", companyId, contract: contractMap[companyId] || {} }) });
+      const data = await res.json();
+      if (data.error) { setMessage("Fehler: " + data.error); return; }
+      setMessage("✅ Vertragsdaten gespeichert.");
+    } catch (e: any) {
+      setMessage("Fehler: " + String(e?.message || e));
+    } finally {
+      setSavingContract(null);
+    }
   }
 
   // Feedback einer Firma laden + Bereich auf-/zuklappen.
@@ -539,6 +572,50 @@ export default function AdminPage() {
                         ))}
                       </div>
                     )}
+                  </div>
+                  <div>
+                    <button type="button" onClick={() => toggleContract(company.id)} className="bg-slate-700 text-white px-4 py-2.5 rounded font-bold text-sm">📄 Vertrag {openContractId === company.id ? "▲" : "▼"}</button>
+                    {openContractId === company.id && (() => {
+                      const c = contractMap[company.id] || {};
+                      const F = (label: string, field: string, type = "text", ph = "") => (
+                        <div className="flex flex-col gap-1">
+                          <label className="text-xs font-medium text-gray-600">{label}</label>
+                          <input type={type} placeholder={ph} value={c[field] ?? ""} onChange={(ev) => setContractField(company.id, field, ev.target.value)} className="border p-2 rounded text-sm" />
+                        </div>
+                      );
+                      return (
+                        <div className="mt-2 border rounded p-3 bg-gray-50 space-y-3">
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                            {F("Vertragsnummer", "contract_number", "text", "z. B. V-2026-001")}
+                            {F("Paket", "package", "text", "Starter / Team / Business")}
+                            {F("Preis pro Monat (netto)", "monthly_price", "number", "z. B. 49")}
+                            {F("USt-Satz in %", "vat_rate", "number", "19 (DE) / 20 (AT)")}
+                            {F("Vertragsbeginn", "start_date", "date")}
+                            {F("Vertragsende (optional)", "end_date", "date")}
+                            {F("Rechnungsempfänger", "customer_name", "text", "Firmenname")}
+                            {F("Straße", "customer_street")}
+                            {F("PLZ", "customer_zip")}
+                            {F("Ort", "customer_city")}
+                            {F("Land", "customer_country", "text", "DE / AT")}
+                            {F("USt-IdNr. / Steuernummer", "vat_id")}
+                            {F("Rechnungs-E-Mail", "invoice_email", "email")}
+                            {F("Zahlungsart", "payment_method", "text", "Überweisung / SEPA")}
+                            {F("Zahlungsziel (Tage)", "payment_terms", "number", "14")}
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <label className="text-xs font-medium text-gray-600">Notizen</label>
+                            <textarea rows={2} value={c.notes ?? ""} onChange={(ev) => setContractField(company.id, "notes", ev.target.value)} className="border p-2 rounded text-sm" />
+                          </div>
+                          <label className="flex items-center gap-2 text-sm">
+                            <input type="checkbox" checked={!!c.active} onChange={(ev) => setContractField(company.id, "active", ev.target.checked)} />
+                            Vertrag aktiv
+                          </label>
+                          <button type="button" disabled={savingContract === company.id} onClick={() => saveContract(company.id)} className="bg-cyan-700 text-white px-4 py-2.5 rounded font-bold text-sm disabled:opacity-50">
+                            {savingContract === company.id ? "⏳ Speichert…" : "💾 Vertrag speichern"}
+                          </button>
+                        </div>
+                      );
+                    })()}
                   </div>
                   <div>
                     <button type="button" onClick={() => toggleFeedback(company.id)} className="bg-cyan-700 text-white px-4 py-2.5 rounded font-bold text-sm">💬 Feedback ansehen {openFeedbackId === company.id ? "▲" : "▼"}</button>

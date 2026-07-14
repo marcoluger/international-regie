@@ -192,8 +192,40 @@ export async function POST(request: Request) {
     }
     await supabaseAdmin.from("company_features").delete().eq("company_id", companyId);
     await supabaseAdmin.from("feedback").delete().eq("company_id", companyId);
+    await supabaseAdmin.from("company_contracts").delete().eq("company_id", companyId);
     await supabaseAdmin.from("company_users").delete().eq("company_id", companyId);
     await supabaseAdmin.from("companies").delete().eq("id", companyId);
+    return Response.json({ success: true });
+  }
+
+  if (action === "getContract") {
+    const { companyId } = body;
+    if (!companyId) return Response.json({ error: "companyId fehlt." }, { status: 400 });
+    const { data, error } = await supabaseAdmin
+      .from("company_contracts")
+      .select("*")
+      .eq("company_id", companyId)
+      .maybeSingle();
+    if (error) return Response.json({ error: error.message }, { status: 500 });
+    return Response.json({ contract: data || null });
+  }
+
+  if (action === "saveContract") {
+    const { companyId, contract } = body;
+    if (!companyId || !contract) return Response.json({ error: "Daten fehlen." }, { status: 400 });
+    const clean = {
+      ...contract,
+      company_id: companyId,
+      monthly_price: contract.monthly_price === "" || contract.monthly_price === null ? null : Number(contract.monthly_price),
+      vat_rate: contract.vat_rate === "" || contract.vat_rate === null ? null : Number(contract.vat_rate),
+      start_date: contract.start_date || null,
+      end_date: contract.end_date || null,
+      updated_at: new Date().toISOString(),
+    };
+    const { error } = await supabaseAdmin
+      .from("company_contracts")
+      .upsert(clean, { onConflict: "company_id" });
+    if (error) return Response.json({ error: error.message }, { status: 500 });
     return Response.json({ success: true });
   }
 
