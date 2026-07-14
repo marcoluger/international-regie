@@ -68,6 +68,7 @@ type CompanySettings = {
 type CurrentCompany = {
   company_id: string;
   role: string;
+  read_only?: boolean;
   companies: {
     id: string;
     name: string;
@@ -3693,6 +3694,9 @@ export default function Home() {
   const [companyFeatures, setCompanyFeatures] = useState<CompanyFeatures | null>(null);
   // Modul "Kommentar-Chat": AN = offener Verlauf fuer alle, AUS = privater Kommentar je Person.
   const chatOn = !!companyFeatures?.comments_enabled;
+  // "Nur lesen": Mitarbeiter darf Arbeitsanweisungen ansehen und Regieberichte erstellen,
+  // aber weder Kommentare schreiben noch den Status aendern.
+  const readOnlyUser = !!(currentCompany as any)?.read_only;
   const firstDate = days.find((day) => day.date)?.date || "";
   const calendarWeek = getCalendarWeek(firstDate);
   const [companyUsers, setCompanyUsers] = useState<any[]>([]);
@@ -3710,6 +3714,7 @@ export default function Home() {
   const [editLang, setEditLang] = useState<string>("Deutsch");
   const [editNationality, setEditNationality] = useState<string>("");
   const [editPhone, setEditPhone] = useState<string>("");
+  const [editReadOnly, setEditReadOnly] = useState<boolean>(false);
   const [savingEdit, setSavingEdit] = useState(false);
   const [showOverview, setShowOverview] = useState(false);
   const [taskComments, setTaskComments] = useState<Record<string, string>>({});
@@ -3911,7 +3916,7 @@ export default function Home() {
   }, [uiLanguage, reportVersion]);
 
   async function loadCompanyContext(userId: string) {
-    const { data: companyUser, error } = await supabase.from("company_users").select("company_id, role, preferred_language").eq("user_id", userId).maybeSingle();
+    const { data: companyUser, error } = await supabase.from("company_users").select("company_id, role, preferred_language, read_only").eq("user_id", userId).maybeSingle();
     if (error) { setMessage("Fehler beim Laden der Firma: " + error.message); return; }
     if (!companyUser) { return; } // Kein Onboarding hier – wird in loadCompanySettings entschieden
     const { data: companyData, error: companyError } = await supabase.from("companies").select("id, name, slug, status").eq("id", companyUser.company_id).single();
@@ -4150,7 +4155,7 @@ export default function Home() {
     try {
       const { data: sessionData } = await supabase.auth.getSession();
       const token = sessionData?.session?.access_token || "";
-      const body: any = { userId: member.user_id, preferredLanguage: editLang, nationality: editNationality.trim(), phone: editPhone.trim() };
+      const body: any = { userId: member.user_id, preferredLanguage: editLang, nationality: editNationality.trim(), phone: editPhone.trim(), readOnly: editReadOnly };
       // Rolle nur mitschicken, wenn geaendert und nicht man selbst.
       if (editRole !== member.role && member.user_id !== user?.id) body.role = editRole;
       const res = await fetch("/api/update-employee", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify(body) });
@@ -6254,7 +6259,7 @@ export default function Home() {
                   {(instruction.work_instruction_tasks || []).sort((a: any, b: any) => a.sort_order - b.sort_order).map((task: any) => (
                     <li key={task.id} className="border border-slate-200 rounded-xl p-3 shadow-sm bg-gray-50 space-y-3">
                       <div className="flex items-center gap-2">
-                        <select className="border rounded-lg p-1 text-sm text-black bg-white" value={task.status || "open"} onChange={(e) => updateTaskStatus(task.id, e.target.value)}>
+                        <select className="border rounded-lg p-1 text-sm text-black bg-white disabled:opacity-60" disabled={readOnlyUser} value={task.status || "open"} onChange={(e) => updateTaskStatus(task.id, e.target.value)}>
                           <option value="open">{t.statusOpen}</option><option value="in_progress">{t.statusInProgress}</option><option value="stopped">{t.statusStopped}</option><option value="completed">{t.statusCompleted}</option>
                         </select>
                         <span className="font-medium">{getTranslatedTask(instruction.id, task.id, task.task_text)}</span>
@@ -6270,6 +6275,9 @@ export default function Home() {
                             <p className="text-sm whitespace-pre-wrap break-words">{getTranslatedComment(instruction.id, task.id, c)}</p>
                           </div>
                         ))}
+                        {readOnlyUser ? (
+                          <p className="text-xs text-gray-500">👁️ {(t as any).readOnlyHint || "Nur lesen – Schreiben ist für dieses Konto gesperrt."}</p>
+                        ) : (<>
                         <p className="text-sm font-medium text-gray-700">💬 {t.commentLabel} (max. 1000 {t.charsLabel}):{myDisplayName() ? <span className="ml-1 font-normal text-cyan-700">— {myDisplayName()}</span> : null}</p>
                         <textarea
                           className="border p-2 w-full rounded-lg text-sm text-black bg-white"
@@ -6301,6 +6309,7 @@ export default function Home() {
                             </button>
                           </div>
                         </div>
+                        </>)}
                       </div>
                     </li>
                   ))}
@@ -6469,11 +6478,11 @@ export default function Home() {
                 <strong>{member.full_name || "-"}</strong>
                 <p>{member.email || "-"}</p>
                 <p>{t.role}: {roleLabel(member.role)}{member.preferred_language ? ` · 🌐 ${member.preferred_language}` : ""}</p>
-                <p className="text-sm text-gray-600">{member.nationality || "-"}{member.phone ? ` · 📞 ${member.phone}` : ""}</p>
+                <p className="text-sm text-gray-600">{member.nationality || "-"}{member.phone ? ` · 📞 ${member.phone}` : ""}{member.read_only ? " · 👁️ nur lesen" : ""}</p>
                 <div className="flex gap-2 flex-wrap">
                   {member.email && (<button type="button" onClick={() => resetCompanyUserPassword(member.email)} className="bg-gray-700 text-white px-3 py-2.5 rounded-lg">{t.resetPassword}</button>)}
                   {currentCompany && canManageMember(currentCompany.role, member.role) && (
-                    <button type="button" onClick={() => { const open = editMemberId !== member.id; setEditMemberId(open ? member.id : null); if (open) { setEditRole(member.role); setEditLang(member.preferred_language || "Deutsch"); setEditNationality(member.nationality || ""); setEditPhone(member.phone || ""); } }} className="bg-cyan-700 text-white px-3 py-2.5 rounded-lg">✏️ {(t as any).editBtn || "Bearbeiten"}</button>
+                    <button type="button" onClick={() => { const open = editMemberId !== member.id; setEditMemberId(open ? member.id : null); if (open) { setEditRole(member.role); setEditLang(member.preferred_language || "Deutsch"); setEditNationality(member.nationality || ""); setEditPhone(member.phone || ""); setEditReadOnly(!!member.read_only); } }} className="bg-cyan-700 text-white px-3 py-2.5 rounded-lg">✏️ {(t as any).editBtn || "Bearbeiten"}</button>
                   )}
                   {currentCompany && canDelete(currentCompany.role, member.role) && member.user_id !== user?.id && (
                     <button type="button" onClick={() => deleteCompanyUser(member.id, member.user_id)} className="bg-red-600 text-white px-3 py-2.5 rounded-lg">🗑️ Löschen</button>
@@ -6498,6 +6507,10 @@ export default function Home() {
                       </select>
                       <label className="text-sm font-medium">📞 Telefon</label>
                       <input className="border p-2 rounded-lg text-black bg-white" value={editPhone} onChange={(e) => setEditPhone(e.target.value)} />
+                      <label className="flex items-center gap-2 text-sm font-medium mt-1">
+                        <input type="checkbox" checked={editReadOnly} onChange={(e) => setEditReadOnly(e.target.checked)} />
+                        👁️ {(t as any).readOnlyLabel || "Nur lesen (Arbeitsanweisung nicht bearbeitbar)"}
+                      </label>
                     </div>
                     <div className="flex gap-2">
                       <button type="button" disabled={savingEdit} onClick={() => updateEmployee(member)} className="bg-cyan-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50">{savingEdit ? "⏳" : "💾"} {(t as any).saveBtn || "Speichern"}</button>

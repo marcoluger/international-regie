@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     const limited = await rateLimit(request, "standard");
     if (limited) return limited;
 
-    const { userId, role, preferredLanguage, nationality, phone } = await request.json();
+    const { userId, role, preferredLanguage, nationality, phone, readOnly } = await request.json();
     if (!userId) {
       return Response.json({ error: "User ID fehlt." }, { status: 400 });
     }
@@ -39,7 +39,8 @@ export async function POST(request: Request) {
         : null;
     const wantNat = typeof nationality === "string" && nationality.trim() ? nationality.trim() : null;
     const wantPhone = typeof phone === "string" && phone.trim() ? phone.trim() : null;
-    if (!wantRole && !wantLang && !wantNat && !wantPhone) {
+    const wantReadOnly = typeof readOnly === "boolean" ? readOnly : null;
+    if (!wantRole && !wantLang && !wantNat && !wantPhone && wantReadOnly === null) {
       return Response.json({ error: "Nichts zu aendern." }, { status: 400 });
     }
 
@@ -129,6 +130,10 @@ export async function POST(request: Request) {
     }
     if (wantPhone) {
       updates.phone = wantPhone;
+    }
+    // "Nur lesen" (kein Kommentar, kein Status) – nur fuer Mitarbeiter sinnvoll.
+    if (wantReadOnly !== null) {
+      updates.read_only = wantReadOnly;
     }
 
     if (Object.keys(updates).length === 0) {

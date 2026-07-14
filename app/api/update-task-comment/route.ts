@@ -55,9 +55,15 @@ export async function POST(request: Request) {
     // 3a) Ist das Chat-Modul fuer die Firma des Aufrufers freigeschaltet?
     const { data: callerMember } = await supabaseAdmin
       .from("company_users")
-      .select("company_id")
+      .select("company_id, read_only")
       .eq("user_id", caller.id)
       .maybeSingle();
+
+    // Konten mit "Nur lesen" duerfen keine Kommentare schreiben (serverseitig erzwungen).
+    if (callerMember?.read_only) {
+      return Response.json({ error: "Dieses Konto darf nur lesen." }, { status: 403 });
+    }
+
     let chatMode = false;
     if (callerMember?.company_id) {
       const { data: feat } = await supabaseAdmin
