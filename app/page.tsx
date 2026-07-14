@@ -3749,6 +3749,7 @@ export default function Home() {
   const [projectZip, setProjectZip] = useState("");
   const [projectCity, setProjectCity] = useState("");
   const [projectManager, setProjectManager] = useState("");
+  const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
   const [pmEdits, setPmEdits] = useState<Record<string, string>>({});
   const [selectedProjectId, setSelectedProjectId] = useState("");
   const [selectedProjectDetailId, setSelectedProjectDetailId] = useState("");
@@ -4961,12 +4962,33 @@ export default function Home() {
     return Array.from(new Set(list)).join(", ");
   }
 
+  // Projekt-Formular leeren und den Bearbeiten-Modus beenden.
+  function resetProjectForm() {
+    setProjectName(""); setProjectCustomer(""); setProjectSite(""); setProjectStreet(""); setProjectZip(""); setProjectCity(""); setProjectManager("");
+    setEditingProjectId(null);
+  }
+  // Bestehendes Projekt in das Formular laden.
+  function startEditProject(p: any) {
+    setEditingProjectId(p.id);
+    setProjectName(p.name || ""); setProjectCustomer(p.customer || ""); setProjectSite(p.site || "");
+    setProjectStreet(p.street || ""); setProjectZip(p.zip || ""); setProjectCity(p.city || "");
+    setProjectManager(p.project_manager || "");
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   async function saveProject() {
     if (!currentCompany) return;
+    if (!projectName.trim()) { setMessage(t.msgFillRequired); return; }
     await ensureFreshSession();
-    const { error } = await dbTimeout(supabase.from("projects").insert({ company_id: currentCompany.company_id, name: projectName, customer: projectCustomer, site: projectSite, street: projectStreet, zip: projectZip, city: projectCity, project_manager: projectManager }));
-    if (error) { setMessage("Fehler beim Speichern: " + error.message); return; }
-    setProjectName(""); setProjectCustomer(""); setProjectSite(""); setProjectStreet(""); setProjectZip(""); setProjectCity(""); setProjectManager("");
+    const payload = { name: projectName, customer: projectCustomer, site: projectSite, street: projectStreet, zip: projectZip, city: projectCity, project_manager: projectManager };
+    if (editingProjectId) {
+      const { error } = await dbTimeout(supabase.from("projects").update(payload).eq("id", editingProjectId));
+      if (error) { setMessage("Fehler beim Speichern: " + error.message); return; }
+    } else {
+      const { error } = await dbTimeout(supabase.from("projects").insert({ company_id: currentCompany.company_id, ...payload }));
+      if (error) { setMessage("Fehler beim Speichern: " + error.message); return; }
+    }
+    resetProjectForm();
     await loadProjects(); setMessage(t.msgProjectSaved);
   }
 
@@ -5898,7 +5920,7 @@ export default function Home() {
 
       {activeTab === "projekte" && (
         <section className="border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4 bg-white text-black">
-          <h2 className="text-xl font-bold">{t.projectsTab}</h2>
+          <h2 className="text-xl font-bold">{t.projectsTab}{editingProjectId ? <span className="ml-2 text-sm font-normal text-amber-700">✏️ {(t as any).editBtn || "Bearbeiten"}</span> : null}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <input className="border p-3 w-full" placeholder={t.projectName} value={projectName} onChange={(e) => setProjectName(e.target.value)} />
             <input className="border p-3 w-full" placeholder={t.customer} value={projectCustomer} onChange={(e) => setProjectCustomer(e.target.value)} />
@@ -5913,7 +5935,10 @@ export default function Home() {
               {companyUsers.filter((m: any) => m.role === "project_manager").map((m: any) => (<option key={m.user_id} value={m.full_name || m.email || ""}>{m.full_name || m.email}</option>))}
             </select>
           </div>
-          <button type="button" onClick={saveProject} className="bg-cyan-700 text-white px-4 py-3 rounded-lg">{t.saveProject}</button>
+          <div className="flex gap-2 flex-wrap">
+            <button type="button" onClick={saveProject} className="bg-cyan-700 text-white px-4 py-3 rounded-lg">{editingProjectId ? `💾 ${t.update}` : t.saveProject}</button>
+            {editingProjectId && (<button type="button" onClick={resetProjectForm} className="bg-gray-200 px-4 py-3 rounded-lg">{(t as any).cancelBtn || "Abbrechen"}</button>)}
+          </div>
           <div className="space-y-3 mt-4">
             {projects.map((project) => (
               <div key={project.id} className="border border-slate-200 rounded-xl p-3 shadow-sm space-y-2">
@@ -5937,6 +5962,7 @@ export default function Home() {
                 )}
                 <div className="flex gap-2">
                   <button type="button" onClick={() => setSelectedProjectDetailId(project.id === selectedProjectDetailId ? "" : project.id)} className="bg-gray-700 text-white px-3 py-2.5 rounded-lg">{project.id === selectedProjectDetailId ? t.closeProject : t.openProject}</button>
+                  {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => startEditProject(project)} className="bg-amber-600 text-white px-3 py-2.5 rounded-lg">✏️ {(t as any).editBtn || "Bearbeiten"}</button>)}
                   <button type="button" onClick={() => deleteProject(project.id)} className="bg-red-600 text-white px-3 py-2.5 rounded-lg">{t.deleteProject}</button>
                 </div>
                 {selectedProjectDetailId === project.id && (
