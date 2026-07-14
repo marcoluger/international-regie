@@ -106,10 +106,9 @@ export async function POST(request: Request) {
       if (!target) return Response.json({ error: "Beitrag nicht gefunden." }, { status: 404 });
       if (!isMine(target)) return Response.json({ error: "Nur eigene Beitraege koennen geloescht werden." }, { status: 403 });
       list = list.filter((c: any) => c?.id !== commentId);
-    } else if (commentId) {
+    } else if (commentId && list.some((c: any) => c?.id === commentId)) {
       // Eigenen Beitrag bearbeiten (nur eigene!)
       const idx = list.findIndex((c: any) => c?.id === commentId);
-      if (idx < 0) return Response.json({ error: "Beitrag nicht gefunden." }, { status: 404 });
       if (!isMine(list[idx])) return Response.json({ error: "Nur eigene Beitraege koennen geaendert werden." }, { status: 403 });
       if (!cleanComment.trim()) {
         list = list.filter((c: any) => c?.id !== commentId);

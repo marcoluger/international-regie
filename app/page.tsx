@@ -6399,7 +6399,9 @@ export default function Home() {
                               disabled={commentSaveState[task.id] === "saving" || (chatOn && !(taskComments[task.id] || "").trim())}
                               onClick={() => {
                                 const val = taskComments[task.id] !== undefined ? taskComments[task.id] : (chatOn ? "" : (ownComment(task)?.text || ""));
-                                updateTaskComment(task.id, val, editingCommentId[task.id]);
+                                const cid = editingCommentId[task.id];
+                                const validCid = chatOn && cid && !cid.startsWith("local-") ? cid : undefined;
+                                updateTaskComment(task.id, val, validCid);
                               }}
                               className="bg-cyan-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50"
                             >
