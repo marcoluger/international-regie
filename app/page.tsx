@@ -6451,14 +6451,39 @@ export default function Home() {
               <>
                 <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black">
                   <h3 className="font-bold mb-3">{t.week}: {getCalendarWeek(selectedWeek)}</h3>
-                  <div className="grid grid-cols-7 gap-1 mb-1">{t.weekdays.map((label) => (<div key={label} className="text-center text-xs font-bold text-gray-500 py-1">{label.slice(0, 2)}</div>))}</div>
-                  <div className="grid grid-cols-7 gap-1">
-                    {weekDates.map((dateStr) => {
+                  {/* Handy: Tage untereinander (gut lesbar). Ab Tablet: 7-Spalten-Raster. */}
+                  <div className="md:hidden space-y-2">
+                    {weekDates.map((dateStr, wi) => {
                       const entries = weekInstructions.filter((inst) => inst.work_date === dateStr);
                       const isToday = dateStr === todayStr;
-                      const dayNo = Number(dateStr.split("-")[2]);
-                      return (<div key={dateStr} onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }} className={`border rounded-lg p-2 min-h-24 min-w-0 cursor-pointer hover:border-cyan-500 transition-colors flex flex-col gap-1 ${isToday ? "border-cyan-600 bg-cyan-50" : entries.length > 0 ? "bg-green-50 border-green-300" : "bg-white"}`}><div className={`text-xs font-bold ${isToday ? "text-cyan-700" : "text-gray-700"}`}>{dayNo}{entries.length > 0 ? ` · ${entries.length} ✓` : ""}</div>{entries.map((e: any) => (<div key={e.id} className="text-xs leading-tight bg-white border border-green-200 rounded px-1 py-0.5 text-gray-700 truncate">{getTranslated(e.id, "title", e.title)}</div>))}</div>);
+                      const [yy, mm, dd] = dateStr.split("-");
+                      return (
+                        <div key={dateStr} onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }} className={`border rounded-xl p-3 cursor-pointer active:bg-gray-100 ${isToday ? "border-cyan-600 bg-cyan-50" : entries.length > 0 ? "bg-green-50 border-green-300" : "bg-white"}`}>
+                          <div className="flex items-center justify-between gap-2">
+                            <span className={`font-bold ${isToday ? "text-cyan-700" : "text-gray-800"}`}>{t.weekdays[wi]}, {dd}.{mm}.</span>
+                            <span className="text-xs text-gray-500">{entries.length > 0 ? `${entries.length} ✓` : "–"}</span>
+                          </div>
+                          {entries.length > 0 && (
+                            <ul className="mt-2 space-y-1">
+                              {entries.map((e: any) => (
+                                <li key={e.id} className="text-sm bg-white border border-green-200 rounded-lg px-2 py-1 text-gray-700 break-words">{getTranslated(e.id, "title", e.title)}</li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      );
                     })}
+                  </div>
+                  <div className="hidden md:block">
+                    <div className="grid grid-cols-7 gap-1 mb-1">{t.weekdays.map((label) => (<div key={label} className="text-center text-xs font-bold text-gray-500 py-1">{label.slice(0, 2)}</div>))}</div>
+                    <div className="grid grid-cols-7 gap-1">
+                      {weekDates.map((dateStr) => {
+                        const entries = weekInstructions.filter((inst) => inst.work_date === dateStr);
+                        const isToday = dateStr === todayStr;
+                        const dayNo = Number(dateStr.split("-")[2]);
+                        return (<div key={dateStr} onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }} className={`border rounded-lg p-2 min-h-24 min-w-0 cursor-pointer hover:border-cyan-500 transition-colors flex flex-col gap-1 ${isToday ? "border-cyan-600 bg-cyan-50" : entries.length > 0 ? "bg-green-50 border-green-300" : "bg-white"}`}><div className={`text-xs font-bold ${isToday ? "text-cyan-700" : "text-gray-700"}`}>{dayNo}{entries.length > 0 ? ` · ${entries.length} ✓` : ""}</div>{entries.map((e: any) => (<div key={e.id} className="text-xs leading-tight bg-white border border-green-200 rounded px-1 py-0.5 text-gray-700 truncate">{getTranslated(e.id, "title", e.title)}</div>))}</div>);
+                      })}
+                    </div>
                   </div>
                 </section>
                 <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-2">
