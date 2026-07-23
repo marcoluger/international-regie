@@ -4513,8 +4513,9 @@ export default function Home() {
   function csvNum(n: number, digits = 2): string {
     return (Math.round(n * 100) / 100).toFixed(digits).replace(".", ",");
   }
-  function downloadHoursCsv() {
-    const gruppen = monthlyHoursByEmployee(exportMonth, exportWeek || undefined);
+  function downloadHoursCsv(nurMitarbeiter?: string) {
+    const alle = monthlyHoursByEmployee(exportMonth, exportWeek || undefined);
+    const gruppen = nurMitarbeiter ? alle.filter((g) => g.name === nurMitarbeiter) : alle;
     if (gruppen.length === 0) { setMessage(t.exportEmpty); return; }
     const clean = (v: any) => String(v ?? "").replace(/;/g, ",").replace(/[\r\n]+/g, " ");
     const head = [t.employee, t.date, t.customer, t.projectNumber, t.site, t.startTime, t.endTime, t.breakLabel, t.hours, `${t.travelTime} (h)`, t.km].join(";");
@@ -4533,14 +4534,15 @@ export default function Home() {
       lines.push("");
       gesamt = { hours: gesamt.hours + g.hours, travelMin: gesamt.travelMin + g.travelMin, km: gesamt.km + g.km, days: gesamt.days + g.days.length };
     }
-    lines.push([t.total, `${gesamt.days} ${t.exportDays}`, "", "", "", "", "", "", csvNum(gesamt.hours), csvNum(gesamt.travelMin / 60), csvNum(gesamt.km, 1)].join(";"));
+    if (gruppen.length > 1) lines.push([t.total, `${gesamt.days} ${t.exportDays}`, "", "", "", "", "", "", csvNum(gesamt.hours), csvNum(gesamt.travelMin / 60), csvNum(gesamt.km, 1)].join(";"));
     // BOM, damit Excel Umlaute richtig anzeigt
     const csv = "\ufeff" + [head, ...lines].join("\r\n");
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `Stunden_${exportMonth}${exportWeek ? "_" + exportWeek.replace(/\s+/g, "") : ""}.csv`;
+    const wer = nurMitarbeiter ? "_" + nurMitarbeiter.replace(/[^\wÄÖÜäöüß.-]+/g, "_") : "";
+    a.download = `Stunden${wer}_${exportMonth}${exportWeek ? "_" + exportWeek.replace(/\s+/g, "") : ""}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -7147,7 +7149,7 @@ export default function Home() {
                 {weeksInMonth(exportMonth).map((w) => (<option key={w} value={w}>{w}</option>))}
               </select>
               <button type="button" onClick={loadTeamReports} className="bg-gray-200 px-3 py-2.5 rounded-lg text-sm">🔄</button>
-              <button type="button" onClick={downloadHoursCsv} className="bg-green-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium">⬇️ {t.exportDownload}</button>
+              <button type="button" onClick={() => downloadHoursCsv()} className="bg-green-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium">⬇️ {t.exportDownload} ({t.filterAll})</button>
             </div>
             {gruppen.length === 0 ? (
               <p className="text-gray-500">{t.exportEmpty}</p>
@@ -7155,10 +7157,13 @@ export default function Home() {
               <div className="space-y-3">
                 {gruppen.map((g) => (
                   <div key={g.name} className="border rounded-lg overflow-hidden">
-                    <button type="button" onClick={() => setExpCollapsed(prev => ({ ...prev, [g.name]: !prev[g.name] }))} className="w-full bg-gray-100 px-3 py-2 font-bold flex justify-between items-center gap-2 text-left">
-                      <span>👤 {g.name} · {csvNum(g.hours)} {t.hours} ({g.days.length} {t.exportDays})</span>
-                      <span className="text-gray-400">{expCollapsed[g.name] ? "▼" : "▲"}</span>
-                    </button>
+                    <div className="bg-gray-100 px-3 py-2 flex justify-between items-center gap-2">
+                      <button type="button" onClick={() => setExpCollapsed(prev => ({ ...prev, [g.name]: !prev[g.name] }))} className="font-bold flex-1 text-left">
+                        👤 {g.name} · {csvNum(g.hours)} {t.hours} ({g.days.length} {t.exportDays})
+                      </button>
+                      <button type="button" onClick={() => downloadHoursCsv(g.name)} title={t.exportDownload} className="bg-green-700 text-white px-3 py-1.5 rounded-lg text-xs whitespace-nowrap">⬇️ CSV</button>
+                      <button type="button" onClick={() => setExpCollapsed(prev => ({ ...prev, [g.name]: !prev[g.name] }))} className="text-gray-400 px-1">{expCollapsed[g.name] ? "▼" : "▲"}</button>
+                    </div>
                     {!expCollapsed[g.name] && (
                       <div className="overflow-x-auto">
                         <table className="w-full text-sm text-left border-collapse">
