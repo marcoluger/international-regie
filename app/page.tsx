@@ -3945,6 +3945,7 @@ export default function Home() {
   const [catTrans, setCatTrans] = useState<Record<string, string>>({});
   const [materialOrders, setMaterialOrders] = useState<any[]>([]);
   const [exportMonth, setExportMonth] = useState<string>(() => new Date().toISOString().slice(0, 7));
+  const [expCollapsed, setExpCollapsed] = useState<Record<string, boolean>>({});
   const [equipment, setEquipment] = useState<any[]>([]);
   const [eqDraft, setEqDraft] = useState<{ id: string; type: string; name: string; identifier: string; note: string }>({ id: "", type: "tool", name: "", identifier: "", note: "" });
   const [eqHistory, setEqHistory] = useState<Record<string, any[]>>({});
@@ -4452,23 +4453,75 @@ export default function Home() {
     }
     return Object.values(rows).sort((x, y) => x.name.localeCompare(y.name));
   }
+  // Einzelne Tage je Mitarbeiter (Tag fuer Tag).
+  function monthlyHourDetail(month: string) {
+    const num = (v: any) => Number(String(v ?? "").replace(",", ".")) || 0;
+    const rows: any[] = [];
+    for (const r of teamReports as any[]) {
+      const name = String(r?.employee || "").trim() || "?";
+      for (const d of (r?.days || [])) {
+        if (!d?.date || !String(d.date).startsWith(month)) continue;
+        const h = parseHours(String(d.hours || ""));
+        const tm = travelMinutes(d.travelOutStart, d.travelOutEnd) + travelMinutes(d.travelReturnStart, d.travelReturnEnd);
+        const km = num(d.travelOutKm) + num(d.travelReturnKm);
+        if (h === 0 && tm === 0 && km === 0) continue;
+        rows.push({
+          name,
+          date: String(d.date),
+          customer: String(d.customer || ""),
+          project: String(d.projectNumber || ""),
+          site: String(d.site || ""),
+          start: String(d.startTime || ""),
+          end: String(d.endTime || ""),
+          pause: String(d.breakMinutes || ""),
+          hours: h,
+          travelMin: tm,
+          km,
+        });
+      }
+    }
+    return rows.sort((x, y) => x.name.localeCompare(y.name) || x.date.localeCompare(y.date));
+  }
+  // Tage nach Mitarbeiter gruppiert (fuer die Anzeige).
+  function monthlyHoursByEmployee(month: string) {
+    const detail = monthlyHourDetail(month);
+    const groups: Record<string, { name: string; days: any[]; hours: number; travelMin: number; km: number }> = {};
+    for (const row of detail) {
+      const key = row.name.toLowerCase();
+      if (!groups[key]) groups[key] = { name: row.name, days: [], hours: 0, travelMin: 0, km: 0 };
+      groups[key].days.push(row);
+      groups[key].hours += row.hours;
+      groups[key].travelMin += row.travelMin;
+      groups[key].km += row.km;
+    }
+    return Object.values(groups).sort((x, y) => x.name.localeCompare(y.name));
+  }
+
   // Zahl im deutschen Format (Komma) fuer Excel.
   function csvNum(n: number, digits = 2): string {
     return (Math.round(n * 100) / 100).toFixed(digits).replace(".", ",");
   }
   function downloadHoursCsv() {
-    const rows = monthlyHourSummary(exportMonth);
-    if (rows.length === 0) { setMessage(t.exportEmpty); return; }
-    const head = [t.employee, t.exportDays, t.hours, `${t.travelTime} (h)`, t.km].join(";");
-    const lines = rows.map((r) => [
-      String(r.name).replace(/;/g, ","),
-      String(r.days),
-      csvNum(r.hours),
-      csvNum(r.travelMin / 60),
-      csvNum(r.km, 1),
-    ].join(";"));
-    const sum = rows.reduce((acc, r) => ({ days: acc.days + r.days, hours: acc.hours + r.hours, travelMin: acc.travelMin + r.travelMin, km: acc.km + r.km }), { days: 0, hours: 0, travelMin: 0, km: 0 });
-    lines.push([t.total, String(sum.days), csvNum(sum.hours), csvNum(sum.travelMin / 60), csvNum(sum.km, 1)].join(";"));
+    const gruppen = monthlyHoursByEmployee(exportMonth);
+    if (gruppen.length === 0) { setMessage(t.exportEmpty); return; }
+    const clean = (v: any) => String(v ?? "").replace(/;/g, ",").replace(/[\r\n]+/g, " ");
+    const head = [t.employee, t.date, t.customer, t.projectNumber, t.site, t.startTime, t.endTime, t.breakLabel, t.hours, `${t.travelTime} (h)`, t.km].join(";");
+    const lines: string[] = [];
+    let gesamt = { hours: 0, travelMin: 0, km: 0, days: 0 };
+    for (const g of gruppen) {
+      for (const d2 of g.days) {
+        lines.push([
+          clean(g.name), clean(d2.date), clean(d2.customer), clean(d2.project), clean(d2.site),
+          clean(d2.start), clean(d2.end), clean(d2.pause),
+          csvNum(d2.hours), csvNum(d2.travelMin / 60), csvNum(d2.km, 1),
+        ].join(";"));
+      }
+      // Zwischensumme je Mitarbeiter
+      lines.push([clean(g.name), `${t.total} (${g.days.length} ${t.exportDays})`, "", "", "", "", "", "", csvNum(g.hours), csvNum(g.travelMin / 60), csvNum(g.km, 1)].join(";"));
+      lines.push("");
+      gesamt = { hours: gesamt.hours + g.hours, travelMin: gesamt.travelMin + g.travelMin, km: gesamt.km + g.km, days: gesamt.days + g.days.length };
+    }
+    lines.push([t.total, `${gesamt.days} ${t.exportDays}`, "", "", "", "", "", "", csvNum(gesamt.hours), csvNum(gesamt.travelMin / 60), csvNum(gesamt.km, 1)].join(";"));
     // BOM, damit Excel Umlaute richtig anzeigt
     const csv = "\ufeff" + [head, ...lines].join("\r\n");
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -7068,8 +7121,8 @@ export default function Home() {
       )}
 
       {activeTab === "export" && companyFeatures?.export_enabled && (currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (() => {
-        const rows = monthlyHourSummary(exportMonth);
-        const sum = rows.reduce((acc, r) => ({ days: acc.days + r.days, hours: acc.hours + r.hours, travelMin: acc.travelMin + r.travelMin, km: acc.km + r.km }), { days: 0, hours: 0, travelMin: 0, km: 0 });
+        const gruppen = monthlyHoursByEmployee(exportMonth);
+        const sum = gruppen.reduce((acc, g) => ({ days: acc.days + g.days.length, hours: acc.hours + g.hours, travelMin: acc.travelMin + g.travelMin, km: acc.km + g.km }), { days: 0, hours: 0, travelMin: 0, km: 0 });
         return (
         <div className="space-y-4">
           <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-3">
@@ -7080,39 +7133,54 @@ export default function Home() {
               <button type="button" onClick={loadTeamReports} className="bg-gray-200 px-3 py-2.5 rounded-lg text-sm">🔄</button>
               <button type="button" onClick={downloadHoursCsv} className="bg-green-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium">⬇️ {t.exportDownload}</button>
             </div>
-            {rows.length === 0 ? (
+            {gruppen.length === 0 ? (
               <p className="text-gray-500">{t.exportEmpty}</p>
             ) : (
-              <div className="border border-slate-200 rounded-xl overflow-x-auto">
-                <table className="w-full text-sm text-left border-collapse">
-                  <thead>
-                    <tr className="bg-gray-100">
-                      <th className="px-3 py-2 font-bold">{t.employee}</th>
-                      <th className="px-3 py-2 font-bold text-right">{t.exportDays}</th>
-                      <th className="px-3 py-2 font-bold text-right">{t.hours}</th>
-                      <th className="px-3 py-2 font-bold text-right">{t.travelTime}</th>
-                      <th className="px-3 py-2 font-bold text-right">{t.km}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {rows.map((r) => (
-                      <tr key={r.name} className="border-t border-slate-200">
-                        <td className="px-3 py-2 break-words">{r.name}</td>
-                        <td className="px-3 py-2 text-right">{r.days}</td>
-                        <td className="px-3 py-2 text-right">{csvNum(r.hours)}</td>
-                        <td className="px-3 py-2 text-right">{csvNum(r.travelMin / 60)}</td>
-                        <td className="px-3 py-2 text-right">{csvNum(r.km, 1)}</td>
-                      </tr>
-                    ))}
-                    <tr className="border-t-2 border-slate-300 font-bold bg-gray-50">
-                      <td className="px-3 py-2">{t.total}</td>
-                      <td className="px-3 py-2 text-right">{sum.days}</td>
-                      <td className="px-3 py-2 text-right">{csvNum(sum.hours)}</td>
-                      <td className="px-3 py-2 text-right">{csvNum(sum.travelMin / 60)}</td>
-                      <td className="px-3 py-2 text-right">{csvNum(sum.km, 1)}</td>
-                    </tr>
-                  </tbody>
-                </table>
+              <div className="space-y-3">
+                {gruppen.map((g) => (
+                  <div key={g.name} className="border rounded-lg overflow-hidden">
+                    <button type="button" onClick={() => setExpCollapsed(prev => ({ ...prev, [g.name]: !prev[g.name] }))} className="w-full bg-gray-100 px-3 py-2 font-bold flex justify-between items-center gap-2 text-left">
+                      <span>👤 {g.name} · {csvNum(g.hours)} {t.hours} ({g.days.length} {t.exportDays})</span>
+                      <span className="text-gray-400">{expCollapsed[g.name] ? "▼" : "▲"}</span>
+                    </button>
+                    {!expCollapsed[g.name] && (
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm text-left border-collapse">
+                          <thead>
+                            <tr className="bg-gray-50">
+                              <th className="px-2 py-2 font-bold">{t.date}</th>
+                              <th className="px-2 py-2 font-bold">{t.customer}</th>
+                              <th className="px-2 py-2 font-bold">{t.projectNumber}</th>
+                              <th className="px-2 py-2 font-bold">{t.startTime}</th>
+                              <th className="px-2 py-2 font-bold">{t.endTime}</th>
+                              <th className="px-2 py-2 font-bold text-right">{t.hours}</th>
+                              <th className="px-2 py-2 font-bold text-right">{t.km}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {g.days.map((d2: any, di: number) => (
+                              <tr key={di} className="border-t border-slate-200">
+                                <td className="px-2 py-2 whitespace-nowrap">{d2.date}</td>
+                                <td className="px-2 py-2 break-words">{d2.customer || "-"}</td>
+                                <td className="px-2 py-2 break-words">{d2.project || "-"}</td>
+                                <td className="px-2 py-2">{d2.start || "-"}</td>
+                                <td className="px-2 py-2">{d2.end || "-"}</td>
+                                <td className="px-2 py-2 text-right">{csvNum(d2.hours)}</td>
+                                <td className="px-2 py-2 text-right">{d2.km ? csvNum(d2.km, 1) : "-"}</td>
+                              </tr>
+                            ))}
+                            <tr className="border-t-2 border-slate-300 font-bold bg-gray-50">
+                              <td className="px-2 py-2" colSpan={5}>{t.total}</td>
+                              <td className="px-2 py-2 text-right">{csvNum(g.hours)}</td>
+                              <td className="px-2 py-2 text-right">{csvNum(g.km, 1)}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                ))}
+                <p className="font-bold text-right pr-2">{t.total}: {csvNum(sum.hours)} {t.hours} · {csvNum(sum.km, 1)} {t.km}</p>
               </div>
             )}
           </section>
