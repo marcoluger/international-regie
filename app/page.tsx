@@ -96,10 +96,12 @@ type CompanyFeatures = {
   comments_enabled?: boolean;
   material_enabled?: boolean;
   export_enabled?: boolean;
+  equipment_enabled?: boolean;
 };
 
 const texts = {
   Deutsch: {
+    equipmentTab: "Fahrzeuge & Werkzeuge", equipmentVehicle: "Fahrzeug", equipmentTool: "Werkzeug", equipmentIdentifier: "Kennzeichen / Nummer", equipmentAssign: "Zuweisen", equipmentReturn: "Zurückgeben", equipmentFree: "Verfügbar", equipmentHistory: "Verlauf", equipmentEmpty: "Noch keine Geräte erfasst.", equipmentType: "Typ",
     exportTab: "Stundenexport", exportMonth: "Monat", exportDownload: "CSV herunterladen", exportEmpty: "Keine Stunden im gewählten Monat.", exportDays: "Arbeitstage",
     materialOrder: "Material bestellen", materialOrders: "Bestellungen", orderOpen: "Offen", orderOrdered: "Bestellt", orderDelivered: "Geliefert", ordersEmpty: "Keine Bestellungen.", orderNote: "Notiz",
     materialCatalog: "Materialstamm", materialCatalogEmpty: "Noch kein Material gespeichert.",
@@ -338,6 +340,7 @@ const texts = {
     copyDone: "Arbeitsschritte wurden übernommen.",
   },
   Spanisch: {
+    equipmentTab: "Vehículos y herramientas", equipmentVehicle: "Vehículo", equipmentTool: "Herramienta", equipmentIdentifier: "Matrícula / número", equipmentAssign: "Asignar", equipmentReturn: "Devolver", equipmentFree: "Disponible", equipmentHistory: "Historial", equipmentEmpty: "Aún no hay equipos registrados.", equipmentType: "Tipo",
     exportTab: "Exportación de horas", exportMonth: "Mes", exportDownload: "Descargar CSV", exportEmpty: "No hay horas en el mes seleccionado.", exportDays: "Días trabajados",
     materialOrder: "Pedir material", materialOrders: "Pedidos", orderOpen: "Abierto", orderOrdered: "Pedido", orderDelivered: "Entregado", ordersEmpty: "No hay pedidos.", orderNote: "Nota",
     materialCatalog: "Catálogo de materiales", materialCatalogEmpty: "Aún no hay material guardado.",
@@ -576,6 +579,7 @@ const texts = {
     copyDone: "Los pasos de trabajo se han aplicado.",
   },
   Rumänisch: {
+    equipmentTab: "Vehicule și scule", equipmentVehicle: "Vehicul", equipmentTool: "Sculă", equipmentIdentifier: "Număr înmatriculare / număr", equipmentAssign: "Atribuie", equipmentReturn: "Returnează", equipmentFree: "Disponibil", equipmentHistory: "Istoric", equipmentEmpty: "Încă nu există echipamente.", equipmentType: "Tip",
     exportTab: "Export ore", exportMonth: "Luna", exportDownload: "Descarcă CSV", exportEmpty: "Nicio oră în luna selectată.", exportDays: "Zile lucrate",
     materialOrder: "Comandă material", materialOrders: "Comenzi", orderOpen: "Deschis", orderOrdered: "Comandat", orderDelivered: "Livrat", ordersEmpty: "Nicio comandă.", orderNote: "Notă",
     materialCatalog: "Catalog de materiale", materialCatalogEmpty: "Încă nu există materiale salvate.",
@@ -814,6 +818,7 @@ const texts = {
     copyDone: "Etapele de lucru au fost preluate.",
   },
   Englisch: {
+    equipmentTab: "Vehicles & tools", equipmentVehicle: "Vehicle", equipmentTool: "Tool", equipmentIdentifier: "Plate / number", equipmentAssign: "Assign", equipmentReturn: "Return", equipmentFree: "Available", equipmentHistory: "History", equipmentEmpty: "No equipment recorded yet.", equipmentType: "Type",
     exportTab: "Hours export", exportMonth: "Month", exportDownload: "Download CSV", exportEmpty: "No hours in the selected month.", exportDays: "Working days",
     materialOrder: "Order material", materialOrders: "Orders", orderOpen: "Open", orderOrdered: "Ordered", orderDelivered: "Delivered", ordersEmpty: "No orders.", orderNote: "Note",
     materialCatalog: "Material catalogue", materialCatalogEmpty: "No material saved yet.",
@@ -1052,6 +1057,7 @@ const texts = {
     copyDone: "Work steps have been applied.",
   },
   Italienisch: {
+    equipmentTab: "Veicoli e attrezzi", equipmentVehicle: "Veicolo", equipmentTool: "Attrezzo", equipmentIdentifier: "Targa / numero", equipmentAssign: "Assegna", equipmentReturn: "Restituisci", equipmentFree: "Disponibile", equipmentHistory: "Cronologia", equipmentEmpty: "Nessuna attrezzatura registrata.", equipmentType: "Tipo",
     exportTab: "Esportazione ore", exportMonth: "Mese", exportDownload: "Scarica CSV", exportEmpty: "Nessuna ora nel mese selezionato.", exportDays: "Giorni lavorati",
     materialOrder: "Ordina materiale", materialOrders: "Ordini", orderOpen: "Aperto", orderOrdered: "Ordinato", orderDelivered: "Consegnato", ordersEmpty: "Nessun ordine.", orderNote: "Nota",
     materialCatalog: "Catalogo materiali", materialCatalogEmpty: "Nessun materiale salvato.",
@@ -1290,6 +1296,7 @@ const texts = {
     copyDone: "Le fasi di lavoro sono state applicate.",
   },
   Türkisch: {
+    equipmentTab: "Araçlar ve aletler", equipmentVehicle: "Araç", equipmentTool: "Alet", equipmentIdentifier: "Plaka / numara", equipmentAssign: "Ata", equipmentReturn: "İade et", equipmentFree: "Müsait", equipmentHistory: "Geçmiş", equipmentEmpty: "Henüz ekipman girilmedi.", equipmentType: "Tür",
     exportTab: "Saat dışa aktarma", exportMonth: "Ay", exportDownload: "CSV indir", exportEmpty: "Seçilen ayda saat yok.", exportDays: "Çalışma günleri",
     materialOrder: "Malzeme siparişi", materialOrders: "Siparişler", orderOpen: "Açık", orderOrdered: "Sipariş edildi", orderDelivered: "Teslim edildi", ordersEmpty: "Sipariş yok.", orderNote: "Not",
     materialCatalog: "Malzeme kataloğu", materialCatalogEmpty: "Henüz kayıtlı malzeme yok.",
@@ -1528,6 +1535,7 @@ const texts = {
     copyDone: "İş adımları alındı.",
   },
   Ungarisch: {
+    equipmentTab: "Járművek és szerszámok", equipmentVehicle: "Jármű", equipmentTool: "Szerszám", equipmentIdentifier: "Rendszám / szám", equipmentAssign: "Kiosztás", equipmentReturn: "Visszaadás", equipmentFree: "Elérhető", equipmentHistory: "Előzmények", equipmentEmpty: "Még nincs rögzített eszköz.", equipmentType: "Típus",
     exportTab: "Óraexport", exportMonth: "Hónap", exportDownload: "CSV letöltése", exportEmpty: "Nincs óra a kiválasztott hónapban.", exportDays: "Munkanapok",
     materialOrder: "Anyag rendelése", materialOrders: "Rendelések", orderOpen: "Nyitott", orderOrdered: "Megrendelve", orderDelivered: "Kiszállítva", ordersEmpty: "Nincs rendelés.", orderNote: "Megjegyzés",
     materialCatalog: "Anyagtörzs", materialCatalogEmpty: "Még nincs mentett anyag.",
@@ -1766,6 +1774,7 @@ const texts = {
     copyDone: "A munkalépések átvéve.",
   },
   Tschechisch: {
+    equipmentTab: "Vozidla a nářadí", equipmentVehicle: "Vozidlo", equipmentTool: "Nářadí", equipmentIdentifier: "SPZ / číslo", equipmentAssign: "Přidělit", equipmentReturn: "Vrátit", equipmentFree: "Dostupné", equipmentHistory: "Historie", equipmentEmpty: "Zatím není zadáno žádné vybavení.", equipmentType: "Typ",
     exportTab: "Export hodin", exportMonth: "Měsíc", exportDownload: "Stáhnout CSV", exportEmpty: "Žádné hodiny ve vybraném měsíci.", exportDays: "Pracovní dny",
     materialOrder: "Objednat materiál", materialOrders: "Objednávky", orderOpen: "Otevřeno", orderOrdered: "Objednáno", orderDelivered: "Dodáno", ordersEmpty: "Žádné objednávky.", orderNote: "Poznámka",
     materialCatalog: "Katalog materiálu", materialCatalogEmpty: "Zatím není uložen žádný materiál.",
@@ -2004,6 +2013,7 @@ const texts = {
     copyDone: "Pracovní kroky byly převzaty.",
   },
   Ukrainisch: {
+    equipmentTab: "Транспорт та інструменти", equipmentVehicle: "Транспорт", equipmentTool: "Інструмент", equipmentIdentifier: "Номер", equipmentAssign: "Призначити", equipmentReturn: "Повернути", equipmentFree: "Доступно", equipmentHistory: "Історія", equipmentEmpty: "Обладнання ще не внесено.", equipmentType: "Тип",
     exportTab: "Експорт годин", exportMonth: "Місяць", exportDownload: "Завантажити CSV", exportEmpty: "Немає годин у вибраному місяці.", exportDays: "Робочі дні",
     materialOrder: "Замовити матеріал", materialOrders: "Замовлення", orderOpen: "Відкрито", orderOrdered: "Замовлено", orderDelivered: "Доставлено", ordersEmpty: "Замовлень немає.", orderNote: "Примітка",
     materialCatalog: "Каталог матеріалів", materialCatalogEmpty: "Матеріали ще не збережені.",
@@ -2242,6 +2252,7 @@ const texts = {
     copyDone: "Робочі кроки перенесено.",
   },
   Bulgarisch: {
+    equipmentTab: "Превозни средства и инструменти", equipmentVehicle: "Превозно средство", equipmentTool: "Инструмент", equipmentIdentifier: "Регистрационен / номер", equipmentAssign: "Присвои", equipmentReturn: "Върни", equipmentFree: "Свободно", equipmentHistory: "История", equipmentEmpty: "Все още няма въведено оборудване.", equipmentType: "Тип",
     exportTab: "Експорт на часове", exportMonth: "Месец", exportDownload: "Изтегли CSV", exportEmpty: "Няма часове за избрания месец.", exportDays: "Работни дни",
     materialOrder: "Поръчай материал", materialOrders: "Поръчки", orderOpen: "Отворена", orderOrdered: "Поръчана", orderDelivered: "Доставена", ordersEmpty: "Няма поръчки.", orderNote: "Бележка",
     materialCatalog: "Каталог с материали", materialCatalogEmpty: "Все още няма записани материали.",
@@ -2480,6 +2491,7 @@ const texts = {
     copyDone: "Работните стъпки са прехвърлени.",
   },
   Serbisch: {
+    equipmentTab: "Vozila i alati", equipmentVehicle: "Vozilo", equipmentTool: "Alat", equipmentIdentifier: "Registracija / broj", equipmentAssign: "Dodeli", equipmentReturn: "Vrati", equipmentFree: "Dostupno", equipmentHistory: "Istorija", equipmentEmpty: "Još nema unete opreme.", equipmentType: "Vrsta",
     exportTab: "Izvoz sati", exportMonth: "Mesec", exportDownload: "Preuzmi CSV", exportEmpty: "Nema sati u izabranom mesecu.", exportDays: "Radni dani",
     materialOrder: "Poruči materijal", materialOrders: "Porudžbine", orderOpen: "Otvoreno", orderOrdered: "Poručeno", orderDelivered: "Isporučeno", ordersEmpty: "Nema porudžbina.", orderNote: "Napomena",
     materialCatalog: "Katalog materijala", materialCatalogEmpty: "Još nema sačuvanog materijala.",
@@ -2718,6 +2730,7 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Kroatisch: {
+    equipmentTab: "Vozila i alati", equipmentVehicle: "Vozilo", equipmentTool: "Alat", equipmentIdentifier: "Registracija / broj", equipmentAssign: "Dodijeli", equipmentReturn: "Vrati", equipmentFree: "Dostupno", equipmentHistory: "Povijest", equipmentEmpty: "Još nema unesenih uređaja.", equipmentType: "Vrsta",
     exportTab: "Izvoz sati", exportMonth: "Mjesec", exportDownload: "Preuzmi CSV", exportEmpty: "Nema sati u odabranom mjesecu.", exportDays: "Radni dani",
     materialOrder: "Naruči materijal", materialOrders: "Narudžbe", orderOpen: "Otvoreno", orderOrdered: "Naručeno", orderDelivered: "Isporučeno", ordersEmpty: "Nema narudžbi.", orderNote: "Napomena",
     materialCatalog: "Katalog materijala", materialCatalogEmpty: "Još nema spremljenog materijala.",
@@ -2956,6 +2969,7 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Slowenisch: {
+    equipmentTab: "Vozila in orodja", equipmentVehicle: "Vozilo", equipmentTool: "Orodje", equipmentIdentifier: "Registrska št. / številka", equipmentAssign: "Dodeli", equipmentReturn: "Vrni", equipmentFree: "Na voljo", equipmentHistory: "Zgodovina", equipmentEmpty: "Naprave še niso vnesene.", equipmentType: "Vrsta",
     exportTab: "Izvoz ur", exportMonth: "Mesec", exportDownload: "Prenesi CSV", exportEmpty: "Ni ur v izbranem mesecu.", exportDays: "Delovni dnevi",
     materialOrder: "Naroči material", materialOrders: "Naročila", orderOpen: "Odprto", orderOrdered: "Naročeno", orderDelivered: "Dostavljeno", ordersEmpty: "Ni naročil.", orderNote: "Opomba",
     materialCatalog: "Katalog materiala", materialCatalogEmpty: "Material še ni shranjen.",
@@ -3194,6 +3208,7 @@ const texts = {
     copyDone: "Delovni koraki so prevzeti.",
   },
   Polnisch: {
+    equipmentTab: "Pojazdy i narzędzia", equipmentVehicle: "Pojazd", equipmentTool: "Narzędzie", equipmentIdentifier: "Nr rejestracyjny / numer", equipmentAssign: "Przypisz", equipmentReturn: "Zwróć", equipmentFree: "Dostępne", equipmentHistory: "Historia", equipmentEmpty: "Brak zapisanego sprzętu.", equipmentType: "Typ",
     exportTab: "Eksport godzin", exportMonth: "Miesiąc", exportDownload: "Pobierz CSV", exportEmpty: "Brak godzin w wybranym miesiącu.", exportDays: "Dni robocze",
     materialOrder: "Zamów materiał", materialOrders: "Zamówienia", orderOpen: "Otwarte", orderOrdered: "Zamówione", orderDelivered: "Dostarczone", ordersEmpty: "Brak zamówień.", orderNote: "Notatka",
     materialCatalog: "Katalog materiałów", materialCatalogEmpty: "Brak zapisanych materiałów.",
@@ -3876,6 +3891,10 @@ export default function Home() {
   const [catalogSuggestions, setCatalogSuggestions] = useState<{ name: string; unit: string }[]>([]);
   const [materialOrders, setMaterialOrders] = useState<any[]>([]);
   const [exportMonth, setExportMonth] = useState<string>(() => new Date().toISOString().slice(0, 7));
+  const [equipment, setEquipment] = useState<any[]>([]);
+  const [eqDraft, setEqDraft] = useState<{ id: string; type: string; name: string; identifier: string; note: string }>({ id: "", type: "tool", name: "", identifier: "", note: "" });
+  const [eqHistory, setEqHistory] = useState<Record<string, any[]>>({});
+  const [eqOpenId, setEqOpenId] = useState<string | null>(null);
   const [orderDraft, setOrderDraft] = useState<Record<string, { qty: string; unit: string; name: string; note: string }>>({});
   const [orderSaving, setOrderSaving] = useState<string | null>(null);
   const [pmEdits, setPmEdits] = useState<Record<string, string>>({});
@@ -4173,6 +4192,57 @@ export default function Home() {
     const trans = instructionTranslations[instructionId];
     if (trans && trans.language === uiLanguage && trans.tasks?.[materialKey(name)]) return trans.tasks[materialKey(name)];
     return name || "";
+  }
+
+  // ── Fahrzeuge & Werkzeuge ──
+  async function equipmentCall(payload: any) {
+    let token = tokenRef.current;
+    if (!token) {
+      try {
+        const sess = await dbTimeout(supabase.auth.getSession(), 5000);
+        token = sess?.data?.session?.access_token || "";
+      } catch { /* Route antwortet dann mit 401 */ }
+    }
+    const res = await fetch("/api/equipment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify(payload),
+    });
+    return await res.json().catch(() => ({ error: "Antwort konnte nicht gelesen werden." }));
+  }
+  async function loadEquipment() {
+    try {
+      const data = await equipmentCall({ action: "list" });
+      if (Array.isArray(data?.items)) setEquipment(data.items);
+    } catch { /* still ignorieren */ }
+  }
+  async function saveEquipment() {
+    if (!eqDraft.name.trim()) { setMessage(t.msgFillRequired); return; }
+    const data = await equipmentCall({ action: "save", id: eqDraft.id || undefined, type: eqDraft.type, name: eqDraft.name.trim(), identifier: eqDraft.identifier, note: eqDraft.note });
+    if (data?.error) { setMessage("Fehler: " + data.error); return; }
+    setEqDraft({ id: "", type: "tool", name: "", identifier: "", note: "" });
+    await loadEquipment();
+    setMessage("\u2705 " + t.msgSaved);
+  }
+  async function deleteEquipment(id: string) {
+    const data = await equipmentCall({ action: "delete", id });
+    if (data?.error) { setMessage("Fehler: " + data.error); return; }
+    await loadEquipment();
+  }
+  async function assignEquipment(id: string, userId: string) {
+    const data = await equipmentCall({ action: "assign", id, userId: userId || null });
+    if (data?.error) { setMessage("Fehler: " + data.error); return; }
+    await loadEquipment();
+    if (eqOpenId === id) await loadEquipmentHistory(id);
+  }
+  async function loadEquipmentHistory(id: string) {
+    const data = await equipmentCall({ action: "history", id });
+    if (Array.isArray(data?.history)) setEqHistory(prev => ({ ...prev, [id]: data.history }));
+  }
+  async function toggleEquipmentHistory(id: string) {
+    if (eqOpenId === id) { setEqOpenId(null); return; }
+    setEqOpenId(id);
+    await loadEquipmentHistory(id);
   }
 
   // ── Stundenexport: Monatssummen je Mitarbeiter ──
@@ -6149,6 +6219,9 @@ export default function Home() {
         {companyFeatures?.export_enabled && (currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
         <TabButton label={`📊 ${t.exportTab}`} tabName="export" activeTab={activeTab} onClick={() => { setActiveTab("export"); loadTeamReports(); }} />
         )}
+        {companyFeatures?.equipment_enabled && (
+        <TabButton label={`🚚 ${t.equipmentTab}`} tabName="geraete" activeTab={activeTab} onClick={() => { setActiveTab("geraete"); loadEquipment(); }} />
+        )}
         {companyFeatures?.feedback_enabled && !readOnlyUser && (
 
         <TabButton label={`💬 ${t.feedbackTab}`} tabName="feedback" activeTab={activeTab} onClick={() => { setActiveTab("feedback"); if (currentCompany && (currentCompany.role === "owner" || currentCompany.role === "admin" || currentCompany.role === "project_manager")) loadFeedback(); }} />
@@ -6653,6 +6726,69 @@ export default function Home() {
           </section>
         );
       })()}
+
+      {activeTab === "geraete" && companyFeatures?.equipment_enabled && (
+        <div className="space-y-4">
+          <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-3">
+            <h2 className="text-xl font-bold">🚚 {t.equipmentTab}</h2>
+            {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
+              <div className="flex gap-2 flex-wrap items-center border-b pb-3">
+                <select value={eqDraft.type} onChange={(e) => setEqDraft(p => ({ ...p, type: e.target.value }))} className="border p-2 rounded-lg text-black bg-white">
+                  <option value="tool">🔧 {t.equipmentTool}</option>
+                  <option value="vehicle">🚚 {t.equipmentVehicle}</option>
+                </select>
+                <input placeholder={t.nameLabel} value={eqDraft.name} onChange={(e) => setEqDraft(p => ({ ...p, name: e.target.value }))} className="border p-2 rounded-lg text-black bg-white flex-1 min-w-[10rem]" />
+                <input placeholder={t.equipmentIdentifier} value={eqDraft.identifier} onChange={(e) => setEqDraft(p => ({ ...p, identifier: e.target.value }))} className="border p-2 rounded-lg text-black bg-white" />
+                <button type="button" onClick={saveEquipment} className="bg-cyan-700 text-white px-4 py-2.5 rounded-lg text-sm">{eqDraft.id ? `💾 ${t.saveBtn}` : `➕ ${t.materialAdd}`}</button>
+                {eqDraft.id && (<button type="button" onClick={() => setEqDraft({ id: "", type: "tool", name: "", identifier: "", note: "" })} className="bg-gray-200 px-4 py-2.5 rounded-lg text-sm">{t.cancelBtn}</button>)}
+              </div>
+            )}
+            {equipment.length === 0 ? (
+              <p className="text-gray-500">{t.equipmentEmpty}</p>
+            ) : (
+              <div className="space-y-2">
+                {equipment.map((eq: any) => (
+                  <div key={eq.id} className="border border-slate-200 rounded-xl p-3 bg-gray-50 space-y-2">
+                    <div className="flex justify-between items-start gap-2 flex-wrap">
+                      <div>
+                        <p className="font-semibold break-words">{eq.type === "vehicle" ? "🚚" : "🔧"} {eq.name}{eq.identifier ? <span className="text-gray-500 font-normal"> · {eq.identifier}</span> : null}</p>
+                        <p className="text-sm">
+                          {eq.assigned_to_name
+                            ? <span className="text-amber-700">👤 {eq.assigned_to_name}{eq.assigned_at ? <span className="text-xs text-gray-500"> · {new Date(eq.assigned_at).toLocaleDateString("de-DE")}</span> : null}</span>
+                            : <span className="text-green-700">✅ {t.equipmentFree}</span>}
+                        </p>
+                      </div>
+                      <button type="button" onClick={() => toggleEquipmentHistory(eq.id)} className="text-xs px-2 py-1 rounded border">🕓 {t.equipmentHistory} {eqOpenId === eq.id ? "▲" : "▼"}</button>
+                    </div>
+                    {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
+                      <div className="flex gap-2 flex-wrap items-center">
+                        <select value={eq.assigned_to || ""} onChange={(e) => assignEquipment(eq.id, e.target.value)} className="border p-2 rounded-lg text-sm text-black bg-white">
+                          <option value="">— {t.equipmentFree} —</option>
+                          {companyUsers.map((m: any) => (<option key={m.user_id} value={m.user_id}>{m.full_name || m.email}</option>))}
+                        </select>
+                        {eq.assigned_to && (<button type="button" onClick={() => assignEquipment(eq.id, "")} className="bg-gray-200 px-3 py-2 rounded-lg text-sm">↩️ {t.equipmentReturn}</button>)}
+                        <button type="button" onClick={() => setEqDraft({ id: eq.id, type: eq.type || "tool", name: eq.name || "", identifier: eq.identifier || "", note: eq.note || "" })} className="text-xs px-2 py-1 rounded border">✏️</button>
+                        <button type="button" onClick={() => deleteEquipment(eq.id)} className="text-xs px-2 py-1 rounded border text-red-600">🗑️</button>
+                      </div>
+                    )}
+                    {eqOpenId === eq.id && (
+                      <div className="border-t pt-2 space-y-1">
+                        {(eqHistory[eq.id] || []).length === 0 ? (
+                          <p className="text-xs text-gray-500">–</p>
+                        ) : (eqHistory[eq.id] || []).map((h: any) => (
+                          <p key={h.id} className="text-xs text-gray-600">
+                            {h.action === "assigned" ? "➡️" : "↩️"} {h.user_name || "?"} · {new Date(h.at).toLocaleString("de-DE")}{h.by_name ? ` · ${h.by_name}` : ""}
+                          </p>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        </div>
+      )}
 
       {activeTab === "export" && companyFeatures?.export_enabled && (currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (() => {
         const rows = monthlyHourSummary(exportMonth);
