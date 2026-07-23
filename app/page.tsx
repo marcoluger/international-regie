@@ -3637,6 +3637,35 @@ function getAllowedLanguages(companyFeatures: any): string[] {
   try { const parsed = JSON.parse(raw); return parsed.length > 0 ? parsed : ["Deutsch"]; } catch { return ["Deutsch"]; }
 }
 
+// Textfeld, das immer so hoch ist, dass der ganze Inhalt sichtbar ist
+// (misst die tatsaechliche Hoehe, damit auch umgebrochene Zeilen mitzaehlen).
+function AutoTextarea({ value, onChange, className, placeholder }: { value: string; onChange: (v: string) => void; className?: string; placeholder?: string }) {
+  const ref = useRef<HTMLTextAreaElement | null>(null);
+  function fit() {
+    const el = ref.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight + 2}px`;
+  }
+  useEffect(() => { fit(); }, [value]);
+  useEffect(() => {
+    const onResize = () => fit();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  return (
+    <textarea
+      ref={ref}
+      rows={4}
+      className={className}
+      placeholder={placeholder}
+      value={value}
+      onInput={fit}
+      onChange={(e) => onChange(e.target.value)}
+    />
+  );
+}
+
 function SignaturePad({ label, value, onChange }: { label: string; value: string; onChange: (dataUrl: string) => void }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const drawing = useRef(false);
@@ -6160,7 +6189,7 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-              <textarea className="border p-3 w-full text-black bg-white resize-none overflow-hidden" rows={Math.max(4, (day.description || "").split("\n").length + 1)} placeholder={t.description} value={day.description} onChange={(e) => updateDay(index, "description", e.target.value)} />
+              <AutoTextarea className="border p-3 w-full text-black bg-white resize-none overflow-hidden" placeholder={t.description} value={day.description} onChange={(v) => updateDay(index, "description", v)} />
               <button type="button" onClick={() => insertWeatherIntoDay(index, day.description)} title={t.weather} className="bg-cyan-50 text-cyan-700 border border-cyan-200 px-3 py-2 rounded-lg text-sm w-fit">🌦️ {t.weather}</button>
               {companyFeatures?.photos_enabled ? <input type="file" accept="image/*" multiple className="border p-3 w-full text-black bg-white" onChange={(e) => handlePhotos(index, e.target.files)} /> : <div className="border border-slate-200 rounded-xl p-3 shadow-sm bg-gray-50 text-sm text-gray-400">🔒 Foto-Upload ist in deinem Paket nicht aktiviert.</div>}
               {day.photos.length > 0 && (<div className="grid grid-cols-2 gap-3">{day.photos.map((photo, photoIndex) => (<div key={photoIndex} className="border rounded-lg p-2"><img src={photo} alt="Foto" className="w-full h-32 object-cover" /><button type="button" onClick={() => deletePhoto(index, photoIndex)} className="mt-2 bg-red-600 text-white px-2 py-2.5 rounded-lg w-full">{t.deletePhoto}</button></div>))}</div>)}
