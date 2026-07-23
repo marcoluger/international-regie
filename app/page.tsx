@@ -3913,6 +3913,7 @@ export default function Home() {
   const [eqFilter, setEqFilter] = useState<string>("all");
   const [orderDraft, setOrderDraft] = useState<Record<string, { qty: string; unit: string; name: string; note: string }>>({});
   const [orderSaving, setOrderSaving] = useState<string | null>(null);
+  const [orderTrans, setOrderTrans] = useState<Record<string, string>>({});
   const [pmEdits, setPmEdits] = useState<Record<string, string>>({});
   const [selectedProjectId, setSelectedProjectId] = useState("");
   const [selectedProjectDetailId, setSelectedProjectDetailId] = useState("");
@@ -3973,6 +3974,29 @@ export default function Home() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentSignature, uiLanguage]);
+
+  // Bestellungen (Bezeichnung + Notiz) in die Anzeige-Sprache uebersetzen.
+  useEffect(() => {
+    let abgebrochen = false;
+    (async () => {
+      if (!companyFeatures?.material_enabled || materialOrders.length === 0) {
+        setOrderTrans({});
+        return;
+      }
+      const items: { key: string; text: string }[] = [];
+      for (const o of materialOrders as any[]) {
+        if ((o?.name || "").trim()) items.push({ key: String(o.id), text: String(o.name) });
+        if ((o?.note || "").trim()) items.push({ key: `n_${o.id}`, text: String(o.note) });
+      }
+      let out: Record<string, string> = {};
+      try {
+        out = await translateBatch(items, "automatisch", uiLanguage);
+      } catch { /* ohne Uebersetzung weiter */ }
+      if (!abgebrochen) setOrderTrans(out);
+    })();
+    return () => { abgebrochen = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [materialOrders, uiLanguage, companyFeatures?.material_enabled]);
 
   // Bezeichnungen der Geraete in die Anzeige-Sprache uebersetzen
   // (gespeichert bleibt immer das Original).
@@ -6901,7 +6925,7 @@ export default function Home() {
               <div className="space-y-2">
                 {materialOrders.map((o: any) => (
                   <div key={o.id} className="border border-slate-200 rounded-xl p-3 bg-gray-50 space-y-2">
-                    <p className="break-words"><strong>{o.qty} {o.unit}</strong> {o.name}{o.note ? <span className="text-gray-600"> · {o.note}</span> : null}</p>
+                    <p className="break-words"><strong>{o.qty} {o.unit}</strong> {orderTrans[o.id] || o.name}{o.note ? <span className="text-gray-600"> · {orderTrans[`n_${o.id}`] || o.note}</span> : null}</p>
                     <p className="text-xs text-gray-500">{o.created_by_name || "?"} · {new Date(o.created_at).toLocaleString("de-DE")}</p>
                     <div className="flex gap-2 flex-wrap items-center">
                       {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") ? (
@@ -7161,7 +7185,7 @@ export default function Home() {
                     <p className="text-sm font-medium text-gray-700">🛒 {t.materialOrder}</p>
                     {materialOrders.filter((o: any) => o.instruction_id === instruction.id).map((o: any) => (
                       <div key={o.id} className="flex items-center justify-between gap-2 bg-white border rounded-lg px-2 py-1 text-sm">
-                        <span className="break-words"><strong>{o.qty} {o.unit}</strong> {o.name}{o.note ? <span className="text-gray-500"> · {o.note}</span> : null}</span>
+                        <span className="break-words"><strong>{o.qty} {o.unit}</strong> {orderTrans[o.id] || o.name}{o.note ? <span className="text-gray-500"> · {orderTrans[`n_${o.id}`] || o.note}</span> : null}</span>
                         <span className={`text-xs px-2 py-0.5 rounded shrink-0 ${o.status === "delivered" ? "bg-green-100 text-green-700" : o.status === "ordered" ? "bg-amber-100 text-amber-700" : "bg-gray-100 text-gray-600"}`}>{orderStatusLabel(o.status)}</span>
                       </div>
                     ))}
