@@ -3932,6 +3932,7 @@ export default function Home() {
   const [materialCatalog, setMaterialCatalog] = useState<any[]>([]);
   const [catDraft, setCatDraft] = useState<{ id: string; name: string; unit: string }>({ id: "", name: "", unit: MATERIAL_UNITS[0] });
   const [catalogSuggestions, setCatalogSuggestions] = useState<{ name: string; unit: string }[]>([]);
+  const [catTrans, setCatTrans] = useState<Record<string, string>>({});
   const [materialOrders, setMaterialOrders] = useState<any[]>([]);
   const [exportMonth, setExportMonth] = useState<string>(() => new Date().toISOString().slice(0, 7));
   const [equipment, setEquipment] = useState<any[]>([]);
@@ -4084,6 +4085,7 @@ export default function Home() {
     (async () => {
       if (!companyFeatures?.material_enabled || materialCatalog.length === 0) {
         setCatalogSuggestions([]);
+        setCatTrans({});
         return;
       }
       const items = materialCatalog
@@ -4094,6 +4096,7 @@ export default function Home() {
         out = await translateBatch(items, "automatisch", uiLanguage);
       } catch { /* ohne Uebersetzung weiter */ }
       if (abgebrochen) return;
+      setCatTrans(out);
       const seen = new Map<string, { name: string; unit: string }>();
       for (const m of materialCatalog) {
         const orig = (m?.name || "").trim();
@@ -7197,7 +7200,7 @@ export default function Home() {
                   <tbody>
                     {materialCatalog.map((m: any) => (
                       <tr key={m.id} className="border-t border-slate-200">
-                        <td className="px-3 py-2 break-words">{m.name}</td>
+                        <td className="px-3 py-2 break-words">{catTrans[m.id] || m.name}</td>
                         <td className="px-3 py-2">{m.unit || "-"}</td>
                         <td className="px-3 py-2 text-right whitespace-nowrap">
                           {!readOnlyUser && (<button type="button" onClick={() => setCatDraft({ id: m.id, name: m.name || "", unit: m.unit || MATERIAL_UNITS[0] })} className="text-xs px-2 py-1 rounded border mr-1">✏️</button>)}
