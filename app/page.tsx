@@ -3866,7 +3866,7 @@ export default function Home() {
   // Reagiert auf die Sprache UND auf den Inhalt der Kommentare (Signatur),
   // damit es auch direkt beim ersten Laden greift – ohne Seiten-Neuladen.
   const commentSignature = workInstructions
-    .map((i: any) => `${i.id}.${(i.title || "").length}.${(i.problems_text || "").length}.${(i.work_instruction_tasks || []).map((task: any) => `${task.id}:${(task.task_text || "").length}:${JSON.stringify(task.comments || task.employee_comment || "").length}`).join(",")}`)
+    .map((i: any) => `${i.id}.${(i.title || "").length}.${(i.problems_text || "").length}.${(i.work_instruction_tasks || []).map((task: any) => `${task.id}:${(task.task_text || "").length}:${JSON.stringify(task.comments || task.employee_comment || "").length}`).join(",")}.${JSON.stringify(i.used_material || []).length}`)
     .join("|");
   useEffect(() => {
     uiLanguageRef.current = uiLanguage;
@@ -4067,6 +4067,17 @@ export default function Home() {
     } catch (e: any) {
       setCommentSaveState(prev => ({ ...prev, [taskId]: "error:" + String(e?.message || e) }));
     }
+  }
+
+  // Schluessel fuer die Uebersetzung einer Materialbezeichnung.
+  function materialKey(name: string): string {
+    return `mat_${(name || "").trim().toLowerCase()}`;
+  }
+  // Materialbezeichnung in der Anzeige-Sprache (faellt auf das Original zurueck).
+  function getTranslatedMaterial(instructionId: string, name: string): string {
+    const trans = instructionTranslations[instructionId];
+    if (trans && trans.language === uiLanguage && trans.tasks?.[materialKey(name)]) return trans.tasks[materialKey(name)];
+    return name || "";
   }
 
   // ── Materialstamm (gespeichertes Material einer Firma) ──
@@ -4752,6 +4763,14 @@ export default function Home() {
           jobs.push({ instId: inst.id, storeKey: key, inTasks: true, text: cBody, sourceLang });
         }
       }
+      // Verbrauchtes Material (Bezeichnungen)
+      for (const m of (Array.isArray(inst.used_material) ? inst.used_material : [])) {
+        const mName = (m?.name || "").trim();
+        if (!mName) continue;
+        const mKey = materialKey(mName);
+        if (sameLang && existing?.tasks?.[mKey]) continue;
+        jobs.push({ instId: inst.id, storeKey: mKey, inTasks: true, text: mName, sourceLang: "automatisch" });
+      }
     }
     if (jobs.length === 0) return;
     const fieldUpdates: Record<string, Record<string, string>> = {};
@@ -5398,7 +5417,7 @@ export default function Home() {
       ...completedTasks,
       problemsTranslated ? `─────\n⚠️ ${currentTexts.problemsHints}: ${problemsTranslated}` : "",
       materialTranslated ? `📦 ${currentTexts.material}: ${materialTranslated}` : "",
-      usedMaterialList(instruction).length > 0 ? `📦 ${currentTexts.materialUsed}: ${usedMaterialList(instruction).map((m: any) => `${m.qty} ${m.unit} ${m.name}`).join(", ")}` : "",
+      usedMaterialList(instruction).length > 0 ? `📦 ${currentTexts.materialUsed}: ${usedMaterialList(instruction).map((m: any) => `${m.qty} ${m.unit} ${getTranslatedMaterial(instruction.id, m.name)}`).join(", ")}` : "",
       werkzeugTranslated ? `🔧 ${currentTexts.werkzeug}: ${werkzeugTranslated}` : "",
       instruction.employee_note ? `${currentTexts.feedbackLabel}: ${instruction.employee_note}` : ""
     ].filter(Boolean).join("\n─────\n");
@@ -6640,7 +6659,7 @@ export default function Home() {
                       <ul className="space-y-1">
                         {usedMaterialList(instruction).map((m: any, mi: number) => (
                           <li key={mi} className="flex items-center justify-between gap-2 bg-white border rounded-lg px-2 py-1 text-sm">
-                            <span className="break-words"><strong>{m.qty} {m.unit}</strong> {m.name}{m.by ? <span className="text-xs text-gray-400"> · {m.by}</span> : null}</span>
+                            <span className="break-words"><strong>{m.qty} {m.unit}</strong> {getTranslatedMaterial(instruction.id, m.name)}{m.by ? <span className="text-xs text-gray-400"> · {m.by}</span> : null}</span>
                             {!readOnlyUser && (<button type="button" title={t.delete} onClick={() => removeMaterial(instruction, mi)} className="text-xs px-2 py-1 rounded border text-red-600 shrink-0">🗑️</button>)}
                           </li>
                         ))}
