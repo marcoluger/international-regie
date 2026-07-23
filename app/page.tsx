@@ -4304,7 +4304,7 @@ export default function Home() {
           return { ...d, translation: tr };
         } catch { return { ...d, translation: "" }; }
       }));
-      await createPDF(false, { days: pdfDays, reportName: r.report_name, employee: r.employee, calendarWeek: "" });
+      await createPDF(false, { days: pdfDays, reportName: r.report_name, employee: r.employee, calendarWeek: "", sigEmployee: (r as any).signature_employee || "", sigCustomer: (r as any).signature_customer || "" });
     } finally {
       setMessage("");
     }
@@ -4948,7 +4948,7 @@ export default function Home() {
     if (!user) { setMessage(t.msgPleaseLogin); return; }
     await ensureFreshSession();
     const name = reportName.trim() || buildReportName();
-    const reportData = { report_name: name, employee, from_language: fromLanguage, to_language: toLanguage, pdf_language: pdfLanguage, days, user_id: user.id, project_id: selectedProjectId || null };
+    const reportData = { report_name: name, employee, from_language: fromLanguage, to_language: toLanguage, pdf_language: pdfLanguage, days, user_id: user.id, project_id: selectedProjectId || null, signature_employee: sigEmployee || null, signature_customer: sigCustomer || null };
     let error;
     if (currentReportId) {
       ({ error } = await dbTimeout(supabase.from("reports").update(reportData).eq("id", currentReportId)));
@@ -4972,7 +4972,7 @@ export default function Home() {
     const typed = reportName.trim();
     const takenNames = new Set(savedReports.map((r: any) => (r.report_name || "").trim()));
     const name = (typed && !takenNames.has(typed)) ? typed : buildReportName();
-    const reportData = { report_name: name, employee, from_language: fromLanguage, to_language: toLanguage, pdf_language: pdfLanguage, days, user_id: user.id, project_id: selectedProjectId || null };
+    const reportData = { report_name: name, employee, from_language: fromLanguage, to_language: toLanguage, pdf_language: pdfLanguage, days, user_id: user.id, project_id: selectedProjectId || null, signature_employee: sigEmployee || null, signature_customer: sigCustomer || null };
     const result = await dbTimeout(supabase.from("reports").insert(reportData).select().single());
     if (result.error) { setMessage("Fehler beim Speichern: " + result.error.message); return; }
     if (result.data?.id) setCurrentReportId(result.data.id);
@@ -4987,6 +4987,7 @@ export default function Home() {
     setCurrentReportId(report.id); setReportName(report.report_name); setEmployee(report.employee || "");
     setFromLanguage(report.from_language || "Deutsch"); setToLanguage(report.to_language || "Polnisch");
     setPdfLanguage(report.pdf_language || "Deutsch"); setDays(report.days || createEmptyDays());
+    setSigEmployee((report as any).signature_employee || ""); setSigCustomer((report as any).signature_customer || "");
     setReportVersion((v) => v + 1);
     setMessage(t.msgLoaded); setActiveTab("regiebericht");
   }
@@ -5320,11 +5321,13 @@ export default function Home() {
     setShowOnboarding(false); setOnboardingDone(true); setMessage("Willkommen! Ihre Firmendaten wurden gespeichert.");
   }
 
-  async function createPDF(sendByEmail = false, src?: { days?: DayEntry[]; reportName?: string; calendarWeek?: string; employee?: string }) {
+  async function createPDF(sendByEmail = false, src?: { days?: DayEntry[]; reportName?: string; calendarWeek?: string; employee?: string; sigEmployee?: string; sigCustomer?: string }) {
     const pdfDays = src?.days ?? days;
     const pdfReportName = src?.reportName ?? reportName;
     const pdfCalendarWeek = src?.calendarWeek ?? calendarWeek;
     const pdfEmployee = src?.employee ?? employee;
+    const pdfSigEmployee = src ? (src.sigEmployee || "") : sigEmployee;
+    const pdfSigCustomer = src ? (src.sigCustomer || "") : sigCustomer;
     const p = pdfTexts[uiLanguage as keyof typeof pdfTexts] || pdfTexts["Deutsch" as keyof typeof pdfTexts];
     const doc = new jsPDF("p", "mm", "a4");
     const FONT = await loadPdfFont(doc);
@@ -5433,7 +5436,7 @@ export default function Home() {
       doc.setDrawColor(200); doc.line(marginLeft, y, pageWidth - marginRight, y); y += 10; doc.setDrawColor(0);
     }
     const sigW = 70; const sigH = 21;
-    const anySig = !!(sigEmployee || sigCustomer);
+    const anySig = !!(pdfSigEmployee || pdfSigCustomer);
     addNewPageIfNeeded(anySig ? 92 : 65);
     doc.setFontSize(12); doc.setFont(FONT, "bold"); doc.text(p.summary, marginLeft, y); y += 8;
     doc.setFontSize(10); doc.setFont(FONT, "normal");
@@ -5441,8 +5444,8 @@ export default function Home() {
     Object.entries(projectTotals).forEach(([project, total]) => { doc.text(sanitizePdfText(`${p.project} ${project}: ${total.toString().replace(".", ",")} ${p.hours}${travelKmByProject[project] ? ` · ${formatKm(travelKmByProject[project])} ${t.km}` : ""}`), marginLeft, y); y += 6; });
     if (totalTravelMinutes > 0 || totalTravelKm > 0) { doc.text(sanitizePdfText(`${t.travelTime} (${t.total}): ${formatTravelTime(totalTravelMinutes)} h · ${totalTravelKmDisplay} ${t.km}`), marginLeft, y); y += 8; }
     y += anySig ? 30 : 18;
-    if (sigEmployee) { try { doc.addImage(sigEmployee, "PNG", marginLeft, y - sigH, sigW, sigH); } catch {} }
-    if (sigCustomer) { try { doc.addImage(sigCustomer, "PNG", pageWidth - marginRight - sigW, y - sigH, sigW, sigH); } catch {} }
+    if (pdfSigEmployee) { try { doc.addImage(pdfSigEmployee, "PNG", marginLeft, y - sigH, sigW, sigH); } catch {} }
+    if (pdfSigCustomer) { try { doc.addImage(pdfSigCustomer, "PNG", pageWidth - marginRight - sigW, y - sigH, sigW, sigH); } catch {} }
     doc.line(marginLeft, y, marginLeft + 70, y); doc.line(pageWidth - marginRight - 70, y, pageWidth - marginRight, y);
     y += 6; doc.setFontSize(9); doc.text(p.signatureEmployee, marginLeft, y); doc.text(p.signatureCustomer, pageWidth - marginRight - 70, y);
     addFooter();
