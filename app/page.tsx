@@ -3815,6 +3815,7 @@ export default function Home() {
   const [matSaving, setMatSaving] = useState<string | null>(null);
   const [materialCatalog, setMaterialCatalog] = useState<any[]>([]);
   const [catDraft, setCatDraft] = useState<{ id: string; name: string; unit: string }>({ id: "", name: "", unit: MATERIAL_UNITS[0] });
+  const [catalogSuggestions, setCatalogSuggestions] = useState<{ name: string; unit: string }[]>([]);
   const [pmEdits, setPmEdits] = useState<Record<string, string>>({});
   const [selectedProjectId, setSelectedProjectId] = useState("");
   const [selectedProjectDetailId, setSelectedProjectDetailId] = useState("");
@@ -3875,6 +3876,38 @@ export default function Home() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentSignature, uiLanguage]);
+
+  // Vorschlaege fuer die Materialerfassung: immer in der eingestellten Sprache.
+  // Der Katalog speichert die Originalbezeichnung; hier wird sie uebersetzt und
+  // doppelte Eintraege (z. B. dieselbe Position in zwei Sprachen) werden zusammengefasst.
+  useEffect(() => {
+    let abgebrochen = false;
+    (async () => {
+      if (!companyFeatures?.material_enabled || materialCatalog.length === 0) {
+        setCatalogSuggestions([]);
+        return;
+      }
+      const items = materialCatalog
+        .filter((m: any) => (m?.name || "").trim())
+        .map((m: any) => ({ key: String(m.id), text: String(m.name) }));
+      let out: Record<string, string> = {};
+      try {
+        out = await translateBatch(items, "automatisch", uiLanguage);
+      } catch { /* ohne Uebersetzung weiter */ }
+      if (abgebrochen) return;
+      const seen = new Map<string, { name: string; unit: string }>();
+      for (const m of materialCatalog) {
+        const orig = (m?.name || "").trim();
+        if (!orig) continue;
+        const name = (out[String(m.id)] || orig).trim();
+        const key = name.toLowerCase();
+        if (!seen.has(key)) seen.set(key, { name, unit: m.unit || "" });
+      }
+      setCatalogSuggestions(Array.from(seen.values()).sort((x, y) => x.name.localeCompare(y.name)));
+    })();
+    return () => { abgebrochen = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [materialCatalog, uiLanguage, companyFeatures?.material_enabled]);
 
   // Materialstamm laden, sobald das Modul freigeschaltet ist.
   useEffect(() => {
@@ -4117,7 +4150,9 @@ export default function Home() {
   }
   // Einheit aus dem Materialstamm zu einer Bezeichnung finden.
   function unitForMaterial(name: string): string {
-    const hit = materialCatalog.find((m: any) => (m.name || "").toLowerCase() === (name || "").trim().toLowerCase());
+    const key = (name || "").trim().toLowerCase();
+    const hit = catalogSuggestions.find((m) => m.name.toLowerCase() === key)
+      || materialCatalog.find((m: any) => (m.name || "").toLowerCase() === key);
     return hit?.unit || "";
   }
 
@@ -6673,7 +6708,7 @@ export default function Home() {
                         </select>
                         <input list={`matlist-${instruction.id}`} placeholder={t.materialName} value={matDraft[instruction.id]?.name ?? ""} onChange={(e) => { const v = e.target.value; const u = unitForMaterial(v); setMatDraft(p => { const cur = p[instruction.id] || { qty: "", unit: MATERIAL_UNITS[0], name: "" }; return { ...p, [instruction.id]: { ...cur, name: v, unit: u || cur.unit } }; }); }} className="border p-2 rounded-lg text-sm text-black bg-white flex-1 min-w-[10rem]" />
                         <datalist id={`matlist-${instruction.id}`}>
-                          {materialCatalog.map((m: any) => (<option key={m.id} value={m.name} />))}
+                          {catalogSuggestions.map((m) => (<option key={m.name} value={m.name} />))}
                         </datalist>
                         <button type="button" disabled={matSaving === instruction.id} onClick={() => addMaterial(instruction)} className="bg-cyan-600 text-white px-3 py-2.5 rounded-lg text-sm disabled:opacity-50">{matSaving === instruction.id ? "⏳" : "➕"} {t.materialAdd}</button>
                       </div>
