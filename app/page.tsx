@@ -3943,6 +3943,7 @@ export default function Home() {
   const [absences, setAbsences] = useState<any[]>([]);
   const [absDraft, setAbsDraft] = useState<{ type: string; start: string; end: string; note: string }>({ type: "vacation", start: "", end: "", note: "" });
   const [absSaving, setAbsSaving] = useState(false);
+  const [absTrans, setAbsTrans] = useState<Record<string, string>>({});
   const [orderDraft, setOrderDraft] = useState<Record<string, { qty: string; unit: string; name: string; note: string }>>({});
   const [orderSaving, setOrderSaving] = useState<string | null>(null);
   const [orderTrans, setOrderTrans] = useState<Record<string, string>>({});
@@ -4006,6 +4007,28 @@ export default function Home() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentSignature, uiLanguage]);
+
+  // Notizen der Abwesenheiten in die Anzeige-Sprache uebersetzen.
+  useEffect(() => {
+    let abgebrochen = false;
+    (async () => {
+      if (!companyFeatures?.absence_enabled || absences.length === 0) {
+        setAbsTrans({});
+        return;
+      }
+      const items = (absences as any[])
+        .filter((a) => (a?.note || "").trim())
+        .map((a) => ({ key: String(a.id), text: String(a.note) }));
+      if (items.length === 0) { setAbsTrans({}); return; }
+      let out: Record<string, string> = {};
+      try {
+        out = await translateBatch(items, "automatisch", uiLanguage);
+      } catch { /* ohne Uebersetzung weiter */ }
+      if (!abgebrochen) setAbsTrans(out);
+    })();
+    return () => { abgebrochen = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [absences, uiLanguage, companyFeatures?.absence_enabled]);
 
   // Bestellungen (Bezeichnung + Notiz) in die Anzeige-Sprache uebersetzen.
   useEffect(() => {
@@ -6912,7 +6935,7 @@ export default function Home() {
                           {a.type === "sick" ? "🤒" : "🌴"} {a.type === "sick" ? t.absenceSick : t.absenceVacation}
                           <span className="font-normal"> · {a.start_date}{a.end_date !== a.start_date ? ` – ${a.end_date}` : ""} ({absenceDayCount(a)} {t.exportDays})</span>
                         </p>
-                        <p className="text-xs text-gray-500">{a.user_name || "?"}{a.note ? ` · ${a.note}` : ""}</p>
+                        <p className="text-xs text-gray-500">{a.user_name || "?"}{a.note ? ` · ${absTrans[a.id] || a.note}` : ""}</p>
                       </div>
                       <span className={`text-xs px-2 py-0.5 rounded shrink-0 ${a.type === "sick" ? "bg-blue-100 text-blue-700" : a.status === "approved" ? "bg-green-100 text-green-700" : a.status === "rejected" ? "bg-red-100 text-red-700" : "bg-gray-100 text-gray-600"}`}>
                         {a.type === "sick" ? t.absenceReported : a.status === "approved" ? t.absenceApproved : a.status === "rejected" ? t.absenceRejected : t.absencePending}
