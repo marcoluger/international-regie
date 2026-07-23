@@ -3611,12 +3611,25 @@ function SignaturePad({ label, value, onChange }: { label: string; value: string
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const drawing = useRef(false);
   const hasDrawn = useRef(false);
+  const lastEmitted = useRef("");
+  // Zeigt eine gespeicherte Unterschrift auf der Zeichenflaeche an bzw. leert sie.
   useEffect(() => {
-    if (value === "") {
-      const c = canvasRef.current; const ctx = c ? c.getContext("2d") : null;
-      if (c && ctx) ctx.clearRect(0, 0, c.width, c.height);
+    const c = canvasRef.current; const ctx = c ? c.getContext("2d") : null;
+    if (!c || !ctx) return;
+    if (!value) {
+      ctx.clearRect(0, 0, c.width, c.height);
       hasDrawn.current = false;
+      return;
     }
+    // Eigenes Zeichnen nicht ueberschreiben (sonst flackert es beim Malen).
+    if (value === lastEmitted.current) return;
+    const img = new Image();
+    img.onload = () => {
+      ctx.clearRect(0, 0, c.width, c.height);
+      ctx.drawImage(img, 0, 0, c.width, c.height);
+      hasDrawn.current = true;
+    };
+    img.src = value;
   }, [value]);
   function getCtx() { const c = canvasRef.current; return c ? c.getContext("2d") : null; }
   function pos(e: React.PointerEvent<HTMLCanvasElement>) {
@@ -3634,12 +3647,12 @@ function SignaturePad({ label, value, onChange }: { label: string; value: string
   }
   function end() {
     if (!drawing.current) return; drawing.current = false;
-    if (hasDrawn.current && canvasRef.current) onChange(canvasRef.current.toDataURL("image/png"));
+    if (hasDrawn.current && canvasRef.current) { const url = canvasRef.current.toDataURL("image/png"); lastEmitted.current = url; onChange(url); }
   }
   function clear() {
     const c = canvasRef.current; const ctx = getCtx();
     if (c && ctx) ctx.clearRect(0, 0, c.width, c.height);
-    hasDrawn.current = false; onChange("");
+    hasDrawn.current = false; lastEmitted.current = ""; onChange("");
   }
   return (
     <div className="border border-slate-200 rounded-xl p-3 shadow-sm bg-white">
