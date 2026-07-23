@@ -101,6 +101,7 @@ type CompanyFeatures = {
 
 const texts = {
   Deutsch: {
+    filterAll: "Alle",
     equipmentTab: "Fahrzeuge & Werkzeuge", equipmentVehicle: "Fahrzeug", equipmentTool: "Werkzeug", equipmentIdentifier: "Kennzeichen / Nummer", equipmentAssign: "Zuweisen", equipmentReturn: "Zurückgeben", equipmentFree: "Verfügbar", equipmentHistory: "Verlauf", equipmentEmpty: "Noch keine Geräte erfasst.", equipmentType: "Typ",
     exportTab: "Stundenexport", exportMonth: "Monat", exportDownload: "CSV herunterladen", exportEmpty: "Keine Stunden im gewählten Monat.", exportDays: "Arbeitstage",
     materialOrder: "Material bestellen", materialOrders: "Bestellungen", orderOpen: "Offen", orderOrdered: "Bestellt", orderDelivered: "Geliefert", ordersEmpty: "Keine Bestellungen.", orderNote: "Notiz",
@@ -340,6 +341,7 @@ const texts = {
     copyDone: "Arbeitsschritte wurden übernommen.",
   },
   Spanisch: {
+    filterAll: "Todos",
     equipmentTab: "Vehículos y herramientas", equipmentVehicle: "Vehículo", equipmentTool: "Herramienta", equipmentIdentifier: "Matrícula / número", equipmentAssign: "Asignar", equipmentReturn: "Devolver", equipmentFree: "Disponible", equipmentHistory: "Historial", equipmentEmpty: "Aún no hay equipos registrados.", equipmentType: "Tipo",
     exportTab: "Exportación de horas", exportMonth: "Mes", exportDownload: "Descargar CSV", exportEmpty: "No hay horas en el mes seleccionado.", exportDays: "Días trabajados",
     materialOrder: "Pedir material", materialOrders: "Pedidos", orderOpen: "Abierto", orderOrdered: "Pedido", orderDelivered: "Entregado", ordersEmpty: "No hay pedidos.", orderNote: "Nota",
@@ -579,6 +581,7 @@ const texts = {
     copyDone: "Los pasos de trabajo se han aplicado.",
   },
   Rumänisch: {
+    filterAll: "Toate",
     equipmentTab: "Vehicule și scule", equipmentVehicle: "Vehicul", equipmentTool: "Sculă", equipmentIdentifier: "Număr înmatriculare / număr", equipmentAssign: "Atribuie", equipmentReturn: "Returnează", equipmentFree: "Disponibil", equipmentHistory: "Istoric", equipmentEmpty: "Încă nu există echipamente.", equipmentType: "Tip",
     exportTab: "Export ore", exportMonth: "Luna", exportDownload: "Descarcă CSV", exportEmpty: "Nicio oră în luna selectată.", exportDays: "Zile lucrate",
     materialOrder: "Comandă material", materialOrders: "Comenzi", orderOpen: "Deschis", orderOrdered: "Comandat", orderDelivered: "Livrat", ordersEmpty: "Nicio comandă.", orderNote: "Notă",
@@ -818,6 +821,7 @@ const texts = {
     copyDone: "Etapele de lucru au fost preluate.",
   },
   Englisch: {
+    filterAll: "All",
     equipmentTab: "Vehicles & tools", equipmentVehicle: "Vehicle", equipmentTool: "Tool", equipmentIdentifier: "Plate / number", equipmentAssign: "Assign", equipmentReturn: "Return", equipmentFree: "Available", equipmentHistory: "History", equipmentEmpty: "No equipment recorded yet.", equipmentType: "Type",
     exportTab: "Hours export", exportMonth: "Month", exportDownload: "Download CSV", exportEmpty: "No hours in the selected month.", exportDays: "Working days",
     materialOrder: "Order material", materialOrders: "Orders", orderOpen: "Open", orderOrdered: "Ordered", orderDelivered: "Delivered", ordersEmpty: "No orders.", orderNote: "Note",
@@ -1057,6 +1061,7 @@ const texts = {
     copyDone: "Work steps have been applied.",
   },
   Italienisch: {
+    filterAll: "Tutti",
     equipmentTab: "Veicoli e attrezzi", equipmentVehicle: "Veicolo", equipmentTool: "Attrezzo", equipmentIdentifier: "Targa / numero", equipmentAssign: "Assegna", equipmentReturn: "Restituisci", equipmentFree: "Disponibile", equipmentHistory: "Cronologia", equipmentEmpty: "Nessuna attrezzatura registrata.", equipmentType: "Tipo",
     exportTab: "Esportazione ore", exportMonth: "Mese", exportDownload: "Scarica CSV", exportEmpty: "Nessuna ora nel mese selezionato.", exportDays: "Giorni lavorati",
     materialOrder: "Ordina materiale", materialOrders: "Ordini", orderOpen: "Aperto", orderOrdered: "Ordinato", orderDelivered: "Consegnato", ordersEmpty: "Nessun ordine.", orderNote: "Nota",
@@ -1296,6 +1301,7 @@ const texts = {
     copyDone: "Le fasi di lavoro sono state applicate.",
   },
   Türkisch: {
+    filterAll: "Tümü",
     equipmentTab: "Araçlar ve aletler", equipmentVehicle: "Araç", equipmentTool: "Alet", equipmentIdentifier: "Plaka / numara", equipmentAssign: "Ata", equipmentReturn: "İade et", equipmentFree: "Müsait", equipmentHistory: "Geçmiş", equipmentEmpty: "Henüz ekipman girilmedi.", equipmentType: "Tür",
     exportTab: "Saat dışa aktarma", exportMonth: "Ay", exportDownload: "CSV indir", exportEmpty: "Seçilen ayda saat yok.", exportDays: "Çalışma günleri",
     materialOrder: "Malzeme siparişi", materialOrders: "Siparişler", orderOpen: "Açık", orderOrdered: "Sipariş edildi", orderDelivered: "Teslim edildi", ordersEmpty: "Sipariş yok.", orderNote: "Not",
@@ -1535,6 +1541,7 @@ const texts = {
     copyDone: "İş adımları alındı.",
   },
   Ungarisch: {
+    filterAll: "Összes",
     equipmentTab: "Járművek és szerszámok", equipmentVehicle: "Jármű", equipmentTool: "Szerszám", equipmentIdentifier: "Rendszám / szám", equipmentAssign: "Kiosztás", equipmentReturn: "Visszaadás", equipmentFree: "Elérhető", equipmentHistory: "Előzmények", equipmentEmpty: "Még nincs rögzített eszköz.", equipmentType: "Típus",
     exportTab: "Óraexport", exportMonth: "Hónap", exportDownload: "CSV letöltése", exportEmpty: "Nincs óra a kiválasztott hónapban.", exportDays: "Munkanapok",
     materialOrder: "Anyag rendelése", materialOrders: "Rendelések", orderOpen: "Nyitott", orderOrdered: "Megrendelve", orderDelivered: "Kiszállítva", ordersEmpty: "Nincs rendelés.", orderNote: "Megjegyzés",
@@ -1774,6 +1781,7 @@ const texts = {
     copyDone: "A munkalépések átvéve.",
   },
   Tschechisch: {
+    filterAll: "Vše",
     equipmentTab: "Vozidla a nářadí", equipmentVehicle: "Vozidlo", equipmentTool: "Nářadí", equipmentIdentifier: "SPZ / číslo", equipmentAssign: "Přidělit", equipmentReturn: "Vrátit", equipmentFree: "Dostupné", equipmentHistory: "Historie", equipmentEmpty: "Zatím není zadáno žádné vybavení.", equipmentType: "Typ",
     exportTab: "Export hodin", exportMonth: "Měsíc", exportDownload: "Stáhnout CSV", exportEmpty: "Žádné hodiny ve vybraném měsíci.", exportDays: "Pracovní dny",
     materialOrder: "Objednat materiál", materialOrders: "Objednávky", orderOpen: "Otevřeno", orderOrdered: "Objednáno", orderDelivered: "Dodáno", ordersEmpty: "Žádné objednávky.", orderNote: "Poznámka",
@@ -2013,6 +2021,7 @@ const texts = {
     copyDone: "Pracovní kroky byly převzaty.",
   },
   Ukrainisch: {
+    filterAll: "Усі",
     equipmentTab: "Транспорт та інструменти", equipmentVehicle: "Транспорт", equipmentTool: "Інструмент", equipmentIdentifier: "Номер", equipmentAssign: "Призначити", equipmentReturn: "Повернути", equipmentFree: "Доступно", equipmentHistory: "Історія", equipmentEmpty: "Обладнання ще не внесено.", equipmentType: "Тип",
     exportTab: "Експорт годин", exportMonth: "Місяць", exportDownload: "Завантажити CSV", exportEmpty: "Немає годин у вибраному місяці.", exportDays: "Робочі дні",
     materialOrder: "Замовити матеріал", materialOrders: "Замовлення", orderOpen: "Відкрито", orderOrdered: "Замовлено", orderDelivered: "Доставлено", ordersEmpty: "Замовлень немає.", orderNote: "Примітка",
@@ -2252,6 +2261,7 @@ const texts = {
     copyDone: "Робочі кроки перенесено.",
   },
   Bulgarisch: {
+    filterAll: "Всички",
     equipmentTab: "Превозни средства и инструменти", equipmentVehicle: "Превозно средство", equipmentTool: "Инструмент", equipmentIdentifier: "Регистрационен / номер", equipmentAssign: "Присвои", equipmentReturn: "Върни", equipmentFree: "Свободно", equipmentHistory: "История", equipmentEmpty: "Все още няма въведено оборудване.", equipmentType: "Тип",
     exportTab: "Експорт на часове", exportMonth: "Месец", exportDownload: "Изтегли CSV", exportEmpty: "Няма часове за избрания месец.", exportDays: "Работни дни",
     materialOrder: "Поръчай материал", materialOrders: "Поръчки", orderOpen: "Отворена", orderOrdered: "Поръчана", orderDelivered: "Доставена", ordersEmpty: "Няма поръчки.", orderNote: "Бележка",
@@ -2491,6 +2501,7 @@ const texts = {
     copyDone: "Работните стъпки са прехвърлени.",
   },
   Serbisch: {
+    filterAll: "Sve",
     equipmentTab: "Vozila i alati", equipmentVehicle: "Vozilo", equipmentTool: "Alat", equipmentIdentifier: "Registracija / broj", equipmentAssign: "Dodeli", equipmentReturn: "Vrati", equipmentFree: "Dostupno", equipmentHistory: "Istorija", equipmentEmpty: "Još nema unete opreme.", equipmentType: "Vrsta",
     exportTab: "Izvoz sati", exportMonth: "Mesec", exportDownload: "Preuzmi CSV", exportEmpty: "Nema sati u izabranom mesecu.", exportDays: "Radni dani",
     materialOrder: "Poruči materijal", materialOrders: "Porudžbine", orderOpen: "Otvoreno", orderOrdered: "Poručeno", orderDelivered: "Isporučeno", ordersEmpty: "Nema porudžbina.", orderNote: "Napomena",
@@ -2730,6 +2741,7 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Kroatisch: {
+    filterAll: "Sve",
     equipmentTab: "Vozila i alati", equipmentVehicle: "Vozilo", equipmentTool: "Alat", equipmentIdentifier: "Registracija / broj", equipmentAssign: "Dodijeli", equipmentReturn: "Vrati", equipmentFree: "Dostupno", equipmentHistory: "Povijest", equipmentEmpty: "Još nema unesenih uređaja.", equipmentType: "Vrsta",
     exportTab: "Izvoz sati", exportMonth: "Mjesec", exportDownload: "Preuzmi CSV", exportEmpty: "Nema sati u odabranom mjesecu.", exportDays: "Radni dani",
     materialOrder: "Naruči materijal", materialOrders: "Narudžbe", orderOpen: "Otvoreno", orderOrdered: "Naručeno", orderDelivered: "Isporučeno", ordersEmpty: "Nema narudžbi.", orderNote: "Napomena",
@@ -2969,6 +2981,7 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Slowenisch: {
+    filterAll: "Vse",
     equipmentTab: "Vozila in orodja", equipmentVehicle: "Vozilo", equipmentTool: "Orodje", equipmentIdentifier: "Registrska št. / številka", equipmentAssign: "Dodeli", equipmentReturn: "Vrni", equipmentFree: "Na voljo", equipmentHistory: "Zgodovina", equipmentEmpty: "Naprave še niso vnesene.", equipmentType: "Vrsta",
     exportTab: "Izvoz ur", exportMonth: "Mesec", exportDownload: "Prenesi CSV", exportEmpty: "Ni ur v izbranem mesecu.", exportDays: "Delovni dnevi",
     materialOrder: "Naroči material", materialOrders: "Naročila", orderOpen: "Odprto", orderOrdered: "Naročeno", orderDelivered: "Dostavljeno", ordersEmpty: "Ni naročil.", orderNote: "Opomba",
@@ -3208,6 +3221,7 @@ const texts = {
     copyDone: "Delovni koraki so prevzeti.",
   },
   Polnisch: {
+    filterAll: "Wszystkie",
     equipmentTab: "Pojazdy i narzędzia", equipmentVehicle: "Pojazd", equipmentTool: "Narzędzie", equipmentIdentifier: "Nr rejestracyjny / numer", equipmentAssign: "Przypisz", equipmentReturn: "Zwróć", equipmentFree: "Dostępne", equipmentHistory: "Historia", equipmentEmpty: "Brak zapisanego sprzętu.", equipmentType: "Typ",
     exportTab: "Eksport godzin", exportMonth: "Miesiąc", exportDownload: "Pobierz CSV", exportEmpty: "Brak godzin w wybranym miesiącu.", exportDays: "Dni robocze",
     materialOrder: "Zamów materiał", materialOrders: "Zamówienia", orderOpen: "Otwarte", orderOrdered: "Zamówione", orderDelivered: "Dostarczone", ordersEmpty: "Brak zamówień.", orderNote: "Notatka",
@@ -3896,6 +3910,7 @@ export default function Home() {
   const [eqHistory, setEqHistory] = useState<Record<string, any[]>>({});
   const [eqOpenId, setEqOpenId] = useState<string | null>(null);
   const [eqTrans, setEqTrans] = useState<Record<string, string>>({});
+  const [eqFilter, setEqFilter] = useState<string>("all");
   const [orderDraft, setOrderDraft] = useState<Record<string, { qty: string; unit: string; name: string; note: string }>>({});
   const [orderSaving, setOrderSaving] = useState<string | null>(null);
   const [pmEdits, setPmEdits] = useState<Record<string, string>>({});
@@ -6766,11 +6781,18 @@ export default function Home() {
                 {eqDraft.id && (<button type="button" onClick={() => setEqDraft({ id: "", type: "tool", name: "", identifier: "", note: "" })} className="bg-gray-200 px-4 py-2.5 rounded-lg text-sm">{t.cancelBtn}</button>)}
               </div>
             )}
-            {equipment.length === 0 ? (
+            <div className="flex gap-2 flex-wrap">
+              {[{ k: "all", label: t.filterAll }, { k: "vehicle", label: `🚚 ${t.equipmentVehicle}` }, { k: "tool", label: `🔧 ${t.equipmentTool}` }].map((f) => (
+                <button key={f.k} type="button" onClick={() => setEqFilter(f.k)} className={`px-3 py-2 rounded-lg text-sm border ${eqFilter === f.k ? "bg-cyan-700 text-white border-cyan-700" : "bg-white text-gray-700"}`}>
+                  {f.label} ({f.k === "all" ? equipment.length : equipment.filter((x: any) => (x.type || "tool") === f.k).length})
+                </button>
+              ))}
+            </div>
+            {equipment.filter((eq: any) => eqFilter === "all" || (eq.type || "tool") === eqFilter).length === 0 ? (
               <p className="text-gray-500">{t.equipmentEmpty}</p>
             ) : (
               <div className="space-y-2">
-                {equipment.map((eq: any) => (
+                {equipment.filter((eq: any) => eqFilter === "all" || (eq.type || "tool") === eqFilter).map((eq: any) => (
                   <div key={eq.id} className="border border-slate-200 rounded-xl p-3 bg-gray-50 space-y-2">
                     <div className="flex justify-between items-start gap-2 flex-wrap">
                       <div>
