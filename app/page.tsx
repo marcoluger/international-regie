@@ -7175,7 +7175,7 @@ export default function Home() {
         <div className="space-y-4">
           <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-3">
             <h2 className="text-xl font-bold">📦 {t.materialCatalog}</h2>
-            {!readOnlyUser && (
+            {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
               <div className="flex gap-2 flex-wrap items-center">
                 <input placeholder={t.materialName} value={catDraft.name} onChange={(e) => setCatDraft(p => ({ ...p, name: e.target.value }))} className="border p-3 rounded-lg text-black bg-white flex-1 min-w-[12rem]" />
                 <select value={catDraft.unit} onChange={(e) => setCatDraft(p => ({ ...p, unit: e.target.value }))} className="border p-3 rounded-lg text-black bg-white">
@@ -7203,7 +7203,7 @@ export default function Home() {
                         <td className="px-3 py-2 break-words">{catTrans[m.id] || m.name}</td>
                         <td className="px-3 py-2">{m.unit || "-"}</td>
                         <td className="px-3 py-2 text-right whitespace-nowrap">
-                          {!readOnlyUser && (<button type="button" onClick={() => setCatDraft({ id: m.id, name: m.name || "", unit: m.unit || MATERIAL_UNITS[0] })} className="text-xs px-2 py-1 rounded border mr-1">✏️</button>)}
+                          {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => setCatDraft({ id: m.id, name: m.name || "", unit: m.unit || MATERIAL_UNITS[0] })} className="text-xs px-2 py-1 rounded border mr-1">✏️</button>)}
                           {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => deleteCatalogItem(m.id)} className="text-xs px-2 py-1 rounded border text-red-600">🗑️</button>)}
                         </td>
                       </tr>

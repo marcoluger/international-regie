@@ -57,9 +57,14 @@ export async function POST(request: Request) {
       return Response.json({ items: data || [] });
     }
 
-    // Ab hier: Aendern – nicht fuer Nur-lesen-Konten
+    // Ab hier: Aendern – nur Owner/Admin/Projektleiter (Mitarbeiter duerfen nur lesen).
+    // Hinweis: Beim Erfassen von verbrauchtem Material lernt der Stamm weiterhin
+    // automatisch dazu (ueber /api/update-material) – das bleibt fuer alle moeglich.
     if (member.read_only) {
       return Response.json({ error: "Dieses Konto darf nur lesen." }, { status: 403 });
+    }
+    if (!MANAGER_ROLES.includes(member.role)) {
+      return Response.json({ error: "Keine Berechtigung zum Bearbeiten des Materialstamms." }, { status: 403 });
     }
 
     // ── Speichern (neu oder aendern) ──
