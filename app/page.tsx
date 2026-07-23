@@ -12,6 +12,16 @@ const supabase = createClient(
 );
 
 const languages = ["Deutsch", "Kroatisch", "Slowenisch", "Polnisch", "Rumänisch", "Ukrainisch", "Ungarisch", "Bulgarisch", "Tschechisch", "Türkisch", "Italienisch", "Englisch", "Serbisch", "Spanisch"];
+const UNIT_LABELS: Record<string, Record<string, string>> = {
+  "Stk": { Deutsch: "Stk", Kroatisch: "kom", Slowenisch: "kos", Polnisch: "szt", Rumänisch: "buc", Ukrainisch: "шт", Ungarisch: "db", Bulgarisch: "бр", Tschechisch: "ks", Türkisch: "adet", Italienisch: "pz", Englisch: "pcs", Serbisch: "kom", Spanisch: "ud" },
+  "Pack": { Deutsch: "Pack", Kroatisch: "pak", Slowenisch: "pak", Polnisch: "opak", Rumänisch: "pachet", Ukrainisch: "упак", Ungarisch: "csom", Bulgarisch: "опак", Tschechisch: "bal", Türkisch: "paket", Italienisch: "conf", Englisch: "pack", Serbisch: "pak", Spanisch: "paq" },
+  "Rolle": { Deutsch: "Rolle", Kroatisch: "rola", Slowenisch: "kolut", Polnisch: "rolka", Rumänisch: "rolă", Ukrainisch: "рулон", Ungarisch: "tekercs", Bulgarisch: "ролка", Tschechisch: "role", Türkisch: "rulo", Italienisch: "rotolo", Englisch: "roll", Serbisch: "rola", Spanisch: "rollo" },
+  "Sack": { Deutsch: "Sack", Kroatisch: "vreća", Slowenisch: "vreča", Polnisch: "worek", Rumänisch: "sac", Ukrainisch: "мішок", Ungarisch: "zsák", Bulgarisch: "чувал", Tschechisch: "pytel", Türkisch: "çuval", Italienisch: "sacco", Englisch: "bag", Serbisch: "vreća", Spanisch: "saco" },
+};
+// Einheit in der Anzeige-Sprache (intern wird immer der gleiche Wert gespeichert).
+function unitLabel(unit: string, lang: string): string {
+  return UNIT_LABELS[unit]?.[lang] || unit;
+}
 const MATERIAL_UNITS = ["Stk", "m", "m²", "kg", "l", "Pack", "Rolle", "Sack"];
 const COUNTRIES = ["Deutschland", "Österreich", "Schweiz", "Rumänien", "Italien", "Türkei", "Ungarn", "Tschechien", "Slowakei", "Ukraine", "Bulgarien", "Serbien", "Kroatien", "Slowenien", "Bosnien und Herzegowina", "Nordmazedonien", "Kosovo", "Albanien", "Polen", "Portugal", "Spanien", "Griechenland", "Andere"];
 const pdfLanguages = ["Deutsch", "Kroatisch", "Slowenisch", "Polnisch", "Englisch", "Spanisch"];
@@ -5861,7 +5871,7 @@ export default function Home() {
       ...completedTasks,
       problemsTranslated ? `─────\n⚠️ ${currentTexts.problemsHints}: ${problemsTranslated}` : "",
       materialTranslated ? `📦 ${currentTexts.material}: ${materialTranslated}` : "",
-      usedMaterialList(instruction).length > 0 ? `📦 ${currentTexts.materialUsed}: ${usedMaterialList(instruction).map((m: any) => `${m.qty} ${m.unit} ${getTranslatedMaterial(instruction.id, m.name)}`).join(", ")}` : "",
+      usedMaterialList(instruction).length > 0 ? `📦 ${currentTexts.materialUsed}: ${usedMaterialList(instruction).map((m: any) => `${m.qty} ${unitLabel(m.unit, uiLanguage)} ${getTranslatedMaterial(instruction.id, m.name)}`).join(", ")}` : "",
       werkzeugTranslated ? `🔧 ${currentTexts.werkzeug}: ${werkzeugTranslated}` : "",
       instruction.employee_note ? `${currentTexts.feedbackLabel}: ${instruction.employee_note}` : ""
     ].filter(Boolean).join("\n─────\n");
@@ -6177,7 +6187,7 @@ export default function Home() {
     await block(t.problems, inst.problems_text || "");
     await block(t.material, inst.material || "");
     if (usedMaterialList(inst).length > 0) {
-      await block(t.materialUsed, usedMaterialList(inst).map((m: any) => `${m.qty} ${m.unit} ${m.name}`).join(", "));
+      await block(t.materialUsed, usedMaterialList(inst).map((m: any) => `${m.qty} ${unitLabel(m.unit, uiLanguage)} ${m.name}`).join(", "));
     }
     await block(t.werkzeug, inst.werkzeug || "");
     const tasks = (inst.work_instruction_tasks || []).slice().sort((a: any, b: any) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
@@ -7142,7 +7152,7 @@ export default function Home() {
                         <p className="text-sm font-semibold text-gray-700 pl-1">🏗️ {projekt} ({list.length})</p>
                         {list.map((o: any) => (
                   <div key={o.id} className="border border-slate-200 rounded-xl p-3 bg-gray-50 space-y-2">
-                    <p className="break-words"><strong>{o.qty} {o.unit}</strong> {orderTrans[o.id] || o.name}{o.note ? <span className="text-gray-600"> · {orderTrans[`n_${o.id}`] || o.note}</span> : null}</p>
+                    <p className="break-words"><strong>{o.qty} {unitLabel(o.unit, uiLanguage)}</strong> {orderTrans[o.id] || o.name}{o.note ? <span className="text-gray-600"> · {orderTrans[`n_${o.id}`] || o.note}</span> : null}</p>
                     <p className="text-xs text-gray-500">{o.created_by_name || "?"} · {new Date(o.created_at).toLocaleString("de-DE")}</p>
                     <div className="flex gap-2 flex-wrap items-center">
                       {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") ? (
@@ -7179,7 +7189,7 @@ export default function Home() {
               <div className="flex gap-2 flex-wrap items-center">
                 <input placeholder={t.materialName} value={catDraft.name} onChange={(e) => setCatDraft(p => ({ ...p, name: e.target.value }))} className="border p-3 rounded-lg text-black bg-white flex-1 min-w-[12rem]" />
                 <select value={catDraft.unit} onChange={(e) => setCatDraft(p => ({ ...p, unit: e.target.value }))} className="border p-3 rounded-lg text-black bg-white">
-                  {MATERIAL_UNITS.map((u) => (<option key={u} value={u}>{u}</option>))}
+                  {MATERIAL_UNITS.map((u) => (<option key={u} value={u}>{unitLabel(u, uiLanguage)}</option>))}
                 </select>
                 <button type="button" onClick={saveCatalogItem} className="bg-cyan-700 text-white px-4 py-3 rounded-lg text-sm">{catDraft.id ? `💾 ${t.saveBtn}` : `➕ ${t.materialAdd}`}</button>
                 {catDraft.id && (<button type="button" onClick={() => setCatDraft({ id: "", name: "", unit: MATERIAL_UNITS[0] })} className="bg-gray-200 px-4 py-3 rounded-lg text-sm">{t.cancelBtn}</button>)}
@@ -7201,7 +7211,7 @@ export default function Home() {
                     {materialCatalog.map((m: any) => (
                       <tr key={m.id} className="border-t border-slate-200">
                         <td className="px-3 py-2 break-words">{catTrans[m.id] || m.name}</td>
-                        <td className="px-3 py-2">{m.unit || "-"}</td>
+                        <td className="px-3 py-2">{m.unit ? unitLabel(m.unit, uiLanguage) : "-"}</td>
                         <td className="px-3 py-2 text-right whitespace-nowrap">
                           {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => setCatDraft({ id: m.id, name: m.name || "", unit: m.unit || MATERIAL_UNITS[0] })} className="text-xs px-2 py-1 rounded border mr-1">✏️</button>)}
                           {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => deleteCatalogItem(m.id)} className="text-xs px-2 py-1 rounded border text-red-600">🗑️</button>)}
@@ -7381,7 +7391,7 @@ export default function Home() {
                       <ul className="space-y-1">
                         {usedMaterialList(instruction).map((m: any, mi: number) => (
                           <li key={mi} className="flex items-center justify-between gap-2 bg-white border rounded-lg px-2 py-1 text-sm">
-                            <span className="break-words"><strong>{m.qty} {m.unit}</strong> {getTranslatedMaterial(instruction.id, m.name)}{m.by ? <span className="text-xs text-gray-400"> · {m.by}</span> : null}</span>
+                            <span className="break-words"><strong>{m.qty} {unitLabel(m.unit, uiLanguage)}</strong> {getTranslatedMaterial(instruction.id, m.name)}{m.by ? <span className="text-xs text-gray-400"> · {m.by}</span> : null}</span>
                             {!readOnlyUser && (<button type="button" title={t.delete} onClick={() => removeMaterial(instruction, mi)} className="text-xs px-2 py-1 rounded border text-red-600 shrink-0">🗑️</button>)}
                           </li>
                         ))}
@@ -7391,7 +7401,7 @@ export default function Home() {
                       <div className="flex gap-2 flex-wrap items-center">
                         <input type="number" inputMode="decimal" placeholder={t.materialQty} value={matDraft[instruction.id]?.qty ?? ""} onChange={(e) => setMatDraft(p => ({ ...p, [instruction.id]: { ...(p[instruction.id] || { qty: "", unit: MATERIAL_UNITS[0], name: "" }), qty: e.target.value } }))} className="border p-2 rounded-lg text-sm w-24 text-black bg-white" />
                         <select value={matDraft[instruction.id]?.unit ?? MATERIAL_UNITS[0]} onChange={(e) => setMatDraft(p => ({ ...p, [instruction.id]: { ...(p[instruction.id] || { qty: "", unit: MATERIAL_UNITS[0], name: "" }), unit: e.target.value } }))} className="border p-2 rounded-lg text-sm text-black bg-white">
-                          {MATERIAL_UNITS.map((u) => (<option key={u} value={u}>{u}</option>))}
+                          {MATERIAL_UNITS.map((u) => (<option key={u} value={u}>{unitLabel(u, uiLanguage)}</option>))}
                         </select>
                         <input list={`matlist-${instruction.id}`} placeholder={t.materialName} value={matDraft[instruction.id]?.name ?? ""} onChange={(e) => { const v = e.target.value; const u = unitForMaterial(v); setMatDraft(p => { const cur = p[instruction.id] || { qty: "", unit: MATERIAL_UNITS[0], name: "" }; return { ...p, [instruction.id]: { ...cur, name: v, unit: u || cur.unit } }; }); }} className="border p-2 rounded-lg text-sm text-black bg-white flex-1 min-w-[10rem]" />
                         <datalist id={`matlist-${instruction.id}`}>
@@ -7407,14 +7417,14 @@ export default function Home() {
                     <p className="text-sm font-medium text-gray-700">🛒 {t.materialOrder}</p>
                     {materialOrders.filter((o: any) => o.instruction_id === instruction.id).map((o: any) => (
                       <div key={o.id} className="flex items-center justify-between gap-2 bg-white border rounded-lg px-2 py-1 text-sm">
-                        <span className="break-words"><strong>{o.qty} {o.unit}</strong> {orderTrans[o.id] || o.name}{o.note ? <span className="text-gray-500"> · {orderTrans[`n_${o.id}`] || o.note}</span> : null}</span>
+                        <span className="break-words"><strong>{o.qty} {unitLabel(o.unit, uiLanguage)}</strong> {orderTrans[o.id] || o.name}{o.note ? <span className="text-gray-500"> · {orderTrans[`n_${o.id}`] || o.note}</span> : null}</span>
                         <span className={`text-xs px-2 py-0.5 rounded shrink-0 ${o.status === "delivered" ? "bg-green-100 text-green-700" : o.status === "ordered" ? "bg-amber-100 text-amber-700" : "bg-gray-100 text-gray-600"}`}>{orderStatusLabel(o.status)}</span>
                       </div>
                     ))}
                     <div className="flex gap-2 flex-wrap items-center">
                       <input type="number" inputMode="decimal" placeholder={t.materialQty} value={orderDraft[instruction.id]?.qty ?? ""} onChange={(e) => setOrderDraft(p => ({ ...p, [instruction.id]: { ...(p[instruction.id] || { qty: "", unit: MATERIAL_UNITS[0], name: "", note: "" }), qty: e.target.value } }))} className="border p-2 rounded-lg text-sm w-24 text-black bg-white" />
                       <select value={orderDraft[instruction.id]?.unit ?? MATERIAL_UNITS[0]} onChange={(e) => setOrderDraft(p => ({ ...p, [instruction.id]: { ...(p[instruction.id] || { qty: "", unit: MATERIAL_UNITS[0], name: "", note: "" }), unit: e.target.value } }))} className="border p-2 rounded-lg text-sm text-black bg-white">
-                        {MATERIAL_UNITS.map((u) => (<option key={u} value={u}>{u}</option>))}
+                        {MATERIAL_UNITS.map((u) => (<option key={u} value={u}>{unitLabel(u, uiLanguage)}</option>))}
                       </select>
                       <input list={`matlist-${instruction.id}`} placeholder={t.materialName} value={orderDraft[instruction.id]?.name ?? ""} onChange={(e) => { const v = e.target.value; const u = unitForMaterial(v); setOrderDraft(p => { const cur = p[instruction.id] || { qty: "", unit: MATERIAL_UNITS[0], name: "", note: "" }; return { ...p, [instruction.id]: { ...cur, name: v, unit: u || cur.unit } }; }); }} className="border p-2 rounded-lg text-sm text-black bg-white flex-1 min-w-[10rem]" />
                       <input placeholder={t.orderNote} value={orderDraft[instruction.id]?.note ?? ""} onChange={(e) => setOrderDraft(p => ({ ...p, [instruction.id]: { ...(p[instruction.id] || { qty: "", unit: MATERIAL_UNITS[0], name: "", note: "" }), note: e.target.value } }))} className="border p-2 rounded-lg text-sm text-black bg-white flex-1 min-w-[8rem]" />
