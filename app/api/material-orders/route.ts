@@ -70,7 +70,24 @@ export async function POST(request: Request) {
       if (!isManager) q = q.eq("created_by", caller.id);
       const { data, error } = await q;
       if (error) return Response.json({ error: error.message }, { status: 500 });
-      return Response.json({ orders: data || [] });
+
+      // Projekt und Datum der zugehoerigen Arbeitsanweisung ergaenzen
+      const ids = Array.from(new Set((data || []).map((o: any) => o.instruction_id).filter(Boolean)));
+      const info: Record<string, any> = {};
+      if (ids.length > 0) {
+        const { data: insts } = await supabaseAdmin
+          .from("work_instructions")
+          .select("id, project, work_date, title")
+          .in("id", ids);
+        for (const i of insts || []) info[i.id] = i;
+      }
+      const orders = (data || []).map((o: any) => ({
+        ...o,
+        project: info[o.instruction_id]?.project || "",
+        work_date: info[o.instruction_id]?.work_date || null,
+        instruction_title: info[o.instruction_id]?.title || "",
+      }));
+      return Response.json({ orders });
     }
 
     // Ab hier: Aenderungen – nicht fuer Nur-lesen-Konten

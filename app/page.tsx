@@ -6921,9 +6921,28 @@ export default function Home() {
             </div>
             {materialOrders.length === 0 ? (
               <p className="text-gray-500">{t.ordersEmpty}</p>
-            ) : (
-              <div className="space-y-2">
-                {materialOrders.map((o: any) => (
+            ) : (() => {
+              // Nach Kalenderwoche und Projekt gruppieren (neueste Woche zuerst)
+              const weeks: Record<string, { label: string; sort: string; projects: Record<string, any[]> }> = {};
+              for (const o of materialOrders as any[]) {
+                const datum = (o.work_date || String(o.created_at || "").slice(0, 10)) || "";
+                const wk = datum ? `${getCalendarWeek(datum)} · ${datum.slice(0, 4)}` : "–";
+                const pr = String(o.project || "").trim() || t.noProject;
+                if (!weeks[wk]) weeks[wk] = { label: wk, sort: datum, projects: {} };
+                if (datum > weeks[wk].sort) weeks[wk].sort = datum;
+                if (!weeks[wk].projects[pr]) weeks[wk].projects[pr] = [];
+                weeks[wk].projects[pr].push(o);
+              }
+              const sorted = Object.values(weeks).sort((a, b) => b.sort.localeCompare(a.sort));
+              return (
+              <div className="space-y-4">
+                {sorted.map((w) => (
+                  <div key={w.label} className="space-y-2">
+                    <p className="font-bold text-cyan-800 border-b pb-1">📅 {w.label}</p>
+                    {Object.entries(w.projects).map(([projekt, list]) => (
+                      <div key={projekt} className="space-y-2">
+                        <p className="text-sm font-semibold text-gray-700 pl-1">🏗️ {projekt} ({list.length})</p>
+                        {list.map((o: any) => (
                   <div key={o.id} className="border border-slate-200 rounded-xl p-3 bg-gray-50 space-y-2">
                     <p className="break-words"><strong>{o.qty} {o.unit}</strong> {orderTrans[o.id] || o.name}{o.note ? <span className="text-gray-600"> · {orderTrans[`n_${o.id}`] || o.note}</span> : null}</p>
                     <p className="text-xs text-gray-500">{o.created_by_name || "?"} · {new Date(o.created_at).toLocaleString("de-DE")}</p>
@@ -6943,8 +6962,13 @@ export default function Home() {
                     </div>
                   </div>
                 ))}
+                      </div>
+                    ))}
+                  </div>
+                ))}
               </div>
-            )}
+              );
+            })()}
           </section>
         </div>
       )}
