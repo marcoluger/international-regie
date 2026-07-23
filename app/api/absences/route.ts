@@ -83,7 +83,8 @@ export async function POST(request: Request) {
         start_date: start,
         end_date: end,
         note: String(body?.note ?? "").trim().slice(0, 500),
-        status: "pending",
+        // Krankmeldungen werden nur erfasst, Urlaub muss genehmigt werden.
+        status: body?.type === "sick" ? "noted" : "pending",
       };
       const { error } = await supabaseAdmin.from("absences").insert(row);
       if (error) return Response.json({ error: error.message }, { status: 500 });
@@ -98,6 +99,17 @@ export async function POST(request: Request) {
         return Response.json({ error: "Ungültiger Status." }, { status: 400 });
       }
       if (!body?.id) return Response.json({ error: "id fehlt." }, { status: 400 });
+      const { data: target } = await supabaseAdmin
+        .from("absences")
+        .select("id, company_id, type")
+        .eq("id", body.id)
+        .maybeSingle();
+      if (!target || target.company_id !== member.company_id) {
+        return Response.json({ error: "Meldung nicht gefunden." }, { status: 404 });
+      }
+      if (target.type === "sick") {
+        return Response.json({ error: "Krankmeldungen werden nicht genehmigt." }, { status: 400 });
+      }
       const { error } = await supabaseAdmin
         .from("absences")
         .update({ status, decided_by_name: myName, decided_at: new Date().toISOString() })

@@ -102,6 +102,7 @@ type CompanyFeatures = {
 
 const texts = {
   Deutsch: {
+    absenceReported: "Gemeldet",
     absenceTab: "Urlaub & Abwesenheit", absenceVacation: "Urlaub", absenceSick: "Krankheit", absenceFrom: "Von", absenceTo: "Bis", absenceRequest: "Beantragen", absencePending: "Offen", absenceApproved: "Genehmigt", absenceRejected: "Abgelehnt", absenceApprove: "Genehmigen", absenceReject: "Ablehnen", absenceEmpty: "Keine Meldungen.",
     filterAll: "Alle",
     equipmentTab: "Fahrzeuge & Werkzeuge", equipmentVehicle: "Fahrzeug", equipmentTool: "Werkzeug", equipmentIdentifier: "Kennzeichen / Nummer", equipmentAssign: "Zuweisen", equipmentReturn: "Zurückgeben", equipmentFree: "Verfügbar", equipmentHistory: "Verlauf", equipmentEmpty: "Noch keine Geräte erfasst.", equipmentType: "Typ",
@@ -343,6 +344,7 @@ const texts = {
     copyDone: "Arbeitsschritte wurden übernommen.",
   },
   Spanisch: {
+    absenceReported: "Notificado",
     absenceTab: "Vacaciones y ausencias", absenceVacation: "Vacaciones", absenceSick: "Enfermedad", absenceFrom: "Desde", absenceTo: "Hasta", absenceRequest: "Solicitar", absencePending: "Abierto", absenceApproved: "Aprobado", absenceRejected: "Rechazado", absenceApprove: "Aprobar", absenceReject: "Rechazar", absenceEmpty: "No hay solicitudes.",
     filterAll: "Todos",
     equipmentTab: "Vehículos y herramientas", equipmentVehicle: "Vehículo", equipmentTool: "Herramienta", equipmentIdentifier: "Matrícula / número", equipmentAssign: "Asignar", equipmentReturn: "Devolver", equipmentFree: "Disponible", equipmentHistory: "Historial", equipmentEmpty: "Aún no hay equipos registrados.", equipmentType: "Tipo",
@@ -584,6 +586,7 @@ const texts = {
     copyDone: "Los pasos de trabajo se han aplicado.",
   },
   Rumänisch: {
+    absenceReported: "Raportat",
     absenceTab: "Concediu și absențe", absenceVacation: "Concediu", absenceSick: "Boală", absenceFrom: "De la", absenceTo: "Până la", absenceRequest: "Solicită", absencePending: "Deschis", absenceApproved: "Aprobat", absenceRejected: "Respins", absenceApprove: "Aprobă", absenceReject: "Respinge", absenceEmpty: "Nicio solicitare.",
     filterAll: "Toate",
     equipmentTab: "Vehicule și scule", equipmentVehicle: "Vehicul", equipmentTool: "Sculă", equipmentIdentifier: "Număr înmatriculare / număr", equipmentAssign: "Atribuie", equipmentReturn: "Returnează", equipmentFree: "Disponibil", equipmentHistory: "Istoric", equipmentEmpty: "Încă nu există echipamente.", equipmentType: "Tip",
@@ -825,6 +828,7 @@ const texts = {
     copyDone: "Etapele de lucru au fost preluate.",
   },
   Englisch: {
+    absenceReported: "Reported",
     absenceTab: "Leave & absence", absenceVacation: "Vacation", absenceSick: "Sick leave", absenceFrom: "From", absenceTo: "To", absenceRequest: "Request", absencePending: "Open", absenceApproved: "Approved", absenceRejected: "Rejected", absenceApprove: "Approve", absenceReject: "Reject", absenceEmpty: "No requests.",
     filterAll: "All",
     equipmentTab: "Vehicles & tools", equipmentVehicle: "Vehicle", equipmentTool: "Tool", equipmentIdentifier: "Plate / number", equipmentAssign: "Assign", equipmentReturn: "Return", equipmentFree: "Available", equipmentHistory: "History", equipmentEmpty: "No equipment recorded yet.", equipmentType: "Type",
@@ -1066,6 +1070,7 @@ const texts = {
     copyDone: "Work steps have been applied.",
   },
   Italienisch: {
+    absenceReported: "Segnalato",
     absenceTab: "Ferie e assenze", absenceVacation: "Ferie", absenceSick: "Malattia", absenceFrom: "Dal", absenceTo: "Al", absenceRequest: "Richiedi", absencePending: "Aperto", absenceApproved: "Approvato", absenceRejected: "Rifiutato", absenceApprove: "Approva", absenceReject: "Rifiuta", absenceEmpty: "Nessuna richiesta.",
     filterAll: "Tutti",
     equipmentTab: "Veicoli e attrezzi", equipmentVehicle: "Veicolo", equipmentTool: "Attrezzo", equipmentIdentifier: "Targa / numero", equipmentAssign: "Assegna", equipmentReturn: "Restituisci", equipmentFree: "Disponibile", equipmentHistory: "Cronologia", equipmentEmpty: "Nessuna attrezzatura registrata.", equipmentType: "Tipo",
@@ -1307,6 +1312,7 @@ const texts = {
     copyDone: "Le fasi di lavoro sono state applicate.",
   },
   Türkisch: {
+    absenceReported: "Bildirildi",
     absenceTab: "İzin ve devamsızlık", absenceVacation: "İzin", absenceSick: "Hastalık", absenceFrom: "Başlangıç", absenceTo: "Bitiş", absenceRequest: "Talep et", absencePending: "Açık", absenceApproved: "Onaylandı", absenceRejected: "Reddedildi", absenceApprove: "Onayla", absenceReject: "Reddet", absenceEmpty: "Talep yok.",
     filterAll: "Tümü",
     equipmentTab: "Araçlar ve aletler", equipmentVehicle: "Araç", equipmentTool: "Alet", equipmentIdentifier: "Plaka / numara", equipmentAssign: "Ata", equipmentReturn: "İade et", equipmentFree: "Müsait", equipmentHistory: "Geçmiş", equipmentEmpty: "Henüz ekipman girilmedi.", equipmentType: "Tür",
@@ -1548,6 +1554,7 @@ const texts = {
     copyDone: "İş adımları alındı.",
   },
   Ungarisch: {
+    absenceReported: "Bejelentve",
     absenceTab: "Szabadság és távollét", absenceVacation: "Szabadság", absenceSick: "Betegség", absenceFrom: "Ettől", absenceTo: "Eddig", absenceRequest: "Igénylés", absencePending: "Nyitott", absenceApproved: "Jóváhagyva", absenceRejected: "Elutasítva", absenceApprove: "Jóváhagyás", absenceReject: "Elutasítás", absenceEmpty: "Nincs bejelentés.",
     filterAll: "Összes",
     equipmentTab: "Járművek és szerszámok", equipmentVehicle: "Jármű", equipmentTool: "Szerszám", equipmentIdentifier: "Rendszám / szám", equipmentAssign: "Kiosztás", equipmentReturn: "Visszaadás", equipmentFree: "Elérhető", equipmentHistory: "Előzmények", equipmentEmpty: "Még nincs rögzített eszköz.", equipmentType: "Típus",
@@ -1789,6 +1796,7 @@ const texts = {
     copyDone: "A munkalépések átvéve.",
   },
   Tschechisch: {
+    absenceReported: "Nahlášeno",
     absenceTab: "Dovolená a nepřítomnost", absenceVacation: "Dovolená", absenceSick: "Nemoc", absenceFrom: "Od", absenceTo: "Do", absenceRequest: "Podat žádost", absencePending: "Otevřeno", absenceApproved: "Schváleno", absenceRejected: "Zamítnuto", absenceApprove: "Schválit", absenceReject: "Zamítnout", absenceEmpty: "Žádné žádosti.",
     filterAll: "Vše",
     equipmentTab: "Vozidla a nářadí", equipmentVehicle: "Vozidlo", equipmentTool: "Nářadí", equipmentIdentifier: "SPZ / číslo", equipmentAssign: "Přidělit", equipmentReturn: "Vrátit", equipmentFree: "Dostupné", equipmentHistory: "Historie", equipmentEmpty: "Zatím není zadáno žádné vybavení.", equipmentType: "Typ",
@@ -2030,6 +2038,7 @@ const texts = {
     copyDone: "Pracovní kroky byly převzaty.",
   },
   Ukrainisch: {
+    absenceReported: "Повідомлено",
     absenceTab: "Відпустка та відсутність", absenceVacation: "Відпустка", absenceSick: "Лікарняний", absenceFrom: "З", absenceTo: "До", absenceRequest: "Подати заявку", absencePending: "Відкрито", absenceApproved: "Затверджено", absenceRejected: "Відхилено", absenceApprove: "Затвердити", absenceReject: "Відхилити", absenceEmpty: "Немає заявок.",
     filterAll: "Усі",
     equipmentTab: "Транспорт та інструменти", equipmentVehicle: "Транспорт", equipmentTool: "Інструмент", equipmentIdentifier: "Номер", equipmentAssign: "Призначити", equipmentReturn: "Повернути", equipmentFree: "Доступно", equipmentHistory: "Історія", equipmentEmpty: "Обладнання ще не внесено.", equipmentType: "Тип",
@@ -2271,6 +2280,7 @@ const texts = {
     copyDone: "Робочі кроки перенесено.",
   },
   Bulgarisch: {
+    absenceReported: "Съобщено",
     absenceTab: "Отпуск и отсъствия", absenceVacation: "Отпуск", absenceSick: "Болничен", absenceFrom: "От", absenceTo: "До", absenceRequest: "Заяви", absencePending: "Отворена", absenceApproved: "Одобрена", absenceRejected: "Отхвърлена", absenceApprove: "Одобри", absenceReject: "Отхвърли", absenceEmpty: "Няма заявки.",
     filterAll: "Всички",
     equipmentTab: "Превозни средства и инструменти", equipmentVehicle: "Превозно средство", equipmentTool: "Инструмент", equipmentIdentifier: "Регистрационен / номер", equipmentAssign: "Присвои", equipmentReturn: "Върни", equipmentFree: "Свободно", equipmentHistory: "История", equipmentEmpty: "Все още няма въведено оборудване.", equipmentType: "Тип",
@@ -2512,6 +2522,7 @@ const texts = {
     copyDone: "Работните стъпки са прехвърлени.",
   },
   Serbisch: {
+    absenceReported: "Prijavljeno",
     absenceTab: "Godišnji i odsustva", absenceVacation: "Godišnji odmor", absenceSick: "Bolovanje", absenceFrom: "Od", absenceTo: "Do", absenceRequest: "Podnesi zahtev", absencePending: "Otvoreno", absenceApproved: "Odobreno", absenceRejected: "Odbijeno", absenceApprove: "Odobri", absenceReject: "Odbij", absenceEmpty: "Nema prijava.",
     filterAll: "Sve",
     equipmentTab: "Vozila i alati", equipmentVehicle: "Vozilo", equipmentTool: "Alat", equipmentIdentifier: "Registracija / broj", equipmentAssign: "Dodeli", equipmentReturn: "Vrati", equipmentFree: "Dostupno", equipmentHistory: "Istorija", equipmentEmpty: "Još nema unete opreme.", equipmentType: "Vrsta",
@@ -2753,6 +2764,7 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Kroatisch: {
+    absenceReported: "Prijavljeno",
     absenceTab: "Godišnji i izostanci", absenceVacation: "Godišnji odmor", absenceSick: "Bolovanje", absenceFrom: "Od", absenceTo: "Do", absenceRequest: "Podnesi zahtjev", absencePending: "Otvoreno", absenceApproved: "Odobreno", absenceRejected: "Odbijeno", absenceApprove: "Odobri", absenceReject: "Odbij", absenceEmpty: "Nema prijava.",
     filterAll: "Sve",
     equipmentTab: "Vozila i alati", equipmentVehicle: "Vozilo", equipmentTool: "Alat", equipmentIdentifier: "Registracija / broj", equipmentAssign: "Dodijeli", equipmentReturn: "Vrati", equipmentFree: "Dostupno", equipmentHistory: "Povijest", equipmentEmpty: "Još nema unesenih uređaja.", equipmentType: "Vrsta",
@@ -2994,6 +3006,7 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Slowenisch: {
+    absenceReported: "Prijavljeno",
     absenceTab: "Dopust in odsotnosti", absenceVacation: "Dopust", absenceSick: "Bolniška", absenceFrom: "Od", absenceTo: "Do", absenceRequest: "Oddaj vlogo", absencePending: "Odprto", absenceApproved: "Odobreno", absenceRejected: "Zavrnjeno", absenceApprove: "Odobri", absenceReject: "Zavrni", absenceEmpty: "Ni prijav.",
     filterAll: "Vse",
     equipmentTab: "Vozila in orodja", equipmentVehicle: "Vozilo", equipmentTool: "Orodje", equipmentIdentifier: "Registrska št. / številka", equipmentAssign: "Dodeli", equipmentReturn: "Vrni", equipmentFree: "Na voljo", equipmentHistory: "Zgodovina", equipmentEmpty: "Naprave še niso vnesene.", equipmentType: "Vrsta",
@@ -3235,6 +3248,7 @@ const texts = {
     copyDone: "Delovni koraki so prevzeti.",
   },
   Polnisch: {
+    absenceReported: "Zgłoszone",
     absenceTab: "Urlop i nieobecności", absenceVacation: "Urlop", absenceSick: "Choroba", absenceFrom: "Od", absenceTo: "Do", absenceRequest: "Złóż wniosek", absencePending: "Otwarte", absenceApproved: "Zatwierdzone", absenceRejected: "Odrzucone", absenceApprove: "Zatwierdź", absenceReject: "Odrzuć", absenceEmpty: "Brak zgłoszeń.",
     filterAll: "Wszystkie",
     equipmentTab: "Pojazdy i narzędzia", equipmentVehicle: "Pojazd", equipmentTool: "Narzędzie", equipmentIdentifier: "Nr rejestracyjny / numer", equipmentAssign: "Przypisz", equipmentReturn: "Zwróć", equipmentFree: "Dostępne", equipmentHistory: "Historia", equipmentEmpty: "Brak zapisanego sprzętu.", equipmentType: "Typ",
@@ -6900,12 +6914,12 @@ export default function Home() {
                         </p>
                         <p className="text-xs text-gray-500">{a.user_name || "?"}{a.note ? ` · ${a.note}` : ""}</p>
                       </div>
-                      <span className={`text-xs px-2 py-0.5 rounded shrink-0 ${a.status === "approved" ? "bg-green-100 text-green-700" : a.status === "rejected" ? "bg-red-100 text-red-700" : "bg-gray-100 text-gray-600"}`}>
-                        {a.status === "approved" ? t.absenceApproved : a.status === "rejected" ? t.absenceRejected : t.absencePending}
+                      <span className={`text-xs px-2 py-0.5 rounded shrink-0 ${a.type === "sick" ? "bg-blue-100 text-blue-700" : a.status === "approved" ? "bg-green-100 text-green-700" : a.status === "rejected" ? "bg-red-100 text-red-700" : "bg-gray-100 text-gray-600"}`}>
+                        {a.type === "sick" ? t.absenceReported : a.status === "approved" ? t.absenceApproved : a.status === "rejected" ? t.absenceRejected : t.absencePending}
                       </span>
                     </div>
                     <div className="flex gap-2 flex-wrap items-center">
-                      {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
+                      {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && a.type !== "sick" && (
                         <>
                           <button type="button" onClick={() => decideAbsence(a.id, "approved")} className="bg-green-700 text-white px-3 py-2 rounded-lg text-sm">✅ {t.absenceApprove}</button>
                           <button type="button" onClick={() => decideAbsence(a.id, "rejected")} className="bg-red-600 text-white px-3 py-2 rounded-lg text-sm">✖️ {t.absenceReject}</button>
