@@ -37,6 +37,8 @@ type DayEntry = {
   description: string;
   translation: string;
   photos: string[];
+  // Uebertragene Arbeitsanweisungen je Tag (fuer "ersetzen statt doppelt anhaengen")
+  blocks?: { id: string; text: string }[];
 };
 
 type SavedReport = {
@@ -5261,8 +5263,18 @@ export default function Home() {
       let idx = targetDate ? baseDays.findIndex((d) => d.date === targetDate) : -1;
       if (idx < 0) idx = baseDays.findIndex((d) => !(d.description || "").trim());
       if (idx < 0) idx = 0;
+      // Bereits uebertragene Anweisungen des Tages. Wird dieselbe Anweisung erneut
+      // uebertragen, wird ihr Block ERSETZT (kein doppelter Text mehr).
       const existingDesc = (baseDays[idx].description || "").trim();
-      baseDays[idx] = { ...baseDays[idx], customer: baseDays[idx].customer || instruction.customer || "", projectNumber: baseDays[idx].projectNumber || instruction.project || "", site: baseDays[idx].site || formatProjectAddress(instruction) || "", description: existingDesc ? `${existingDesc}\n─────\n${description}` : description };
+      const prevBlocks = Array.isArray(baseDays[idx].blocks) ? baseDays[idx].blocks! : [];
+      const blocks = prevBlocks.length > 0
+        ? [...prevBlocks]
+        : (existingDesc ? [{ id: "legacy", text: existingDesc }] : []);
+      const bIdx = blocks.findIndex((b) => b.id === instruction.id);
+      if (bIdx >= 0) blocks[bIdx] = { id: instruction.id, text: description };
+      else blocks.push({ id: instruction.id, text: description });
+      const mergedDesc = blocks.map((b) => b.text).filter(Boolean).join("\n─────\n");
+      baseDays[idx] = { ...baseDays[idx], customer: baseDays[idx].customer || instruction.customer || "", projectNumber: baseDays[idx].projectNumber || instruction.project || "", site: baseDays[idx].site || formatProjectAddress(instruction) || "", description: mergedDesc, blocks };
       setDays(baseDays); setCurrentReportId(targetReport.id); setReportName(targetReport.report_name || ""); setReportLoaded(true); setReportVersion((v) => v + 1); setReportInstruction(instruction); setActiveTab("regiebericht"); setMessage(t.msgReportPrepared);
       return;
     }
@@ -5279,7 +5291,7 @@ export default function Home() {
     }
     const targetIndex = targetDate ? copy.findIndex((day) => day.date === targetDate) : 0;
     const indexToUse = targetIndex >= 0 ? targetIndex : 0;
-    copy[indexToUse] = { ...copy[indexToUse], customer: instruction.customer || "", projectNumber: instruction.project || "", site: formatProjectAddress(instruction) || "", description, photos: [] };
+    copy[indexToUse] = { ...copy[indexToUse], customer: instruction.customer || "", projectNumber: instruction.project || "", site: formatProjectAddress(instruction) || "", description, blocks: [{ id: instruction.id, text: description }], photos: [] };
     setDays(copy); setCurrentReportId(null); setReportName(""); setReportLoaded(false); setReportVersion((v) => v + 1); setReportInstruction(instruction); setActiveTab("regiebericht"); setMessage(t.msgReportPrepared);
   }
 
