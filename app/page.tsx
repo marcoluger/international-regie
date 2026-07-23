@@ -12,6 +12,7 @@ const supabase = createClient(
 );
 
 const languages = ["Deutsch", "Kroatisch", "Slowenisch", "Polnisch", "Rumänisch", "Ukrainisch", "Ungarisch", "Bulgarisch", "Tschechisch", "Türkisch", "Italienisch", "Englisch", "Serbisch", "Spanisch"];
+const MATERIAL_UNITS = ["Stk", "m", "m²", "kg", "l", "Pack", "Rolle", "Sack"];
 const COUNTRIES = ["Deutschland", "Österreich", "Schweiz", "Rumänien", "Italien", "Türkei", "Ungarn", "Tschechien", "Slowakei", "Ukraine", "Bulgarien", "Serbien", "Kroatien", "Slowenien", "Bosnien und Herzegowina", "Nordmazedonien", "Kosovo", "Albanien", "Polen", "Portugal", "Spanien", "Griechenland", "Andere"];
 const pdfLanguages = ["Deutsch", "Kroatisch", "Slowenisch", "Polnisch", "Englisch", "Spanisch"];
 const weekdays = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
@@ -93,10 +94,12 @@ type CompanyFeatures = {
   feedback_enabled?: boolean;
   translator_enabled?: boolean;
   comments_enabled?: boolean;
+  material_enabled?: boolean;
 };
 
 const texts = {
   Deutsch: {
+    materialUsed: "Verbrauchtes Material", materialAdd: "Hinzufügen", materialQty: "Menge", materialUnit: "Einheit", materialName: "Bezeichnung", materialNone: "Noch kein Material erfasst.",
     editBtn: "Bearbeiten", cancelBtn: "Abbrechen", saveBtn: "Speichern", overviewBtn: "Übersicht", languageLabel: "Sprache", nationalityLabel: "Nationalität", phoneLabel: "Telefon", nameLabel: "Name", readOnlyLabel: "Nur lesen (Arbeitsanweisung nicht bearbeitbar)", readOnlyHint: "Nur lesen – Schreiben ist für dieses Konto gesperrt.", commentEdited: "bearbeitet", commentDeleteAsk: "Diesen Beitrag löschen?",
     feedbackTab: "Feedback", feedbackTitle: "Tester-Feedback", feedbackIntro: "Bitte zu jedem Punkt kurz dein Feedback eintragen.", feedbackSend: "Feedback senden", feedbackThanks: "Danke für dein Feedback!", feedbackReview: "Abgegebenes Feedback", feedbackNone: "Noch kein Feedback vorhanden.",
     feedbackPoints: ["Anmeldung & Passwort", "Arbeitsanweisung & Kommentar", "Wetter-Funktion", "Übersetzungen", "Regiebericht erstellen", "PDF-Export", "Kalenderansichten", "Live-Übersetzer", "Bedienung am Handy", "Gesamteindruck & Fehler"],
@@ -331,6 +334,7 @@ const texts = {
     copyDone: "Arbeitsschritte wurden übernommen.",
   },
   Spanisch: {
+    materialUsed: "Material consumido", materialAdd: "Añadir", materialQty: "Cantidad", materialUnit: "Unidad", materialName: "Denominación", materialNone: "Aún no se ha registrado material.",
     editBtn: "Editar", cancelBtn: "Cancelar", saveBtn: "Guardar", overviewBtn: "Resumen", languageLabel: "Idioma", nationalityLabel: "Nacionalidad", phoneLabel: "Teléfono", nameLabel: "Nombre", readOnlyLabel: "Solo lectura (la instrucción no se puede editar)", readOnlyHint: "Solo lectura: la escritura está bloqueada para esta cuenta.", commentEdited: "editado", commentDeleteAsk: "¿Eliminar esta entrada?",
     feedbackTab: "Comentarios", feedbackTitle: "Comentarios del tester", feedbackIntro: "Por favor, añade un breve comentario para cada punto.", feedbackSend: "Enviar comentarios", feedbackThanks: "¡Gracias por tus comentarios!", feedbackReview: "Comentarios recibidos", feedbackNone: "Aún no hay comentarios.",
     feedbackPoints: ["Inicio de sesión y contraseña", "Instrucción de trabajo y comentario", "Función meteorológica", "Traducciones", "Crear informe", "Exportar PDF", "Vistas de calendario", "Traductor en vivo", "Uso en el móvil", "Impresión general y errores"],
@@ -565,6 +569,7 @@ const texts = {
     copyDone: "Los pasos de trabajo se han aplicado.",
   },
   Rumänisch: {
+    materialUsed: "Material consumat", materialAdd: "Adaugă", materialQty: "Cantitate", materialUnit: "Unitate", materialName: "Denumire", materialNone: "Încă nu a fost înregistrat material.",
     editBtn: "Editează", cancelBtn: "Anulează", saveBtn: "Salvează", overviewBtn: "Prezentare generală", languageLabel: "Limbă", nationalityLabel: "Naționalitate", phoneLabel: "Telefon", nameLabel: "Nume", readOnlyLabel: "Doar citire (instrucțiunea nu poate fi editată)", readOnlyHint: "Doar citire – scrierea este blocată pentru acest cont.", commentEdited: "editat", commentDeleteAsk: "Ștergeți această înregistrare?",
     feedbackTab: "Feedback", feedbackTitle: "Feedback tester", feedbackIntro: "Te rugăm să adaugi pe scurt feedback pentru fiecare punct.", feedbackSend: "Trimite feedback", feedbackThanks: "Mulțumim pentru feedback!", feedbackReview: "Feedback primit", feedbackNone: "Încă nu există feedback.",
     feedbackPoints: ["Autentificare & parolă", "Instrucțiune & comentariu", "Funcția meteo", "Traduceri", "Creare raport", "Export PDF", "Vizualizări calendar", "Traducător live", "Utilizare pe telefon", "Impresie generală & erori"],
@@ -799,6 +804,7 @@ const texts = {
     copyDone: "Etapele de lucru au fost preluate.",
   },
   Englisch: {
+    materialUsed: "Material used", materialAdd: "Add", materialQty: "Quantity", materialUnit: "Unit", materialName: "Description", materialNone: "No material recorded yet.",
     editBtn: "Edit", cancelBtn: "Cancel", saveBtn: "Save", overviewBtn: "Overview", languageLabel: "Language", nationalityLabel: "Nationality", phoneLabel: "Phone", nameLabel: "Name", readOnlyLabel: "Read only (work instruction cannot be edited)", readOnlyHint: "Read only – writing is disabled for this account.", commentEdited: "edited", commentDeleteAsk: "Delete this entry?",
     feedbackTab: "Feedback", feedbackTitle: "Tester feedback", feedbackIntro: "Please add short feedback for each point.", feedbackSend: "Send feedback", feedbackThanks: "Thanks for your feedback!", feedbackReview: "Submitted feedback", feedbackNone: "No feedback yet.",
     feedbackPoints: ["Login & password", "Work instruction & comment", "Weather feature", "Translations", "Create report", "PDF export", "Calendar views", "Live translator", "Mobile usability", "Overall & bugs"],
@@ -1033,6 +1039,7 @@ const texts = {
     copyDone: "Work steps have been applied.",
   },
   Italienisch: {
+    materialUsed: "Materiale consumato", materialAdd: "Aggiungi", materialQty: "Quantità", materialUnit: "Unità", materialName: "Descrizione", materialNone: "Nessun materiale registrato.",
     editBtn: "Modifica", cancelBtn: "Annulla", saveBtn: "Salva", overviewBtn: "Panoramica", languageLabel: "Lingua", nationalityLabel: "Nazionalità", phoneLabel: "Telefono", nameLabel: "Nome", readOnlyLabel: "Sola lettura (istruzione non modificabile)", readOnlyHint: "Sola lettura – la scrittura è bloccata per questo account.", commentEdited: "modificato", commentDeleteAsk: "Eliminare questo contributo?",
     feedbackTab: "Feedback", feedbackTitle: "Feedback tester", feedbackIntro: "Aggiungi un breve feedback per ogni punto.", feedbackSend: "Invia feedback", feedbackThanks: "Grazie per il tuo feedback!", feedbackReview: "Feedback ricevuti", feedbackNone: "Ancora nessun feedback.",
     feedbackPoints: ["Accesso & password", "Istruzione & commento", "Funzione meteo", "Traduzioni", "Creare rapporto", "Esportazione PDF", "Viste calendario", "Traduttore live", "Uso su cellulare", "Impressione generale & errori"],
@@ -1267,6 +1274,7 @@ const texts = {
     copyDone: "Le fasi di lavoro sono state applicate.",
   },
   Türkisch: {
+    materialUsed: "Kullanılan malzeme", materialAdd: "Ekle", materialQty: "Miktar", materialUnit: "Birim", materialName: "Tanım", materialNone: "Henüz malzeme girilmedi.",
     editBtn: "Düzenle", cancelBtn: "İptal", saveBtn: "Kaydet", overviewBtn: "Genel bakış", languageLabel: "Dil", nationalityLabel: "Uyruk", phoneLabel: "Telefon", nameLabel: "Ad", readOnlyLabel: "Salt okunur (iş talimatı düzenlenemez)", readOnlyHint: "Salt okunur – bu hesap için yazma engellendi.", commentEdited: "düzenlendi", commentDeleteAsk: "Bu kayıt silinsin mi?",
     feedbackTab: "Geri bildirim", feedbackTitle: "Test geri bildirimi", feedbackIntro: "Lütfen her madde için kısa geri bildirim yazın.", feedbackSend: "Geri bildirim gönder", feedbackThanks: "Geri bildiriminiz için teşekkürler!", feedbackReview: "Gönderilen geri bildirimler", feedbackNone: "Henüz geri bildirim yok.",
     feedbackPoints: ["Giriş & şifre", "İş talimatı & yorum", "Hava durumu", "Çeviriler", "Rapor oluşturma", "PDF dışa aktarma", "Takvim görünümleri", "Canlı çevirmen", "Telefonda kullanım", "Genel izlenim & hatalar"],
@@ -1501,6 +1509,7 @@ const texts = {
     copyDone: "İş adımları alındı.",
   },
   Ungarisch: {
+    materialUsed: "Felhasznált anyag", materialAdd: "Hozzáadás", materialQty: "Mennyiség", materialUnit: "Egység", materialName: "Megnevezés", materialNone: "Még nincs rögzített anyag.",
     editBtn: "Szerkesztés", cancelBtn: "Mégse", saveBtn: "Mentés", overviewBtn: "Áttekintés", languageLabel: "Nyelv", nationalityLabel: "Nemzetiség", phoneLabel: "Telefon", nameLabel: "Név", readOnlyLabel: "Csak olvasás (a munkautasítás nem szerkeszthető)", readOnlyHint: "Csak olvasás – az írás ehhez a fiókhoz le van tiltva.", commentEdited: "szerkesztve", commentDeleteAsk: "Törli ezt a bejegyzést?",
     feedbackTab: "Visszajelzés", feedbackTitle: "Tesztelői visszajelzés", feedbackIntro: "Kérjük, minden ponthoz írjon rövid visszajelzést.", feedbackSend: "Visszajelzés küldése", feedbackThanks: "Köszönjük a visszajelzést!", feedbackReview: "Beérkezett visszajelzések", feedbackNone: "Még nincs visszajelzés.",
     feedbackPoints: ["Bejelentkezés & jelszó", "Munkautasítás & megjegyzés", "Időjárás funkció", "Fordítások", "Jelentés készítése", "PDF exportálás", "Naptárnézetek", "Élő fordító", "Használat telefonon", "Összbenyomás & hibák"],
@@ -1735,6 +1744,7 @@ const texts = {
     copyDone: "A munkalépések átvéve.",
   },
   Tschechisch: {
+    materialUsed: "Spotřebovaný materiál", materialAdd: "Přidat", materialQty: "Množství", materialUnit: "Jednotka", materialName: "Název", materialNone: "Zatím není zadán žádný materiál.",
     editBtn: "Upravit", cancelBtn: "Zrušit", saveBtn: "Uložit", overviewBtn: "Přehled", languageLabel: "Jazyk", nationalityLabel: "Národnost", phoneLabel: "Telefon", nameLabel: "Jméno", readOnlyLabel: "Pouze čtení (pracovní pokyn nelze upravovat)", readOnlyHint: "Pouze čtení – zápis je pro tento účet zakázán.", commentEdited: "upraveno", commentDeleteAsk: "Smazat tento příspěvek?",
     feedbackTab: "Zpětná vazba", feedbackTitle: "Zpětná vazba testera", feedbackIntro: "Ke každému bodu prosím napište krátkou zpětnou vazbu.", feedbackSend: "Odeslat zpětnou vazbu", feedbackThanks: "Děkujeme za zpětnou vazbu!", feedbackReview: "Odeslaná zpětná vazba", feedbackNone: "Zatím žádná zpětná vazba.",
     feedbackPoints: ["Přihlášení & heslo", "Pracovní pokyn & komentář", "Funkce počasí", "Překlady", "Vytvoření výkazu", "Export PDF", "Zobrazení kalendáře", "Živý překladač", "Použití na mobilu", "Celkový dojem & chyby"],
@@ -1969,6 +1979,7 @@ const texts = {
     copyDone: "Pracovní kroky byly převzaty.",
   },
   Ukrainisch: {
+    materialUsed: "Використані матеріали", materialAdd: "Додати", materialQty: "Кількість", materialUnit: "Одиниця", materialName: "Назва", materialNone: "Матеріали ще не внесені.",
     editBtn: "Редагувати", cancelBtn: "Скасувати", saveBtn: "Зберегти", overviewBtn: "Огляд", languageLabel: "Мова", nationalityLabel: "Національність", phoneLabel: "Телефон", nameLabel: "Ім’я", readOnlyLabel: "Лише читання (інструкцію не можна редагувати)", readOnlyHint: "Лише читання – запис для цього облікового запису заблоковано.", commentEdited: "відредаговано", commentDeleteAsk: "Видалити цей запис?",
     feedbackTab: "Відгук", feedbackTitle: "Відгук тестувальника", feedbackIntro: "Будь ласка, додайте короткий відгук до кожного пункту.", feedbackSend: "Надіслати відгук", feedbackThanks: "Дякуємо за відгук!", feedbackReview: "Надіслані відгуки", feedbackNone: "Відгуків поки немає.",
     feedbackPoints: ["Вхід і пароль", "Інструкція та коментар", "Функція погоди", "Переклади", "Створення звіту", "Експорт PDF", "Види календаря", "Живий перекладач", "Використання на телефоні", "Загальне враження та помилки"],
@@ -2203,6 +2214,7 @@ const texts = {
     copyDone: "Робочі кроки перенесено.",
   },
   Bulgarisch: {
+    materialUsed: "Изразходван материал", materialAdd: "Добави", materialQty: "Количество", materialUnit: "Мерна единица", materialName: "Наименование", materialNone: "Все още няма въведен материал.",
     editBtn: "Редактиране", cancelBtn: "Отказ", saveBtn: "Запази", overviewBtn: "Преглед", languageLabel: "Език", nationalityLabel: "Националност", phoneLabel: "Телефон", nameLabel: "Име", readOnlyLabel: "Само четене (инструкцията не може да се редактира)", readOnlyHint: "Само четене – писането е забранено за този акаунт.", commentEdited: "редактирано", commentDeleteAsk: "Да се изтрие ли този запис?",
     feedbackTab: "Отзиви", feedbackTitle: "Обратна връзка от тестер", feedbackIntro: "Моля, добавете кратка обратна връзка за всяка точка.", feedbackSend: "Изпрати обратна връзка", feedbackThanks: "Благодарим за обратната връзка!", feedbackReview: "Изпратени отзиви", feedbackNone: "Все още няма обратна връзка.",
     feedbackPoints: ["Вход и парола", "Инструкция и коментар", "Функция за времето", "Преводи", "Създаване на отчет", "Експорт в PDF", "Изгледи на календара", "Жив преводач", "Използване на телефон", "Общо впечатление и грешки"],
@@ -2437,6 +2449,7 @@ const texts = {
     copyDone: "Работните стъпки са прехвърлени.",
   },
   Serbisch: {
+    materialUsed: "Utrošeni materijal", materialAdd: "Dodaj", materialQty: "Količina", materialUnit: "Jedinica", materialName: "Naziv", materialNone: "Još nema unetog materijala.",
     editBtn: "Izmeni", cancelBtn: "Otkaži", saveBtn: "Sačuvaj", overviewBtn: "Pregled", languageLabel: "Jezik", nationalityLabel: "Nacionalnost", phoneLabel: "Telefon", nameLabel: "Ime", readOnlyLabel: "Samo čitanje (radni nalog se ne može menjati)", readOnlyHint: "Samo čitanje – pisanje je onemogućeno za ovaj nalog.", commentEdited: "izmenjeno", commentDeleteAsk: "Obrisati ovaj unos?",
     feedbackTab: "Povratne informacije", feedbackTitle: "Povratne informacije testera", feedbackIntro: "Molimo dodajte kratku povratnu informaciju za svaku tačku.", feedbackSend: "Pošalji povratne informacije", feedbackThanks: "Hvala na povratnim informacijama!", feedbackReview: "Poslate povratne informacije", feedbackNone: "Još nema povratnih informacija.",
     feedbackPoints: ["Prijava i lozinka", "Radni nalog i komentar", "Funkcija vremena", "Prevodi", "Kreiranje izveštaja", "PDF izvoz", "Prikazi kalendara", "Prevodilac uživo", "Korišćenje na telefonu", "Ukupni utisak i greške"],
@@ -2671,6 +2684,7 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Kroatisch: {
+    materialUsed: "Utrošeni materijal", materialAdd: "Dodaj", materialQty: "Količina", materialUnit: "Jedinica", materialName: "Naziv", materialNone: "Još nema unesenog materijala.",
     editBtn: "Uredi", cancelBtn: "Odustani", saveBtn: "Spremi", overviewBtn: "Pregled", languageLabel: "Jezik", nationalityLabel: "Nacionalnost", phoneLabel: "Telefon", nameLabel: "Ime", readOnlyLabel: "Samo čitanje (radni nalog se ne može uređivati)", readOnlyHint: "Samo čitanje – pisanje je onemogućeno za ovaj račun.", commentEdited: "uređeno", commentDeleteAsk: "Izbrisati ovaj unos?",
     feedbackTab: "Povratne informacije", feedbackTitle: "Povratne informacije testera", feedbackIntro: "Molimo dodajte kratku povratnu informaciju za svaku točku.", feedbackSend: "Pošalji povratne informacije", feedbackThanks: "Hvala na povratnim informacijama!", feedbackReview: "Poslane povratne informacije", feedbackNone: "Još nema povratnih informacija.",
     feedbackPoints: ["Prijava i lozinka", "Radni nalog i komentar", "Funkcija vremena", "Prijevodi", "Izrada izvještaja", "PDF izvoz", "Prikazi kalendara", "Prevoditelj uživo", "Korištenje na mobitelu", "Ukupni dojam i greške"],
@@ -2905,6 +2919,7 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Slowenisch: {
+    materialUsed: "Porabljen material", materialAdd: "Dodaj", materialQty: "Količina", materialUnit: "Enota", materialName: "Naziv", materialNone: "Material še ni vnesen.",
     editBtn: "Uredi", cancelBtn: "Prekliči", saveBtn: "Shrani", overviewBtn: "Pregled", languageLabel: "Jezik", nationalityLabel: "Narodnost", phoneLabel: "Telefon", nameLabel: "Ime", readOnlyLabel: "Samo branje (delovnega naloga ni mogoče urejati)", readOnlyHint: "Samo branje – pisanje je za ta račun onemogočeno.", commentEdited: "urejeno", commentDeleteAsk: "Izbrisati ta vnos?",
     feedbackTab: "Povratne informacije", feedbackTitle: "Povratne informacije preizkuševalca", feedbackIntro: "Prosimo, dodajte kratko povratno informacijo za vsako točko.", feedbackSend: "Pošlji povratne informacije", feedbackThanks: "Hvala za povratne informacije!", feedbackReview: "Oddane povratne informacije", feedbackNone: "Še ni povratnih informacij.",
     feedbackPoints: ["Prijava in geslo", "Delovni nalog in komentar", "Funkcija vremena", "Prevodi", "Ustvarjanje poročila", "Izvoz PDF", "Pogledi koledarja", "Živi prevajalnik", "Uporaba na telefonu", "Splošni vtis in napake"],
@@ -3139,6 +3154,7 @@ const texts = {
     copyDone: "Delovni koraki so prevzeti.",
   },
   Polnisch: {
+    materialUsed: "Zużyty materiał", materialAdd: "Dodaj", materialQty: "Ilość", materialUnit: "Jednostka", materialName: "Nazwa", materialNone: "Brak zapisanego materiału.",
     editBtn: "Edytuj", cancelBtn: "Anuluj", saveBtn: "Zapisz", overviewBtn: "Przegląd", languageLabel: "Język", nationalityLabel: "Narodowość", phoneLabel: "Telefon", nameLabel: "Imię", readOnlyLabel: "Tylko odczyt (instrukcji nie można edytować)", readOnlyHint: "Tylko odczyt – pisanie jest zablokowane dla tego konta.", commentEdited: "edytowano", commentDeleteAsk: "Usunąć ten wpis?",
     feedbackTab: "Opinie", feedbackTitle: "Opinia testera", feedbackIntro: "Prosimy o krótką opinię do każdego punktu.", feedbackSend: "Wyślij opinię", feedbackThanks: "Dziękujemy za opinię!", feedbackReview: "Przesłane opinie", feedbackNone: "Brak opinii.",
     feedbackPoints: ["Logowanie i hasło", "Instrukcja i komentarz", "Funkcja pogody", "Tłumaczenia", "Tworzenie raportu", "Eksport PDF", "Widoki kalendarza", "Tłumacz na żywo", "Obsługa na telefonie", "Ogólne wrażenie i błędy"],
@@ -3781,6 +3797,8 @@ export default function Home() {
   const [projectManager, setProjectManager] = useState("");
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
   const [editingCommentId, setEditingCommentId] = useState<Record<string, string>>({});
+  const [matDraft, setMatDraft] = useState<Record<string, { qty: string; unit: string; name: string }>>({});
+  const [matSaving, setMatSaving] = useState<string | null>(null);
   const [pmEdits, setPmEdits] = useState<Record<string, string>>({});
   const [selectedProjectId, setSelectedProjectId] = useState("");
   const [selectedProjectDetailId, setSelectedProjectDetailId] = useState("");
@@ -4027,6 +4045,55 @@ export default function Home() {
     } catch (e: any) {
       setCommentSaveState(prev => ({ ...prev, [taskId]: "error:" + String(e?.message || e) }));
     }
+  }
+
+  // ── Verbrauchtes Material (Modul: material_enabled) ──
+  function usedMaterialList(inst: any): any[] {
+    return Array.isArray(inst?.used_material) ? inst.used_material : [];
+  }
+  async function saveUsedMaterial(instructionId: string, list: any[]): Promise<boolean> {
+    setMatSaving(instructionId);
+    try {
+      let token = tokenRef.current;
+      if (!token) {
+        try {
+          const sess = await dbTimeout(supabase.auth.getSession(), 5000);
+          token = sess?.data?.session?.access_token || "";
+        } catch { /* Route antwortet dann mit 401 */ }
+      }
+      const res = await withTimeout(
+        fetch("/api/update-material", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ instructionId, material: list }),
+        }),
+        15000,
+        "Zeitüberschreitung beim Speichern (15s). Bitte erneut versuchen."
+      );
+      const data = await res.json();
+      if (!res.ok || data?.error) {
+        setMessage("Fehler: " + (data?.error || `HTTP ${res.status}`));
+        return false;
+      }
+      setWorkInstructions(prev => prev.map((i: any) => (i.id === instructionId ? { ...i, used_material: list } : i)));
+      return true;
+    } catch (e: any) {
+      setMessage("Fehler beim Speichern: " + String(e?.message || e));
+      return false;
+    } finally {
+      setMatSaving(null);
+    }
+  }
+  async function addMaterial(instruction: any) {
+    const d = matDraft[instruction.id] || { qty: "", unit: MATERIAL_UNITS[0], name: "" };
+    if (!String(d.qty).trim() || !d.name.trim()) { setMessage(t.msgFillRequired); return; }
+    const list = [...usedMaterialList(instruction), { qty: String(d.qty).trim(), unit: d.unit || MATERIAL_UNITS[0], name: d.name.trim(), by: myDisplayName(), at: new Date().toISOString() }];
+    const ok = await saveUsedMaterial(instruction.id, list);
+    if (ok) setMatDraft(prev => ({ ...prev, [instruction.id]: { qty: "", unit: d.unit || MATERIAL_UNITS[0], name: "" } }));
+  }
+  async function removeMaterial(instruction: any, idx: number) {
+    const list = usedMaterialList(instruction).filter((_: any, i: number) => i !== idx);
+    await saveUsedMaterial(instruction.id, list);
   }
 
   async function updateTaskComment(taskId: string, comment: string, commentId?: string) {
@@ -5265,6 +5332,7 @@ export default function Home() {
       ...completedTasks,
       problemsTranslated ? `─────\n⚠️ ${currentTexts.problemsHints}: ${problemsTranslated}` : "",
       materialTranslated ? `📦 ${currentTexts.material}: ${materialTranslated}` : "",
+      usedMaterialList(instruction).length > 0 ? `📦 ${currentTexts.materialUsed}: ${usedMaterialList(instruction).map((m: any) => `${m.qty} ${m.unit} ${m.name}`).join(", ")}` : "",
       werkzeugTranslated ? `🔧 ${currentTexts.werkzeug}: ${werkzeugTranslated}` : "",
       instruction.employee_note ? `${currentTexts.feedbackLabel}: ${instruction.employee_note}` : ""
     ].filter(Boolean).join("\n─────\n");
@@ -5579,6 +5647,9 @@ export default function Home() {
     };
     await block(t.problems, inst.problems_text || "");
     await block(t.material, inst.material || "");
+    if (usedMaterialList(inst).length > 0) {
+      await block(t.materialUsed, usedMaterialList(inst).map((m: any) => `${m.qty} ${m.unit} ${m.name}`).join(", "));
+    }
     await block(t.werkzeug, inst.werkzeug || "");
     const tasks = (inst.work_instruction_tasks || []).slice().sort((a: any, b: any) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
     if (tasks.length > 0) {
@@ -6445,6 +6516,33 @@ export default function Home() {
                     </li>
                   ))}
                 </ul>
+                {companyFeatures?.material_enabled && (
+                  <div className="border-t pt-2 mt-2 space-y-2">
+                    <p className="text-sm font-medium text-gray-700">📦 {t.materialUsed}</p>
+                    {usedMaterialList(instruction).length === 0 ? (
+                      <p className="text-xs text-gray-500">{t.materialNone}</p>
+                    ) : (
+                      <ul className="space-y-1">
+                        {usedMaterialList(instruction).map((m: any, mi: number) => (
+                          <li key={mi} className="flex items-center justify-between gap-2 bg-white border rounded-lg px-2 py-1 text-sm">
+                            <span className="break-words"><strong>{m.qty} {m.unit}</strong> {m.name}{m.by ? <span className="text-xs text-gray-400"> · {m.by}</span> : null}</span>
+                            {!readOnlyUser && (<button type="button" title={t.delete} onClick={() => removeMaterial(instruction, mi)} className="text-xs px-2 py-1 rounded border text-red-600 shrink-0">🗑️</button>)}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    {!readOnlyUser && (
+                      <div className="flex gap-2 flex-wrap items-center">
+                        <input type="number" inputMode="decimal" placeholder={t.materialQty} value={matDraft[instruction.id]?.qty ?? ""} onChange={(e) => setMatDraft(p => ({ ...p, [instruction.id]: { ...(p[instruction.id] || { qty: "", unit: MATERIAL_UNITS[0], name: "" }), qty: e.target.value } }))} className="border p-2 rounded-lg text-sm w-24 text-black bg-white" />
+                        <select value={matDraft[instruction.id]?.unit ?? MATERIAL_UNITS[0]} onChange={(e) => setMatDraft(p => ({ ...p, [instruction.id]: { ...(p[instruction.id] || { qty: "", unit: MATERIAL_UNITS[0], name: "" }), unit: e.target.value } }))} className="border p-2 rounded-lg text-sm text-black bg-white">
+                          {MATERIAL_UNITS.map((u) => (<option key={u} value={u}>{u}</option>))}
+                        </select>
+                        <input placeholder={t.materialName} value={matDraft[instruction.id]?.name ?? ""} onChange={(e) => setMatDraft(p => ({ ...p, [instruction.id]: { ...(p[instruction.id] || { qty: "", unit: MATERIAL_UNITS[0], name: "" }), name: e.target.value } }))} className="border p-2 rounded-lg text-sm text-black bg-white flex-1 min-w-[10rem]" />
+                        <button type="button" disabled={matSaving === instruction.id} onClick={() => addMaterial(instruction)} className="bg-cyan-600 text-white px-3 py-2.5 rounded-lg text-sm disabled:opacity-50">{matSaving === instruction.id ? "⏳" : "➕"} {t.materialAdd}</button>
+                      </div>
+                    )}
+                  </div>
+                )}
                 <div className="flex gap-2 pt-2 border-t flex-wrap">
                   {companyFeatures?.module_auto_reports && (<button type="button" onClick={() => { setTransferInst(instruction); loadReportsFromDatabase(); }} className="bg-green-700 text-white px-3 py-2.5 rounded-lg text-sm">📋 {t.toReport}</button>)}
                   <button type="button" onClick={() => createInstructionPDF(instruction)} className="bg-slate-700 text-white px-3 py-2.5 rounded-lg text-sm">📄 PDF</button>

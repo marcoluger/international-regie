@@ -59,6 +59,7 @@ export default function AdminPage() {
   const [openContractId, setOpenContractId] = useState<string | null>(null);
   const [contractMap, setContractMap] = useState<Record<string, any>>({});
   const [savingContract, setSavingContract] = useState<string | null>(null);
+  const [sendingContract, setSendingContract] = useState<string | null>(null);
   const [loadingFeedback, setLoadingFeedback] = useState<string | null>(null);
 
   const [newCompanyName, setNewCompanyName] = useState("");
@@ -218,6 +219,98 @@ export default function AdminPage() {
     if (data.error) { setMessage("Fehler: " + data.error); return; }
     setMessage("✅ Einstellungen gespeichert.");
     loadAll();
+  }
+
+  // Vertrag als PDF erzeugen. Gibt das Dokument zurueck (zum Drucken oder Versenden).
+  async function buildContractPdf(companyId: string) {
+    const { jsPDF } = await import("jspdf");
+    const c = contractMap[companyId] || {};
+    const comp = companies.find((x: any) => x.id === companyId);
+    const doc = new jsPDF();
+    const L = 20;
+    let y = 22;
+    const line = (txt: string, size = 11, bold = false) => {
+      doc.setFontSize(size);
+      doc.setFont("helvetica", bold ? "bold" : "normal");
+      for (const ln of doc.splitTextToSize(txt, 170)) { doc.text(ln, L, y); y += size * 0.55 + 2; }
+    };
+
+    doc.setFontSize(18); doc.setFont("helvetica", "bold");
+    doc.text("Regie International", L, y); y += 8;
+    doc.setFontSize(13); doc.text("Vertragsübersicht", L, y); y += 10;
+
+    doc.setDrawColor(200); doc.line(L, y, 190, y); y += 8;
+
+    line("Kunde", 12, true);
+    line(c.customer_name || comp?.name || "-");
+    if (c.customer_street) line(c.customer_street);
+    if (c.customer_zip || c.customer_city) line(`${c.customer_zip || ""} ${c.customer_city || ""}`.trim());
+    if (c.customer_country) line(c.customer_country);
+    if (c.vat_id) line(`USt-IdNr. / Steuernummer: ${c.vat_id}`);
+    if (c.invoice_email) line(`Rechnungs-E-Mail: ${c.invoice_email}`);
+    y += 4;
+
+    line("Vertrag", 12, true);
+    line(`Vertragsnummer: ${c.contract_number || "-"}`);
+    line(`Paket: ${c.package || "-"}`);
+    const preis = c.monthly_price !== undefined && c.monthly_price !== null && c.monthly_price !== "" ? Number(c.monthly_price) : null;
+    const ust = c.vat_rate !== undefined && c.vat_rate !== null && c.vat_rate !== "" ? Number(c.vat_rate) : null;
+    line(`Preis pro Monat (netto): ${preis !== null ? preis.toFixed(2) + " EUR" : "-"}`);
+    line(`USt-Satz: ${ust !== null ? ust + " %" : "-"}`);
+    if (preis !== null && ust !== null) {
+      const brutto = preis * (1 + ust / 100);
+      line(`Preis pro Monat (brutto): ${brutto.toFixed(2)} EUR`, 11, true);
+    }
+    line(`Vertragsbeginn: ${c.start_date || "-"}`);
+    line(`Vertragsende: ${c.end_date || "unbefristet"}`);
+    line(`Zahlungsart: ${c.payment_method || "-"}`);
+    line(`Zahlungsziel: ${c.payment_terms ? c.payment_terms + " Tage" : "-"}`);
+    line(`Status: ${c.active ? "aktiv" : "inaktiv"}`);
+    y += 4;
+
+    if (c.notes) { line("Notizen", 12, true); line(String(c.notes)); }
+
+    y += 6;
+    doc.setFontSize(9); doc.setFont("helvetica", "normal"); doc.setTextColor(120);
+    doc.text(`Erstellt am ${new Date().toLocaleDateString("de-DE")}`, L, y);
+    doc.setTextColor(0);
+    return doc;
+  }
+
+  // Vertrag als PDF herunterladen.
+  async function downloadContractPdf(companyId: string) {
+    try {
+      const doc = await buildContractPdf(companyId);
+      const c = contractMap[companyId] || {};
+      doc.save(`Vertrag_${(c.contract_number || c.customer_name || "Firma").toString().replace(/[^\w.-]+/g, "_")}.pdf`);
+    } catch (e: any) {
+      setMessage("Fehler beim PDF: " + String(e?.message || e));
+    }
+  }
+
+  // Vertrag per E-Mail senden (PDF im Anhang).
+  async function sendContractMail(companyId: string) {
+    const c = contractMap[companyId] || {};
+    const to = (c.invoice_email || "").trim();
+    if (!to) { setMessage("Fehler: Keine Rechnungs-E-Mail hinterlegt."); return; }
+    if (typeof window !== "undefined" && !window.confirm(`Vertrag als PDF an ${to} senden?`)) return;
+    setSendingContract(companyId);
+    try {
+      const doc = await buildContractPdf(companyId);
+      const base64 = doc.output("datauristring").split(",")[1];
+      const res = await fetch("/api/send-contract", {
+        method: "POST",
+        headers: await authHeaders(),
+        body: JSON.stringify({ companyId, to, customerName: c.customer_name || "", pdfBase64: base64 }),
+      });
+      const data = await res.json();
+      if (data.error) { setMessage("Fehler: " + data.error); return; }
+      setMessage("✅ Vertrag wurde per E-Mail versendet.");
+    } catch (e: any) {
+      setMessage("Fehler beim Versand: " + String(e?.message || e));
+    } finally {
+      setSendingContract(null);
+    }
   }
 
   // Vertragsdaten einer Firma laden + Bereich auf-/zuklappen.
@@ -563,6 +656,7 @@ export default function AdminPage() {
                       <Toggle label="💬 Feedback / Test"     value={!!features.feedback_enabled}    onChange={(v) => updateFeature(company.id, "feedback_enabled", v)} />
                       <Toggle label="🌐 Live-Übersetzer"     value={!!features.translator_enabled}  onChange={(v) => updateFeature(company.id, "translator_enabled", v)} />
                       <Toggle label="💬 Kommentar-Chat"      value={!!features.comments_enabled}    onChange={(v) => updateFeature(company.id, "comments_enabled", v)} />
+                      <Toggle label="📦 Materialerfassung"    value={!!features.material_enabled}    onChange={(v) => updateFeature(company.id, "material_enabled", v)} />
                     </div>
                   </div>
                   <div>
@@ -631,9 +725,15 @@ export default function AdminPage() {
                             <input type="checkbox" checked={!!c.active} onChange={(ev) => setContractField(company.id, "active", ev.target.checked)} />
                             Vertrag aktiv
                           </label>
-                          <button type="button" disabled={savingContract === company.id} onClick={() => saveContract(company.id)} className="bg-cyan-700 text-white px-4 py-2.5 rounded font-bold text-sm disabled:opacity-50">
-                            {savingContract === company.id ? "⏳ Speichert…" : "💾 Vertrag speichern"}
-                          </button>
+                          <div className="flex flex-wrap gap-2">
+                            <button type="button" disabled={savingContract === company.id} onClick={() => saveContract(company.id)} className="bg-cyan-700 text-white px-4 py-2.5 rounded font-bold text-sm disabled:opacity-50">
+                              {savingContract === company.id ? "⏳ Speichert…" : "💾 Vertrag speichern"}
+                            </button>
+                            <button type="button" onClick={() => downloadContractPdf(company.id)} className="bg-slate-700 text-white px-4 py-2.5 rounded font-bold text-sm">📄 PDF drucken</button>
+                            <button type="button" disabled={sendingContract === company.id} onClick={() => sendContractMail(company.id)} className="bg-green-700 text-white px-4 py-2.5 rounded font-bold text-sm disabled:opacity-50">
+                              {sendingContract === company.id ? "⏳ Sendet…" : "✉️ Per E-Mail senden"}
+                            </button>
+                          </div>
                         </div>
                       );
                     })()}
