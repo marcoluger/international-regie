@@ -99,6 +99,7 @@ type CompanyFeatures = {
 
 const texts = {
   Deutsch: {
+    materialCatalog: "Materialstamm", materialCatalogEmpty: "Noch kein Material gespeichert.",
     materialUsed: "Verbrauchtes Material", materialAdd: "Hinzufügen", materialQty: "Menge", materialUnit: "Einheit", materialName: "Bezeichnung", materialNone: "Noch kein Material erfasst.",
     editBtn: "Bearbeiten", cancelBtn: "Abbrechen", saveBtn: "Speichern", overviewBtn: "Übersicht", languageLabel: "Sprache", nationalityLabel: "Nationalität", phoneLabel: "Telefon", nameLabel: "Name", readOnlyLabel: "Nur lesen (Arbeitsanweisung nicht bearbeitbar)", readOnlyHint: "Nur lesen – Schreiben ist für dieses Konto gesperrt.", commentEdited: "bearbeitet", commentDeleteAsk: "Diesen Beitrag löschen?",
     feedbackTab: "Feedback", feedbackTitle: "Tester-Feedback", feedbackIntro: "Bitte zu jedem Punkt kurz dein Feedback eintragen.", feedbackSend: "Feedback senden", feedbackThanks: "Danke für dein Feedback!", feedbackReview: "Abgegebenes Feedback", feedbackNone: "Noch kein Feedback vorhanden.",
@@ -334,6 +335,7 @@ const texts = {
     copyDone: "Arbeitsschritte wurden übernommen.",
   },
   Spanisch: {
+    materialCatalog: "Catálogo de materiales", materialCatalogEmpty: "Aún no hay material guardado.",
     materialUsed: "Material consumido", materialAdd: "Añadir", materialQty: "Cantidad", materialUnit: "Unidad", materialName: "Denominación", materialNone: "Aún no se ha registrado material.",
     editBtn: "Editar", cancelBtn: "Cancelar", saveBtn: "Guardar", overviewBtn: "Resumen", languageLabel: "Idioma", nationalityLabel: "Nacionalidad", phoneLabel: "Teléfono", nameLabel: "Nombre", readOnlyLabel: "Solo lectura (la instrucción no se puede editar)", readOnlyHint: "Solo lectura: la escritura está bloqueada para esta cuenta.", commentEdited: "editado", commentDeleteAsk: "¿Eliminar esta entrada?",
     feedbackTab: "Comentarios", feedbackTitle: "Comentarios del tester", feedbackIntro: "Por favor, añade un breve comentario para cada punto.", feedbackSend: "Enviar comentarios", feedbackThanks: "¡Gracias por tus comentarios!", feedbackReview: "Comentarios recibidos", feedbackNone: "Aún no hay comentarios.",
@@ -569,6 +571,7 @@ const texts = {
     copyDone: "Los pasos de trabajo se han aplicado.",
   },
   Rumänisch: {
+    materialCatalog: "Catalog de materiale", materialCatalogEmpty: "Încă nu există materiale salvate.",
     materialUsed: "Material consumat", materialAdd: "Adaugă", materialQty: "Cantitate", materialUnit: "Unitate", materialName: "Denumire", materialNone: "Încă nu a fost înregistrat material.",
     editBtn: "Editează", cancelBtn: "Anulează", saveBtn: "Salvează", overviewBtn: "Prezentare generală", languageLabel: "Limbă", nationalityLabel: "Naționalitate", phoneLabel: "Telefon", nameLabel: "Nume", readOnlyLabel: "Doar citire (instrucțiunea nu poate fi editată)", readOnlyHint: "Doar citire – scrierea este blocată pentru acest cont.", commentEdited: "editat", commentDeleteAsk: "Ștergeți această înregistrare?",
     feedbackTab: "Feedback", feedbackTitle: "Feedback tester", feedbackIntro: "Te rugăm să adaugi pe scurt feedback pentru fiecare punct.", feedbackSend: "Trimite feedback", feedbackThanks: "Mulțumim pentru feedback!", feedbackReview: "Feedback primit", feedbackNone: "Încă nu există feedback.",
@@ -804,6 +807,7 @@ const texts = {
     copyDone: "Etapele de lucru au fost preluate.",
   },
   Englisch: {
+    materialCatalog: "Material catalogue", materialCatalogEmpty: "No material saved yet.",
     materialUsed: "Material used", materialAdd: "Add", materialQty: "Quantity", materialUnit: "Unit", materialName: "Description", materialNone: "No material recorded yet.",
     editBtn: "Edit", cancelBtn: "Cancel", saveBtn: "Save", overviewBtn: "Overview", languageLabel: "Language", nationalityLabel: "Nationality", phoneLabel: "Phone", nameLabel: "Name", readOnlyLabel: "Read only (work instruction cannot be edited)", readOnlyHint: "Read only – writing is disabled for this account.", commentEdited: "edited", commentDeleteAsk: "Delete this entry?",
     feedbackTab: "Feedback", feedbackTitle: "Tester feedback", feedbackIntro: "Please add short feedback for each point.", feedbackSend: "Send feedback", feedbackThanks: "Thanks for your feedback!", feedbackReview: "Submitted feedback", feedbackNone: "No feedback yet.",
@@ -1039,6 +1043,7 @@ const texts = {
     copyDone: "Work steps have been applied.",
   },
   Italienisch: {
+    materialCatalog: "Catalogo materiali", materialCatalogEmpty: "Nessun materiale salvato.",
     materialUsed: "Materiale consumato", materialAdd: "Aggiungi", materialQty: "Quantità", materialUnit: "Unità", materialName: "Descrizione", materialNone: "Nessun materiale registrato.",
     editBtn: "Modifica", cancelBtn: "Annulla", saveBtn: "Salva", overviewBtn: "Panoramica", languageLabel: "Lingua", nationalityLabel: "Nazionalità", phoneLabel: "Telefono", nameLabel: "Nome", readOnlyLabel: "Sola lettura (istruzione non modificabile)", readOnlyHint: "Sola lettura – la scrittura è bloccata per questo account.", commentEdited: "modificato", commentDeleteAsk: "Eliminare questo contributo?",
     feedbackTab: "Feedback", feedbackTitle: "Feedback tester", feedbackIntro: "Aggiungi un breve feedback per ogni punto.", feedbackSend: "Invia feedback", feedbackThanks: "Grazie per il tuo feedback!", feedbackReview: "Feedback ricevuti", feedbackNone: "Ancora nessun feedback.",
@@ -1274,6 +1279,7 @@ const texts = {
     copyDone: "Le fasi di lavoro sono state applicate.",
   },
   Türkisch: {
+    materialCatalog: "Malzeme kataloğu", materialCatalogEmpty: "Henüz kayıtlı malzeme yok.",
     materialUsed: "Kullanılan malzeme", materialAdd: "Ekle", materialQty: "Miktar", materialUnit: "Birim", materialName: "Tanım", materialNone: "Henüz malzeme girilmedi.",
     editBtn: "Düzenle", cancelBtn: "İptal", saveBtn: "Kaydet", overviewBtn: "Genel bakış", languageLabel: "Dil", nationalityLabel: "Uyruk", phoneLabel: "Telefon", nameLabel: "Ad", readOnlyLabel: "Salt okunur (iş talimatı düzenlenemez)", readOnlyHint: "Salt okunur – bu hesap için yazma engellendi.", commentEdited: "düzenlendi", commentDeleteAsk: "Bu kayıt silinsin mi?",
     feedbackTab: "Geri bildirim", feedbackTitle: "Test geri bildirimi", feedbackIntro: "Lütfen her madde için kısa geri bildirim yazın.", feedbackSend: "Geri bildirim gönder", feedbackThanks: "Geri bildiriminiz için teşekkürler!", feedbackReview: "Gönderilen geri bildirimler", feedbackNone: "Henüz geri bildirim yok.",
@@ -1509,6 +1515,7 @@ const texts = {
     copyDone: "İş adımları alındı.",
   },
   Ungarisch: {
+    materialCatalog: "Anyagtörzs", materialCatalogEmpty: "Még nincs mentett anyag.",
     materialUsed: "Felhasznált anyag", materialAdd: "Hozzáadás", materialQty: "Mennyiség", materialUnit: "Egység", materialName: "Megnevezés", materialNone: "Még nincs rögzített anyag.",
     editBtn: "Szerkesztés", cancelBtn: "Mégse", saveBtn: "Mentés", overviewBtn: "Áttekintés", languageLabel: "Nyelv", nationalityLabel: "Nemzetiség", phoneLabel: "Telefon", nameLabel: "Név", readOnlyLabel: "Csak olvasás (a munkautasítás nem szerkeszthető)", readOnlyHint: "Csak olvasás – az írás ehhez a fiókhoz le van tiltva.", commentEdited: "szerkesztve", commentDeleteAsk: "Törli ezt a bejegyzést?",
     feedbackTab: "Visszajelzés", feedbackTitle: "Tesztelői visszajelzés", feedbackIntro: "Kérjük, minden ponthoz írjon rövid visszajelzést.", feedbackSend: "Visszajelzés küldése", feedbackThanks: "Köszönjük a visszajelzést!", feedbackReview: "Beérkezett visszajelzések", feedbackNone: "Még nincs visszajelzés.",
@@ -1744,6 +1751,7 @@ const texts = {
     copyDone: "A munkalépések átvéve.",
   },
   Tschechisch: {
+    materialCatalog: "Katalog materiálu", materialCatalogEmpty: "Zatím není uložen žádný materiál.",
     materialUsed: "Spotřebovaný materiál", materialAdd: "Přidat", materialQty: "Množství", materialUnit: "Jednotka", materialName: "Název", materialNone: "Zatím není zadán žádný materiál.",
     editBtn: "Upravit", cancelBtn: "Zrušit", saveBtn: "Uložit", overviewBtn: "Přehled", languageLabel: "Jazyk", nationalityLabel: "Národnost", phoneLabel: "Telefon", nameLabel: "Jméno", readOnlyLabel: "Pouze čtení (pracovní pokyn nelze upravovat)", readOnlyHint: "Pouze čtení – zápis je pro tento účet zakázán.", commentEdited: "upraveno", commentDeleteAsk: "Smazat tento příspěvek?",
     feedbackTab: "Zpětná vazba", feedbackTitle: "Zpětná vazba testera", feedbackIntro: "Ke každému bodu prosím napište krátkou zpětnou vazbu.", feedbackSend: "Odeslat zpětnou vazbu", feedbackThanks: "Děkujeme za zpětnou vazbu!", feedbackReview: "Odeslaná zpětná vazba", feedbackNone: "Zatím žádná zpětná vazba.",
@@ -1979,6 +1987,7 @@ const texts = {
     copyDone: "Pracovní kroky byly převzaty.",
   },
   Ukrainisch: {
+    materialCatalog: "Каталог матеріалів", materialCatalogEmpty: "Матеріали ще не збережені.",
     materialUsed: "Використані матеріали", materialAdd: "Додати", materialQty: "Кількість", materialUnit: "Одиниця", materialName: "Назва", materialNone: "Матеріали ще не внесені.",
     editBtn: "Редагувати", cancelBtn: "Скасувати", saveBtn: "Зберегти", overviewBtn: "Огляд", languageLabel: "Мова", nationalityLabel: "Національність", phoneLabel: "Телефон", nameLabel: "Ім’я", readOnlyLabel: "Лише читання (інструкцію не можна редагувати)", readOnlyHint: "Лише читання – запис для цього облікового запису заблоковано.", commentEdited: "відредаговано", commentDeleteAsk: "Видалити цей запис?",
     feedbackTab: "Відгук", feedbackTitle: "Відгук тестувальника", feedbackIntro: "Будь ласка, додайте короткий відгук до кожного пункту.", feedbackSend: "Надіслати відгук", feedbackThanks: "Дякуємо за відгук!", feedbackReview: "Надіслані відгуки", feedbackNone: "Відгуків поки немає.",
@@ -2214,6 +2223,7 @@ const texts = {
     copyDone: "Робочі кроки перенесено.",
   },
   Bulgarisch: {
+    materialCatalog: "Каталог с материали", materialCatalogEmpty: "Все още няма записани материали.",
     materialUsed: "Изразходван материал", materialAdd: "Добави", materialQty: "Количество", materialUnit: "Мерна единица", materialName: "Наименование", materialNone: "Все още няма въведен материал.",
     editBtn: "Редактиране", cancelBtn: "Отказ", saveBtn: "Запази", overviewBtn: "Преглед", languageLabel: "Език", nationalityLabel: "Националност", phoneLabel: "Телефон", nameLabel: "Име", readOnlyLabel: "Само четене (инструкцията не може да се редактира)", readOnlyHint: "Само четене – писането е забранено за този акаунт.", commentEdited: "редактирано", commentDeleteAsk: "Да се изтрие ли този запис?",
     feedbackTab: "Отзиви", feedbackTitle: "Обратна връзка от тестер", feedbackIntro: "Моля, добавете кратка обратна връзка за всяка точка.", feedbackSend: "Изпрати обратна връзка", feedbackThanks: "Благодарим за обратната връзка!", feedbackReview: "Изпратени отзиви", feedbackNone: "Все още няма обратна връзка.",
@@ -2449,6 +2459,7 @@ const texts = {
     copyDone: "Работните стъпки са прехвърлени.",
   },
   Serbisch: {
+    materialCatalog: "Katalog materijala", materialCatalogEmpty: "Još nema sačuvanog materijala.",
     materialUsed: "Utrošeni materijal", materialAdd: "Dodaj", materialQty: "Količina", materialUnit: "Jedinica", materialName: "Naziv", materialNone: "Još nema unetog materijala.",
     editBtn: "Izmeni", cancelBtn: "Otkaži", saveBtn: "Sačuvaj", overviewBtn: "Pregled", languageLabel: "Jezik", nationalityLabel: "Nacionalnost", phoneLabel: "Telefon", nameLabel: "Ime", readOnlyLabel: "Samo čitanje (radni nalog se ne može menjati)", readOnlyHint: "Samo čitanje – pisanje je onemogućeno za ovaj nalog.", commentEdited: "izmenjeno", commentDeleteAsk: "Obrisati ovaj unos?",
     feedbackTab: "Povratne informacije", feedbackTitle: "Povratne informacije testera", feedbackIntro: "Molimo dodajte kratku povratnu informaciju za svaku tačku.", feedbackSend: "Pošalji povratne informacije", feedbackThanks: "Hvala na povratnim informacijama!", feedbackReview: "Poslate povratne informacije", feedbackNone: "Još nema povratnih informacija.",
@@ -2684,6 +2695,7 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Kroatisch: {
+    materialCatalog: "Katalog materijala", materialCatalogEmpty: "Još nema spremljenog materijala.",
     materialUsed: "Utrošeni materijal", materialAdd: "Dodaj", materialQty: "Količina", materialUnit: "Jedinica", materialName: "Naziv", materialNone: "Još nema unesenog materijala.",
     editBtn: "Uredi", cancelBtn: "Odustani", saveBtn: "Spremi", overviewBtn: "Pregled", languageLabel: "Jezik", nationalityLabel: "Nacionalnost", phoneLabel: "Telefon", nameLabel: "Ime", readOnlyLabel: "Samo čitanje (radni nalog se ne može uređivati)", readOnlyHint: "Samo čitanje – pisanje je onemogućeno za ovaj račun.", commentEdited: "uređeno", commentDeleteAsk: "Izbrisati ovaj unos?",
     feedbackTab: "Povratne informacije", feedbackTitle: "Povratne informacije testera", feedbackIntro: "Molimo dodajte kratku povratnu informaciju za svaku točku.", feedbackSend: "Pošalji povratne informacije", feedbackThanks: "Hvala na povratnim informacijama!", feedbackReview: "Poslane povratne informacije", feedbackNone: "Još nema povratnih informacija.",
@@ -2919,6 +2931,7 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Slowenisch: {
+    materialCatalog: "Katalog materiala", materialCatalogEmpty: "Material še ni shranjen.",
     materialUsed: "Porabljen material", materialAdd: "Dodaj", materialQty: "Količina", materialUnit: "Enota", materialName: "Naziv", materialNone: "Material še ni vnesen.",
     editBtn: "Uredi", cancelBtn: "Prekliči", saveBtn: "Shrani", overviewBtn: "Pregled", languageLabel: "Jezik", nationalityLabel: "Narodnost", phoneLabel: "Telefon", nameLabel: "Ime", readOnlyLabel: "Samo branje (delovnega naloga ni mogoče urejati)", readOnlyHint: "Samo branje – pisanje je za ta račun onemogočeno.", commentEdited: "urejeno", commentDeleteAsk: "Izbrisati ta vnos?",
     feedbackTab: "Povratne informacije", feedbackTitle: "Povratne informacije preizkuševalca", feedbackIntro: "Prosimo, dodajte kratko povratno informacijo za vsako točko.", feedbackSend: "Pošlji povratne informacije", feedbackThanks: "Hvala za povratne informacije!", feedbackReview: "Oddane povratne informacije", feedbackNone: "Še ni povratnih informacij.",
@@ -3154,6 +3167,7 @@ const texts = {
     copyDone: "Delovni koraki so prevzeti.",
   },
   Polnisch: {
+    materialCatalog: "Katalog materiałów", materialCatalogEmpty: "Brak zapisanych materiałów.",
     materialUsed: "Zużyty materiał", materialAdd: "Dodaj", materialQty: "Ilość", materialUnit: "Jednostka", materialName: "Nazwa", materialNone: "Brak zapisanego materiału.",
     editBtn: "Edytuj", cancelBtn: "Anuluj", saveBtn: "Zapisz", overviewBtn: "Przegląd", languageLabel: "Język", nationalityLabel: "Narodowość", phoneLabel: "Telefon", nameLabel: "Imię", readOnlyLabel: "Tylko odczyt (instrukcji nie można edytować)", readOnlyHint: "Tylko odczyt – pisanie jest zablokowane dla tego konta.", commentEdited: "edytowano", commentDeleteAsk: "Usunąć ten wpis?",
     feedbackTab: "Opinie", feedbackTitle: "Opinia testera", feedbackIntro: "Prosimy o krótką opinię do każdego punktu.", feedbackSend: "Wyślij opinię", feedbackThanks: "Dziękujemy za opinię!", feedbackReview: "Przesłane opinie", feedbackNone: "Brak opinii.",
@@ -3799,6 +3813,8 @@ export default function Home() {
   const [editingCommentId, setEditingCommentId] = useState<Record<string, string>>({});
   const [matDraft, setMatDraft] = useState<Record<string, { qty: string; unit: string; name: string }>>({});
   const [matSaving, setMatSaving] = useState<string | null>(null);
+  const [materialCatalog, setMaterialCatalog] = useState<any[]>([]);
+  const [catDraft, setCatDraft] = useState<{ id: string; name: string; unit: string }>({ id: "", name: "", unit: MATERIAL_UNITS[0] });
   const [pmEdits, setPmEdits] = useState<Record<string, string>>({});
   const [selectedProjectId, setSelectedProjectId] = useState("");
   const [selectedProjectDetailId, setSelectedProjectDetailId] = useState("");
@@ -3859,6 +3875,12 @@ export default function Home() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentSignature, uiLanguage]);
+
+  // Materialstamm laden, sobald das Modul freigeschaltet ist.
+  useEffect(() => {
+    if (companyFeatures?.material_enabled && currentCompany) loadMaterialCatalog();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [companyFeatures?.material_enabled, currentCompany?.company_id]);
 
   // Live-Uebersetzer: Von-/Zu-Sprache auf die freigeschalteten Sprachen begrenzen.
   useEffect(() => {
@@ -4047,6 +4069,47 @@ export default function Home() {
     }
   }
 
+  // ── Materialstamm (gespeichertes Material einer Firma) ──
+  async function catalogCall(payload: any) {
+    let token = tokenRef.current;
+    if (!token) {
+      try {
+        const sess = await dbTimeout(supabase.auth.getSession(), 5000);
+        token = sess?.data?.session?.access_token || "";
+      } catch { /* Route antwortet dann mit 401 */ }
+    }
+    const res = await fetch("/api/material-catalog", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify(payload),
+    });
+    return await res.json().catch(() => ({ error: "Antwort konnte nicht gelesen werden." }));
+  }
+  async function loadMaterialCatalog() {
+    try {
+      const data = await catalogCall({ action: "list" });
+      if (Array.isArray(data?.items)) setMaterialCatalog(data.items);
+    } catch { /* still ignorieren */ }
+  }
+  async function saveCatalogItem() {
+    if (!catDraft.name.trim()) { setMessage(t.msgFillRequired); return; }
+    const data = await catalogCall({ action: "save", id: catDraft.id || undefined, name: catDraft.name.trim(), unit: catDraft.unit });
+    if (data?.error) { setMessage("Fehler: " + data.error); return; }
+    setCatDraft({ id: "", name: "", unit: MATERIAL_UNITS[0] });
+    await loadMaterialCatalog();
+    setMessage("\u2705 " + t.msgSaved);
+  }
+  async function deleteCatalogItem(id: string) {
+    const data = await catalogCall({ action: "delete", id });
+    if (data?.error) { setMessage("Fehler: " + data.error); return; }
+    await loadMaterialCatalog();
+  }
+  // Einheit aus dem Materialstamm zu einer Bezeichnung finden.
+  function unitForMaterial(name: string): string {
+    const hit = materialCatalog.find((m: any) => (m.name || "").toLowerCase() === (name || "").trim().toLowerCase());
+    return hit?.unit || "";
+  }
+
   // ── Verbrauchtes Material (Modul: material_enabled) ──
   function usedMaterialList(inst: any): any[] {
     return Array.isArray(inst?.used_material) ? inst.used_material : [];
@@ -4089,7 +4152,10 @@ export default function Home() {
     if (!String(d.qty).trim() || !d.name.trim()) { setMessage(t.msgFillRequired); return; }
     const list = [...usedMaterialList(instruction), { qty: String(d.qty).trim(), unit: d.unit || MATERIAL_UNITS[0], name: d.name.trim(), by: myDisplayName(), at: new Date().toISOString() }];
     const ok = await saveUsedMaterial(instruction.id, list);
-    if (ok) setMatDraft(prev => ({ ...prev, [instruction.id]: { qty: "", unit: d.unit || MATERIAL_UNITS[0], name: "" } }));
+    if (ok) {
+      setMatDraft(prev => ({ ...prev, [instruction.id]: { qty: "", unit: d.unit || MATERIAL_UNITS[0], name: "" } }));
+      loadMaterialCatalog();
+    }
   }
   async function removeMaterial(instruction: any, idx: number) {
     const list = usedMaterialList(instruction).filter((_: any, i: number) => i !== idx);
@@ -5856,7 +5922,11 @@ export default function Home() {
         {companyFeatures?.translator_enabled && (
         <TabButton label={`🌐 ${t.translatorTab}`} tabName="uebersetzer" activeTab={activeTab} onClick={() => setActiveTab("uebersetzer")} />
         )}
+        {companyFeatures?.material_enabled && (
+        <TabButton label={`📦 ${t.materialCatalog}`} tabName="material" activeTab={activeTab} onClick={() => { setActiveTab("material"); loadMaterialCatalog(); }} />
+        )}
         {companyFeatures?.feedback_enabled && !readOnlyUser && (
+
         <TabButton label={`💬 ${t.feedbackTab}`} tabName="feedback" activeTab={activeTab} onClick={() => { setActiveTab("feedback"); if (currentCompany && (currentCompany.role === "owner" || currentCompany.role === "admin" || currentCompany.role === "project_manager")) loadFeedback(); }} />
         )}
       </nav>
@@ -6360,6 +6430,51 @@ export default function Home() {
         );
       })()}
 
+      {activeTab === "material" && companyFeatures?.material_enabled && (
+        <div className="space-y-4">
+          <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-3">
+            <h2 className="text-xl font-bold">📦 {t.materialCatalog}</h2>
+            {!readOnlyUser && (
+              <div className="flex gap-2 flex-wrap items-center">
+                <input placeholder={t.materialName} value={catDraft.name} onChange={(e) => setCatDraft(p => ({ ...p, name: e.target.value }))} className="border p-3 rounded-lg text-black bg-white flex-1 min-w-[12rem]" />
+                <select value={catDraft.unit} onChange={(e) => setCatDraft(p => ({ ...p, unit: e.target.value }))} className="border p-3 rounded-lg text-black bg-white">
+                  {MATERIAL_UNITS.map((u) => (<option key={u} value={u}>{u}</option>))}
+                </select>
+                <button type="button" onClick={saveCatalogItem} className="bg-cyan-700 text-white px-4 py-3 rounded-lg text-sm">{catDraft.id ? `💾 ${t.saveBtn}` : `➕ ${t.materialAdd}`}</button>
+                {catDraft.id && (<button type="button" onClick={() => setCatDraft({ id: "", name: "", unit: MATERIAL_UNITS[0] })} className="bg-gray-200 px-4 py-3 rounded-lg text-sm">{t.cancelBtn}</button>)}
+              </div>
+            )}
+            {materialCatalog.length === 0 ? (
+              <p className="text-gray-500">{t.materialCatalogEmpty}</p>
+            ) : (
+              <div className="border border-slate-200 rounded-xl overflow-x-auto">
+                <table className="w-full text-sm text-left border-collapse">
+                  <thead>
+                    <tr className="bg-gray-100">
+                      <th className="px-3 py-2 font-bold">{t.materialName}</th>
+                      <th className="px-3 py-2 font-bold">{t.materialUnit}</th>
+                      <th className="px-3 py-2"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {materialCatalog.map((m: any) => (
+                      <tr key={m.id} className="border-t border-slate-200">
+                        <td className="px-3 py-2 break-words">{m.name}</td>
+                        <td className="px-3 py-2">{m.unit || "-"}</td>
+                        <td className="px-3 py-2 text-right whitespace-nowrap">
+                          {!readOnlyUser && (<button type="button" onClick={() => setCatDraft({ id: m.id, name: m.name || "", unit: m.unit || MATERIAL_UNITS[0] })} className="text-xs px-2 py-1 rounded border mr-1">✏️</button>)}
+                          {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => deleteCatalogItem(m.id)} className="text-xs px-2 py-1 rounded border text-red-600">🗑️</button>)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+        </div>
+      )}
+
       {activeTab === "feedback" && companyFeatures?.feedback_enabled && !readOnlyUser && (
         <div className="space-y-4">
           <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-3">
@@ -6537,7 +6652,10 @@ export default function Home() {
                         <select value={matDraft[instruction.id]?.unit ?? MATERIAL_UNITS[0]} onChange={(e) => setMatDraft(p => ({ ...p, [instruction.id]: { ...(p[instruction.id] || { qty: "", unit: MATERIAL_UNITS[0], name: "" }), unit: e.target.value } }))} className="border p-2 rounded-lg text-sm text-black bg-white">
                           {MATERIAL_UNITS.map((u) => (<option key={u} value={u}>{u}</option>))}
                         </select>
-                        <input placeholder={t.materialName} value={matDraft[instruction.id]?.name ?? ""} onChange={(e) => setMatDraft(p => ({ ...p, [instruction.id]: { ...(p[instruction.id] || { qty: "", unit: MATERIAL_UNITS[0], name: "" }), name: e.target.value } }))} className="border p-2 rounded-lg text-sm text-black bg-white flex-1 min-w-[10rem]" />
+                        <input list={`matlist-${instruction.id}`} placeholder={t.materialName} value={matDraft[instruction.id]?.name ?? ""} onChange={(e) => { const v = e.target.value; const u = unitForMaterial(v); setMatDraft(p => { const cur = p[instruction.id] || { qty: "", unit: MATERIAL_UNITS[0], name: "" }; return { ...p, [instruction.id]: { ...cur, name: v, unit: u || cur.unit } }; }); }} className="border p-2 rounded-lg text-sm text-black bg-white flex-1 min-w-[10rem]" />
+                        <datalist id={`matlist-${instruction.id}`}>
+                          {materialCatalog.map((m: any) => (<option key={m.id} value={m.name} />))}
+                        </datalist>
                         <button type="button" disabled={matSaving === instruction.id} onClick={() => addMaterial(instruction)} className="bg-cyan-600 text-white px-3 py-2.5 rounded-lg text-sm disabled:opacity-50">{matSaving === instruction.id ? "⏳" : "➕"} {t.materialAdd}</button>
                       </div>
                     )}

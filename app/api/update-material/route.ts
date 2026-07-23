@@ -91,6 +91,29 @@ export async function POST(request: Request) {
       .eq("id", instructionId);
     if (error) return Response.json({ error: error.message }, { status: 500 });
 
+    // 6) Materialstamm mitlernen: neue Bezeichnungen automatisch aufnehmen.
+    try {
+      const seen = new Set<string>();
+      for (const m of clean) {
+        const name = (m.name || "").trim();
+        if (!name || seen.has(name.toLowerCase())) continue;
+        seen.add(name.toLowerCase());
+        const { data: exists } = await supabaseAdmin
+          .from("material_catalog")
+          .select("id")
+          .eq("company_id", member.company_id)
+          .ilike("name", name)
+          .maybeSingle();
+        if (!exists) {
+          await supabaseAdmin
+            .from("material_catalog")
+            .insert({ company_id: member.company_id, name, unit: m.unit || "" });
+        }
+      }
+    } catch {
+      /* Der Materialstamm ist nur eine Hilfe - Fehler hier duerfen das Speichern nicht stoppen. */
+    }
+
     return Response.json({ success: true });
   } catch (error) {
     return Response.json({ error: String(error) }, { status: 500 });
