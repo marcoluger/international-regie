@@ -99,6 +99,7 @@ type CompanyFeatures = {
 
 const texts = {
   Deutsch: {
+    materialOrder: "Material bestellen", materialOrders: "Bestellungen", orderOpen: "Offen", orderOrdered: "Bestellt", orderDelivered: "Geliefert", ordersEmpty: "Keine Bestellungen.", orderNote: "Notiz",
     materialCatalog: "Materialstamm", materialCatalogEmpty: "Noch kein Material gespeichert.",
     materialUsed: "Verbrauchtes Material", materialAdd: "Hinzufügen", materialQty: "Menge", materialUnit: "Einheit", materialName: "Bezeichnung", materialNone: "Noch kein Material erfasst.",
     editBtn: "Bearbeiten", cancelBtn: "Abbrechen", saveBtn: "Speichern", overviewBtn: "Übersicht", languageLabel: "Sprache", nationalityLabel: "Nationalität", phoneLabel: "Telefon", nameLabel: "Name", readOnlyLabel: "Nur lesen (Arbeitsanweisung nicht bearbeitbar)", readOnlyHint: "Nur lesen – Schreiben ist für dieses Konto gesperrt.", commentEdited: "bearbeitet", commentDeleteAsk: "Diesen Beitrag löschen?",
@@ -335,6 +336,7 @@ const texts = {
     copyDone: "Arbeitsschritte wurden übernommen.",
   },
   Spanisch: {
+    materialOrder: "Pedir material", materialOrders: "Pedidos", orderOpen: "Abierto", orderOrdered: "Pedido", orderDelivered: "Entregado", ordersEmpty: "No hay pedidos.", orderNote: "Nota",
     materialCatalog: "Catálogo de materiales", materialCatalogEmpty: "Aún no hay material guardado.",
     materialUsed: "Material consumido", materialAdd: "Añadir", materialQty: "Cantidad", materialUnit: "Unidad", materialName: "Denominación", materialNone: "Aún no se ha registrado material.",
     editBtn: "Editar", cancelBtn: "Cancelar", saveBtn: "Guardar", overviewBtn: "Resumen", languageLabel: "Idioma", nationalityLabel: "Nacionalidad", phoneLabel: "Teléfono", nameLabel: "Nombre", readOnlyLabel: "Solo lectura (la instrucción no se puede editar)", readOnlyHint: "Solo lectura: la escritura está bloqueada para esta cuenta.", commentEdited: "editado", commentDeleteAsk: "¿Eliminar esta entrada?",
@@ -571,6 +573,7 @@ const texts = {
     copyDone: "Los pasos de trabajo se han aplicado.",
   },
   Rumänisch: {
+    materialOrder: "Comandă material", materialOrders: "Comenzi", orderOpen: "Deschis", orderOrdered: "Comandat", orderDelivered: "Livrat", ordersEmpty: "Nicio comandă.", orderNote: "Notă",
     materialCatalog: "Catalog de materiale", materialCatalogEmpty: "Încă nu există materiale salvate.",
     materialUsed: "Material consumat", materialAdd: "Adaugă", materialQty: "Cantitate", materialUnit: "Unitate", materialName: "Denumire", materialNone: "Încă nu a fost înregistrat material.",
     editBtn: "Editează", cancelBtn: "Anulează", saveBtn: "Salvează", overviewBtn: "Prezentare generală", languageLabel: "Limbă", nationalityLabel: "Naționalitate", phoneLabel: "Telefon", nameLabel: "Nume", readOnlyLabel: "Doar citire (instrucțiunea nu poate fi editată)", readOnlyHint: "Doar citire – scrierea este blocată pentru acest cont.", commentEdited: "editat", commentDeleteAsk: "Ștergeți această înregistrare?",
@@ -807,6 +810,7 @@ const texts = {
     copyDone: "Etapele de lucru au fost preluate.",
   },
   Englisch: {
+    materialOrder: "Order material", materialOrders: "Orders", orderOpen: "Open", orderOrdered: "Ordered", orderDelivered: "Delivered", ordersEmpty: "No orders.", orderNote: "Note",
     materialCatalog: "Material catalogue", materialCatalogEmpty: "No material saved yet.",
     materialUsed: "Material used", materialAdd: "Add", materialQty: "Quantity", materialUnit: "Unit", materialName: "Description", materialNone: "No material recorded yet.",
     editBtn: "Edit", cancelBtn: "Cancel", saveBtn: "Save", overviewBtn: "Overview", languageLabel: "Language", nationalityLabel: "Nationality", phoneLabel: "Phone", nameLabel: "Name", readOnlyLabel: "Read only (work instruction cannot be edited)", readOnlyHint: "Read only – writing is disabled for this account.", commentEdited: "edited", commentDeleteAsk: "Delete this entry?",
@@ -1043,6 +1047,7 @@ const texts = {
     copyDone: "Work steps have been applied.",
   },
   Italienisch: {
+    materialOrder: "Ordina materiale", materialOrders: "Ordini", orderOpen: "Aperto", orderOrdered: "Ordinato", orderDelivered: "Consegnato", ordersEmpty: "Nessun ordine.", orderNote: "Nota",
     materialCatalog: "Catalogo materiali", materialCatalogEmpty: "Nessun materiale salvato.",
     materialUsed: "Materiale consumato", materialAdd: "Aggiungi", materialQty: "Quantità", materialUnit: "Unità", materialName: "Descrizione", materialNone: "Nessun materiale registrato.",
     editBtn: "Modifica", cancelBtn: "Annulla", saveBtn: "Salva", overviewBtn: "Panoramica", languageLabel: "Lingua", nationalityLabel: "Nazionalità", phoneLabel: "Telefono", nameLabel: "Nome", readOnlyLabel: "Sola lettura (istruzione non modificabile)", readOnlyHint: "Sola lettura – la scrittura è bloccata per questo account.", commentEdited: "modificato", commentDeleteAsk: "Eliminare questo contributo?",
@@ -1279,6 +1284,7 @@ const texts = {
     copyDone: "Le fasi di lavoro sono state applicate.",
   },
   Türkisch: {
+    materialOrder: "Malzeme siparişi", materialOrders: "Siparişler", orderOpen: "Açık", orderOrdered: "Sipariş edildi", orderDelivered: "Teslim edildi", ordersEmpty: "Sipariş yok.", orderNote: "Not",
     materialCatalog: "Malzeme kataloğu", materialCatalogEmpty: "Henüz kayıtlı malzeme yok.",
     materialUsed: "Kullanılan malzeme", materialAdd: "Ekle", materialQty: "Miktar", materialUnit: "Birim", materialName: "Tanım", materialNone: "Henüz malzeme girilmedi.",
     editBtn: "Düzenle", cancelBtn: "İptal", saveBtn: "Kaydet", overviewBtn: "Genel bakış", languageLabel: "Dil", nationalityLabel: "Uyruk", phoneLabel: "Telefon", nameLabel: "Ad", readOnlyLabel: "Salt okunur (iş talimatı düzenlenemez)", readOnlyHint: "Salt okunur – bu hesap için yazma engellendi.", commentEdited: "düzenlendi", commentDeleteAsk: "Bu kayıt silinsin mi?",
@@ -1515,6 +1521,7 @@ const texts = {
     copyDone: "İş adımları alındı.",
   },
   Ungarisch: {
+    materialOrder: "Anyag rendelése", materialOrders: "Rendelések", orderOpen: "Nyitott", orderOrdered: "Megrendelve", orderDelivered: "Kiszállítva", ordersEmpty: "Nincs rendelés.", orderNote: "Megjegyzés",
     materialCatalog: "Anyagtörzs", materialCatalogEmpty: "Még nincs mentett anyag.",
     materialUsed: "Felhasznált anyag", materialAdd: "Hozzáadás", materialQty: "Mennyiség", materialUnit: "Egység", materialName: "Megnevezés", materialNone: "Még nincs rögzített anyag.",
     editBtn: "Szerkesztés", cancelBtn: "Mégse", saveBtn: "Mentés", overviewBtn: "Áttekintés", languageLabel: "Nyelv", nationalityLabel: "Nemzetiség", phoneLabel: "Telefon", nameLabel: "Név", readOnlyLabel: "Csak olvasás (a munkautasítás nem szerkeszthető)", readOnlyHint: "Csak olvasás – az írás ehhez a fiókhoz le van tiltva.", commentEdited: "szerkesztve", commentDeleteAsk: "Törli ezt a bejegyzést?",
@@ -1751,6 +1758,7 @@ const texts = {
     copyDone: "A munkalépések átvéve.",
   },
   Tschechisch: {
+    materialOrder: "Objednat materiál", materialOrders: "Objednávky", orderOpen: "Otevřeno", orderOrdered: "Objednáno", orderDelivered: "Dodáno", ordersEmpty: "Žádné objednávky.", orderNote: "Poznámka",
     materialCatalog: "Katalog materiálu", materialCatalogEmpty: "Zatím není uložen žádný materiál.",
     materialUsed: "Spotřebovaný materiál", materialAdd: "Přidat", materialQty: "Množství", materialUnit: "Jednotka", materialName: "Název", materialNone: "Zatím není zadán žádný materiál.",
     editBtn: "Upravit", cancelBtn: "Zrušit", saveBtn: "Uložit", overviewBtn: "Přehled", languageLabel: "Jazyk", nationalityLabel: "Národnost", phoneLabel: "Telefon", nameLabel: "Jméno", readOnlyLabel: "Pouze čtení (pracovní pokyn nelze upravovat)", readOnlyHint: "Pouze čtení – zápis je pro tento účet zakázán.", commentEdited: "upraveno", commentDeleteAsk: "Smazat tento příspěvek?",
@@ -1987,6 +1995,7 @@ const texts = {
     copyDone: "Pracovní kroky byly převzaty.",
   },
   Ukrainisch: {
+    materialOrder: "Замовити матеріал", materialOrders: "Замовлення", orderOpen: "Відкрито", orderOrdered: "Замовлено", orderDelivered: "Доставлено", ordersEmpty: "Замовлень немає.", orderNote: "Примітка",
     materialCatalog: "Каталог матеріалів", materialCatalogEmpty: "Матеріали ще не збережені.",
     materialUsed: "Використані матеріали", materialAdd: "Додати", materialQty: "Кількість", materialUnit: "Одиниця", materialName: "Назва", materialNone: "Матеріали ще не внесені.",
     editBtn: "Редагувати", cancelBtn: "Скасувати", saveBtn: "Зберегти", overviewBtn: "Огляд", languageLabel: "Мова", nationalityLabel: "Національність", phoneLabel: "Телефон", nameLabel: "Ім’я", readOnlyLabel: "Лише читання (інструкцію не можна редагувати)", readOnlyHint: "Лише читання – запис для цього облікового запису заблоковано.", commentEdited: "відредаговано", commentDeleteAsk: "Видалити цей запис?",
@@ -2223,6 +2232,7 @@ const texts = {
     copyDone: "Робочі кроки перенесено.",
   },
   Bulgarisch: {
+    materialOrder: "Поръчай материал", materialOrders: "Поръчки", orderOpen: "Отворена", orderOrdered: "Поръчана", orderDelivered: "Доставена", ordersEmpty: "Няма поръчки.", orderNote: "Бележка",
     materialCatalog: "Каталог с материали", materialCatalogEmpty: "Все още няма записани материали.",
     materialUsed: "Изразходван материал", materialAdd: "Добави", materialQty: "Количество", materialUnit: "Мерна единица", materialName: "Наименование", materialNone: "Все още няма въведен материал.",
     editBtn: "Редактиране", cancelBtn: "Отказ", saveBtn: "Запази", overviewBtn: "Преглед", languageLabel: "Език", nationalityLabel: "Националност", phoneLabel: "Телефон", nameLabel: "Име", readOnlyLabel: "Само четене (инструкцията не може да се редактира)", readOnlyHint: "Само четене – писането е забранено за този акаунт.", commentEdited: "редактирано", commentDeleteAsk: "Да се изтрие ли този запис?",
@@ -2459,6 +2469,7 @@ const texts = {
     copyDone: "Работните стъпки са прехвърлени.",
   },
   Serbisch: {
+    materialOrder: "Poruči materijal", materialOrders: "Porudžbine", orderOpen: "Otvoreno", orderOrdered: "Poručeno", orderDelivered: "Isporučeno", ordersEmpty: "Nema porudžbina.", orderNote: "Napomena",
     materialCatalog: "Katalog materijala", materialCatalogEmpty: "Još nema sačuvanog materijala.",
     materialUsed: "Utrošeni materijal", materialAdd: "Dodaj", materialQty: "Količina", materialUnit: "Jedinica", materialName: "Naziv", materialNone: "Još nema unetog materijala.",
     editBtn: "Izmeni", cancelBtn: "Otkaži", saveBtn: "Sačuvaj", overviewBtn: "Pregled", languageLabel: "Jezik", nationalityLabel: "Nacionalnost", phoneLabel: "Telefon", nameLabel: "Ime", readOnlyLabel: "Samo čitanje (radni nalog se ne može menjati)", readOnlyHint: "Samo čitanje – pisanje je onemogućeno za ovaj nalog.", commentEdited: "izmenjeno", commentDeleteAsk: "Obrisati ovaj unos?",
@@ -2695,6 +2706,7 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Kroatisch: {
+    materialOrder: "Naruči materijal", materialOrders: "Narudžbe", orderOpen: "Otvoreno", orderOrdered: "Naručeno", orderDelivered: "Isporučeno", ordersEmpty: "Nema narudžbi.", orderNote: "Napomena",
     materialCatalog: "Katalog materijala", materialCatalogEmpty: "Još nema spremljenog materijala.",
     materialUsed: "Utrošeni materijal", materialAdd: "Dodaj", materialQty: "Količina", materialUnit: "Jedinica", materialName: "Naziv", materialNone: "Još nema unesenog materijala.",
     editBtn: "Uredi", cancelBtn: "Odustani", saveBtn: "Spremi", overviewBtn: "Pregled", languageLabel: "Jezik", nationalityLabel: "Nacionalnost", phoneLabel: "Telefon", nameLabel: "Ime", readOnlyLabel: "Samo čitanje (radni nalog se ne može uređivati)", readOnlyHint: "Samo čitanje – pisanje je onemogućeno za ovaj račun.", commentEdited: "uređeno", commentDeleteAsk: "Izbrisati ovaj unos?",
@@ -2931,6 +2943,7 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Slowenisch: {
+    materialOrder: "Naroči material", materialOrders: "Naročila", orderOpen: "Odprto", orderOrdered: "Naročeno", orderDelivered: "Dostavljeno", ordersEmpty: "Ni naročil.", orderNote: "Opomba",
     materialCatalog: "Katalog materiala", materialCatalogEmpty: "Material še ni shranjen.",
     materialUsed: "Porabljen material", materialAdd: "Dodaj", materialQty: "Količina", materialUnit: "Enota", materialName: "Naziv", materialNone: "Material še ni vnesen.",
     editBtn: "Uredi", cancelBtn: "Prekliči", saveBtn: "Shrani", overviewBtn: "Pregled", languageLabel: "Jezik", nationalityLabel: "Narodnost", phoneLabel: "Telefon", nameLabel: "Ime", readOnlyLabel: "Samo branje (delovnega naloga ni mogoče urejati)", readOnlyHint: "Samo branje – pisanje je za ta račun onemogočeno.", commentEdited: "urejeno", commentDeleteAsk: "Izbrisati ta vnos?",
@@ -3167,6 +3180,7 @@ const texts = {
     copyDone: "Delovni koraki so prevzeti.",
   },
   Polnisch: {
+    materialOrder: "Zamów materiał", materialOrders: "Zamówienia", orderOpen: "Otwarte", orderOrdered: "Zamówione", orderDelivered: "Dostarczone", ordersEmpty: "Brak zamówień.", orderNote: "Notatka",
     materialCatalog: "Katalog materiałów", materialCatalogEmpty: "Brak zapisanych materiałów.",
     materialUsed: "Zużyty materiał", materialAdd: "Dodaj", materialQty: "Ilość", materialUnit: "Jednostka", materialName: "Nazwa", materialNone: "Brak zapisanego materiału.",
     editBtn: "Edytuj", cancelBtn: "Anuluj", saveBtn: "Zapisz", overviewBtn: "Przegląd", languageLabel: "Język", nationalityLabel: "Narodowość", phoneLabel: "Telefon", nameLabel: "Imię", readOnlyLabel: "Tylko odczyt (instrukcji nie można edytować)", readOnlyHint: "Tylko odczyt – pisanie jest zablokowane dla tego konta.", commentEdited: "edytowano", commentDeleteAsk: "Usunąć ten wpis?",
@@ -3845,6 +3859,9 @@ export default function Home() {
   const [materialCatalog, setMaterialCatalog] = useState<any[]>([]);
   const [catDraft, setCatDraft] = useState<{ id: string; name: string; unit: string }>({ id: "", name: "", unit: MATERIAL_UNITS[0] });
   const [catalogSuggestions, setCatalogSuggestions] = useState<{ name: string; unit: string }[]>([]);
+  const [materialOrders, setMaterialOrders] = useState<any[]>([]);
+  const [orderDraft, setOrderDraft] = useState<Record<string, { qty: string; unit: string; name: string; note: string }>>({});
+  const [orderSaving, setOrderSaving] = useState<string | null>(null);
   const [pmEdits, setPmEdits] = useState<Record<string, string>>({});
   const [selectedProjectId, setSelectedProjectId] = useState("");
   const [selectedProjectDetailId, setSelectedProjectDetailId] = useState("");
@@ -3940,7 +3957,7 @@ export default function Home() {
 
   // Materialstamm laden, sobald das Modul freigeschaltet ist.
   useEffect(() => {
-    if (companyFeatures?.material_enabled && currentCompany) loadMaterialCatalog();
+    if (companyFeatures?.material_enabled && currentCompany) { loadMaterialCatalog(); loadMaterialOrders(); }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [companyFeatures?.material_enabled, currentCompany?.company_id]);
 
@@ -4140,6 +4157,56 @@ export default function Home() {
     const trans = instructionTranslations[instructionId];
     if (trans && trans.language === uiLanguage && trans.tasks?.[materialKey(name)]) return trans.tasks[materialKey(name)];
     return name || "";
+  }
+
+  // ── Materialbestellungen ──
+  async function ordersCall(payload: any) {
+    let token = tokenRef.current;
+    if (!token) {
+      try {
+        const sess = await dbTimeout(supabase.auth.getSession(), 5000);
+        token = sess?.data?.session?.access_token || "";
+      } catch { /* Route antwortet dann mit 401 */ }
+    }
+    const res = await fetch("/api/material-orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify(payload),
+    });
+    return await res.json().catch(() => ({ error: "Antwort konnte nicht gelesen werden." }));
+  }
+  async function loadMaterialOrders() {
+    try {
+      const data = await ordersCall({ action: "list" });
+      if (Array.isArray(data?.orders)) setMaterialOrders(data.orders);
+    } catch { /* still ignorieren */ }
+  }
+  async function createOrder(instructionId: string) {
+    const d = orderDraft[instructionId] || { qty: "", unit: MATERIAL_UNITS[0], name: "", note: "" };
+    if (!d.name.trim()) { setMessage(t.msgFillRequired); return; }
+    setOrderSaving(instructionId);
+    try {
+      const data = await ordersCall({ action: "create", instructionId, qty: d.qty, unit: d.unit, name: d.name.trim(), note: d.note });
+      if (data?.error) { setMessage("Fehler: " + data.error); return; }
+      setOrderDraft(prev => ({ ...prev, [instructionId]: { qty: "", unit: d.unit || MATERIAL_UNITS[0], name: "", note: "" } }));
+      await loadMaterialOrders();
+      setMessage("\u2705 " + t.msgSaved);
+    } finally {
+      setOrderSaving(null);
+    }
+  }
+  async function setOrderStatus(id: string, status: string) {
+    const data = await ordersCall({ action: "status", id, status });
+    if (data?.error) { setMessage("Fehler: " + data.error); return; }
+    setMaterialOrders(prev => prev.map((o: any) => (o.id === id ? { ...o, status } : o)));
+  }
+  async function deleteOrder(id: string) {
+    const data = await ordersCall({ action: "delete", id });
+    if (data?.error) { setMessage("Fehler: " + data.error); return; }
+    setMaterialOrders(prev => prev.filter((o: any) => o.id !== id));
+  }
+  function orderStatusLabel(st: string): string {
+    return st === "ordered" ? t.orderOrdered : st === "delivered" ? t.orderDelivered : t.orderOpen;
   }
 
   // ── Materialstamm (gespeichertes Material einer Firma) ──
@@ -6008,6 +6075,9 @@ export default function Home() {
         {companyFeatures?.material_enabled && (
         <TabButton label={`📦 ${t.materialCatalog}`} tabName="material" activeTab={activeTab} onClick={() => { setActiveTab("material"); loadMaterialCatalog(); }} />
         )}
+        {companyFeatures?.material_enabled && (
+        <TabButton label={`🛒 ${t.materialOrders}`} tabName="bestellungen" activeTab={activeTab} onClick={() => { setActiveTab("bestellungen"); loadMaterialOrders(); }} />
+        )}
         {companyFeatures?.feedback_enabled && !readOnlyUser && (
 
         <TabButton label={`💬 ${t.feedbackTab}`} tabName="feedback" activeTab={activeTab} onClick={() => { setActiveTab("feedback"); if (currentCompany && (currentCompany.role === "owner" || currentCompany.role === "admin" || currentCompany.role === "project_manager")) loadFeedback(); }} />
@@ -6513,6 +6583,43 @@ export default function Home() {
         );
       })()}
 
+      {activeTab === "bestellungen" && companyFeatures?.material_enabled && (
+        <div className="space-y-4">
+          <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-3">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-bold">🛒 {t.materialOrders} ({materialOrders.length})</h2>
+              <button type="button" onClick={loadMaterialOrders} className="bg-gray-200 px-3 py-2.5 rounded-lg text-sm">🔄</button>
+            </div>
+            {materialOrders.length === 0 ? (
+              <p className="text-gray-500">{t.ordersEmpty}</p>
+            ) : (
+              <div className="space-y-2">
+                {materialOrders.map((o: any) => (
+                  <div key={o.id} className="border border-slate-200 rounded-xl p-3 bg-gray-50 space-y-2">
+                    <p className="break-words"><strong>{o.qty} {o.unit}</strong> {o.name}{o.note ? <span className="text-gray-600"> · {o.note}</span> : null}</p>
+                    <p className="text-xs text-gray-500">{o.created_by_name || "?"} · {new Date(o.created_at).toLocaleString("de-DE")}</p>
+                    <div className="flex gap-2 flex-wrap items-center">
+                      {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") ? (
+                        <>
+                          <select value={o.status || "open"} onChange={(e) => setOrderStatus(o.id, e.target.value)} className="border p-2 rounded-lg text-sm text-black bg-white">
+                            <option value="open">{t.orderOpen}</option>
+                            <option value="ordered">{t.orderOrdered}</option>
+                            <option value="delivered">{t.orderDelivered}</option>
+                          </select>
+                          <button type="button" onClick={() => deleteOrder(o.id)} className="text-xs px-2 py-1 rounded border text-red-600">🗑️</button>
+                        </>
+                      ) : (
+                        <span className={`text-xs px-2 py-0.5 rounded ${o.status === "delivered" ? "bg-green-100 text-green-700" : o.status === "ordered" ? "bg-amber-100 text-amber-700" : "bg-gray-100 text-gray-600"}`}>{orderStatusLabel(o.status)}</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        </div>
+      )}
+
       {activeTab === "material" && companyFeatures?.material_enabled && (
         <div className="space-y-4">
           <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-3">
@@ -6742,6 +6849,26 @@ export default function Home() {
                         <button type="button" disabled={matSaving === instruction.id} onClick={() => addMaterial(instruction)} className="bg-cyan-600 text-white px-3 py-2.5 rounded-lg text-sm disabled:opacity-50">{matSaving === instruction.id ? "⏳" : "➕"} {t.materialAdd}</button>
                       </div>
                     )}
+                  </div>
+                )}
+                {companyFeatures?.material_enabled && !readOnlyUser && (
+                  <div className="border-t pt-2 mt-2 space-y-2">
+                    <p className="text-sm font-medium text-gray-700">🛒 {t.materialOrder}</p>
+                    {materialOrders.filter((o: any) => o.instruction_id === instruction.id).map((o: any) => (
+                      <div key={o.id} className="flex items-center justify-between gap-2 bg-white border rounded-lg px-2 py-1 text-sm">
+                        <span className="break-words"><strong>{o.qty} {o.unit}</strong> {o.name}{o.note ? <span className="text-gray-500"> · {o.note}</span> : null}</span>
+                        <span className={`text-xs px-2 py-0.5 rounded shrink-0 ${o.status === "delivered" ? "bg-green-100 text-green-700" : o.status === "ordered" ? "bg-amber-100 text-amber-700" : "bg-gray-100 text-gray-600"}`}>{orderStatusLabel(o.status)}</span>
+                      </div>
+                    ))}
+                    <div className="flex gap-2 flex-wrap items-center">
+                      <input type="number" inputMode="decimal" placeholder={t.materialQty} value={orderDraft[instruction.id]?.qty ?? ""} onChange={(e) => setOrderDraft(p => ({ ...p, [instruction.id]: { ...(p[instruction.id] || { qty: "", unit: MATERIAL_UNITS[0], name: "", note: "" }), qty: e.target.value } }))} className="border p-2 rounded-lg text-sm w-24 text-black bg-white" />
+                      <select value={orderDraft[instruction.id]?.unit ?? MATERIAL_UNITS[0]} onChange={(e) => setOrderDraft(p => ({ ...p, [instruction.id]: { ...(p[instruction.id] || { qty: "", unit: MATERIAL_UNITS[0], name: "", note: "" }), unit: e.target.value } }))} className="border p-2 rounded-lg text-sm text-black bg-white">
+                        {MATERIAL_UNITS.map((u) => (<option key={u} value={u}>{u}</option>))}
+                      </select>
+                      <input list={`matlist-${instruction.id}`} placeholder={t.materialName} value={orderDraft[instruction.id]?.name ?? ""} onChange={(e) => { const v = e.target.value; const u = unitForMaterial(v); setOrderDraft(p => { const cur = p[instruction.id] || { qty: "", unit: MATERIAL_UNITS[0], name: "", note: "" }; return { ...p, [instruction.id]: { ...cur, name: v, unit: u || cur.unit } }; }); }} className="border p-2 rounded-lg text-sm text-black bg-white flex-1 min-w-[10rem]" />
+                      <input placeholder={t.orderNote} value={orderDraft[instruction.id]?.note ?? ""} onChange={(e) => setOrderDraft(p => ({ ...p, [instruction.id]: { ...(p[instruction.id] || { qty: "", unit: MATERIAL_UNITS[0], name: "", note: "" }), note: e.target.value } }))} className="border p-2 rounded-lg text-sm text-black bg-white flex-1 min-w-[8rem]" />
+                      <button type="button" disabled={orderSaving === instruction.id} onClick={() => createOrder(instruction.id)} className="bg-amber-600 text-white px-3 py-2.5 rounded-lg text-sm disabled:opacity-50">{orderSaving === instruction.id ? "⏳" : "🛒"} {t.materialOrder}</button>
+                    </div>
                   </div>
                 )}
                 <div className="flex gap-2 pt-2 border-t flex-wrap">
