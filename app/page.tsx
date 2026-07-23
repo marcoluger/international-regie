@@ -3946,6 +3946,7 @@ export default function Home() {
   const [materialOrders, setMaterialOrders] = useState<any[]>([]);
   const [exportMonth, setExportMonth] = useState<string>(() => new Date().toISOString().slice(0, 7));
   const [expCollapsed, setExpCollapsed] = useState<Record<string, boolean>>({});
+  const [exportWeek, setExportWeek] = useState<string>("");
   const [equipment, setEquipment] = useState<any[]>([]);
   const [eqDraft, setEqDraft] = useState<{ id: string; type: string; name: string; identifier: string; note: string }>({ id: "", type: "tool", name: "", identifier: "", note: "" });
   const [eqHistory, setEqHistory] = useState<Record<string, any[]>>({});
@@ -4454,7 +4455,7 @@ export default function Home() {
     return Object.values(rows).sort((x, y) => x.name.localeCompare(y.name));
   }
   // Einzelne Tage je Mitarbeiter (Tag fuer Tag).
-  function monthlyHourDetail(month: string) {
+  function monthlyHourDetail(month: string, week?: string) {
     const num = (v: any) => Number(String(v ?? "").replace(",", ".")) || 0;
     const rows: any[] = [];
     for (const r of teamReports as any[]) {
@@ -4465,6 +4466,7 @@ export default function Home() {
         const tm = travelMinutes(d.travelOutStart, d.travelOutEnd) + travelMinutes(d.travelReturnStart, d.travelReturnEnd);
         const km = num(d.travelOutKm) + num(d.travelReturnKm);
         if (h === 0 && tm === 0 && km === 0) continue;
+        if (week && getCalendarWeek(String(d.date)) !== week) continue;
         rows.push({
           name,
           date: String(d.date),
@@ -4483,8 +4485,8 @@ export default function Home() {
     return rows.sort((x, y) => x.name.localeCompare(y.name) || x.date.localeCompare(y.date));
   }
   // Tage nach Mitarbeiter gruppiert (fuer die Anzeige).
-  function monthlyHoursByEmployee(month: string) {
-    const detail = monthlyHourDetail(month);
+  function monthlyHoursByEmployee(month: string, week?: string) {
+    const detail = monthlyHourDetail(month, week);
     const groups: Record<string, { name: string; days: any[]; hours: number; travelMin: number; km: number }> = {};
     for (const row of detail) {
       const key = row.name.toLowerCase();
@@ -4497,12 +4499,22 @@ export default function Home() {
     return Object.values(groups).sort((x, y) => x.name.localeCompare(y.name));
   }
 
+  // Welche Kalenderwochen kommen im gewaehlten Monat vor?
+  function weeksInMonth(month: string): string[] {
+    const set = new Set<string>();
+    for (const row of monthlyHourDetail(month)) {
+      const wk = getCalendarWeek(row.date);
+      if (wk) set.add(wk);
+    }
+    return Array.from(set).sort((a2, b2) => Number(a2.replace(/\D/g, "")) - Number(b2.replace(/\D/g, "")));
+  }
+
   // Zahl im deutschen Format (Komma) fuer Excel.
   function csvNum(n: number, digits = 2): string {
     return (Math.round(n * 100) / 100).toFixed(digits).replace(".", ",");
   }
   function downloadHoursCsv() {
-    const gruppen = monthlyHoursByEmployee(exportMonth);
+    const gruppen = monthlyHoursByEmployee(exportMonth, exportWeek || undefined);
     if (gruppen.length === 0) { setMessage(t.exportEmpty); return; }
     const clean = (v: any) => String(v ?? "").replace(/;/g, ",").replace(/[\r\n]+/g, " ");
     const head = [t.employee, t.date, t.customer, t.projectNumber, t.site, t.startTime, t.endTime, t.breakLabel, t.hours, `${t.travelTime} (h)`, t.km].join(";");
@@ -4528,7 +4540,7 @@ export default function Home() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `Stunden_${exportMonth}.csv`;
+    a.download = `Stunden_${exportMonth}${exportWeek ? "_" + exportWeek.replace(/\s+/g, "") : ""}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -7121,7 +7133,7 @@ export default function Home() {
       )}
 
       {activeTab === "export" && companyFeatures?.export_enabled && (currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (() => {
-        const gruppen = monthlyHoursByEmployee(exportMonth);
+        const gruppen = monthlyHoursByEmployee(exportMonth, exportWeek || undefined);
         const sum = gruppen.reduce((acc, g) => ({ days: acc.days + g.days.length, hours: acc.hours + g.hours, travelMin: acc.travelMin + g.travelMin, km: acc.km + g.km }), { days: 0, hours: 0, travelMin: 0, km: 0 });
         return (
         <div className="space-y-4">
@@ -7129,7 +7141,11 @@ export default function Home() {
             <h2 className="text-xl font-bold">📊 {t.exportTab}</h2>
             <div className="flex gap-2 flex-wrap items-center">
               <label className="text-sm font-medium">{t.exportMonth}</label>
-              <input type="month" value={exportMonth} onChange={(e) => setExportMonth(e.target.value)} className="border p-2 rounded-lg text-black bg-white" />
+              <input type="month" value={exportMonth} onChange={(e) => { setExportMonth(e.target.value); setExportWeek(""); }} className="border p-2 rounded-lg text-black bg-white" />
+              <select value={exportWeek} onChange={(e) => setExportWeek(e.target.value)} className="border p-2 rounded-lg text-black bg-white">
+                <option value="">{t.filterAll}</option>
+                {weeksInMonth(exportMonth).map((w) => (<option key={w} value={w}>{w}</option>))}
+              </select>
               <button type="button" onClick={loadTeamReports} className="bg-gray-200 px-3 py-2.5 rounded-lg text-sm">🔄</button>
               <button type="button" onClick={downloadHoursCsv} className="bg-green-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium">⬇️ {t.exportDownload}</button>
             </div>
