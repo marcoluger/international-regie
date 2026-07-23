@@ -3895,6 +3895,7 @@ export default function Home() {
   const [eqDraft, setEqDraft] = useState<{ id: string; type: string; name: string; identifier: string; note: string }>({ id: "", type: "tool", name: "", identifier: "", note: "" });
   const [eqHistory, setEqHistory] = useState<Record<string, any[]>>({});
   const [eqOpenId, setEqOpenId] = useState<string | null>(null);
+  const [eqTrans, setEqTrans] = useState<Record<string, string>>({});
   const [orderDraft, setOrderDraft] = useState<Record<string, { qty: string; unit: string; name: string; note: string }>>({});
   const [orderSaving, setOrderSaving] = useState<string | null>(null);
   const [pmEdits, setPmEdits] = useState<Record<string, string>>({});
@@ -3957,6 +3958,28 @@ export default function Home() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentSignature, uiLanguage]);
+
+  // Bezeichnungen der Geraete in die Anzeige-Sprache uebersetzen
+  // (gespeichert bleibt immer das Original).
+  useEffect(() => {
+    let abgebrochen = false;
+    (async () => {
+      if (!companyFeatures?.equipment_enabled || equipment.length === 0) {
+        setEqTrans({});
+        return;
+      }
+      const items = equipment
+        .filter((e: any) => (e?.name || "").trim())
+        .map((e: any) => ({ key: String(e.id), text: String(e.name) }));
+      let out: Record<string, string> = {};
+      try {
+        out = await translateBatch(items, "automatisch", uiLanguage);
+      } catch { /* ohne Uebersetzung weiter */ }
+      if (!abgebrochen) setEqTrans(out);
+    })();
+    return () => { abgebrochen = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [equipment, uiLanguage, companyFeatures?.equipment_enabled]);
 
   // Vorschlaege fuer die Materialerfassung: immer in der eingestellten Sprache.
   // Der Katalog speichert die Originalbezeichnung; hier wird sie uebersetzt und
@@ -6751,7 +6774,7 @@ export default function Home() {
                   <div key={eq.id} className="border border-slate-200 rounded-xl p-3 bg-gray-50 space-y-2">
                     <div className="flex justify-between items-start gap-2 flex-wrap">
                       <div>
-                        <p className="font-semibold break-words">{eq.type === "vehicle" ? "🚚" : "🔧"} {eq.name}{eq.identifier ? <span className="text-gray-500 font-normal"> · {eq.identifier}</span> : null}</p>
+                        <p className="font-semibold break-words">{eq.type === "vehicle" ? "🚚" : "🔧"} {eqTrans[eq.id] || eq.name}{eq.identifier ? <span className="text-gray-500 font-normal"> · {eq.identifier}</span> : null}</p>
                         <p className="text-sm">
                           {eq.assigned_to_name
                             ? <span className="text-amber-700">👤 {eq.assigned_to_name}{eq.assigned_at ? <span className="text-xs text-gray-500"> · {new Date(eq.assigned_at).toLocaleDateString("de-DE")}</span> : null}</span>
