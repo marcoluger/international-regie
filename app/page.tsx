@@ -95,10 +95,12 @@ type CompanyFeatures = {
   translator_enabled?: boolean;
   comments_enabled?: boolean;
   material_enabled?: boolean;
+  export_enabled?: boolean;
 };
 
 const texts = {
   Deutsch: {
+    exportTab: "Stundenexport", exportMonth: "Monat", exportDownload: "CSV herunterladen", exportEmpty: "Keine Stunden im gewählten Monat.", exportDays: "Arbeitstage",
     materialOrder: "Material bestellen", materialOrders: "Bestellungen", orderOpen: "Offen", orderOrdered: "Bestellt", orderDelivered: "Geliefert", ordersEmpty: "Keine Bestellungen.", orderNote: "Notiz",
     materialCatalog: "Materialstamm", materialCatalogEmpty: "Noch kein Material gespeichert.",
     materialUsed: "Verbrauchtes Material", materialAdd: "Hinzufügen", materialQty: "Menge", materialUnit: "Einheit", materialName: "Bezeichnung", materialNone: "Noch kein Material erfasst.",
@@ -336,6 +338,7 @@ const texts = {
     copyDone: "Arbeitsschritte wurden übernommen.",
   },
   Spanisch: {
+    exportTab: "Exportación de horas", exportMonth: "Mes", exportDownload: "Descargar CSV", exportEmpty: "No hay horas en el mes seleccionado.", exportDays: "Días trabajados",
     materialOrder: "Pedir material", materialOrders: "Pedidos", orderOpen: "Abierto", orderOrdered: "Pedido", orderDelivered: "Entregado", ordersEmpty: "No hay pedidos.", orderNote: "Nota",
     materialCatalog: "Catálogo de materiales", materialCatalogEmpty: "Aún no hay material guardado.",
     materialUsed: "Material consumido", materialAdd: "Añadir", materialQty: "Cantidad", materialUnit: "Unidad", materialName: "Denominación", materialNone: "Aún no se ha registrado material.",
@@ -573,6 +576,7 @@ const texts = {
     copyDone: "Los pasos de trabajo se han aplicado.",
   },
   Rumänisch: {
+    exportTab: "Export ore", exportMonth: "Luna", exportDownload: "Descarcă CSV", exportEmpty: "Nicio oră în luna selectată.", exportDays: "Zile lucrate",
     materialOrder: "Comandă material", materialOrders: "Comenzi", orderOpen: "Deschis", orderOrdered: "Comandat", orderDelivered: "Livrat", ordersEmpty: "Nicio comandă.", orderNote: "Notă",
     materialCatalog: "Catalog de materiale", materialCatalogEmpty: "Încă nu există materiale salvate.",
     materialUsed: "Material consumat", materialAdd: "Adaugă", materialQty: "Cantitate", materialUnit: "Unitate", materialName: "Denumire", materialNone: "Încă nu a fost înregistrat material.",
@@ -810,6 +814,7 @@ const texts = {
     copyDone: "Etapele de lucru au fost preluate.",
   },
   Englisch: {
+    exportTab: "Hours export", exportMonth: "Month", exportDownload: "Download CSV", exportEmpty: "No hours in the selected month.", exportDays: "Working days",
     materialOrder: "Order material", materialOrders: "Orders", orderOpen: "Open", orderOrdered: "Ordered", orderDelivered: "Delivered", ordersEmpty: "No orders.", orderNote: "Note",
     materialCatalog: "Material catalogue", materialCatalogEmpty: "No material saved yet.",
     materialUsed: "Material used", materialAdd: "Add", materialQty: "Quantity", materialUnit: "Unit", materialName: "Description", materialNone: "No material recorded yet.",
@@ -1047,6 +1052,7 @@ const texts = {
     copyDone: "Work steps have been applied.",
   },
   Italienisch: {
+    exportTab: "Esportazione ore", exportMonth: "Mese", exportDownload: "Scarica CSV", exportEmpty: "Nessuna ora nel mese selezionato.", exportDays: "Giorni lavorati",
     materialOrder: "Ordina materiale", materialOrders: "Ordini", orderOpen: "Aperto", orderOrdered: "Ordinato", orderDelivered: "Consegnato", ordersEmpty: "Nessun ordine.", orderNote: "Nota",
     materialCatalog: "Catalogo materiali", materialCatalogEmpty: "Nessun materiale salvato.",
     materialUsed: "Materiale consumato", materialAdd: "Aggiungi", materialQty: "Quantità", materialUnit: "Unità", materialName: "Descrizione", materialNone: "Nessun materiale registrato.",
@@ -1284,6 +1290,7 @@ const texts = {
     copyDone: "Le fasi di lavoro sono state applicate.",
   },
   Türkisch: {
+    exportTab: "Saat dışa aktarma", exportMonth: "Ay", exportDownload: "CSV indir", exportEmpty: "Seçilen ayda saat yok.", exportDays: "Çalışma günleri",
     materialOrder: "Malzeme siparişi", materialOrders: "Siparişler", orderOpen: "Açık", orderOrdered: "Sipariş edildi", orderDelivered: "Teslim edildi", ordersEmpty: "Sipariş yok.", orderNote: "Not",
     materialCatalog: "Malzeme kataloğu", materialCatalogEmpty: "Henüz kayıtlı malzeme yok.",
     materialUsed: "Kullanılan malzeme", materialAdd: "Ekle", materialQty: "Miktar", materialUnit: "Birim", materialName: "Tanım", materialNone: "Henüz malzeme girilmedi.",
@@ -1521,6 +1528,7 @@ const texts = {
     copyDone: "İş adımları alındı.",
   },
   Ungarisch: {
+    exportTab: "Óraexport", exportMonth: "Hónap", exportDownload: "CSV letöltése", exportEmpty: "Nincs óra a kiválasztott hónapban.", exportDays: "Munkanapok",
     materialOrder: "Anyag rendelése", materialOrders: "Rendelések", orderOpen: "Nyitott", orderOrdered: "Megrendelve", orderDelivered: "Kiszállítva", ordersEmpty: "Nincs rendelés.", orderNote: "Megjegyzés",
     materialCatalog: "Anyagtörzs", materialCatalogEmpty: "Még nincs mentett anyag.",
     materialUsed: "Felhasznált anyag", materialAdd: "Hozzáadás", materialQty: "Mennyiség", materialUnit: "Egység", materialName: "Megnevezés", materialNone: "Még nincs rögzített anyag.",
@@ -1758,6 +1766,7 @@ const texts = {
     copyDone: "A munkalépések átvéve.",
   },
   Tschechisch: {
+    exportTab: "Export hodin", exportMonth: "Měsíc", exportDownload: "Stáhnout CSV", exportEmpty: "Žádné hodiny ve vybraném měsíci.", exportDays: "Pracovní dny",
     materialOrder: "Objednat materiál", materialOrders: "Objednávky", orderOpen: "Otevřeno", orderOrdered: "Objednáno", orderDelivered: "Dodáno", ordersEmpty: "Žádné objednávky.", orderNote: "Poznámka",
     materialCatalog: "Katalog materiálu", materialCatalogEmpty: "Zatím není uložen žádný materiál.",
     materialUsed: "Spotřebovaný materiál", materialAdd: "Přidat", materialQty: "Množství", materialUnit: "Jednotka", materialName: "Název", materialNone: "Zatím není zadán žádný materiál.",
@@ -1995,6 +2004,7 @@ const texts = {
     copyDone: "Pracovní kroky byly převzaty.",
   },
   Ukrainisch: {
+    exportTab: "Експорт годин", exportMonth: "Місяць", exportDownload: "Завантажити CSV", exportEmpty: "Немає годин у вибраному місяці.", exportDays: "Робочі дні",
     materialOrder: "Замовити матеріал", materialOrders: "Замовлення", orderOpen: "Відкрито", orderOrdered: "Замовлено", orderDelivered: "Доставлено", ordersEmpty: "Замовлень немає.", orderNote: "Примітка",
     materialCatalog: "Каталог матеріалів", materialCatalogEmpty: "Матеріали ще не збережені.",
     materialUsed: "Використані матеріали", materialAdd: "Додати", materialQty: "Кількість", materialUnit: "Одиниця", materialName: "Назва", materialNone: "Матеріали ще не внесені.",
@@ -2232,6 +2242,7 @@ const texts = {
     copyDone: "Робочі кроки перенесено.",
   },
   Bulgarisch: {
+    exportTab: "Експорт на часове", exportMonth: "Месец", exportDownload: "Изтегли CSV", exportEmpty: "Няма часове за избрания месец.", exportDays: "Работни дни",
     materialOrder: "Поръчай материал", materialOrders: "Поръчки", orderOpen: "Отворена", orderOrdered: "Поръчана", orderDelivered: "Доставена", ordersEmpty: "Няма поръчки.", orderNote: "Бележка",
     materialCatalog: "Каталог с материали", materialCatalogEmpty: "Все още няма записани материали.",
     materialUsed: "Изразходван материал", materialAdd: "Добави", materialQty: "Количество", materialUnit: "Мерна единица", materialName: "Наименование", materialNone: "Все още няма въведен материал.",
@@ -2469,6 +2480,7 @@ const texts = {
     copyDone: "Работните стъпки са прехвърлени.",
   },
   Serbisch: {
+    exportTab: "Izvoz sati", exportMonth: "Mesec", exportDownload: "Preuzmi CSV", exportEmpty: "Nema sati u izabranom mesecu.", exportDays: "Radni dani",
     materialOrder: "Poruči materijal", materialOrders: "Porudžbine", orderOpen: "Otvoreno", orderOrdered: "Poručeno", orderDelivered: "Isporučeno", ordersEmpty: "Nema porudžbina.", orderNote: "Napomena",
     materialCatalog: "Katalog materijala", materialCatalogEmpty: "Još nema sačuvanog materijala.",
     materialUsed: "Utrošeni materijal", materialAdd: "Dodaj", materialQty: "Količina", materialUnit: "Jedinica", materialName: "Naziv", materialNone: "Još nema unetog materijala.",
@@ -2706,6 +2718,7 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Kroatisch: {
+    exportTab: "Izvoz sati", exportMonth: "Mjesec", exportDownload: "Preuzmi CSV", exportEmpty: "Nema sati u odabranom mjesecu.", exportDays: "Radni dani",
     materialOrder: "Naruči materijal", materialOrders: "Narudžbe", orderOpen: "Otvoreno", orderOrdered: "Naručeno", orderDelivered: "Isporučeno", ordersEmpty: "Nema narudžbi.", orderNote: "Napomena",
     materialCatalog: "Katalog materijala", materialCatalogEmpty: "Još nema spremljenog materijala.",
     materialUsed: "Utrošeni materijal", materialAdd: "Dodaj", materialQty: "Količina", materialUnit: "Jedinica", materialName: "Naziv", materialNone: "Još nema unesenog materijala.",
@@ -2943,6 +2956,7 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Slowenisch: {
+    exportTab: "Izvoz ur", exportMonth: "Mesec", exportDownload: "Prenesi CSV", exportEmpty: "Ni ur v izbranem mesecu.", exportDays: "Delovni dnevi",
     materialOrder: "Naroči material", materialOrders: "Naročila", orderOpen: "Odprto", orderOrdered: "Naročeno", orderDelivered: "Dostavljeno", ordersEmpty: "Ni naročil.", orderNote: "Opomba",
     materialCatalog: "Katalog materiala", materialCatalogEmpty: "Material še ni shranjen.",
     materialUsed: "Porabljen material", materialAdd: "Dodaj", materialQty: "Količina", materialUnit: "Enota", materialName: "Naziv", materialNone: "Material še ni vnesen.",
@@ -3180,6 +3194,7 @@ const texts = {
     copyDone: "Delovni koraki so prevzeti.",
   },
   Polnisch: {
+    exportTab: "Eksport godzin", exportMonth: "Miesiąc", exportDownload: "Pobierz CSV", exportEmpty: "Brak godzin w wybranym miesiącu.", exportDays: "Dni robocze",
     materialOrder: "Zamów materiał", materialOrders: "Zamówienia", orderOpen: "Otwarte", orderOrdered: "Zamówione", orderDelivered: "Dostarczone", ordersEmpty: "Brak zamówień.", orderNote: "Notatka",
     materialCatalog: "Katalog materiałów", materialCatalogEmpty: "Brak zapisanych materiałów.",
     materialUsed: "Zużyty materiał", materialAdd: "Dodaj", materialQty: "Ilość", materialUnit: "Jednostka", materialName: "Nazwa", materialNone: "Brak zapisanego materiału.",
@@ -3860,6 +3875,7 @@ export default function Home() {
   const [catDraft, setCatDraft] = useState<{ id: string; name: string; unit: string }>({ id: "", name: "", unit: MATERIAL_UNITS[0] });
   const [catalogSuggestions, setCatalogSuggestions] = useState<{ name: string; unit: string }[]>([]);
   const [materialOrders, setMaterialOrders] = useState<any[]>([]);
+  const [exportMonth, setExportMonth] = useState<string>(() => new Date().toISOString().slice(0, 7));
   const [orderDraft, setOrderDraft] = useState<Record<string, { qty: string; unit: string; name: string; note: string }>>({});
   const [orderSaving, setOrderSaving] = useState<string | null>(null);
   const [pmEdits, setPmEdits] = useState<Record<string, string>>({});
@@ -4157,6 +4173,58 @@ export default function Home() {
     const trans = instructionTranslations[instructionId];
     if (trans && trans.language === uiLanguage && trans.tasks?.[materialKey(name)]) return trans.tasks[materialKey(name)];
     return name || "";
+  }
+
+  // ── Stundenexport: Monatssummen je Mitarbeiter ──
+  function monthlyHourSummary(month: string) {
+    const rows: Record<string, { name: string; days: number; hours: number; travelMin: number; km: number }> = {};
+    const num = (v: any) => Number(String(v ?? "").replace(",", ".")) || 0;
+    for (const r of teamReports as any[]) {
+      const name = String(r?.employee || "").trim() || "?";
+      for (const d of (r?.days || [])) {
+        if (!d?.date || !String(d.date).startsWith(month)) continue;
+        const h = parseHours(String(d.hours || ""));
+        const tm = travelMinutes(d.travelOutStart, d.travelOutEnd) + travelMinutes(d.travelReturnStart, d.travelReturnEnd);
+        const km = num(d.travelOutKm) + num(d.travelReturnKm);
+        if (h === 0 && tm === 0 && km === 0) continue;
+        const key = name.toLowerCase();
+        if (!rows[key]) rows[key] = { name, days: 0, hours: 0, travelMin: 0, km: 0 };
+        if (h > 0) rows[key].days += 1;
+        rows[key].hours += h;
+        rows[key].travelMin += tm;
+        rows[key].km += km;
+      }
+    }
+    return Object.values(rows).sort((x, y) => x.name.localeCompare(y.name));
+  }
+  // Zahl im deutschen Format (Komma) fuer Excel.
+  function csvNum(n: number, digits = 2): string {
+    return (Math.round(n * 100) / 100).toFixed(digits).replace(".", ",");
+  }
+  function downloadHoursCsv() {
+    const rows = monthlyHourSummary(exportMonth);
+    if (rows.length === 0) { setMessage(t.exportEmpty); return; }
+    const head = [t.employee, t.exportDays, t.hours, `${t.travelTime} (h)`, t.km].join(";");
+    const lines = rows.map((r) => [
+      String(r.name).replace(/;/g, ","),
+      String(r.days),
+      csvNum(r.hours),
+      csvNum(r.travelMin / 60),
+      csvNum(r.km, 1),
+    ].join(";"));
+    const sum = rows.reduce((acc, r) => ({ days: acc.days + r.days, hours: acc.hours + r.hours, travelMin: acc.travelMin + r.travelMin, km: acc.km + r.km }), { days: 0, hours: 0, travelMin: 0, km: 0 });
+    lines.push([t.total, String(sum.days), csvNum(sum.hours), csvNum(sum.travelMin / 60), csvNum(sum.km, 1)].join(";"));
+    // BOM, damit Excel Umlaute richtig anzeigt
+    const csv = "\ufeff" + [head, ...lines].join("\r\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Stunden_${exportMonth}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   }
 
   // ── Materialbestellungen ──
@@ -6078,6 +6146,9 @@ export default function Home() {
         {companyFeatures?.material_enabled && (
         <TabButton label={`🛒 ${t.materialOrders}`} tabName="bestellungen" activeTab={activeTab} onClick={() => { setActiveTab("bestellungen"); loadMaterialOrders(); }} />
         )}
+        {companyFeatures?.export_enabled && (currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
+        <TabButton label={`📊 ${t.exportTab}`} tabName="export" activeTab={activeTab} onClick={() => { setActiveTab("export"); loadTeamReports(); }} />
+        )}
         {companyFeatures?.feedback_enabled && !readOnlyUser && (
 
         <TabButton label={`💬 ${t.feedbackTab}`} tabName="feedback" activeTab={activeTab} onClick={() => { setActiveTab("feedback"); if (currentCompany && (currentCompany.role === "owner" || currentCompany.role === "admin" || currentCompany.role === "project_manager")) loadFeedback(); }} />
@@ -6580,6 +6651,59 @@ export default function Home() {
               </div>
             ))}
           </section>
+        );
+      })()}
+
+      {activeTab === "export" && companyFeatures?.export_enabled && (currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (() => {
+        const rows = monthlyHourSummary(exportMonth);
+        const sum = rows.reduce((acc, r) => ({ days: acc.days + r.days, hours: acc.hours + r.hours, travelMin: acc.travelMin + r.travelMin, km: acc.km + r.km }), { days: 0, hours: 0, travelMin: 0, km: 0 });
+        return (
+        <div className="space-y-4">
+          <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-3">
+            <h2 className="text-xl font-bold">📊 {t.exportTab}</h2>
+            <div className="flex gap-2 flex-wrap items-center">
+              <label className="text-sm font-medium">{t.exportMonth}</label>
+              <input type="month" value={exportMonth} onChange={(e) => setExportMonth(e.target.value)} className="border p-2 rounded-lg text-black bg-white" />
+              <button type="button" onClick={loadTeamReports} className="bg-gray-200 px-3 py-2.5 rounded-lg text-sm">🔄</button>
+              <button type="button" onClick={downloadHoursCsv} className="bg-green-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium">⬇️ {t.exportDownload}</button>
+            </div>
+            {rows.length === 0 ? (
+              <p className="text-gray-500">{t.exportEmpty}</p>
+            ) : (
+              <div className="border border-slate-200 rounded-xl overflow-x-auto">
+                <table className="w-full text-sm text-left border-collapse">
+                  <thead>
+                    <tr className="bg-gray-100">
+                      <th className="px-3 py-2 font-bold">{t.employee}</th>
+                      <th className="px-3 py-2 font-bold text-right">{t.exportDays}</th>
+                      <th className="px-3 py-2 font-bold text-right">{t.hours}</th>
+                      <th className="px-3 py-2 font-bold text-right">{t.travelTime}</th>
+                      <th className="px-3 py-2 font-bold text-right">{t.km}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map((r) => (
+                      <tr key={r.name} className="border-t border-slate-200">
+                        <td className="px-3 py-2 break-words">{r.name}</td>
+                        <td className="px-3 py-2 text-right">{r.days}</td>
+                        <td className="px-3 py-2 text-right">{csvNum(r.hours)}</td>
+                        <td className="px-3 py-2 text-right">{csvNum(r.travelMin / 60)}</td>
+                        <td className="px-3 py-2 text-right">{csvNum(r.km, 1)}</td>
+                      </tr>
+                    ))}
+                    <tr className="border-t-2 border-slate-300 font-bold bg-gray-50">
+                      <td className="px-3 py-2">{t.total}</td>
+                      <td className="px-3 py-2 text-right">{sum.days}</td>
+                      <td className="px-3 py-2 text-right">{csvNum(sum.hours)}</td>
+                      <td className="px-3 py-2 text-right">{csvNum(sum.travelMin / 60)}</td>
+                      <td className="px-3 py-2 text-right">{csvNum(sum.km, 1)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+        </div>
         );
       })()}
 

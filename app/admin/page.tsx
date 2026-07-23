@@ -657,6 +657,7 @@ export default function AdminPage() {
                       <Toggle label="🌐 Live-Übersetzer"     value={!!features.translator_enabled}  onChange={(v) => updateFeature(company.id, "translator_enabled", v)} />
                       <Toggle label="💬 Kommentar-Chat"      value={!!features.comments_enabled}    onChange={(v) => updateFeature(company.id, "comments_enabled", v)} />
                       <Toggle label="📦 Materialerfassung"    value={!!features.material_enabled}    onChange={(v) => updateFeature(company.id, "material_enabled", v)} />
+                      <Toggle label="📊 Stundenexport"       value={!!features.export_enabled}      onChange={(v) => updateFeature(company.id, "export_enabled", v)} />
                     </div>
                   </div>
                   <div>
