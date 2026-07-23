@@ -97,10 +97,12 @@ type CompanyFeatures = {
   material_enabled?: boolean;
   export_enabled?: boolean;
   equipment_enabled?: boolean;
+  absence_enabled?: boolean;
 };
 
 const texts = {
   Deutsch: {
+    absenceTab: "Urlaub & Abwesenheit", absenceVacation: "Urlaub", absenceSick: "Krankheit", absenceFrom: "Von", absenceTo: "Bis", absenceRequest: "Beantragen", absencePending: "Offen", absenceApproved: "Genehmigt", absenceRejected: "Abgelehnt", absenceApprove: "Genehmigen", absenceReject: "Ablehnen", absenceEmpty: "Keine Meldungen.",
     filterAll: "Alle",
     equipmentTab: "Fahrzeuge & Werkzeuge", equipmentVehicle: "Fahrzeug", equipmentTool: "Werkzeug", equipmentIdentifier: "Kennzeichen / Nummer", equipmentAssign: "Zuweisen", equipmentReturn: "Zurückgeben", equipmentFree: "Verfügbar", equipmentHistory: "Verlauf", equipmentEmpty: "Noch keine Geräte erfasst.", equipmentType: "Typ",
     exportTab: "Stundenexport", exportMonth: "Monat", exportDownload: "CSV herunterladen", exportEmpty: "Keine Stunden im gewählten Monat.", exportDays: "Arbeitstage",
@@ -341,6 +343,7 @@ const texts = {
     copyDone: "Arbeitsschritte wurden übernommen.",
   },
   Spanisch: {
+    absenceTab: "Vacaciones y ausencias", absenceVacation: "Vacaciones", absenceSick: "Enfermedad", absenceFrom: "Desde", absenceTo: "Hasta", absenceRequest: "Solicitar", absencePending: "Abierto", absenceApproved: "Aprobado", absenceRejected: "Rechazado", absenceApprove: "Aprobar", absenceReject: "Rechazar", absenceEmpty: "No hay solicitudes.",
     filterAll: "Todos",
     equipmentTab: "Vehículos y herramientas", equipmentVehicle: "Vehículo", equipmentTool: "Herramienta", equipmentIdentifier: "Matrícula / número", equipmentAssign: "Asignar", equipmentReturn: "Devolver", equipmentFree: "Disponible", equipmentHistory: "Historial", equipmentEmpty: "Aún no hay equipos registrados.", equipmentType: "Tipo",
     exportTab: "Exportación de horas", exportMonth: "Mes", exportDownload: "Descargar CSV", exportEmpty: "No hay horas en el mes seleccionado.", exportDays: "Días trabajados",
@@ -581,6 +584,7 @@ const texts = {
     copyDone: "Los pasos de trabajo se han aplicado.",
   },
   Rumänisch: {
+    absenceTab: "Concediu și absențe", absenceVacation: "Concediu", absenceSick: "Boală", absenceFrom: "De la", absenceTo: "Până la", absenceRequest: "Solicită", absencePending: "Deschis", absenceApproved: "Aprobat", absenceRejected: "Respins", absenceApprove: "Aprobă", absenceReject: "Respinge", absenceEmpty: "Nicio solicitare.",
     filterAll: "Toate",
     equipmentTab: "Vehicule și scule", equipmentVehicle: "Vehicul", equipmentTool: "Sculă", equipmentIdentifier: "Număr înmatriculare / număr", equipmentAssign: "Atribuie", equipmentReturn: "Returnează", equipmentFree: "Disponibil", equipmentHistory: "Istoric", equipmentEmpty: "Încă nu există echipamente.", equipmentType: "Tip",
     exportTab: "Export ore", exportMonth: "Luna", exportDownload: "Descarcă CSV", exportEmpty: "Nicio oră în luna selectată.", exportDays: "Zile lucrate",
@@ -821,6 +825,7 @@ const texts = {
     copyDone: "Etapele de lucru au fost preluate.",
   },
   Englisch: {
+    absenceTab: "Leave & absence", absenceVacation: "Vacation", absenceSick: "Sick leave", absenceFrom: "From", absenceTo: "To", absenceRequest: "Request", absencePending: "Open", absenceApproved: "Approved", absenceRejected: "Rejected", absenceApprove: "Approve", absenceReject: "Reject", absenceEmpty: "No requests.",
     filterAll: "All",
     equipmentTab: "Vehicles & tools", equipmentVehicle: "Vehicle", equipmentTool: "Tool", equipmentIdentifier: "Plate / number", equipmentAssign: "Assign", equipmentReturn: "Return", equipmentFree: "Available", equipmentHistory: "History", equipmentEmpty: "No equipment recorded yet.", equipmentType: "Type",
     exportTab: "Hours export", exportMonth: "Month", exportDownload: "Download CSV", exportEmpty: "No hours in the selected month.", exportDays: "Working days",
@@ -1061,6 +1066,7 @@ const texts = {
     copyDone: "Work steps have been applied.",
   },
   Italienisch: {
+    absenceTab: "Ferie e assenze", absenceVacation: "Ferie", absenceSick: "Malattia", absenceFrom: "Dal", absenceTo: "Al", absenceRequest: "Richiedi", absencePending: "Aperto", absenceApproved: "Approvato", absenceRejected: "Rifiutato", absenceApprove: "Approva", absenceReject: "Rifiuta", absenceEmpty: "Nessuna richiesta.",
     filterAll: "Tutti",
     equipmentTab: "Veicoli e attrezzi", equipmentVehicle: "Veicolo", equipmentTool: "Attrezzo", equipmentIdentifier: "Targa / numero", equipmentAssign: "Assegna", equipmentReturn: "Restituisci", equipmentFree: "Disponibile", equipmentHistory: "Cronologia", equipmentEmpty: "Nessuna attrezzatura registrata.", equipmentType: "Tipo",
     exportTab: "Esportazione ore", exportMonth: "Mese", exportDownload: "Scarica CSV", exportEmpty: "Nessuna ora nel mese selezionato.", exportDays: "Giorni lavorati",
@@ -1301,6 +1307,7 @@ const texts = {
     copyDone: "Le fasi di lavoro sono state applicate.",
   },
   Türkisch: {
+    absenceTab: "İzin ve devamsızlık", absenceVacation: "İzin", absenceSick: "Hastalık", absenceFrom: "Başlangıç", absenceTo: "Bitiş", absenceRequest: "Talep et", absencePending: "Açık", absenceApproved: "Onaylandı", absenceRejected: "Reddedildi", absenceApprove: "Onayla", absenceReject: "Reddet", absenceEmpty: "Talep yok.",
     filterAll: "Tümü",
     equipmentTab: "Araçlar ve aletler", equipmentVehicle: "Araç", equipmentTool: "Alet", equipmentIdentifier: "Plaka / numara", equipmentAssign: "Ata", equipmentReturn: "İade et", equipmentFree: "Müsait", equipmentHistory: "Geçmiş", equipmentEmpty: "Henüz ekipman girilmedi.", equipmentType: "Tür",
     exportTab: "Saat dışa aktarma", exportMonth: "Ay", exportDownload: "CSV indir", exportEmpty: "Seçilen ayda saat yok.", exportDays: "Çalışma günleri",
@@ -1541,6 +1548,7 @@ const texts = {
     copyDone: "İş adımları alındı.",
   },
   Ungarisch: {
+    absenceTab: "Szabadság és távollét", absenceVacation: "Szabadság", absenceSick: "Betegség", absenceFrom: "Ettől", absenceTo: "Eddig", absenceRequest: "Igénylés", absencePending: "Nyitott", absenceApproved: "Jóváhagyva", absenceRejected: "Elutasítva", absenceApprove: "Jóváhagyás", absenceReject: "Elutasítás", absenceEmpty: "Nincs bejelentés.",
     filterAll: "Összes",
     equipmentTab: "Járművek és szerszámok", equipmentVehicle: "Jármű", equipmentTool: "Szerszám", equipmentIdentifier: "Rendszám / szám", equipmentAssign: "Kiosztás", equipmentReturn: "Visszaadás", equipmentFree: "Elérhető", equipmentHistory: "Előzmények", equipmentEmpty: "Még nincs rögzített eszköz.", equipmentType: "Típus",
     exportTab: "Óraexport", exportMonth: "Hónap", exportDownload: "CSV letöltése", exportEmpty: "Nincs óra a kiválasztott hónapban.", exportDays: "Munkanapok",
@@ -1781,6 +1789,7 @@ const texts = {
     copyDone: "A munkalépések átvéve.",
   },
   Tschechisch: {
+    absenceTab: "Dovolená a nepřítomnost", absenceVacation: "Dovolená", absenceSick: "Nemoc", absenceFrom: "Od", absenceTo: "Do", absenceRequest: "Podat žádost", absencePending: "Otevřeno", absenceApproved: "Schváleno", absenceRejected: "Zamítnuto", absenceApprove: "Schválit", absenceReject: "Zamítnout", absenceEmpty: "Žádné žádosti.",
     filterAll: "Vše",
     equipmentTab: "Vozidla a nářadí", equipmentVehicle: "Vozidlo", equipmentTool: "Nářadí", equipmentIdentifier: "SPZ / číslo", equipmentAssign: "Přidělit", equipmentReturn: "Vrátit", equipmentFree: "Dostupné", equipmentHistory: "Historie", equipmentEmpty: "Zatím není zadáno žádné vybavení.", equipmentType: "Typ",
     exportTab: "Export hodin", exportMonth: "Měsíc", exportDownload: "Stáhnout CSV", exportEmpty: "Žádné hodiny ve vybraném měsíci.", exportDays: "Pracovní dny",
@@ -2021,6 +2030,7 @@ const texts = {
     copyDone: "Pracovní kroky byly převzaty.",
   },
   Ukrainisch: {
+    absenceTab: "Відпустка та відсутність", absenceVacation: "Відпустка", absenceSick: "Лікарняний", absenceFrom: "З", absenceTo: "До", absenceRequest: "Подати заявку", absencePending: "Відкрито", absenceApproved: "Затверджено", absenceRejected: "Відхилено", absenceApprove: "Затвердити", absenceReject: "Відхилити", absenceEmpty: "Немає заявок.",
     filterAll: "Усі",
     equipmentTab: "Транспорт та інструменти", equipmentVehicle: "Транспорт", equipmentTool: "Інструмент", equipmentIdentifier: "Номер", equipmentAssign: "Призначити", equipmentReturn: "Повернути", equipmentFree: "Доступно", equipmentHistory: "Історія", equipmentEmpty: "Обладнання ще не внесено.", equipmentType: "Тип",
     exportTab: "Експорт годин", exportMonth: "Місяць", exportDownload: "Завантажити CSV", exportEmpty: "Немає годин у вибраному місяці.", exportDays: "Робочі дні",
@@ -2261,6 +2271,7 @@ const texts = {
     copyDone: "Робочі кроки перенесено.",
   },
   Bulgarisch: {
+    absenceTab: "Отпуск и отсъствия", absenceVacation: "Отпуск", absenceSick: "Болничен", absenceFrom: "От", absenceTo: "До", absenceRequest: "Заяви", absencePending: "Отворена", absenceApproved: "Одобрена", absenceRejected: "Отхвърлена", absenceApprove: "Одобри", absenceReject: "Отхвърли", absenceEmpty: "Няма заявки.",
     filterAll: "Всички",
     equipmentTab: "Превозни средства и инструменти", equipmentVehicle: "Превозно средство", equipmentTool: "Инструмент", equipmentIdentifier: "Регистрационен / номер", equipmentAssign: "Присвои", equipmentReturn: "Върни", equipmentFree: "Свободно", equipmentHistory: "История", equipmentEmpty: "Все още няма въведено оборудване.", equipmentType: "Тип",
     exportTab: "Експорт на часове", exportMonth: "Месец", exportDownload: "Изтегли CSV", exportEmpty: "Няма часове за избрания месец.", exportDays: "Работни дни",
@@ -2501,6 +2512,7 @@ const texts = {
     copyDone: "Работните стъпки са прехвърлени.",
   },
   Serbisch: {
+    absenceTab: "Godišnji i odsustva", absenceVacation: "Godišnji odmor", absenceSick: "Bolovanje", absenceFrom: "Od", absenceTo: "Do", absenceRequest: "Podnesi zahtev", absencePending: "Otvoreno", absenceApproved: "Odobreno", absenceRejected: "Odbijeno", absenceApprove: "Odobri", absenceReject: "Odbij", absenceEmpty: "Nema prijava.",
     filterAll: "Sve",
     equipmentTab: "Vozila i alati", equipmentVehicle: "Vozilo", equipmentTool: "Alat", equipmentIdentifier: "Registracija / broj", equipmentAssign: "Dodeli", equipmentReturn: "Vrati", equipmentFree: "Dostupno", equipmentHistory: "Istorija", equipmentEmpty: "Još nema unete opreme.", equipmentType: "Vrsta",
     exportTab: "Izvoz sati", exportMonth: "Mesec", exportDownload: "Preuzmi CSV", exportEmpty: "Nema sati u izabranom mesecu.", exportDays: "Radni dani",
@@ -2741,6 +2753,7 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Kroatisch: {
+    absenceTab: "Godišnji i izostanci", absenceVacation: "Godišnji odmor", absenceSick: "Bolovanje", absenceFrom: "Od", absenceTo: "Do", absenceRequest: "Podnesi zahtjev", absencePending: "Otvoreno", absenceApproved: "Odobreno", absenceRejected: "Odbijeno", absenceApprove: "Odobri", absenceReject: "Odbij", absenceEmpty: "Nema prijava.",
     filterAll: "Sve",
     equipmentTab: "Vozila i alati", equipmentVehicle: "Vozilo", equipmentTool: "Alat", equipmentIdentifier: "Registracija / broj", equipmentAssign: "Dodijeli", equipmentReturn: "Vrati", equipmentFree: "Dostupno", equipmentHistory: "Povijest", equipmentEmpty: "Još nema unesenih uređaja.", equipmentType: "Vrsta",
     exportTab: "Izvoz sati", exportMonth: "Mjesec", exportDownload: "Preuzmi CSV", exportEmpty: "Nema sati u odabranom mjesecu.", exportDays: "Radni dani",
@@ -2981,6 +2994,7 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Slowenisch: {
+    absenceTab: "Dopust in odsotnosti", absenceVacation: "Dopust", absenceSick: "Bolniška", absenceFrom: "Od", absenceTo: "Do", absenceRequest: "Oddaj vlogo", absencePending: "Odprto", absenceApproved: "Odobreno", absenceRejected: "Zavrnjeno", absenceApprove: "Odobri", absenceReject: "Zavrni", absenceEmpty: "Ni prijav.",
     filterAll: "Vse",
     equipmentTab: "Vozila in orodja", equipmentVehicle: "Vozilo", equipmentTool: "Orodje", equipmentIdentifier: "Registrska št. / številka", equipmentAssign: "Dodeli", equipmentReturn: "Vrni", equipmentFree: "Na voljo", equipmentHistory: "Zgodovina", equipmentEmpty: "Naprave še niso vnesene.", equipmentType: "Vrsta",
     exportTab: "Izvoz ur", exportMonth: "Mesec", exportDownload: "Prenesi CSV", exportEmpty: "Ni ur v izbranem mesecu.", exportDays: "Delovni dnevi",
@@ -3221,6 +3235,7 @@ const texts = {
     copyDone: "Delovni koraki so prevzeti.",
   },
   Polnisch: {
+    absenceTab: "Urlop i nieobecności", absenceVacation: "Urlop", absenceSick: "Choroba", absenceFrom: "Od", absenceTo: "Do", absenceRequest: "Złóż wniosek", absencePending: "Otwarte", absenceApproved: "Zatwierdzone", absenceRejected: "Odrzucone", absenceApprove: "Zatwierdź", absenceReject: "Odrzuć", absenceEmpty: "Brak zgłoszeń.",
     filterAll: "Wszystkie",
     equipmentTab: "Pojazdy i narzędzia", equipmentVehicle: "Pojazd", equipmentTool: "Narzędzie", equipmentIdentifier: "Nr rejestracyjny / numer", equipmentAssign: "Przypisz", equipmentReturn: "Zwróć", equipmentFree: "Dostępne", equipmentHistory: "Historia", equipmentEmpty: "Brak zapisanego sprzętu.", equipmentType: "Typ",
     exportTab: "Eksport godzin", exportMonth: "Miesiąc", exportDownload: "Pobierz CSV", exportEmpty: "Brak godzin w wybranym miesiącu.", exportDays: "Dni robocze",
@@ -3911,6 +3926,9 @@ export default function Home() {
   const [eqOpenId, setEqOpenId] = useState<string | null>(null);
   const [eqTrans, setEqTrans] = useState<Record<string, string>>({});
   const [eqFilter, setEqFilter] = useState<string>("all");
+  const [absences, setAbsences] = useState<any[]>([]);
+  const [absDraft, setAbsDraft] = useState<{ type: string; start: string; end: string; note: string }>({ type: "vacation", start: "", end: "", note: "" });
+  const [absSaving, setAbsSaving] = useState(false);
   const [orderDraft, setOrderDraft] = useState<Record<string, { qty: string; unit: string; name: string; note: string }>>({});
   const [orderSaving, setOrderSaving] = useState<string | null>(null);
   const [orderTrans, setOrderTrans] = useState<Record<string, string>>({});
@@ -4254,6 +4272,60 @@ export default function Home() {
     const trans = instructionTranslations[instructionId];
     if (trans && trans.language === uiLanguage && trans.tasks?.[materialKey(name)]) return trans.tasks[materialKey(name)];
     return name || "";
+  }
+
+  // ── Urlaub & Abwesenheiten ──
+  async function absencesCall(payload: any) {
+    let token = tokenRef.current;
+    if (!token) {
+      try {
+        const sess = await dbTimeout(supabase.auth.getSession(), 5000);
+        token = sess?.data?.session?.access_token || "";
+      } catch { /* Route antwortet dann mit 401 */ }
+    }
+    const res = await fetch("/api/absences", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify(payload),
+    });
+    return await res.json().catch(() => ({ error: "Antwort konnte nicht gelesen werden." }));
+  }
+  async function loadAbsences() {
+    try {
+      const data = await absencesCall({ action: "list" });
+      if (Array.isArray(data?.items)) setAbsences(data.items);
+    } catch { /* still ignorieren */ }
+  }
+  async function createAbsence() {
+    if (!absDraft.start) { setMessage(t.msgFillRequired); return; }
+    setAbsSaving(true);
+    try {
+      const data = await absencesCall({ action: "create", type: absDraft.type, startDate: absDraft.start, endDate: absDraft.end || absDraft.start, note: absDraft.note });
+      if (data?.error) { setMessage("Fehler: " + data.error); return; }
+      setAbsDraft({ type: "vacation", start: "", end: "", note: "" });
+      await loadAbsences();
+      setMessage("\u2705 " + t.msgSaved);
+    } finally {
+      setAbsSaving(false);
+    }
+  }
+  async function decideAbsence(id: string, status: string) {
+    const data = await absencesCall({ action: "decide", id, status });
+    if (data?.error) { setMessage("Fehler: " + data.error); return; }
+    setAbsences(prev => prev.map((a: any) => (a.id === id ? { ...a, status } : a)));
+  }
+  async function deleteAbsence(id: string) {
+    const data = await absencesCall({ action: "delete", id });
+    if (data?.error) { setMessage("Fehler: " + data.error); return; }
+    setAbsences(prev => prev.filter((a: any) => a.id !== id));
+  }
+  // Anzahl Kalendertage einer Abwesenheit.
+  function absenceDayCount(a: any): number {
+    if (!a?.start_date || !a?.end_date) return 0;
+    const from = new Date(a.start_date + "T00:00:00Z").getTime();
+    const to = new Date(a.end_date + "T00:00:00Z").getTime();
+    if (!from || !to || to < from) return 1;
+    return Math.round((to - from) / 86400000) + 1;
   }
 
   // ── Fahrzeuge & Werkzeuge ──
@@ -6284,6 +6356,9 @@ export default function Home() {
         {companyFeatures?.equipment_enabled && (
         <TabButton label={`🚚 ${t.equipmentTab}`} tabName="geraete" activeTab={activeTab} onClick={() => { setActiveTab("geraete"); loadEquipment(); }} />
         )}
+        {companyFeatures?.absence_enabled && (
+        <TabButton label={`🌴 ${t.absenceTab}`} tabName="urlaub" activeTab={activeTab} onClick={() => { setActiveTab("urlaub"); loadAbsences(); }} />
+        )}
         {companyFeatures?.feedback_enabled && !readOnlyUser && (
 
         <TabButton label={`💬 ${t.feedbackTab}`} tabName="feedback" activeTab={activeTab} onClick={() => { setActiveTab("feedback"); if (currentCompany && (currentCompany.role === "owner" || currentCompany.role === "admin" || currentCompany.role === "project_manager")) loadFeedback(); }} />
@@ -6788,6 +6863,66 @@ export default function Home() {
           </section>
         );
       })()}
+
+      {activeTab === "urlaub" && companyFeatures?.absence_enabled && (
+        <div className="space-y-4">
+          <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-3">
+            <h2 className="text-xl font-bold">🌴 {t.absenceTab}</h2>
+            {!readOnlyUser && (
+              <div className="flex gap-2 flex-wrap items-end border-b pb-3">
+                <select value={absDraft.type} onChange={(e) => setAbsDraft(p => ({ ...p, type: e.target.value }))} className="border p-2 rounded-lg text-black bg-white">
+                  <option value="vacation">🌴 {t.absenceVacation}</option>
+                  <option value="sick">🤒 {t.absenceSick}</option>
+                </select>
+                <div className="flex flex-col">
+                  <label className="text-xs text-gray-500">{t.absenceFrom}</label>
+                  <input type="date" value={absDraft.start} onChange={(e) => setAbsDraft(p => ({ ...p, start: e.target.value }))} className="border p-2 rounded-lg text-black bg-white" />
+                </div>
+                <div className="flex flex-col">
+                  <label className="text-xs text-gray-500">{t.absenceTo}</label>
+                  <input type="date" value={absDraft.end} onChange={(e) => setAbsDraft(p => ({ ...p, end: e.target.value }))} className="border p-2 rounded-lg text-black bg-white" />
+                </div>
+                <input placeholder={t.orderNote} value={absDraft.note} onChange={(e) => setAbsDraft(p => ({ ...p, note: e.target.value }))} className="border p-2 rounded-lg text-black bg-white flex-1 min-w-[8rem]" />
+                <button type="button" disabled={absSaving} onClick={createAbsence} className="bg-cyan-700 text-white px-4 py-2.5 rounded-lg text-sm disabled:opacity-50">{absSaving ? "⏳" : "📩"} {t.absenceRequest}</button>
+              </div>
+            )}
+            {absences.length === 0 ? (
+              <p className="text-gray-500">{t.absenceEmpty}</p>
+            ) : (
+              <div className="space-y-2">
+                {absences.map((a: any) => (
+                  <div key={a.id} className="border border-slate-200 rounded-xl p-3 bg-gray-50 space-y-2">
+                    <div className="flex justify-between items-start gap-2 flex-wrap">
+                      <div>
+                        <p className="font-semibold break-words">
+                          {a.type === "sick" ? "🤒" : "🌴"} {a.type === "sick" ? t.absenceSick : t.absenceVacation}
+                          <span className="font-normal"> · {a.start_date}{a.end_date !== a.start_date ? ` – ${a.end_date}` : ""} ({absenceDayCount(a)} {t.exportDays})</span>
+                        </p>
+                        <p className="text-xs text-gray-500">{a.user_name || "?"}{a.note ? ` · ${a.note}` : ""}</p>
+                      </div>
+                      <span className={`text-xs px-2 py-0.5 rounded shrink-0 ${a.status === "approved" ? "bg-green-100 text-green-700" : a.status === "rejected" ? "bg-red-100 text-red-700" : "bg-gray-100 text-gray-600"}`}>
+                        {a.status === "approved" ? t.absenceApproved : a.status === "rejected" ? t.absenceRejected : t.absencePending}
+                      </span>
+                    </div>
+                    <div className="flex gap-2 flex-wrap items-center">
+                      {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
+                        <>
+                          <button type="button" onClick={() => decideAbsence(a.id, "approved")} className="bg-green-700 text-white px-3 py-2 rounded-lg text-sm">✅ {t.absenceApprove}</button>
+                          <button type="button" onClick={() => decideAbsence(a.id, "rejected")} className="bg-red-600 text-white px-3 py-2 rounded-lg text-sm">✖️ {t.absenceReject}</button>
+                        </>
+                      )}
+                      {((currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") || (a.user_id === user?.id && a.status === "pending")) && (
+                        <button type="button" onClick={() => deleteAbsence(a.id)} className="text-xs px-2 py-1 rounded border text-red-600">🗑️</button>
+                      )}
+                      {a.decided_by_name && <span className="text-xs text-gray-400">{a.decided_by_name}</span>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        </div>
+      )}
 
       {activeTab === "geraete" && companyFeatures?.equipment_enabled && (
         <div className="space-y-4">

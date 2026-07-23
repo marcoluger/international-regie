@@ -659,6 +659,7 @@ export default function AdminPage() {
                       <Toggle label="📦 Materialerfassung"    value={!!features.material_enabled}    onChange={(v) => updateFeature(company.id, "material_enabled", v)} />
                       <Toggle label="📊 Stundenexport"       value={!!features.export_enabled}      onChange={(v) => updateFeature(company.id, "export_enabled", v)} />
                       <Toggle label="🚚 Fahrzeuge & Werkzeuge" value={!!features.equipment_enabled} onChange={(v) => updateFeature(company.id, "equipment_enabled", v)} />
+                      <Toggle label="🌴 Urlaub & Abwesenheit" value={!!features.absence_enabled}  onChange={(v) => updateFeature(company.id, "absence_enabled", v)} />
                     </div>
                   </div>
                   <div>
