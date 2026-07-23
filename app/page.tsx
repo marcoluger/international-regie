@@ -3944,6 +3944,7 @@ export default function Home() {
   const [absDraft, setAbsDraft] = useState<{ type: string; start: string; end: string; note: string }>({ type: "vacation", start: "", end: "", note: "" });
   const [absSaving, setAbsSaving] = useState(false);
   const [absTrans, setAbsTrans] = useState<Record<string, string>>({});
+  const [absCollapsed, setAbsCollapsed] = useState<Record<string, boolean>>({});
   const [orderDraft, setOrderDraft] = useState<Record<string, { qty: string; unit: string; name: string; note: string }>>({});
   const [orderSaving, setOrderSaving] = useState<string | null>(null);
   const [orderTrans, setOrderTrans] = useState<Record<string, string>>({});
@@ -6925,9 +6926,26 @@ export default function Home() {
             )}
             {absences.length === 0 ? (
               <p className="text-gray-500">{t.absenceEmpty}</p>
-            ) : (
-              <div className="space-y-2">
-                {absences.map((a: any) => (
+            ) : (() => {
+              // Nach Mitarbeiter gruppieren (alphabetisch)
+              const gruppen: Record<string, { name: string; items: any[] }> = {};
+              for (const ab of absences as any[]) {
+                const key = String(ab.user_id || ab.user_name || "?");
+                if (!gruppen[key]) gruppen[key] = { name: ab.user_name || "?", items: [] };
+                gruppen[key].items.push(ab);
+              }
+              const sortiert = Object.entries(gruppen).sort((x, y) => x[1].name.localeCompare(y[1].name));
+              return (
+              <div className="space-y-3">
+                {sortiert.map(([uid, g]) => (
+                  <div key={uid} className="border rounded-lg overflow-hidden">
+                    <button type="button" onClick={() => setAbsCollapsed(prev => ({ ...prev, [uid]: !prev[uid] }))} className="w-full bg-gray-100 px-3 py-2 font-bold flex justify-between items-center gap-2">
+                      <span>👤 {g.name} ({g.items.length})</span>
+                      <span className="text-gray-400">{absCollapsed[uid] ? "▼" : "▲"}</span>
+                    </button>
+                    {!absCollapsed[uid] && (
+                    <div className="p-2 space-y-2">
+                {g.items.map((a: any) => (
                   <div key={a.id} className="border border-slate-200 rounded-xl p-3 bg-gray-50 space-y-2">
                     <div className="flex justify-between items-start gap-2 flex-wrap">
                       <div>
@@ -6955,8 +6973,13 @@ export default function Home() {
                     </div>
                   </div>
                 ))}
+                    </div>
+                    )}
+                  </div>
+                ))}
               </div>
-            )}
+              );
+            })()}
           </section>
         </div>
       )}
