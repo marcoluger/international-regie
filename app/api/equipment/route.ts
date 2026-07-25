@@ -17,6 +17,41 @@ function todayStr(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
+// Beim Zuruecknehmen/Neu-Vergeben eines Fahrzeugs: gefahrene km im Verlauf festhalten
+// und die km-Felder fuer die naechste Vergabe zuruecksetzen. Best-effort.
+async function finalizeVehicleKm(
+  supabaseAdmin: any,
+  companyId: string,
+  eq: { id: string; type?: string; assigned_to?: string | null; assigned_to_name?: string | null; start_km?: number | null; end_km?: number | null },
+  byName: string,
+): Promise<void> {
+  try {
+    if (!eq || eq.type !== "vehicle") return;
+    if (eq.start_km == null && eq.end_km == null) return;
+    const s = eq.start_km, e = eq.end_km;
+    let note: string;
+    if (s != null && e != null) {
+      const driven = Math.max(0, Number(e) - Number(s));
+      note = `Gefahren: ${driven} km (Start ${s} → Ende ${e})`;
+    } else if (s != null) {
+      note = `Start ${s} km (kein Ende erfasst)`;
+    } else {
+      note = `Ende ${e} km (kein Start erfasst)`;
+    }
+    await supabaseAdmin.from("equipment_log").insert({
+      company_id: companyId,
+      equipment_id: eq.id,
+      action: "km",
+      user_id: eq.assigned_to || null,
+      user_name: eq.assigned_to_name || "",
+      by_name: byName || "",
+      note,
+    });
+    await supabaseAdmin.from("equipment").update({ start_km: null, end_km: null })
+      .eq("id", eq.id).eq("company_id", companyId);
+  } catch { /* best-effort */ }
+}
+
 // Faellige Planungen automatisch anwenden (Uebernahme am Starttag, Rueckgabe nach Enddatum).
 // Wird bei jedem "list" aufgerufen, damit die Realitaet ohne Hintergrundjob in Sync bleibt.
 // Fehler hier duerfen das Auflisten NIE blockieren.
@@ -71,11 +106,13 @@ async function reconcilePlans(supabaseAdmin: any, companyId: string, byName: str
       if (p.activated) {
         const { data: eq } = await supabaseAdmin
           .from("equipment")
-          .select("id, assigned_to, assigned_to_name")
+          .select("id, type, assigned_to, assigned_to_name, start_km, end_km")
           .eq("id", p.equipment_id)
           .eq("company_id", companyId)
           .maybeSingle();
         if (eq && eq.assigned_to === p.user_id) {
+          // Gefahrene km festhalten + zuruecksetzen, bevor freigegeben wird.
+          await finalizeVehicleKm(supabaseAdmin, companyId, eq, byName ? `${byName} (Plan)` : "Plan");
           await supabaseAdmin.from("equipment").update({
             assigned_to: null, assigned_to_name: null, assigned_at: null,
           }).eq("id", p.equipment_id).eq("company_id", companyId);
@@ -174,13 +211,41 @@ export async function POST(request: Request) {
       if (!body?.id) return Response.json({ error: "id fehlt." }, { status: 400 });
       const { data, error } = await supabaseAdmin
         .from("equipment_log")
-        .select("id, action, user_name, by_name, at")
+        .select("id, action, user_name, by_name, note, at")
         .eq("company_id", member.company_id)
         .eq("equipment_id", body.id)
         .order("at", { ascending: false })
         .limit(200);
       if (error) return Response.json({ error: error.message }, { status: 500 });
       return Response.json({ history: data || [] });
+    }
+
+    // ── km eines Fahrzeugs setzen (zugewiesener Mitarbeiter ODER Chef) ──
+    if (action === "set_km") {
+      if (!body?.id) return Response.json({ error: "id fehlt." }, { status: 400 });
+      const { data: eq } = await supabaseAdmin
+        .from("equipment")
+        .select("id, company_id, type, assigned_to")
+        .eq("id", body.id)
+        .maybeSingle();
+      if (!eq || eq.company_id !== member.company_id) {
+        return Response.json({ error: "Gerät nicht gefunden." }, { status: 404 });
+      }
+      const allowed = isManager || eq.assigned_to === caller.id;
+      if (!allowed) return Response.json({ error: "Keine Berechtigung." }, { status: 403 });
+      const kmVal = (v: any): number | null => {
+        const s = String(v ?? "").trim().replace(",", ".");
+        if (!s) return null;
+        const n = Number(s);
+        return Number.isFinite(n) ? n : null;
+      };
+      const { error } = await supabaseAdmin
+        .from("equipment")
+        .update({ start_km: kmVal(body?.startKm), end_km: kmVal(body?.endKm) })
+        .eq("id", body.id)
+        .eq("company_id", member.company_id);
+      if (error) return Response.json({ error: error.message }, { status: 500 });
+      return Response.json({ success: true });
     }
 
     // Ab hier: nur Owner/Admin/Projektleiter
@@ -192,21 +257,13 @@ export async function POST(request: Request) {
     if (action === "save") {
       const name = String(body?.name ?? "").trim().slice(0, 200);
       if (!name) return Response.json({ error: "Bezeichnung fehlt." }, { status: 400 });
-      const isVehicle = body?.type === "vehicle";
-      // Kilometerstand nur bei Fahrzeugen; leere Eingabe -> null.
-      const kmVal = (v: any): number | null => {
-        const s = String(v ?? "").trim().replace(",", ".");
-        if (!s) return null;
-        const n = Number(s);
-        return Number.isFinite(n) ? n : null;
-      };
+      // Hinweis: start_km/end_km werden hier NICHT gesetzt – die pflegt der zugewiesene
+      // Mitarbeiter ueber die Aktion "set_km".
       const row = {
-        type: isVehicle ? "vehicle" : "tool",
+        type: body?.type === "vehicle" ? "vehicle" : "tool",
         name,
         identifier: String(body?.identifier ?? "").trim().slice(0, 100),
         note: String(body?.note ?? "").trim().slice(0, 500),
-        start_km: isVehicle ? kmVal(body?.startKm) : null,
-        end_km: isVehicle ? kmVal(body?.endKm) : null,
       };
       if (body?.id) {
         const { error } = await supabaseAdmin
@@ -245,11 +302,16 @@ export async function POST(request: Request) {
       // Geraet muss zur eigenen Firma gehoeren
       const { data: eq } = await supabaseAdmin
         .from("equipment")
-        .select("id, company_id, assigned_to, assigned_to_name")
+        .select("id, company_id, type, assigned_to, assigned_to_name, start_km, end_km")
         .eq("id", body.id)
         .maybeSingle();
       if (!eq || eq.company_id !== member.company_id) {
         return Response.json({ error: "Gerät nicht gefunden." }, { status: 404 });
+      }
+
+      // Wechselt die Zuweisung (Rueckgabe oder anderer Mitarbeiter)? Dann km abschliessen.
+      if (eq.assigned_to && eq.assigned_to !== targetId) {
+        await finalizeVehicleKm(supabaseAdmin, member.company_id, eq, byName);
       }
 
       let targetName = "";

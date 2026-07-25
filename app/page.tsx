@@ -3833,7 +3833,7 @@ const EXTRA_LABELS: Record<string, Record<string, string>> = {
     planCancel: "Abbrechen", planPick: "— bitte wählen —",
     exportProjectLabel: "Projekt", exportTranslating: "Übersetze Tätigkeiten…",
     exportByEmployee: "Stunden Mitarbeiter", exportByProject: "Stunden Projekt",
-    kmStart: "Start-km", kmEnd: "End-km", kmDriven: "Gefahrene km",
+    kmStart: "Start-km", kmEnd: "End-km", kmDriven: "Gefahrene km", kmSave: "km speichern",
   },
   Englisch: {
     planTitle: "Planning", planNew: "New plan", planEquipment: "Equipment", planEmployee: "Employee",
@@ -3844,7 +3844,7 @@ const EXTRA_LABELS: Record<string, Record<string, string>> = {
     planCancel: "Cancel", planPick: "— please choose —",
     exportProjectLabel: "Project", exportTranslating: "Translating activities…",
     exportByEmployee: "Hours by employee", exportByProject: "Hours by project",
-    kmStart: "Start km", kmEnd: "End km", kmDriven: "Distance (km)",
+    kmStart: "Start km", kmEnd: "End km", kmDriven: "Distance (km)", kmSave: "Save km",
   },
 };
 
@@ -3977,7 +3977,9 @@ export default function Home() {
   const [exportWeek, setExportWeek] = useState<string>("");
   const [exportProject, setExportProject] = useState<string>("");
   const [equipment, setEquipment] = useState<any[]>([]);
-  const [eqDraft, setEqDraft] = useState<{ id: string; type: string; name: string; identifier: string; note: string; startKm: string; endKm: string }>({ id: "", type: "tool", name: "", identifier: "", note: "", startKm: "", endKm: "" });
+  const [eqDraft, setEqDraft] = useState<{ id: string; type: string; name: string; identifier: string; note: string }>({ id: "", type: "tool", name: "", identifier: "", note: "" });
+  // km-Eingaben je Fahrzeug (durch den zugewiesenen Mitarbeiter / Chefs, direkt an der Karte).
+  const [eqKmDraft, setEqKmDraft] = useState<Record<string, { start: string; end: string }>>({});
   const [eqHistory, setEqHistory] = useState<Record<string, any[]>>({});
   const [eqOpenId, setEqOpenId] = useState<string | null>(null);
   const [eqTrans, setEqTrans] = useState<Record<string, string>>({});
@@ -4438,9 +4440,9 @@ export default function Home() {
   }
   async function saveEquipment() {
     if (!eqDraft.name.trim()) { setMessage(t.msgFillRequired); return; }
-    const data = await equipmentCall({ action: "save", id: eqDraft.id || undefined, type: eqDraft.type, name: eqDraft.name.trim(), identifier: eqDraft.identifier, note: eqDraft.note, startKm: eqDraft.startKm, endKm: eqDraft.endKm });
+    const data = await equipmentCall({ action: "save", id: eqDraft.id || undefined, type: eqDraft.type, name: eqDraft.name.trim(), identifier: eqDraft.identifier, note: eqDraft.note });
     if (data?.error) { setMessage("Fehler: " + data.error); return; }
-    setEqDraft({ id: "", type: "tool", name: "", identifier: "", note: "", startKm: "", endKm: "" });
+    setEqDraft({ id: "", type: "tool", name: "", identifier: "", note: "" });
     await loadEquipment();
     setMessage("\u2705 " + t.msgSaved);
   }
@@ -4498,6 +4500,13 @@ export default function Home() {
     if (data?.error) { setMessage(data.error); return; }
     if (eqPlanDraft.id === id) setEqPlanDraft({ id: "", equipmentId: "", userId: "", dateFrom: "", dateTo: "", note: "" });
     await loadEquipmentPlans();
+  }
+  // km fuer ein (zugewiesenes) Fahrzeug speichern – durch den Mitarbeiter oder Chefs.
+  async function setKm(id: string, start: string, end: string) {
+    const data = await equipmentCall({ action: "set_km", id, startKm: start, endKm: end });
+    if (data?.error) { setMessage(data.error); return; }
+    setEqKmDraft((prev) => { const n = { ...prev }; delete n[id]; return n; });
+    await loadEquipment();
   }
 
   // ── Stundenexport: Monatssummen je Mitarbeiter ──
@@ -7215,13 +7224,8 @@ export default function Home() {
                 </select>
                 <input placeholder={t.nameLabel} value={eqDraft.name} onChange={(e) => setEqDraft(p => ({ ...p, name: e.target.value }))} className="border p-2 rounded-lg text-black bg-white flex-1 min-w-[10rem]" />
                 <input placeholder={t.equipmentIdentifier} value={eqDraft.identifier} onChange={(e) => setEqDraft(p => ({ ...p, identifier: e.target.value }))} className="border p-2 rounded-lg text-black bg-white" />
-                {eqDraft.type === "vehicle" && (<>
-                  <input type="number" inputMode="numeric" placeholder={tx.kmStart} value={eqDraft.startKm} onChange={(e) => setEqDraft(p => ({ ...p, startKm: e.target.value }))} className="border p-2 rounded-lg text-black bg-white w-28" />
-                  <input type="number" inputMode="numeric" placeholder={tx.kmEnd} value={eqDraft.endKm} onChange={(e) => setEqDraft(p => ({ ...p, endKm: e.target.value }))} className="border p-2 rounded-lg text-black bg-white w-28" />
-                  {eqDraft.startKm !== "" && eqDraft.endKm !== "" && (<span className="text-sm text-gray-700 whitespace-nowrap">= {Math.max(0, (Number(String(eqDraft.endKm).replace(",", ".")) || 0) - (Number(String(eqDraft.startKm).replace(",", ".")) || 0))} {t.km}</span>)}
-                </>)}
                 <button type="button" onClick={saveEquipment} className="bg-cyan-700 text-white px-4 py-2.5 rounded-lg text-sm">{eqDraft.id ? `💾 ${t.saveBtn}` : `➕ ${t.materialAdd}`}</button>
-                {eqDraft.id && (<button type="button" onClick={() => setEqDraft({ id: "", type: "tool", name: "", identifier: "", note: "", startKm: "", endKm: "" })} className="bg-gray-200 px-4 py-2.5 rounded-lg text-sm">{t.cancelBtn}</button>)}
+                {eqDraft.id && (<button type="button" onClick={() => setEqDraft({ id: "", type: "tool", name: "", identifier: "", note: "" })} className="bg-gray-200 px-4 py-2.5 rounded-lg text-sm">{t.cancelBtn}</button>)}
               </div>
             )}
             <div className="flex gap-2 flex-wrap">
@@ -7258,17 +7262,32 @@ export default function Home() {
                           {companyUsers.map((m: any) => (<option key={m.user_id} value={m.user_id}>{m.full_name || m.email}</option>))}
                         </select>
                         {eq.assigned_to && (<button type="button" onClick={() => assignEquipment(eq.id, "")} className="bg-gray-200 px-3 py-2 rounded-lg text-sm">↩️ {t.equipmentReturn}</button>)}
-                        <button type="button" onClick={() => setEqDraft({ id: eq.id, type: eq.type || "tool", name: eq.name || "", identifier: eq.identifier || "", note: eq.note || "", startKm: eq.start_km != null ? String(eq.start_km) : "", endKm: eq.end_km != null ? String(eq.end_km) : "" })} className="text-xs px-2 py-1 rounded border">✏️</button>
+                        <button type="button" onClick={() => setEqDraft({ id: eq.id, type: eq.type || "tool", name: eq.name || "", identifier: eq.identifier || "", note: eq.note || "" })} className="text-xs px-2 py-1 rounded border">✏️</button>
                         <button type="button" onClick={() => deleteEquipment(eq.id)} className="text-xs px-2 py-1 rounded border text-red-600">🗑️</button>
                       </div>
                     )}
+                    {eq.type === "vehicle" && eq.assigned_to && (eq.assigned_to === user?.id || currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (() => {
+                      const s = eqKmDraft[eq.id]?.start ?? (eq.start_km != null ? String(eq.start_km) : "");
+                      const e2 = eqKmDraft[eq.id]?.end ?? (eq.end_km != null ? String(eq.end_km) : "");
+                      const upd = (patch: { start?: string; end?: string }) => setEqKmDraft(prev => ({ ...prev, [eq.id]: { start: prev[eq.id]?.start ?? (eq.start_km != null ? String(eq.start_km) : ""), end: prev[eq.id]?.end ?? (eq.end_km != null ? String(eq.end_km) : ""), ...patch } }));
+                      const driven = s !== "" && e2 !== "" ? Math.max(0, (Number(String(e2).replace(",", ".")) || 0) - (Number(String(s).replace(",", ".")) || 0)) : null;
+                      return (
+                        <div className="flex gap-2 flex-wrap items-center bg-cyan-50 border border-cyan-100 rounded-lg p-2">
+                          <span className="text-sm font-medium">🚗 km</span>
+                          <input type="number" inputMode="numeric" placeholder={tx.kmStart} value={s} onChange={(ev) => upd({ start: ev.target.value })} className="border p-2 rounded-lg text-black bg-white w-28" />
+                          <input type="number" inputMode="numeric" placeholder={tx.kmEnd} value={e2} onChange={(ev) => upd({ end: ev.target.value })} className="border p-2 rounded-lg text-black bg-white w-28" />
+                          {driven != null && <span className="text-sm text-gray-700 whitespace-nowrap">= {driven} {t.km}</span>}
+                          <button type="button" onClick={() => setKm(eq.id, s, e2)} className="bg-cyan-700 text-white px-3 py-2 rounded-lg text-sm">💾 {tx.kmSave}</button>
+                        </div>
+                      );
+                    })()}
                     {eqOpenId === eq.id && (
                       <div className="border-t pt-2 space-y-1">
                         {(eqHistory[eq.id] || []).length === 0 ? (
                           <p className="text-xs text-gray-500">–</p>
                         ) : (eqHistory[eq.id] || []).map((h: any) => (
                           <p key={h.id} className="text-xs text-gray-600">
-                            {h.action === "assigned" ? "➡️" : "↩️"} {h.user_name || "?"} · {new Date(h.at).toLocaleString("de-DE")}{h.by_name ? ` · ${h.by_name}` : ""}
+                            {h.action === "km" ? "🚗" : h.action === "assigned" ? "➡️" : "↩️"} {h.action === "km" ? (h.note || "") : (h.user_name || "?")} · {new Date(h.at).toLocaleString("de-DE")}{h.by_name ? ` · ${h.by_name}` : ""}
                           </p>
                         ))}
                       </div>
