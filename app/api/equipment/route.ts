@@ -441,6 +441,56 @@ export async function POST(request: Request) {
       return Response.json({ success: true });
     }
 
+    // ── Monats-Report: Nutzungs-Zeitraeume aus dem Verlauf rekonstruieren ──
+    if (action === "report") {
+      const { data: eqs } = await supabaseAdmin
+        .from("equipment")
+        .select("id, type, name, identifier")
+        .eq("company_id", member.company_id)
+        .limit(2000);
+      const { data: logs } = await supabaseAdmin
+        .from("equipment_log")
+        .select("equipment_id, action, user_name, note, at")
+        .eq("company_id", member.company_id)
+        .order("equipment_id", { ascending: true })
+        .order("at", { ascending: true })
+        .limit(10000);
+      const eqMap = new Map((eqs || []).map((e: any) => [e.id, e]));
+      const byEq = new Map<string, any[]>();
+      for (const l of logs || []) {
+        if (!byEq.has(l.equipment_id)) byEq.set(l.equipment_id, []);
+        byEq.get(l.equipment_id)!.push(l);
+      }
+      const parseKm = (note: any): number | null => {
+        const m = String(note || "").match(/Gefahren:\s*([\d.,]+)/);
+        return m ? (Number(m[1].replace(",", ".")) || 0) : null;
+      };
+      const periods: any[] = [];
+      for (const [eqId, list] of byEq) {
+        const eq = eqMap.get(eqId);
+        if (!eq) continue;
+        let open: { user_name: string; at: string } | null = null;
+        let pendingKm: number | null = null;
+        for (const l of list) {
+          if (l.action === "km") {
+            const k = parseKm(l.note);
+            if (k != null) pendingKm = k;
+          } else if (l.action === "assigned") {
+            if (open) {
+              periods.push({ type: eq.type, name: eq.name, identifier: eq.identifier, employee: open.user_name, start: open.at, end: l.at, km: pendingKm, damage: "" });
+              pendingKm = null;
+            }
+            open = { user_name: l.user_name, at: l.at };
+          } else if (l.action === "returned") {
+            periods.push({ type: eq.type, name: eq.name, identifier: eq.identifier, employee: open?.user_name || l.user_name, start: open?.at || null, end: l.at, km: pendingKm, damage: l.note || "" });
+            open = null; pendingKm = null;
+          }
+        }
+        if (open) periods.push({ type: eq.type, name: eq.name, identifier: eq.identifier, employee: open.user_name, start: open.at, end: null, km: pendingKm, damage: "", ongoing: true });
+      }
+      return Response.json({ periods });
+    }
+
     return Response.json({ error: "Unbekannte Aktion." }, { status: 400 });
   } catch (error) {
     return Response.json({ error: String(error) }, { status: 500 });

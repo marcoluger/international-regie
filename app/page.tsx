@@ -3838,6 +3838,8 @@ const EXTRA_LABELS: Record<string, Record<string, string>> = {
     returnPlaceholder: "z. B. Kratzer hinten links, Werkzeug defekt … (optional)",
     returnConfirm: "Zurückgeben", returnNoteHistory: "Rückgabe-Notiz",
     returnNoDamage: "Keine Beschädigung", returnDamage: "Beschädigung", returnOther: "Sonstiges",
+    eqReportTitle: "Monats-Export", eqReportVehicles: "Fahrzeuge CSV", eqReportTools: "Werkzeug CSV",
+    colFrom: "Von", colTo: "Bis", colDuration: "Dauer (Tage)", colDamage: "Beschädigung / Notiz", colOngoing: "läuft noch",
   },
   Englisch: {
     planTitle: "Planning", planNew: "New plan", planEquipment: "Equipment", planEmployee: "Employee",
@@ -3853,6 +3855,8 @@ const EXTRA_LABELS: Record<string, Record<string, string>> = {
     returnPlaceholder: "e.g. scratch rear left, tool broken … (optional)",
     returnConfirm: "Return", returnNoteHistory: "Return note",
     returnNoDamage: "No damage", returnDamage: "Damage", returnOther: "Other",
+    eqReportTitle: "Monthly export", eqReportVehicles: "Vehicles CSV", eqReportTools: "Tools CSV",
+    colFrom: "From", colTo: "To", colDuration: "Duration (days)", colDamage: "Damage / note", colOngoing: "ongoing",
   },
 };
 
@@ -3992,6 +3996,7 @@ export default function Home() {
   const [returnTarget, setReturnTarget] = useState<{ id: string; name: string } | null>(null);
   const [returnNote, setReturnNote] = useState<string>("");
   const [returnKind, setReturnKind] = useState<"none" | "damage" | "other">("none");
+  const [eqReportMonth, setEqReportMonth] = useState<string>(() => new Date().toISOString().slice(0, 7));
   const [eqHistory, setEqHistory] = useState<Record<string, any[]>>({});
   const [eqOpenId, setEqOpenId] = useState<string | null>(null);
   const [eqTrans, setEqTrans] = useState<Record<string, string>>({});
@@ -4487,6 +4492,41 @@ export default function Home() {
     setReturnTarget(null);
     setReturnNote("");
     setReturnKind("none");
+  }
+  // Monats-CSV je Kategorie (Fahrzeug/Werkzeug) aus den Nutzungs-Zeitraeumen.
+  async function downloadEquipmentCsv(kind: "vehicle" | "tool") {
+    const data = await equipmentCall({ action: "report" });
+    const periods: any[] = Array.isArray(data?.periods) ? data.periods : [];
+    const nowIso = new Date().toISOString();
+    const rows = periods
+      .filter((p) => (p.type || "tool") === kind)
+      .filter((p) => String(p.end || nowIso).slice(0, 7) === eqReportMonth)
+      .sort((a, b) => String(a.start || "").localeCompare(String(b.start || "")));
+    if (rows.length === 0) { setMessage(t.exportEmpty); return; }
+    const clean = (v: any) => String(v ?? "").replace(/;/g, ",").replace(/[\r\n]+/g, " ");
+    const fmtDate = (x: any) => (x ? new Date(x).toLocaleDateString("de-DE") : "");
+    const durDays = (p: any) => {
+      if (!p.start) return "";
+      const end = p.end ? new Date(p.end).getTime() : Date.now();
+      return csvNum(Math.max(0, (end - new Date(p.start).getTime()) / 86400000), 1);
+    };
+    const isVeh = kind === "vehicle";
+    const head = (isVeh
+      ? [t.equipmentVehicle, t.equipmentIdentifier, t.employee, tx.colFrom, tx.colTo, tx.colDuration, t.km, tx.colDamage]
+      : [t.equipmentTool, t.equipmentIdentifier, t.employee, tx.colFrom, tx.colTo, tx.colDuration, tx.colDamage]
+    ).join(";");
+    const lines = rows.map((p) => {
+      const base = [clean(p.name), clean(p.identifier), clean(p.employee), fmtDate(p.start), p.ongoing ? tx.colOngoing : fmtDate(p.end), durDays(p)];
+      return (isVeh ? [...base, p.km != null ? csvNum(p.km, 1) : "", clean(p.damage)] : [...base, clean(p.damage)]).join(";");
+    });
+    const csv = "\ufeff" + [head, ...lines].join("\r\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${isVeh ? "Fahrzeuge" : "Werkzeug"}_${eqReportMonth}.csv`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   }
   async function loadEquipmentHistory(id: string) {
     const data = await equipmentCall({ action: "history", id });
@@ -7348,6 +7388,18 @@ export default function Home() {
                 </div>
               </div>
             </div>
+          )}
+
+          {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
+          <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-3">
+            <h2 className="text-xl font-bold">📊 {tx.eqReportTitle}</h2>
+            <div className="flex gap-2 flex-wrap items-center">
+              <label className="text-sm font-medium">{t.exportMonth}</label>
+              <input type="month" value={eqReportMonth} onChange={(e) => setEqReportMonth(e.target.value)} className="border p-2 rounded-lg text-black bg-white" />
+              <button type="button" onClick={() => downloadEquipmentCsv("vehicle")} className="bg-cyan-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium">🚚 {tx.eqReportVehicles}</button>
+              <button type="button" onClick={() => downloadEquipmentCsv("tool")} className="bg-green-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium">🔧 {tx.eqReportTools}</button>
+            </div>
+          </section>
           )}
 
           {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
