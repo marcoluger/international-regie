@@ -112,6 +112,7 @@ type CompanyFeatures = {
 
 const texts = {
   Deutsch: {
+    navigate: "Navigation",
     absenceReported: "Gemeldet",
     absenceTab: "Urlaub & Abwesenheit", absenceVacation: "Urlaub", absenceSick: "Krankheit", absenceFrom: "Von", absenceTo: "Bis", absenceRequest: "Beantragen", absencePending: "Offen", absenceApproved: "Genehmigt", absenceRejected: "Abgelehnt", absenceApprove: "Genehmigen", absenceReject: "Ablehnen", absenceEmpty: "Keine Meldungen.",
     filterAll: "Alle",
@@ -354,6 +355,7 @@ const texts = {
     copyDone: "Arbeitsschritte wurden übernommen.",
   },
   Spanisch: {
+    navigate: "Cómo llegar",
     absenceReported: "Notificado",
     absenceTab: "Vacaciones y ausencias", absenceVacation: "Vacaciones", absenceSick: "Enfermedad", absenceFrom: "Desde", absenceTo: "Hasta", absenceRequest: "Solicitar", absencePending: "Abierto", absenceApproved: "Aprobado", absenceRejected: "Rechazado", absenceApprove: "Aprobar", absenceReject: "Rechazar", absenceEmpty: "No hay solicitudes.",
     filterAll: "Todos",
@@ -596,6 +598,7 @@ const texts = {
     copyDone: "Los pasos de trabajo se han aplicado.",
   },
   Rumänisch: {
+    navigate: "Navigare",
     absenceReported: "Raportat",
     absenceTab: "Concediu și absențe", absenceVacation: "Concediu", absenceSick: "Boală", absenceFrom: "De la", absenceTo: "Până la", absenceRequest: "Solicită", absencePending: "Deschis", absenceApproved: "Aprobat", absenceRejected: "Respins", absenceApprove: "Aprobă", absenceReject: "Respinge", absenceEmpty: "Nicio solicitare.",
     filterAll: "Toate",
@@ -838,6 +841,7 @@ const texts = {
     copyDone: "Etapele de lucru au fost preluate.",
   },
   Englisch: {
+    navigate: "Directions",
     absenceReported: "Reported",
     absenceTab: "Leave & absence", absenceVacation: "Vacation", absenceSick: "Sick leave", absenceFrom: "From", absenceTo: "To", absenceRequest: "Request", absencePending: "Open", absenceApproved: "Approved", absenceRejected: "Rejected", absenceApprove: "Approve", absenceReject: "Reject", absenceEmpty: "No requests.",
     filterAll: "All",
@@ -1080,6 +1084,7 @@ const texts = {
     copyDone: "Work steps have been applied.",
   },
   Italienisch: {
+    navigate: "Indicazioni",
     absenceReported: "Segnalato",
     absenceTab: "Ferie e assenze", absenceVacation: "Ferie", absenceSick: "Malattia", absenceFrom: "Dal", absenceTo: "Al", absenceRequest: "Richiedi", absencePending: "Aperto", absenceApproved: "Approvato", absenceRejected: "Rifiutato", absenceApprove: "Approva", absenceReject: "Rifiuta", absenceEmpty: "Nessuna richiesta.",
     filterAll: "Tutti",
@@ -1322,6 +1327,7 @@ const texts = {
     copyDone: "Le fasi di lavoro sono state applicate.",
   },
   Türkisch: {
+    navigate: "Yol tarifi",
     absenceReported: "Bildirildi",
     absenceTab: "İzin ve devamsızlık", absenceVacation: "İzin", absenceSick: "Hastalık", absenceFrom: "Başlangıç", absenceTo: "Bitiş", absenceRequest: "Talep et", absencePending: "Açık", absenceApproved: "Onaylandı", absenceRejected: "Reddedildi", absenceApprove: "Onayla", absenceReject: "Reddet", absenceEmpty: "Talep yok.",
     filterAll: "Tümü",
@@ -1564,6 +1570,7 @@ const texts = {
     copyDone: "İş adımları alındı.",
   },
   Ungarisch: {
+    navigate: "Navigáció",
     absenceReported: "Bejelentve",
     absenceTab: "Szabadság és távollét", absenceVacation: "Szabadság", absenceSick: "Betegség", absenceFrom: "Ettől", absenceTo: "Eddig", absenceRequest: "Igénylés", absencePending: "Nyitott", absenceApproved: "Jóváhagyva", absenceRejected: "Elutasítva", absenceApprove: "Jóváhagyás", absenceReject: "Elutasítás", absenceEmpty: "Nincs bejelentés.",
     filterAll: "Összes",
@@ -1806,6 +1813,7 @@ const texts = {
     copyDone: "A munkalépések átvéve.",
   },
   Tschechisch: {
+    navigate: "Navigace",
     absenceReported: "Nahlášeno",
     absenceTab: "Dovolená a nepřítomnost", absenceVacation: "Dovolená", absenceSick: "Nemoc", absenceFrom: "Od", absenceTo: "Do", absenceRequest: "Podat žádost", absencePending: "Otevřeno", absenceApproved: "Schváleno", absenceRejected: "Zamítnuto", absenceApprove: "Schválit", absenceReject: "Zamítnout", absenceEmpty: "Žádné žádosti.",
     filterAll: "Vše",
@@ -2048,6 +2056,7 @@ const texts = {
     copyDone: "Pracovní kroky byly převzaty.",
   },
   Ukrainisch: {
+    navigate: "Навігація",
     absenceReported: "Повідомлено",
     absenceTab: "Відпустка та відсутність", absenceVacation: "Відпустка", absenceSick: "Лікарняний", absenceFrom: "З", absenceTo: "До", absenceRequest: "Подати заявку", absencePending: "Відкрито", absenceApproved: "Затверджено", absenceRejected: "Відхилено", absenceApprove: "Затвердити", absenceReject: "Відхилити", absenceEmpty: "Немає заявок.",
     filterAll: "Усі",
@@ -2290,6 +2299,7 @@ const texts = {
     copyDone: "Робочі кроки перенесено.",
   },
   Bulgarisch: {
+    navigate: "Навигация",
     absenceReported: "Съобщено",
     absenceTab: "Отпуск и отсъствия", absenceVacation: "Отпуск", absenceSick: "Болничен", absenceFrom: "От", absenceTo: "До", absenceRequest: "Заяви", absencePending: "Отворена", absenceApproved: "Одобрена", absenceRejected: "Отхвърлена", absenceApprove: "Одобри", absenceReject: "Отхвърли", absenceEmpty: "Няма заявки.",
     filterAll: "Всички",
@@ -2532,6 +2542,7 @@ const texts = {
     copyDone: "Работните стъпки са прехвърлени.",
   },
   Serbisch: {
+    navigate: "Navigacija",
     absenceReported: "Prijavljeno",
     absenceTab: "Godišnji i odsustva", absenceVacation: "Godišnji odmor", absenceSick: "Bolovanje", absenceFrom: "Od", absenceTo: "Do", absenceRequest: "Podnesi zahtev", absencePending: "Otvoreno", absenceApproved: "Odobreno", absenceRejected: "Odbijeno", absenceApprove: "Odobri", absenceReject: "Odbij", absenceEmpty: "Nema prijava.",
     filterAll: "Sve",
@@ -2774,6 +2785,7 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Kroatisch: {
+    navigate: "Navigacija",
     absenceReported: "Prijavljeno",
     absenceTab: "Godišnji i izostanci", absenceVacation: "Godišnji odmor", absenceSick: "Bolovanje", absenceFrom: "Od", absenceTo: "Do", absenceRequest: "Podnesi zahtjev", absencePending: "Otvoreno", absenceApproved: "Odobreno", absenceRejected: "Odbijeno", absenceApprove: "Odobri", absenceReject: "Odbij", absenceEmpty: "Nema prijava.",
     filterAll: "Sve",
@@ -3016,6 +3028,7 @@ const texts = {
     copyDone: "Radni koraci su preuzeti.",
   },
   Slowenisch: {
+    navigate: "Navigacija",
     absenceReported: "Prijavljeno",
     absenceTab: "Dopust in odsotnosti", absenceVacation: "Dopust", absenceSick: "Bolniška", absenceFrom: "Od", absenceTo: "Do", absenceRequest: "Oddaj vlogo", absencePending: "Odprto", absenceApproved: "Odobreno", absenceRejected: "Zavrnjeno", absenceApprove: "Odobri", absenceReject: "Zavrni", absenceEmpty: "Ni prijav.",
     filterAll: "Vse",
@@ -3258,6 +3271,7 @@ const texts = {
     copyDone: "Delovni koraki so prevzeti.",
   },
   Polnisch: {
+    navigate: "Nawigacja",
     absenceReported: "Zgłoszone",
     absenceTab: "Urlop i nieobecności", absenceVacation: "Urlop", absenceSick: "Choroba", absenceFrom: "Od", absenceTo: "Do", absenceRequest: "Złóż wniosek", absencePending: "Otwarte", absenceApproved: "Zatwierdzone", absenceRejected: "Odrzucone", absenceApprove: "Zatwierdź", absenceReject: "Odrzuć", absenceEmpty: "Brak zgłoszeń.",
     filterAll: "Wszystkie",
@@ -6205,6 +6219,16 @@ export default function Home() {
     const zc = [p?.zip, p?.city].filter(Boolean).map((x: any) => String(x).trim()).join(" ");
     return [p?.site, p?.street, zc].map((x: any) => (x || "").toString().trim()).filter(Boolean).join(", ");
   }
+  // Reine Navigations-Adresse (Straße + PLZ/Ort; ohne Baustellen-Name, damit Maps sauber findet).
+  function projectNavAddress(p: any): string {
+    const zc = [p?.zip, p?.city].filter(Boolean).map((x: any) => String(x).trim()).join(" ");
+    const parts = [p?.street, zc].map((x: any) => (x || "").toString().trim()).filter(Boolean);
+    if (parts.length === 0 && p?.site) parts.push(String(p.site).trim());
+    return parts.join(", ");
+  }
+  function projectNavUrl(p: any): string {
+    return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(projectNavAddress(p))}`;
+  }
 
   // Liefert die Projekte, die in einem Bericht vorkommen (fuer die Anzeige hinter dem Namen).
   function reportProjects(r: any): string {
@@ -7244,8 +7268,9 @@ export default function Home() {
                 ) : (
                 <p>{t.projectManager}: {project.project_manager || "-"}</p>
                 )}
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   <button type="button" onClick={() => setSelectedProjectDetailId(project.id === selectedProjectDetailId ? "" : project.id)} className="bg-gray-700 text-white px-3 py-2.5 rounded-lg">{project.id === selectedProjectDetailId ? t.closeProject : t.openProject}</button>
+                  {projectNavAddress(project) && (<a href={projectNavUrl(project)} target="_blank" rel="noopener noreferrer" className="bg-blue-600 text-white px-3 py-2.5 rounded-lg inline-flex items-center">🧭 {tx.navigate}</a>)}
                   {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => startEditProject(project)} className="bg-amber-600 text-white px-3 py-2.5 rounded-lg">✏️ {t.editBtn}</button>)}
                   <button type="button" onClick={() => deleteProject(project.id)} className="bg-red-600 text-white px-3 py-2.5 rounded-lg">{t.deleteProject}</button>
                 </div>
