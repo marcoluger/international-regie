@@ -254,6 +254,43 @@ export async function POST(request: Request) {
       return Response.json({ success: true });
     }
 
+    // ── Zurueckgeben (leeres userId): der aktuelle Besitzer selbst ODER ein Chef ──
+    if (action === "assign" && !body?.userId) {
+      if (!body?.id) return Response.json({ error: "id fehlt." }, { status: 400 });
+      const { data: eq } = await supabaseAdmin
+        .from("equipment")
+        .select("id, company_id, type, assigned_to, assigned_to_name, start_km, end_km")
+        .eq("id", body.id)
+        .maybeSingle();
+      if (!eq || eq.company_id !== member.company_id) {
+        return Response.json({ error: "Gerät nicht gefunden." }, { status: 404 });
+      }
+      if (!isManager && eq.assigned_to !== caller.id) {
+        return Response.json({ error: "Keine Berechtigung." }, { status: 403 });
+      }
+      // km abschliessen (Fahrzeug), dann freigeben.
+      if (eq.assigned_to) {
+        await finalizeVehicleKm(supabaseAdmin, member.company_id, eq, byName);
+      }
+      const { error } = await supabaseAdmin
+        .from("equipment")
+        .update({ assigned_to: null, assigned_to_name: null, assigned_at: null })
+        .eq("id", body.id)
+        .eq("company_id", member.company_id);
+      if (error) return Response.json({ error: error.message }, { status: 500 });
+      const returnNote = String(body?.note ?? "").trim().slice(0, 500);
+      await supabaseAdmin.from("equipment_log").insert({
+        company_id: member.company_id,
+        equipment_id: body.id,
+        action: "returned",
+        user_id: null,
+        user_name: eq.assigned_to_name || "",
+        by_name: byName,
+        note: returnNote || null,
+      });
+      return Response.json({ success: true });
+    }
+
     // Ab hier: nur Owner/Admin/Projektleiter
     if (!isManager) {
       return Response.json({ error: "Keine Berechtigung." }, { status: 403 });

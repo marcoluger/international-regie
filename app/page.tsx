@@ -7354,6 +7354,11 @@ export default function Home() {
                         <button type="button" onClick={() => deleteEquipment(eq.id)} className="text-xs px-2 py-1 rounded border text-red-600">🗑️</button>
                       </div>
                     )}
+                    {eq.assigned_to && eq.assigned_to === user?.id && !(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
+                      <div className="flex gap-2 flex-wrap items-center">
+                        <button type="button" onClick={() => requestReturn(eq)} className="bg-gray-200 px-3 py-2 rounded-lg text-sm">↩️ {t.equipmentReturn}</button>
+                      </div>
+                    )}
                     {eq.type === "vehicle" && eq.assigned_to && (eq.assigned_to === user?.id || currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (() => {
                       const s = eqKmDraft[eq.id]?.start ?? (eq.start_km != null ? String(eq.start_km) : "");
                       const e2 = eqKmDraft[eq.id]?.end ?? (eq.end_km != null ? String(eq.end_km) : "");
