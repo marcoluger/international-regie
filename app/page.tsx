@@ -6229,6 +6229,16 @@ export default function Home() {
   function projectNavUrl(p: any): string {
     return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(projectNavAddress(p))}`;
   }
+  // Navigations-Adresse einer Arbeitsanweisung (Straße + PLZ/Ort; sonst Baustelle).
+  function instructionNavAddress(i: any): string {
+    const zc = [i?.zip, i?.city].filter(Boolean).map((x: any) => String(x).trim()).join(" ");
+    const parts = [i?.street, zc].map((x: any) => (x || "").toString().trim()).filter(Boolean);
+    if (parts.length === 0 && i?.site) parts.push(String(i.site).trim());
+    return parts.join(", ");
+  }
+  function instructionNavUrl(i: any): string {
+    return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(instructionNavAddress(i))}`;
+  }
 
   // Liefert die Projekte, die in einem Bericht vorkommen (fuer die Anzeige hinter dem Namen).
   function reportProjects(r: any): string {
@@ -7270,7 +7280,6 @@ export default function Home() {
                 )}
                 <div className="flex gap-2 flex-wrap">
                   <button type="button" onClick={() => setSelectedProjectDetailId(project.id === selectedProjectDetailId ? "" : project.id)} className="bg-gray-700 text-white px-3 py-2.5 rounded-lg">{project.id === selectedProjectDetailId ? t.closeProject : t.openProject}</button>
-                  {projectNavAddress(project) && (<a href={projectNavUrl(project)} target="_blank" rel="noopener noreferrer" className="bg-blue-600 text-white px-3 py-2.5 rounded-lg inline-flex items-center">🧭 {tx.navigate}</a>)}
                   {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => startEditProject(project)} className="bg-amber-600 text-white px-3 py-2.5 rounded-lg">✏️ {t.editBtn}</button>)}
                   <button type="button" onClick={() => deleteProject(project.id)} className="bg-red-600 text-white px-3 py-2.5 rounded-lg">{t.deleteProject}</button>
                 </div>
@@ -7429,6 +7438,7 @@ export default function Home() {
                           <p className="text-sm text-gray-600">{t.site}: {instruction.site || "-"}</p>
                           {(instruction.street || instruction.zip || instruction.city) && (<p className="text-sm text-gray-600">{[instruction.street, [instruction.zip, instruction.city].filter(Boolean).join(" ")].filter(Boolean).join(", ")}</p>)}
                           <div className="flex gap-2 flex-wrap">
+                            {instructionNavAddress(instruction) && (<a href={instructionNavUrl(instruction)} target="_blank" rel="noopener noreferrer" className="bg-blue-600 text-white px-3 py-2.5 rounded-lg text-sm inline-flex items-center">🧭 {tx.navigate}</a>)}
                             <button type="button" onClick={() => createInstructionPDF(instruction)} className="bg-slate-700 text-white px-3 py-2.5 rounded-lg text-sm">📄 PDF</button>
                             {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => startEditInstruction(instruction)} className="bg-amber-600 text-white px-3 py-2.5 rounded-lg text-sm">✏️ {t.loadEdit}</button>)}
                             {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => deleteWorkInstruction(instruction.id)} className="bg-red-600 text-white px-3 py-2.5 rounded-lg text-sm">{t.deleteInstruction}</button>)}
@@ -8073,6 +8083,7 @@ export default function Home() {
                 {renderReadStatus(instruction)}
                 {openDayCards[instruction.id] && (<>
                 <p><strong>{t.customer}:</strong> {instruction.customer || "-"}</p>
+                {instructionNavAddress(instruction) && (<a href={instructionNavUrl(instruction)} target="_blank" rel="noopener noreferrer" className="bg-blue-600 text-white px-3 py-2.5 rounded-lg text-sm inline-flex items-center w-fit">🧭 {tx.navigate}</a>)}
                 {instruction.problems_text && (<div className="bg-yellow-50 border rounded-lg p-2"><strong>{t.problemsHints}:</strong> {getTranslated(instruction.id, "problems_text", instruction.problems_text)}</div>)}
                 {instruction.material && (<div className="bg-cyan-50 border rounded-lg p-2"><strong>{t.material}:</strong> {getTranslated(instruction.id, "material", instruction.material)}</div>)}
                 {instruction.werkzeug && (<div className="bg-green-50 border rounded-lg p-2"><strong>{t.werkzeug}:</strong> {getTranslated(instruction.id, "werkzeug", instruction.werkzeug)}</div>)}
