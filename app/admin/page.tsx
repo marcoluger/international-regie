@@ -382,7 +382,7 @@ export default function AdminPage() {
       }
 
       doc.setFont("helvetica", "normal"); doc.setFontSize(10);
-      doc.text(`Jährlich: ${(total * 12).toFixed(2)} EUR netto — mit 2 Monaten gratis: ${(total * 10).toFixed(2)} EUR netto`, L, y); y += 9;
+      doc.text(`Jährlich: ${(total * 12).toFixed(2)} EUR netto — mit 1 Monat gratis: ${(total * 11).toFixed(2)} EUR netto`, L, y); y += 9;
       doc.setDrawColor(220); doc.line(L, y, R, y); y += 6;
       doc.setFontSize(9.5); doc.setTextColor(90);
       for (const ln of [
@@ -670,7 +670,7 @@ export default function AdminPage() {
                 <div className="border-t border-white/25 mt-3 pt-3 flex justify-between items-baseline">
                   <span>pro Monat</span><span><span className="text-3xl font-extrabold tabular-nums">{total}</span> €</span>
                 </div>
-                <p className="text-emerald-100/80 text-xs mt-2">Jährlich: {total * 12} € · mit 2 Monaten gratis: {total * 10} €</p>
+                <p className="text-emerald-100/80 text-xs mt-2">Jährlich: {total * 12} € · mit 1 Monat gratis: {total * 11} €</p>
                 <div className="border-t border-white/20 mt-3 pt-3 space-y-2">
                   <input value={calcCustomer} onChange={(e) => setCalcCustomer(e.target.value)} placeholder="Kunde / Firma (optional)" className="w-full text-black text-sm p-2 rounded" />
                   <div className="flex gap-2">
