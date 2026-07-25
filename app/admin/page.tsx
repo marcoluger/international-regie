@@ -882,7 +882,8 @@ export default function AdminPage() {
                     </div>
                   </div>
                   {(() => {
-                    const { items, total } = computeMonthlyPrice(prices, { employeeCount: users.length, moduleFlags: features, langCount: (features.allowed_languages || []).length });
+                    const licensedSeats = Number(features.max_employees) || users.length || 1;
+                    const { items, total } = computeMonthlyPrice(prices, { employeeCount: licensedSeats, moduleFlags: features, langCount: (features.allowed_languages || []).length });
                     return (
                       <div>
                         <h3 className="font-bold mb-3">💶 Preis-Vorschlag (netto / Monat)</h3>
@@ -899,7 +900,7 @@ export default function AdminPage() {
                             <span>Gesamt / Monat</span>
                             <span className="tabular-nums">{total} €</span>
                           </div>
-                          <p className="text-xs text-gray-500 mt-2">Berechnet aus aktivierten Modulen, {users.length} Mitarbeiter und {(features.allowed_languages || []).length} Sprache(n). Grundlage: PRICING im Code.</p>
+                          <p className="text-xs text-gray-500 mt-2">Größenstufe nach „Max. Mitarbeiter" ({features.max_employees || "?"}), plus aktivierte Module und {(features.allowed_languages || []).length} Sprache(n).</p>
                         </div>
                       </div>
                     );
