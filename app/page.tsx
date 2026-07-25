@@ -3837,6 +3837,7 @@ const EXTRA_LABELS: Record<string, Record<string, string>> = {
     returnTitle: "Rückgabe", returnQuestion: "Beschädigung oder Besonderheit?",
     returnPlaceholder: "z. B. Kratzer hinten links, Werkzeug defekt … (optional)",
     returnConfirm: "Zurückgeben", returnNoteHistory: "Rückgabe-Notiz",
+    returnNoDamage: "Keine Beschädigung", returnDamage: "Beschädigung", returnOther: "Sonstiges",
   },
   Englisch: {
     planTitle: "Planning", planNew: "New plan", planEquipment: "Equipment", planEmployee: "Employee",
@@ -3851,6 +3852,7 @@ const EXTRA_LABELS: Record<string, Record<string, string>> = {
     returnTitle: "Return", returnQuestion: "Damage or anything notable?",
     returnPlaceholder: "e.g. scratch rear left, tool broken … (optional)",
     returnConfirm: "Return", returnNoteHistory: "Return note",
+    returnNoDamage: "No damage", returnDamage: "Damage", returnOther: "Other",
   },
 };
 
@@ -3989,6 +3991,7 @@ export default function Home() {
   // Rueckgabe-Nachfrage (Beschaedigung / Besonderheit) fuer Fahrzeuge & Werkzeuge.
   const [returnTarget, setReturnTarget] = useState<{ id: string; name: string } | null>(null);
   const [returnNote, setReturnNote] = useState<string>("");
+  const [returnKind, setReturnKind] = useState<"none" | "damage" | "other">("none");
   const [eqHistory, setEqHistory] = useState<Record<string, any[]>>({});
   const [eqOpenId, setEqOpenId] = useState<string | null>(null);
   const [eqTrans, setEqTrans] = useState<Record<string, string>>({});
@@ -4469,14 +4472,21 @@ export default function Home() {
   // Rueckgabe mit Nachfrage nach Beschaedigung/Besonderheit.
   function requestReturn(eq: any) {
     setReturnNote("");
+    setReturnKind("none");
     setReturnTarget({ id: eq.id, name: eqTrans[eq.id] || eq.name || "" });
   }
   async function confirmReturn() {
     const tgt = returnTarget;
     if (!tgt) return;
-    await assignEquipment(tgt.id, "", returnNote.trim());
+    const txt = returnNote.trim();
+    let note = "";
+    if (returnKind === "none") note = tx.returnNoDamage;
+    else if (returnKind === "damage") note = txt ? `${tx.returnDamage}: ${txt}` : tx.returnDamage;
+    else note = txt ? `${tx.returnOther}: ${txt}` : tx.returnOther;
+    await assignEquipment(tgt.id, "", note);
     setReturnTarget(null);
     setReturnNote("");
+    setReturnKind("none");
   }
   async function loadEquipmentHistory(id: string) {
     const data = await equipmentCall({ action: "history", id });
@@ -7324,9 +7334,16 @@ export default function Home() {
               <div className="bg-white rounded-2xl p-4 w-full max-w-md space-y-3 text-black shadow-xl" onClick={(ev) => ev.stopPropagation()}>
                 <h3 className="text-lg font-bold">↩️ {tx.returnTitle}: {returnTarget.name}</h3>
                 <p className="text-sm text-gray-700">{tx.returnQuestion}</p>
-                <textarea value={returnNote} onChange={(ev) => setReturnNote(ev.target.value)} placeholder={tx.returnPlaceholder} rows={3} className="border p-2 rounded-lg w-full text-black bg-white" />
+                <div className="space-y-1">
+                  <label className="flex items-center gap-2 text-sm cursor-pointer"><input type="radio" name="returnKind" checked={returnKind === "none"} onChange={() => setReturnKind("none")} /> ✅ {tx.returnNoDamage}</label>
+                  <label className="flex items-center gap-2 text-sm cursor-pointer"><input type="radio" name="returnKind" checked={returnKind === "damage"} onChange={() => setReturnKind("damage")} /> ⚠️ {tx.returnDamage}</label>
+                  <label className="flex items-center gap-2 text-sm cursor-pointer"><input type="radio" name="returnKind" checked={returnKind === "other"} onChange={() => setReturnKind("other")} /> 📝 {tx.returnOther}</label>
+                </div>
+                {returnKind !== "none" && (
+                  <textarea value={returnNote} onChange={(ev) => setReturnNote(ev.target.value)} placeholder={tx.returnPlaceholder} rows={3} className="border p-2 rounded-lg w-full text-black bg-white" />
+                )}
                 <div className="flex gap-2 justify-end">
-                  <button type="button" onClick={() => { setReturnTarget(null); setReturnNote(""); }} className="bg-gray-200 px-4 py-2 rounded-lg text-sm">{tx.planCancel}</button>
+                  <button type="button" onClick={() => { setReturnTarget(null); setReturnNote(""); setReturnKind("none"); }} className="bg-gray-200 px-4 py-2 rounded-lg text-sm">{tx.planCancel}</button>
                   <button type="button" onClick={confirmReturn} className="bg-cyan-700 text-white px-4 py-2 rounded-lg text-sm">↩️ {tx.returnConfirm}</button>
                 </div>
               </div>
