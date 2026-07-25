@@ -7352,8 +7352,9 @@ export default function Home() {
           <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-3">
             <h2 className="text-xl font-bold">📊 {t.exportTab}</h2>
             <div className="space-y-3">
-              {/* Filter: Monat + Kalenderwoche (gelten fuer beide Exporte) */}
+              {/* Zeile 1: Stunden nach Mitarbeiter – inkl. Monat/Woche (gelten fuer beide Exporte) */}
               <div className="flex gap-2 flex-wrap items-center">
+                <span className="text-sm font-semibold w-full sm:w-44">👤 {tx.exportByEmployee}</span>
                 <label className="text-sm font-medium">{t.exportMonth}</label>
                 <input type="month" value={exportMonth} onChange={(e) => { setExportMonth(e.target.value); setExportWeek(""); setExportProject(""); }} className="border p-2 rounded-lg text-black bg-white" />
                 <select value={exportWeek} onChange={(e) => { setExportWeek(e.target.value); setExportProject(""); }} className="border p-2 rounded-lg text-black bg-white">
@@ -7361,10 +7362,6 @@ export default function Home() {
                   {weeksInMonth(exportMonth).map((w) => (<option key={w} value={w}>{w}</option>))}
                 </select>
                 <button type="button" onClick={loadTeamReports} className="bg-gray-200 px-3 py-2.5 rounded-lg text-sm">🔄</button>
-              </div>
-              {/* Zeile 1: Stunden nach Mitarbeiter */}
-              <div className="flex gap-2 flex-wrap items-center border-t pt-3">
-                <span className="text-sm font-semibold w-full sm:w-44">👤 {tx.exportByEmployee}</span>
                 <button type="button" onClick={() => downloadHoursCsv()} className="bg-green-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium">⬇️ {t.exportDownload}</button>
               </div>
               {/* Zeile 2: Stunden nach Projekt */}
