@@ -2,6 +2,16 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { rateLimit } from "../../../lib/rateLimit";
 
+// Sprachnamen aus dem Sprachwaehler, die die KI sonst missversteht, eindeutig machen.
+// (z. B. "Indisch" -> Hindi). Wird auf from-/toLanguage angewendet.
+const LANG_ALIASES: Record<string, string> = {
+  Indisch: "Hindi (in Devanagari-Schrift)",
+  Philippinisch: "Filipino (Tagalog)",
+};
+function normLang(l: string): string {
+  return LANG_ALIASES[l] || l;
+}
+
 // /api/translate
 // Uebersetzt Text von fromLanguage nach toLanguage – in BEIDE Richtungen.
 // Mit Datenbank-Cache: jeder Text wird pro Zielsprache nur EINMAL an OpenAI geschickt,
@@ -61,8 +71,8 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const description: string = body?.description ?? "";
-    const fromLanguage: string = body?.fromLanguage ?? "Deutsch";
-    const toLanguage: string = body?.toLanguage ?? "Deutsch";
+    const fromLanguage: string = normLang(body?.fromLanguage ?? "Deutsch");
+    const toLanguage: string = normLang(body?.toLanguage ?? "Deutsch");
 
     // Nichts zu uebersetzen
     if (!description || !description.trim()) {

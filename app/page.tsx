@@ -5793,6 +5793,11 @@ export default function Home() {
         if (taskText && !(sameLang && existing?.tasks?.[task.id])) {
           jobs.push({ instId: inst.id, storeKey: task.id, inTasks: true, text: taskText, sourceLang: "automatisch" });
         }
+        // Aufgaben-Notiz (Freitext vom Mitarbeiter) mit uebersetzen.
+        const noteText = (task.note || "").trim();
+        if (noteText && !(sameLang && existing?.tasks?.[`note_${task.id}`])) {
+          jobs.push({ instId: inst.id, storeKey: `note_${task.id}`, inTasks: true, text: noteText, sourceLang: "automatisch" });
+        }
         for (const entry of taskCommentList(task)) {
           const cBody = splitWeather(entry?.text || "").body.trim();
           if (!cBody) continue;
@@ -7130,7 +7135,7 @@ export default function Home() {
                             <div key={ri} className="flex items-center gap-2 text-sm">
                               <span>{icon}</span>
                               <span className={`flex-1 break-words ${s === "completed" ? "line-through text-gray-400" : ""}`}>{getTranslatedTask(r.inst.id, r.task.id, r.task.task_text)}</span>
-                              {r.date && r.date !== today ? (<span className={r.overdue ? "text-xs text-red-600 whitespace-nowrap" : "text-xs text-gray-500 whitespace-nowrap"}>{r.overdue ? t.dashOverdue + ": " : ""}{r.date}</span>) : (r.task.note ? (<span className="text-xs text-gray-500 whitespace-nowrap break-words">{r.task.note}</span>) : null)}
+                              {r.date && r.date !== today ? (<span className={r.overdue ? "text-xs text-red-600 whitespace-nowrap" : "text-xs text-gray-500 whitespace-nowrap"}>{r.overdue ? t.dashOverdue + ": " : ""}{r.date}</span>) : (r.task.note ? (<span className="text-xs text-gray-500 whitespace-nowrap break-words">{getTranslatedTask(r.inst.id, `note_${r.task.id}`, r.task.note)}</span>) : null)}
                               <button type="button" onClick={() => openInstructionFromDashboard(r.inst)} title={t.dashOpen} aria-label={t.dashOpen} className="text-cyan-700 hover:text-cyan-800 shrink-0 px-1 font-bold">→</button>
                             </div>
                           );
@@ -7307,7 +7312,7 @@ export default function Home() {
                         {instruction.street && <p><strong>{t.street}:</strong> {instruction.street}</p>}
                         {(instruction.zip || instruction.city) && <p><strong>{t.zip} / {t.city}:</strong> {[instruction.zip, instruction.city].filter(Boolean).join(" ")}</p>}
                         {instruction.problems_text && <p><strong>{t.problems}:</strong> {getTranslated(instruction.id, "problems_text", instruction.problems_text)}</p>}
-                        {(instruction.work_instruction_tasks || []).length > 0 && (<ul className="list-disc pl-6 space-y-1">{instruction.work_instruction_tasks.map((task: any) => (<li key={task.id}>{task.status === "completed" ? t.statusCompleted : task.status === "in_progress" ? t.statusInProgress : task.status === "stopped" ? t.statusStopped : t.statusOpen}{" "}{getTranslatedTask(instruction.id, task.id, task.task_text)}{task.note && <div className="text-sm text-gray-600 ml-2">{t.feedbackLabel}: {task.note}</div>}</li>))}</ul>)}
+                        {(instruction.work_instruction_tasks || []).length > 0 && (<ul className="list-disc pl-6 space-y-1">{instruction.work_instruction_tasks.map((task: any) => (<li key={task.id}>{task.status === "completed" ? t.statusCompleted : task.status === "in_progress" ? t.statusInProgress : task.status === "stopped" ? t.statusStopped : t.statusOpen}{" "}{getTranslatedTask(instruction.id, task.id, task.task_text)}{task.note && <div className="text-sm text-gray-600 ml-2">{t.feedbackLabel}: {getTranslatedTask(instruction.id, `note_${task.id}`, task.note)}</div>}</li>))}</ul>)}
                         {companyFeatures?.module_auto_reports ? (<button type="button" onClick={() => { setTransferInst(instruction); loadReportsFromDatabase(); }} className="bg-green-700 text-white px-3 py-2.5 rounded-lg">{t.toReport}</button>) : (<p className="text-sm text-gray-500">{t.autoReportLocked}</p>)}
                         <button type="button" onClick={() => createInstructionPDF(instruction)} className="bg-slate-700 text-white px-3 py-2.5 rounded-lg text-sm">📄 PDF</button>
                       </div>
@@ -8103,7 +8108,7 @@ export default function Home() {
                         </select>
                         <span className="font-medium">{getTranslatedTask(instruction.id, task.id, task.task_text)}</span>
                       </div>
-                      {task.note && <p className="text-sm text-gray-600 ml-2">{t.feedbackLabel}: {task.note}</p>}
+                      {task.note && <p className="text-sm text-gray-600 ml-2">{t.feedbackLabel}: {getTranslatedTask(instruction.id, `note_${task.id}`, task.note)}</p>}
                       {(task.photos || []).length > 0 && companyFeatures?.photos_enabled && (<div className="grid grid-cols-3 gap-1">{(task.photos || []).map((photo: string, pi: number) => (<img key={pi} src={photo} alt="Foto" className="w-full h-16 object-cover rounded-lg" />))}</div>)}
                       {/* Kommentare. Modul AN = offener Chat (alle sehen alles),
                           Modul AUS = privater Kommentar (jeder sieht nur seinen eigenen). */}
