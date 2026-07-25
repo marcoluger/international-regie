@@ -3832,6 +3832,7 @@ const EXTRA_LABELS: Record<string, Record<string, string>> = {
     planConflictText: "Dieses Gerät ist im gewählten Zeitraum bereits verplant:", planSaveAnyway: "Trotzdem speichern",
     planCancel: "Abbrechen", planPick: "— bitte wählen —",
     exportProjectLabel: "Projekt", exportTranslating: "Übersetze Tätigkeiten…",
+    exportByEmployee: "Stunden Mitarbeiter", exportByProject: "Stunden Projekt",
   },
   Englisch: {
     planTitle: "Planning", planNew: "New plan", planEquipment: "Equipment", planEmployee: "Employee",
@@ -3841,6 +3842,7 @@ const EXTRA_LABELS: Record<string, Record<string, string>> = {
     planConflictText: "This equipment is already planned for the selected period:", planSaveAnyway: "Save anyway",
     planCancel: "Cancel", planPick: "— please choose —",
     exportProjectLabel: "Project", exportTranslating: "Translating activities…",
+    exportByEmployee: "Hours by employee", exportByProject: "Hours by project",
   },
 };
 
@@ -7349,20 +7351,31 @@ export default function Home() {
         <div className="space-y-4">
           <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-3">
             <h2 className="text-xl font-bold">📊 {t.exportTab}</h2>
-            <div className="flex gap-2 flex-wrap items-center">
-              <label className="text-sm font-medium">{t.exportMonth}</label>
-              <input type="month" value={exportMonth} onChange={(e) => { setExportMonth(e.target.value); setExportWeek(""); setExportProject(""); }} className="border p-2 rounded-lg text-black bg-white" />
-              <select value={exportWeek} onChange={(e) => { setExportWeek(e.target.value); setExportProject(""); }} className="border p-2 rounded-lg text-black bg-white">
-                <option value="">{t.filterAll}</option>
-                {weeksInMonth(exportMonth).map((w) => (<option key={w} value={w}>{w}</option>))}
-              </select>
-              <select value={exportProject} onChange={(e) => setExportProject(e.target.value)} className="border p-2 rounded-lg text-black bg-white" title={tx.exportProjectLabel}>
-                <option value="">📁 {tx.exportProjectLabel}: {t.filterAll}</option>
-                {monthlyHoursByProject(exportMonth, exportWeek || undefined).map((g) => (<option key={g.project} value={g.project}>{g.project}</option>))}
-              </select>
-              <button type="button" onClick={loadTeamReports} className="bg-gray-200 px-3 py-2.5 rounded-lg text-sm">🔄</button>
-              <button type="button" onClick={() => downloadHoursCsv()} className="bg-green-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium">⬇️ {t.exportDownload} ({t.filterAll})</button>
-              <button type="button" onClick={() => downloadProjectCsv()} className="bg-cyan-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium">📁 {t.exportDownload} ({exportProject || t.hoursPerProject})</button>
+            <div className="space-y-3">
+              {/* Filter: Monat + Kalenderwoche (gelten fuer beide Exporte) */}
+              <div className="flex gap-2 flex-wrap items-center">
+                <label className="text-sm font-medium">{t.exportMonth}</label>
+                <input type="month" value={exportMonth} onChange={(e) => { setExportMonth(e.target.value); setExportWeek(""); setExportProject(""); }} className="border p-2 rounded-lg text-black bg-white" />
+                <select value={exportWeek} onChange={(e) => { setExportWeek(e.target.value); setExportProject(""); }} className="border p-2 rounded-lg text-black bg-white">
+                  <option value="">{t.filterAll}</option>
+                  {weeksInMonth(exportMonth).map((w) => (<option key={w} value={w}>{w}</option>))}
+                </select>
+                <button type="button" onClick={loadTeamReports} className="bg-gray-200 px-3 py-2.5 rounded-lg text-sm">🔄</button>
+              </div>
+              {/* Zeile 1: Stunden nach Mitarbeiter */}
+              <div className="flex gap-2 flex-wrap items-center border-t pt-3">
+                <span className="text-sm font-semibold w-full sm:w-44">👤 {tx.exportByEmployee}</span>
+                <button type="button" onClick={() => downloadHoursCsv()} className="bg-green-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium">⬇️ {t.exportDownload}</button>
+              </div>
+              {/* Zeile 2: Stunden nach Projekt */}
+              <div className="flex gap-2 flex-wrap items-center border-t pt-3">
+                <span className="text-sm font-semibold w-full sm:w-44">📁 {tx.exportByProject}</span>
+                <select value={exportProject} onChange={(e) => setExportProject(e.target.value)} className="border p-2 rounded-lg text-black bg-white" title={tx.exportProjectLabel}>
+                  <option value="">{tx.exportProjectLabel}: {t.filterAll}</option>
+                  {monthlyHoursByProject(exportMonth, exportWeek || undefined).map((g) => (<option key={g.project} value={g.project}>{g.project}</option>))}
+                </select>
+                <button type="button" onClick={() => downloadProjectCsv()} className="bg-cyan-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium">⬇️ {t.exportDownload}</button>
+              </div>
             </div>
             {gruppen.length === 0 ? (
               <p className="text-gray-500">{t.exportEmpty}</p>
