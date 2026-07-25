@@ -130,7 +130,7 @@ export default function AdminPage() {
   const [calcMods, setCalcMods] = useState<Record<string, boolean>>({});
   const [calcCustomer, setCalcCustomer] = useState("");
   const [calcOfferNr, setCalcOfferNr] = useState("");
-  const [calcVat, setCalcVat] = useState("20");
+  const [calcVat, setCalcVat] = useState("19");
   // Editierte Preise im Browser merken.
   useEffect(() => { try { const s = localStorage.getItem("regie_prices"); if (s) setPrices(JSON.parse(s)); } catch {} }, []);
   useEffect(() => { try { localStorage.setItem("regie_prices", JSON.stringify(prices)); } catch {} }, [prices]);
@@ -386,7 +386,7 @@ export default function AdminPage() {
       doc.setDrawColor(220); doc.line(L, y, R, y); y += 6;
       doc.setFontSize(9.5); doc.setTextColor(90);
       for (const ln of [
-        "Angebot freibleibend. 14 Tage kostenlos testen.",
+        "Angebot freibleibend.",
         "Alle Preise netto zzgl. gesetzlicher Umsatzsteuer. Laufzeit monatlich, sofern nicht anders vereinbart.",
         `Erstellt am ${new Date().toLocaleDateString("de-DE")}.`,
       ]) { doc.text(ln, L, y); y += 5; }
@@ -936,7 +936,7 @@ export default function AdminPage() {
                             {F("Vertragsnummer", "contract_number", "text", "z. B. V-2026-001")}
                             {F("Paket", "package", "text", "Starter / Team / Business")}
                             {F("Preis pro Monat (netto)", "monthly_price", "number", "z. B. 49")}
-                            {F("USt-Satz in %", "vat_rate", "number", "19 (DE) / 20 (AT)")}
+                            {F("USt-Satz in %", "vat_rate", "number", "19")}
                             {F("Vertragsbeginn", "start_date", "date")}
                             {F("Vertragsende (optional)", "end_date", "date")}
                             {F("Rechnungsempfänger", "customer_name", "text", "Firmenname")}
