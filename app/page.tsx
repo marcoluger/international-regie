@@ -3831,6 +3831,7 @@ const EXTRA_LABELS: Record<string, Record<string, string>> = {
     planPlanned: "geplant", planConflictTitle: "Achtung: Überschneidung",
     planConflictText: "Dieses Gerät ist im gewählten Zeitraum bereits verplant:", planSaveAnyway: "Trotzdem speichern",
     planCancel: "Abbrechen", planPick: "— bitte wählen —",
+    exportProjectLabel: "Projekt", exportTranslating: "Übersetze Tätigkeiten…",
   },
   Englisch: {
     planTitle: "Planning", planNew: "New plan", planEquipment: "Equipment", planEmployee: "Employee",
@@ -3839,6 +3840,7 @@ const EXTRA_LABELS: Record<string, Record<string, string>> = {
     planPlanned: "planned", planConflictTitle: "Warning: overlap",
     planConflictText: "This equipment is already planned for the selected period:", planSaveAnyway: "Save anyway",
     planCancel: "Cancel", planPick: "— please choose —",
+    exportProjectLabel: "Project", exportTranslating: "Translating activities…",
   },
 };
 
@@ -3969,6 +3971,7 @@ export default function Home() {
   const [exportMonth, setExportMonth] = useState<string>(() => new Date().toISOString().slice(0, 7));
   const [expCollapsed, setExpCollapsed] = useState<Record<string, boolean>>({});
   const [exportWeek, setExportWeek] = useState<string>("");
+  const [exportProject, setExportProject] = useState<string>("");
   const [equipment, setEquipment] = useState<any[]>([]);
   const [eqDraft, setEqDraft] = useState<{ id: string; type: string; name: string; identifier: string; note: string }>({ id: "", type: "tool", name: "", identifier: "", note: "" });
   const [eqHistory, setEqHistory] = useState<Record<string, any[]>>({});
@@ -4631,9 +4634,26 @@ export default function Home() {
     URL.revokeObjectURL(url);
   }
   // CSV nach Projekt gruppiert – alle Mitarbeiter zusammen, inkl. Taetigkeit.
-  function downloadProjectCsv() {
-    const gruppen = monthlyHoursByProject(exportMonth, exportWeek || undefined);
+  async function downloadProjectCsv() {
+    let gruppen = monthlyHoursByProject(exportMonth, exportWeek || undefined);
+    // Nur das gewaehlte Projekt (leer = alle).
+    if (exportProject) gruppen = gruppen.filter((g) => g.project === exportProject);
     if (gruppen.length === 0) { setMessage(t.exportEmpty); return; }
+
+    // Taetigkeiten in die eingestellte Sprache uebersetzen (Auto-Spracherkennung + Server-Cache).
+    let descMap: Record<string, string> = {};
+    const uniqueDescs = Array.from(new Set(
+      gruppen.flatMap((g) => g.days.map((d2: any) => String(d2.desc || "").trim())).filter(Boolean)
+    ));
+    if (uniqueDescs.length > 0) {
+      setMessage(tx.exportTranslating);
+      try {
+        descMap = await translateBatch(uniqueDescs.map((d) => ({ key: d, text: d })), "automatisch", uiLanguage);
+      } catch { /* ohne Uebersetzung weiter */ }
+      setMessage("");
+    }
+    const transDesc = (s: any) => { const k = String(s || "").trim(); return k ? (descMap[k] || k) : ""; };
+
     const clean = (v: any) => String(v ?? "").replace(/;/g, ",").replace(/[\r\n]+/g, " ");
     const head = [t.projectNumber, t.customer, t.employee, t.date, t.site, t.hours, `${t.travelTime} (h)`, t.km, t.description].join(";");
     const lines: string[] = [];
@@ -4642,7 +4662,7 @@ export default function Home() {
       for (const d2 of g.days) {
         lines.push([
           clean(g.project), clean(d2.customer), clean(d2.name), clean(d2.date), clean(d2.site),
-          csvNum(d2.hours), csvNum(d2.travelMin / 60), csvNum(d2.km, 1), clean(d2.desc),
+          csvNum(d2.hours), csvNum(d2.travelMin / 60), csvNum(d2.km, 1), clean(transDesc(d2.desc)),
         ].join(";"));
       }
       // Zwischensumme je Projekt
@@ -4656,7 +4676,8 @@ export default function Home() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `Projekte_${exportMonth}${exportWeek ? "_" + exportWeek.replace(/\s+/g, "") : ""}.csv`;
+    const projTag = exportProject ? "_" + exportProject.replace(/[^\wÄÖÜäöüß.-]+/g, "_") : "";
+    a.download = `Projekte${projTag}_${exportMonth}${exportWeek ? "_" + exportWeek.replace(/\s+/g, "") : ""}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -7330,14 +7351,18 @@ export default function Home() {
             <h2 className="text-xl font-bold">📊 {t.exportTab}</h2>
             <div className="flex gap-2 flex-wrap items-center">
               <label className="text-sm font-medium">{t.exportMonth}</label>
-              <input type="month" value={exportMonth} onChange={(e) => { setExportMonth(e.target.value); setExportWeek(""); }} className="border p-2 rounded-lg text-black bg-white" />
-              <select value={exportWeek} onChange={(e) => setExportWeek(e.target.value)} className="border p-2 rounded-lg text-black bg-white">
+              <input type="month" value={exportMonth} onChange={(e) => { setExportMonth(e.target.value); setExportWeek(""); setExportProject(""); }} className="border p-2 rounded-lg text-black bg-white" />
+              <select value={exportWeek} onChange={(e) => { setExportWeek(e.target.value); setExportProject(""); }} className="border p-2 rounded-lg text-black bg-white">
                 <option value="">{t.filterAll}</option>
                 {weeksInMonth(exportMonth).map((w) => (<option key={w} value={w}>{w}</option>))}
               </select>
+              <select value={exportProject} onChange={(e) => setExportProject(e.target.value)} className="border p-2 rounded-lg text-black bg-white" title={tx.exportProjectLabel}>
+                <option value="">📁 {tx.exportProjectLabel}: {t.filterAll}</option>
+                {monthlyHoursByProject(exportMonth, exportWeek || undefined).map((g) => (<option key={g.project} value={g.project}>{g.project}</option>))}
+              </select>
               <button type="button" onClick={loadTeamReports} className="bg-gray-200 px-3 py-2.5 rounded-lg text-sm">🔄</button>
               <button type="button" onClick={() => downloadHoursCsv()} className="bg-green-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium">⬇️ {t.exportDownload} ({t.filterAll})</button>
-              <button type="button" onClick={() => downloadProjectCsv()} className="bg-cyan-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium">📁 {t.exportDownload} ({t.hoursPerProject})</button>
+              <button type="button" onClick={() => downloadProjectCsv()} className="bg-cyan-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium">📁 {t.exportDownload} ({exportProject || t.hoursPerProject})</button>
             </div>
             {gruppen.length === 0 ? (
               <p className="text-gray-500">{t.exportEmpty}</p>
