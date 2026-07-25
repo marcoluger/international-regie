@@ -79,7 +79,8 @@ export async function GET(request: Request) {
     result.push({ ...company, features: features || null, users: users || [], owner_user_id: owner?.user_id || null, settings });
   }
   const { data: legalRow } = await supabaseAdmin.from("site_legal").select("*").eq("id", "main").maybeSingle();
-  return Response.json({ companies: result, legal: legalRow || { impressum: "", datenschutz: "" } });
+  const { data: pricingRow } = await supabaseAdmin.from("app_pricing").select("config").eq("id", "main").maybeSingle();
+  return Response.json({ companies: result, legal: legalRow || { impressum: "", datenschutz: "" }, pricing: pricingRow?.config || null });
 }
 
 export async function POST(request: Request) {
@@ -253,6 +254,12 @@ export async function POST(request: Request) {
   if (action === "saveLegal") {
     const { impressum, datenschutz } = body;
     const { error } = await supabaseAdmin.from("site_legal").upsert({ id: "main", impressum: impressum ?? "", datenschutz: datenschutz ?? "" }, { onConflict: "id" });
+    if (error) return Response.json({ error: error.message }, { status: 500 });
+    return Response.json({ success: true });
+  }
+
+  if (action === "savePricing") {
+    const { error } = await supabaseAdmin.from("app_pricing").upsert({ id: "main", config: body?.config ?? {} }, { onConflict: "id" });
     if (error) return Response.json({ error: error.message }, { status: 500 });
     return Response.json({ success: true });
   }

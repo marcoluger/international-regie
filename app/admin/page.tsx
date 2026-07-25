@@ -131,9 +131,7 @@ export default function AdminPage() {
   const [calcCustomer, setCalcCustomer] = useState("");
   const [calcOfferNr, setCalcOfferNr] = useState("");
   const [calcVat, setCalcVat] = useState("19");
-  // Editierte Preise im Browser merken.
-  useEffect(() => { try { const s = localStorage.getItem("regie_prices"); if (s) setPrices(JSON.parse(s)); } catch {} }, []);
-  useEffect(() => { try { localStorage.setItem("regie_prices", JSON.stringify(prices)); } catch {} }, [prices]);
+  const [savingPrices, setSavingPrices] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -184,10 +182,23 @@ export default function AdminPage() {
       setSettingsMap(smap);
       setLegalImpressum(data.legal?.impressum || "");
       setLegalDatenschutz(data.legal?.datenschutz || "");
+      // Zentral gespeicherte Preise (falls vorhanden) uebernehmen.
+      if (data.pricing && data.pricing.seatTiers && data.pricing.modules) setPrices(data.pricing);
       setMessage("");
     } catch (e: any) {
       setMessage("Fehler beim Laden: " + (e?.message || String(e)));
     }
+  }
+
+  async function savePricing() {
+    setSavingPrices(true); setMessage("");
+    try {
+      const res = await fetch("/api/admin-data", { method: "POST", headers: await authHeaders(), body: JSON.stringify({ action: "savePricing", config: prices }) });
+      const data = await res.json();
+      if (data.error) setMessage("Fehler: " + data.error);
+      else setMessage("✅ Preise gespeichert.");
+    } catch (e: any) { setMessage("Fehler: " + (e?.message || String(e))); }
+    setSavingPrices(false);
   }
 
   async function saveLegal() {
@@ -658,7 +669,12 @@ export default function AdminPage() {
                     ))}
                   </div>
                 </div>
-                {editPrices && (<button type="button" onClick={() => setPrices(JSON.parse(JSON.stringify(PRICING_DEFAULT)))} className="text-sm text-red-600 underline">Preise auf Standard zurücksetzen</button>)}
+                {editPrices && (
+                  <div className="flex items-center gap-4 flex-wrap">
+                    <button type="button" onClick={savePricing} disabled={savingPrices} className="bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-bold disabled:opacity-50">{savingPrices ? "Speichert…" : "💾 Preise speichern"}</button>
+                    <button type="button" onClick={() => setPrices(JSON.parse(JSON.stringify(PRICING_DEFAULT)))} className="text-sm text-red-600 underline">Auf Standard zurücksetzen</button>
+                  </div>
+                )}
               </div>
               <div className="bg-emerald-900 text-white rounded-xl p-4 h-fit md:sticky md:top-4">
                 <h3 className="font-bold text-emerald-100 mb-2">Dein Preis</h3>
@@ -681,7 +697,7 @@ export default function AdminPage() {
                 </div>
               </div>
             </div>
-            <p className="text-xs text-gray-500">Vorschlagspreise (netto). Über „Preise bearbeiten" anpassbar – Änderungen werden im Browser gespeichert.</p>
+            <p className="text-xs text-gray-500">Vorschlagspreise (netto). Über „Preise bearbeiten" anpassen und mit „💾 Preise speichern" zentral sichern – gilt dann auf allen Geräten.</p>
           </section>
         );
       })()}
