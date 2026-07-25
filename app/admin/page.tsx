@@ -119,6 +119,9 @@ export default function AdminPage() {
   const [calcEmp, setCalcEmp] = useState(5);
   const [calcLang, setCalcLang] = useState(1);
   const [calcMods, setCalcMods] = useState<Record<string, boolean>>({});
+  const [calcCustomer, setCalcCustomer] = useState("");
+  const [calcOfferNr, setCalcOfferNr] = useState("");
+  const [calcVat, setCalcVat] = useState("20");
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -319,6 +322,68 @@ export default function AdminPage() {
     doc.text(`Erstellt am ${new Date().toLocaleDateString("de-DE")}`, L, y);
     doc.setTextColor(0);
     return doc;
+  }
+
+  // Angebot aus dem Preis-Rechner als PDF erzeugen.
+  async function downloadOfferPdf() {
+    try {
+      const { jsPDF } = await import("jspdf");
+      const calcFeatures: any = { ...calcMods, allowed_languages: Array.from({ length: calcLang }) };
+      const { items, total } = computeMonthlyPrice(calcFeatures, calcEmp);
+      const vat = calcVat !== "" ? Number(calcVat) : null;
+      const doc = new jsPDF();
+      const L = 20, R = 190;
+      let y = 22;
+
+      doc.setFontSize(18); doc.setFont("helvetica", "bold");
+      doc.text("Regie International", L, y); y += 8;
+      doc.setFontSize(13); doc.setFont("helvetica", "normal");
+      doc.text("Angebot", L, y); y += 10;
+      doc.setDrawColor(200); doc.line(L, y, R, y); y += 8;
+
+      if (calcCustomer) { doc.setFontSize(11); doc.setFont("helvetica", "bold"); doc.text(`Für: ${calcCustomer}`, L, y); y += 7; }
+      doc.setFontSize(10); doc.setFont("helvetica", "normal");
+      doc.text(`Angebotsnummer: ${calcOfferNr || "-"}`, L, y);
+      doc.text(`Datum: ${new Date().toLocaleDateString("de-DE")}`, R, y, { align: "right" }); y += 5;
+      doc.text(`Umfang: ${calcEmp} Mitarbeiter · ${calcLang} Sprache(n)`, L, y); y += 8;
+
+      doc.setFontSize(12); doc.setFont("helvetica", "bold");
+      doc.text("Leistungsumfang", L, y); y += 2;
+      doc.line(L, y, R, y); y += 6;
+      doc.setFontSize(10.5);
+      for (const it of items) {
+        doc.setFont("helvetica", "normal");
+        const label = doc.splitTextToSize(it.label, 135);
+        doc.text(label, L, y);
+        doc.text(`${it.price.toFixed(2)} EUR`, R, y, { align: "right" });
+        y += (label.length * 5) + 2;
+      }
+      y += 2; doc.line(L, y, R, y); y += 7;
+
+      doc.setFontSize(12); doc.setFont("helvetica", "bold");
+      doc.text("Monatspreis netto", L, y); doc.text(`${total.toFixed(2)} EUR`, R, y, { align: "right" }); y += 7;
+      if (vat !== null && !Number.isNaN(vat)) {
+        const brutto = total * (1 + vat / 100);
+        doc.setFont("helvetica", "normal"); doc.setFontSize(10.5);
+        doc.text(`zzgl. ${vat}% USt`, L, y); doc.text(`${(brutto - total).toFixed(2)} EUR`, R, y, { align: "right" }); y += 6;
+        doc.setFont("helvetica", "bold"); doc.setFontSize(12);
+        doc.text("Monatspreis brutto", L, y); doc.text(`${brutto.toFixed(2)} EUR`, R, y, { align: "right" }); y += 8;
+      }
+
+      doc.setFont("helvetica", "normal"); doc.setFontSize(10);
+      doc.text(`Jährlich: ${(total * 12).toFixed(2)} EUR netto — mit 2 Monaten gratis: ${(total * 10).toFixed(2)} EUR netto`, L, y); y += 9;
+      doc.setDrawColor(220); doc.line(L, y, R, y); y += 6;
+      doc.setFontSize(9.5); doc.setTextColor(90);
+      for (const ln of [
+        "Angebot freibleibend. 14 Tage kostenlos testen.",
+        "Alle Preise netto zzgl. gesetzlicher Umsatzsteuer. Laufzeit monatlich, sofern nicht anders vereinbart.",
+        `Erstellt am ${new Date().toLocaleDateString("de-DE")}.`,
+      ]) { doc.text(ln, L, y); y += 5; }
+      doc.setTextColor(0);
+      doc.save(`Angebot_${(calcCustomer || calcOfferNr || "Regie").toString().replace(/[^\w.-]+/g, "_")}.pdf`);
+    } catch (e: any) {
+      setMessage("Fehler beim Angebot-PDF: " + String(e?.message || e));
+    }
   }
 
   // Vertrag als PDF herunterladen.
@@ -578,6 +643,14 @@ export default function AdminPage() {
                   <span>pro Monat</span><span><span className="text-3xl font-extrabold tabular-nums">{total}</span> €</span>
                 </div>
                 <p className="text-emerald-100/80 text-xs mt-2">Jährlich: {total * 12} € · mit 2 Monaten gratis: {total * 10} €</p>
+                <div className="border-t border-white/20 mt-3 pt-3 space-y-2">
+                  <input value={calcCustomer} onChange={(e) => setCalcCustomer(e.target.value)} placeholder="Kunde / Firma (optional)" className="w-full text-black text-sm p-2 rounded" />
+                  <div className="flex gap-2">
+                    <input value={calcOfferNr} onChange={(e) => setCalcOfferNr(e.target.value)} placeholder="Angebots-Nr." className="w-1/2 text-black text-sm p-2 rounded" />
+                    <input value={calcVat} onChange={(e) => setCalcVat(e.target.value)} placeholder="USt %" className="w-1/2 text-black text-sm p-2 rounded" />
+                  </div>
+                  <button type="button" onClick={downloadOfferPdf} className="w-full bg-white text-emerald-900 font-bold px-4 py-2.5 rounded-lg text-sm">📄 Angebot als PDF</button>
+                </div>
               </div>
             </div>
             <p className="text-xs text-gray-500">Vorschlagspreise (netto). Beträge zentral in <code>PRICING</code> im Code anpassbar.</p>
