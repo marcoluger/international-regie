@@ -4078,6 +4078,23 @@ const EXTRA_LABELS: Record<string, Record<string, string>> = {
   },
 };
 
+// Rueckgabe-Notiz zerlegen: neuer Code (#none/#damage/#other[:text]) ODER alte,
+// bereits lokalisiert gespeicherte Phrasen (in allen 14 Sprachen erkannt).
+function parseReturnNote(raw: string): { kind: "none" | "damage" | "other" | "legacy"; free: string } {
+  const s = String(raw || "");
+  if (s.startsWith("#none")) return { kind: "none", free: "" };
+  if (s.startsWith("#damage")) return { kind: "damage", free: s.slice(7).replace(/^:\s*/, "") };
+  if (s.startsWith("#other")) return { kind: "other", free: s.slice(6).replace(/^:\s*/, "") };
+  for (const lang of Object.values(EXTRA_LABELS)) {
+    if (s === lang.returnNoDamage) return { kind: "none", free: "" };
+    if (s === lang.returnDamage) return { kind: "damage", free: "" };
+    if (s.startsWith(lang.returnDamage + ": ")) return { kind: "damage", free: s.slice((lang.returnDamage + ": ").length) };
+    if (s === lang.returnOther) return { kind: "other", free: "" };
+    if (s.startsWith(lang.returnOther + ": ")) return { kind: "other", free: s.slice((lang.returnOther + ": ").length) };
+  }
+  return { kind: "legacy", free: s };
+}
+
 export default function Home() {
   const [uiLanguage, setUiLanguage] = useState<Language>("Deutsch");
   const t = texts[uiLanguage];
@@ -4704,10 +4721,12 @@ export default function Home() {
     const tgt = returnTarget;
     if (!tgt) return;
     const txt = returnNote.trim();
+    // Sprachneutral speichern: fester Code + optionaler Freitext. Das Label wird
+    // beim Anzeigen in der jeweiligen Sprache gerendert (keine KI-Uebersetzung noetig).
     let note = "";
-    if (returnKind === "none") note = tx.returnNoDamage;
-    else if (returnKind === "damage") note = txt ? `${tx.returnDamage}: ${txt}` : tx.returnDamage;
-    else note = txt ? `${tx.returnOther}: ${txt}` : tx.returnOther;
+    if (returnKind === "none") note = "#none";
+    else if (returnKind === "damage") note = txt ? `#damage:${txt}` : "#damage";
+    else note = txt ? `#other:${txt}` : "#other";
     await assignEquipment(tgt.id, "", note);
     setReturnTarget(null);
     setReturnNote("");
@@ -4731,6 +4750,13 @@ export default function Home() {
       const end = p.end ? new Date(p.end).getTime() : Date.now();
       return csvNum(Math.max(0, (end - new Date(p.start).getTime()) / 86400000), 1);
     };
+    // Rueckgabe-Notiz mit lokalisiertem Label ausgeben.
+    const fmtDamage = (raw: any) => {
+      const pp = parseReturnNote(String(raw || ""));
+      if (pp.kind === "legacy") return pp.free;
+      const label = pp.kind === "none" ? tx.returnNoDamage : pp.kind === "damage" ? tx.returnDamage : tx.returnOther;
+      return pp.free ? `${label}: ${pp.free}` : label;
+    };
     const isVeh = kind === "vehicle";
     const head = (isVeh
       ? [t.equipmentVehicle, t.equipmentIdentifier, t.employee, tx.colFrom, tx.colTo, tx.colDuration, t.km, tx.colDamage]
@@ -4738,7 +4764,7 @@ export default function Home() {
     ).join(";");
     const lines = rows.map((p) => {
       const base = [clean(p.name), clean(p.identifier), clean(p.employee), fmtDate(p.start), p.ongoing ? tx.colOngoing : fmtDate(p.end), durDays(p)];
-      return (isVeh ? [...base, p.km != null ? csvNum(p.km, 1) : "", clean(p.damage)] : [...base, clean(p.damage)]).join(";");
+      return (isVeh ? [...base, p.km != null ? csvNum(p.km, 1) : "", clean(fmtDamage(p.damage))] : [...base, clean(fmtDamage(p.damage))]).join(";");
     });
     const csv = "\ufeff" + [head, ...lines].join("\r\n");
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -4753,11 +4779,19 @@ export default function Home() {
     const data = await equipmentCall({ action: "history", id });
     if (Array.isArray(data?.history)) {
       setEqHistory(prev => ({ ...prev, [id]: data.history }));
-      // Verlaufs-Notizen (Rueckgabe, km) in die Anzeige-Sprache uebersetzen.
+      // Verlaufs-Notizen in die Anzeige-Sprache uebersetzen.
+      // Feste Auswahl (keine Beschaedigung/Beschaedigung/Sonstiges) wird NICHT per KI
+      // uebersetzt (Label kommt aus EXTRA_LABELS) – nur Freitext und km-Notizen.
       try {
-        const items = data.history
-          .filter((h: any) => h?.note && String(h.note).trim())
-          .map((h: any) => ({ key: String(h.id), text: String(h.note) }));
+        const items = (data.history as any[])
+          .filter((h) => h?.note && String(h.note).trim())
+          .map((h) => {
+            if (h.action === "km") return { key: String(h.id), text: String(h.note) };
+            const p = parseReturnNote(String(h.note));
+            const free = p.kind === "legacy" ? p.free : p.free;
+            return free ? { key: String(h.id), text: free } : null;
+          })
+          .filter(Boolean) as { key: string; text: string }[];
         if (items.length > 0) {
           const out = await translateBatch(items, "automatisch", uiLanguage);
           setEqHistTrans(prev => ({ ...prev, ...out }));
@@ -7611,7 +7645,13 @@ export default function Home() {
                           <p className="text-xs text-gray-500">–</p>
                         ) : (eqHistory[eq.id] || []).map((h: any) => (
                           <p key={h.id} className="text-xs text-gray-600">
-                            {h.action === "km" ? "🚗" : h.action === "assigned" ? "➡️" : "↩️"} {h.action === "km" ? (eqHistTrans[h.id] || h.note || "") : (h.user_name || "?")} · {new Date(h.at).toLocaleString("de-DE")}{h.by_name ? ` · ${h.by_name}` : ""}{h.action !== "km" && h.note ? <span className="text-amber-700"> · ⚠️ {eqHistTrans[h.id] || h.note}</span> : null}
+                            {h.action === "km" ? "🚗" : h.action === "assigned" ? "➡️" : "↩️"} {h.action === "km" ? (eqHistTrans[h.id] || h.note || "") : (h.user_name || "?")} · {new Date(h.at).toLocaleString("de-DE")}{h.by_name ? ` · ${h.by_name}` : ""}{h.action !== "km" && h.note ? (() => {
+                              const p = parseReturnNote(h.note);
+                              const label = p.kind === "none" ? tx.returnNoDamage : p.kind === "damage" ? tx.returnDamage : p.kind === "other" ? tx.returnOther : "";
+                              const free = p.free ? (eqHistTrans[h.id] || p.free) : "";
+                              const text = p.kind === "legacy" ? free : (free ? `${label}: ${free}` : label);
+                              return <span className="text-amber-700"> · ⚠️ {text}</span>;
+                            })() : null}
                           </p>
                         ))}
                       </div>
