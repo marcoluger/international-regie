@@ -3834,6 +3834,9 @@ const EXTRA_LABELS: Record<string, Record<string, string>> = {
     exportProjectLabel: "Projekt", exportTranslating: "Übersetze Tätigkeiten…",
     exportByEmployee: "Stunden Mitarbeiter", exportByProject: "Stunden Projekt",
     kmStart: "Start-km", kmEnd: "End-km", kmDriven: "Gefahrene km", kmSave: "km speichern",
+    returnTitle: "Rückgabe", returnQuestion: "Beschädigung oder Besonderheit?",
+    returnPlaceholder: "z. B. Kratzer hinten links, Werkzeug defekt … (optional)",
+    returnConfirm: "Zurückgeben", returnNoteHistory: "Rückgabe-Notiz",
   },
   Englisch: {
     planTitle: "Planning", planNew: "New plan", planEquipment: "Equipment", planEmployee: "Employee",
@@ -3845,6 +3848,9 @@ const EXTRA_LABELS: Record<string, Record<string, string>> = {
     exportProjectLabel: "Project", exportTranslating: "Translating activities…",
     exportByEmployee: "Hours by employee", exportByProject: "Hours by project",
     kmStart: "Start km", kmEnd: "End km", kmDriven: "Distance (km)", kmSave: "Save km",
+    returnTitle: "Return", returnQuestion: "Damage or anything notable?",
+    returnPlaceholder: "e.g. scratch rear left, tool broken … (optional)",
+    returnConfirm: "Return", returnNoteHistory: "Return note",
   },
 };
 
@@ -3980,6 +3986,9 @@ export default function Home() {
   const [eqDraft, setEqDraft] = useState<{ id: string; type: string; name: string; identifier: string; note: string }>({ id: "", type: "tool", name: "", identifier: "", note: "" });
   // km-Eingaben je Fahrzeug (durch den zugewiesenen Mitarbeiter / Chefs, direkt an der Karte).
   const [eqKmDraft, setEqKmDraft] = useState<Record<string, { start: string; end: string }>>({});
+  // Rueckgabe-Nachfrage (Beschaedigung / Besonderheit) fuer Fahrzeuge & Werkzeuge.
+  const [returnTarget, setReturnTarget] = useState<{ id: string; name: string } | null>(null);
+  const [returnNote, setReturnNote] = useState<string>("");
   const [eqHistory, setEqHistory] = useState<Record<string, any[]>>({});
   const [eqOpenId, setEqOpenId] = useState<string | null>(null);
   const [eqTrans, setEqTrans] = useState<Record<string, string>>({});
@@ -4451,11 +4460,23 @@ export default function Home() {
     if (data?.error) { setMessage("Fehler: " + data.error); return; }
     await loadEquipment();
   }
-  async function assignEquipment(id: string, userId: string) {
-    const data = await equipmentCall({ action: "assign", id, userId: userId || null });
+  async function assignEquipment(id: string, userId: string, note?: string) {
+    const data = await equipmentCall({ action: "assign", id, userId: userId || null, note: note || "" });
     if (data?.error) { setMessage("Fehler: " + data.error); return; }
     await loadEquipment();
     if (eqOpenId === id) await loadEquipmentHistory(id);
+  }
+  // Rueckgabe mit Nachfrage nach Beschaedigung/Besonderheit.
+  function requestReturn(eq: any) {
+    setReturnNote("");
+    setReturnTarget({ id: eq.id, name: eqTrans[eq.id] || eq.name || "" });
+  }
+  async function confirmReturn() {
+    const tgt = returnTarget;
+    if (!tgt) return;
+    await assignEquipment(tgt.id, "", returnNote.trim());
+    setReturnTarget(null);
+    setReturnNote("");
   }
   async function loadEquipmentHistory(id: string) {
     const data = await equipmentCall({ action: "history", id });
@@ -7257,11 +7278,11 @@ export default function Home() {
                     </div>
                     {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
                       <div className="flex gap-2 flex-wrap items-center">
-                        <select value={eq.assigned_to || ""} onChange={(e) => assignEquipment(eq.id, e.target.value)} className="border p-2 rounded-lg text-sm text-black bg-white">
+                        <select value={eq.assigned_to || ""} onChange={(e) => { if (!e.target.value && eq.assigned_to) { requestReturn(eq); } else { assignEquipment(eq.id, e.target.value); } }} className="border p-2 rounded-lg text-sm text-black bg-white">
                           <option value="">— {t.equipmentFree} —</option>
                           {companyUsers.map((m: any) => (<option key={m.user_id} value={m.user_id}>{m.full_name || m.email}</option>))}
                         </select>
-                        {eq.assigned_to && (<button type="button" onClick={() => assignEquipment(eq.id, "")} className="bg-gray-200 px-3 py-2 rounded-lg text-sm">↩️ {t.equipmentReturn}</button>)}
+                        {eq.assigned_to && (<button type="button" onClick={() => requestReturn(eq)} className="bg-gray-200 px-3 py-2 rounded-lg text-sm">↩️ {t.equipmentReturn}</button>)}
                         <button type="button" onClick={() => setEqDraft({ id: eq.id, type: eq.type || "tool", name: eq.name || "", identifier: eq.identifier || "", note: eq.note || "" })} className="text-xs px-2 py-1 rounded border">✏️</button>
                         <button type="button" onClick={() => deleteEquipment(eq.id)} className="text-xs px-2 py-1 rounded border text-red-600">🗑️</button>
                       </div>
@@ -7287,7 +7308,7 @@ export default function Home() {
                           <p className="text-xs text-gray-500">–</p>
                         ) : (eqHistory[eq.id] || []).map((h: any) => (
                           <p key={h.id} className="text-xs text-gray-600">
-                            {h.action === "km" ? "🚗" : h.action === "assigned" ? "➡️" : "↩️"} {h.action === "km" ? (h.note || "") : (h.user_name || "?")} · {new Date(h.at).toLocaleString("de-DE")}{h.by_name ? ` · ${h.by_name}` : ""}
+                            {h.action === "km" ? "🚗" : h.action === "assigned" ? "➡️" : "↩️"} {h.action === "km" ? (h.note || "") : (h.user_name || "?")} · {new Date(h.at).toLocaleString("de-DE")}{h.by_name ? ` · ${h.by_name}` : ""}{h.action !== "km" && h.note ? <span className="text-amber-700"> · ⚠️ {h.note}</span> : null}
                           </p>
                         ))}
                       </div>
@@ -7297,6 +7318,20 @@ export default function Home() {
               </div>
             )}
           </section>
+
+          {returnTarget && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={() => { setReturnTarget(null); setReturnNote(""); }}>
+              <div className="bg-white rounded-2xl p-4 w-full max-w-md space-y-3 text-black shadow-xl" onClick={(ev) => ev.stopPropagation()}>
+                <h3 className="text-lg font-bold">↩️ {tx.returnTitle}: {returnTarget.name}</h3>
+                <p className="text-sm text-gray-700">{tx.returnQuestion}</p>
+                <textarea value={returnNote} onChange={(ev) => setReturnNote(ev.target.value)} placeholder={tx.returnPlaceholder} rows={3} className="border p-2 rounded-lg w-full text-black bg-white" />
+                <div className="flex gap-2 justify-end">
+                  <button type="button" onClick={() => { setReturnTarget(null); setReturnNote(""); }} className="bg-gray-200 px-4 py-2 rounded-lg text-sm">{tx.planCancel}</button>
+                  <button type="button" onClick={confirmReturn} className="bg-cyan-700 text-white px-4 py-2 rounded-lg text-sm">↩️ {tx.returnConfirm}</button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
           <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-3">

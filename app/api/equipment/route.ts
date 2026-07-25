@@ -338,7 +338,8 @@ export async function POST(request: Request) {
         .eq("company_id", member.company_id);
       if (error) return Response.json({ error: error.message }, { status: 500 });
 
-      // Verlauf schreiben
+      // Verlauf schreiben – bei Rueckgabe optional die Beschaedigungs-/Besonderheits-Notiz.
+      const returnNote = String(body?.note ?? "").trim().slice(0, 500);
       await supabaseAdmin.from("equipment_log").insert({
         company_id: member.company_id,
         equipment_id: body.id,
@@ -346,6 +347,7 @@ export async function POST(request: Request) {
         user_id: targetId,
         user_name: targetId ? targetName : (eq.assigned_to_name || ""),
         by_name: byName,
+        note: !targetId && returnNote ? returnNote : null,
       });
 
       return Response.json({ success: true });
