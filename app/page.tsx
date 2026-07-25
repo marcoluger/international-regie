@@ -3821,9 +3821,31 @@ function SignaturePad({ label, value, onChange }: { label: string; value: string
   );
 }
 
+// Zusatz-Labels fuer neue Funktionen (Geraete-Planung). Fallback auf Deutsch,
+// falls eine Sprache hier nicht hinterlegt ist.
+const EXTRA_LABELS: Record<string, Record<string, string>> = {
+  Deutsch: {
+    planTitle: "Planung", planNew: "Neue Planung", planEquipment: "Gerät", planEmployee: "Mitarbeiter",
+    planFrom: "Von", planTo: "Bis", planNote: "Notiz (optional)", planSave: "Planung speichern",
+    planUpcoming: "Geplante Zuordnungen", planEmpty: "Keine Planungen.", planActive: "läuft",
+    planPlanned: "geplant", planConflictTitle: "Achtung: Überschneidung",
+    planConflictText: "Dieses Gerät ist im gewählten Zeitraum bereits verplant:", planSaveAnyway: "Trotzdem speichern",
+    planCancel: "Abbrechen", planPick: "— bitte wählen —",
+  },
+  Englisch: {
+    planTitle: "Planning", planNew: "New plan", planEquipment: "Equipment", planEmployee: "Employee",
+    planFrom: "From", planTo: "To", planNote: "Note (optional)", planSave: "Save plan",
+    planUpcoming: "Planned assignments", planEmpty: "No plans.", planActive: "active",
+    planPlanned: "planned", planConflictTitle: "Warning: overlap",
+    planConflictText: "This equipment is already planned for the selected period:", planSaveAnyway: "Save anyway",
+    planCancel: "Cancel", planPick: "— please choose —",
+  },
+};
+
 export default function Home() {
   const [uiLanguage, setUiLanguage] = useState<Language>("Deutsch");
   const t = texts[uiLanguage];
+  const tx = EXTRA_LABELS[uiLanguage] || EXTRA_LABELS.Deutsch;
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingStep, setOnboardingStep] = useState(1);
   const [onboardingDone, setOnboardingDone] = useState(false);
@@ -3953,6 +3975,10 @@ export default function Home() {
   const [eqOpenId, setEqOpenId] = useState<string | null>(null);
   const [eqTrans, setEqTrans] = useState<Record<string, string>>({});
   const [eqFilter, setEqFilter] = useState<string>("all");
+  const [eqPlans, setEqPlans] = useState<any[]>([]);
+  const [eqPlanDraft, setEqPlanDraft] = useState<{ id: string; equipmentId: string; userId: string; dateFrom: string; dateTo: string; note: string }>({ id: "", equipmentId: "", userId: "", dateFrom: "", dateTo: "", note: "" });
+  const [eqPlanConflict, setEqPlanConflict] = useState<any[] | null>(null);
+  const [eqPlanSaving, setEqPlanSaving] = useState(false);
   const [absences, setAbsences] = useState<any[]>([]);
   const [absDraft, setAbsDraft] = useState<{ type: string; start: string; end: string; note: string }>({ type: "vacation", start: "", end: "", note: "" });
   const [absSaving, setAbsSaving] = useState(false);
@@ -4431,6 +4457,41 @@ export default function Home() {
     setEqOpenId(id);
     await loadEquipmentHistory(id);
   }
+  // ── Geraete-Planung ──
+  async function loadEquipmentPlans() {
+    try {
+      const data = await equipmentCall({ action: "plan_list" });
+      if (Array.isArray(data?.plans)) setEqPlans(data.plans);
+    } catch { /* still */ }
+  }
+  async function savePlan(force = false) {
+    const d = eqPlanDraft;
+    if (!d.equipmentId || !d.userId || !d.dateFrom || !d.dateTo) { setMessage(t.msgFillRequired); return; }
+    setEqPlanSaving(true);
+    try {
+      const data = await equipmentCall({
+        action: "plan_save",
+        id: d.id || undefined,
+        equipmentId: d.equipmentId, userId: d.userId,
+        dateFrom: d.dateFrom, dateTo: d.dateTo, note: d.note,
+        force,
+      });
+      if (data?.conflict) { setEqPlanConflict(data.conflicts || []); return; }
+      if (data?.error) { setMessage(data.error); return; }
+      setEqPlanConflict(null);
+      setEqPlanDraft({ id: "", equipmentId: "", userId: "", dateFrom: "", dateTo: "", note: "" });
+      await loadEquipmentPlans();
+      await loadEquipment();
+    } finally {
+      setEqPlanSaving(false);
+    }
+  }
+  async function deletePlan(id: string) {
+    const data = await equipmentCall({ action: "plan_delete", id });
+    if (data?.error) { setMessage(data.error); return; }
+    if (eqPlanDraft.id === id) setEqPlanDraft({ id: "", equipmentId: "", userId: "", dateFrom: "", dateTo: "", note: "" });
+    await loadEquipmentPlans();
+  }
 
   // ── Stundenexport: Monatssummen je Mitarbeiter ──
   function monthlyHourSummary(month: string) {
@@ -4479,6 +4540,7 @@ export default function Home() {
           hours: h,
           travelMin: tm,
           km,
+          desc: String(d.description || ""),
         });
       }
     }
@@ -4497,6 +4559,26 @@ export default function Home() {
       groups[key].km += row.km;
     }
     return Object.values(groups).sort((x, y) => x.name.localeCompare(y.name));
+  }
+  // Tage nach Projekt gruppiert (alle Mitarbeiter zusammen) – fuer den Projekt-CSV-Export.
+  function monthlyHoursByProject(month: string, week?: string) {
+    const detail = monthlyHourDetail(month, week);
+    const groups: Record<string, { project: string; customer: string; days: any[]; hours: number; travelMin: number; km: number }> = {};
+    for (const row of detail) {
+      const projName = String(row.project || "").trim();
+      const label = projName || String(row.customer || "").trim() || "—";
+      const key = label.toLowerCase();
+      if (!groups[key]) groups[key] = { project: label, customer: String(row.customer || ""), days: [], hours: 0, travelMin: 0, km: 0 };
+      groups[key].days.push(row);
+      groups[key].hours += row.hours;
+      groups[key].travelMin += row.travelMin;
+      groups[key].km += row.km;
+    }
+    // Innerhalb eines Projekts nach Mitarbeiter, dann Datum sortieren.
+    for (const g of Object.values(groups)) {
+      g.days.sort((x: any, y: any) => String(x.name).localeCompare(String(y.name)) || String(x.date).localeCompare(String(y.date)));
+    }
+    return Object.values(groups).sort((x, y) => x.project.localeCompare(y.project));
   }
 
   // Welche Kalenderwochen kommen im gewaehlten Monat vor?
@@ -4543,6 +4625,38 @@ export default function Home() {
     a.href = url;
     const wer = nurMitarbeiter ? "_" + nurMitarbeiter.replace(/[^\wÄÖÜäöüß.-]+/g, "_") : "";
     a.download = `Stunden${wer}_${exportMonth}${exportWeek ? "_" + exportWeek.replace(/\s+/g, "") : ""}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+  // CSV nach Projekt gruppiert – alle Mitarbeiter zusammen, inkl. Taetigkeit.
+  function downloadProjectCsv() {
+    const gruppen = monthlyHoursByProject(exportMonth, exportWeek || undefined);
+    if (gruppen.length === 0) { setMessage(t.exportEmpty); return; }
+    const clean = (v: any) => String(v ?? "").replace(/;/g, ",").replace(/[\r\n]+/g, " ");
+    const head = [t.projectNumber, t.customer, t.employee, t.date, t.site, t.hours, `${t.travelTime} (h)`, t.km, t.description].join(";");
+    const lines: string[] = [];
+    let gesamt = { hours: 0, travelMin: 0, km: 0, days: 0 };
+    for (const g of gruppen) {
+      for (const d2 of g.days) {
+        lines.push([
+          clean(g.project), clean(d2.customer), clean(d2.name), clean(d2.date), clean(d2.site),
+          csvNum(d2.hours), csvNum(d2.travelMin / 60), csvNum(d2.km, 1), clean(d2.desc),
+        ].join(";"));
+      }
+      // Zwischensumme je Projekt
+      lines.push([`${clean(g.project)} — ${t.total}`, "", "", `${g.days.length} ${t.exportDays}`, "", csvNum(g.hours), csvNum(g.travelMin / 60), csvNum(g.km, 1), ""].join(";"));
+      lines.push("");
+      gesamt = { hours: gesamt.hours + g.hours, travelMin: gesamt.travelMin + g.travelMin, km: gesamt.km + g.km, days: gesamt.days + g.days.length };
+    }
+    if (gruppen.length > 1) lines.push([t.total, "", "", `${gesamt.days} ${t.exportDays}`, "", csvNum(gesamt.hours), csvNum(gesamt.travelMin / 60), csvNum(gesamt.km, 1), ""].join(";"));
+    const csv = "\ufeff" + [head, ...lines].join("\r\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Projekte_${exportMonth}${exportWeek ? "_" + exportWeek.replace(/\s+/g, "") : ""}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -6472,7 +6586,7 @@ export default function Home() {
         <TabButton label={`📊 ${t.exportTab}`} tabName="export" activeTab={activeTab} onClick={() => { setActiveTab("export"); loadTeamReports(); }} />
         )}
         {companyFeatures?.equipment_enabled && (
-        <TabButton label={`🚚 ${t.equipmentTab}`} tabName="geraete" activeTab={activeTab} onClick={() => { setActiveTab("geraete"); loadEquipment(); }} />
+        <TabButton label={`🚚 ${t.equipmentTab}`} tabName="geraete" activeTab={activeTab} onClick={() => { setActiveTab("geraete"); loadEquipment(); loadEquipmentPlans(); }} />
         )}
         {companyFeatures?.absence_enabled && (
         <TabButton label={`🌴 ${t.absenceTab}`} tabName="urlaub" activeTab={activeTab} onClick={() => { setActiveTab("urlaub"); loadAbsences(); }} />
@@ -7131,6 +7245,79 @@ export default function Home() {
               </div>
             )}
           </section>
+
+          {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
+          <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-3">
+            <h2 className="text-xl font-bold">📅 {tx.planTitle}</h2>
+            <div className="flex gap-2 flex-wrap items-end border-b pb-3">
+              <div className="flex flex-col">
+                <label className="text-xs text-gray-500">{tx.planEquipment}</label>
+                <select value={eqPlanDraft.equipmentId} onChange={(e) => { setEqPlanConflict(null); setEqPlanDraft(p => ({ ...p, equipmentId: e.target.value })); }} className="border p-2 rounded-lg text-black bg-white">
+                  <option value="">{tx.planPick}</option>
+                  {equipment.map((eq: any) => (<option key={eq.id} value={eq.id}>{eq.type === "vehicle" ? "🚚" : "🔧"} {eq.name}{eq.identifier ? ` · ${eq.identifier}` : ""}</option>))}
+                </select>
+              </div>
+              <div className="flex flex-col">
+                <label className="text-xs text-gray-500">{tx.planEmployee}</label>
+                <select value={eqPlanDraft.userId} onChange={(e) => setEqPlanDraft(p => ({ ...p, userId: e.target.value }))} className="border p-2 rounded-lg text-black bg-white">
+                  <option value="">{tx.planPick}</option>
+                  {companyUsers.map((m: any) => (<option key={m.user_id} value={m.user_id}>{m.full_name || m.email}</option>))}
+                </select>
+              </div>
+              <div className="flex flex-col">
+                <label className="text-xs text-gray-500">{tx.planFrom}</label>
+                <input type="date" value={eqPlanDraft.dateFrom} onChange={(e) => { setEqPlanConflict(null); setEqPlanDraft(p => ({ ...p, dateFrom: e.target.value, dateTo: p.dateTo && p.dateTo < e.target.value ? e.target.value : p.dateTo })); }} className="border p-2 rounded-lg text-black bg-white" />
+              </div>
+              <div className="flex flex-col">
+                <label className="text-xs text-gray-500">{tx.planTo}</label>
+                <input type="date" value={eqPlanDraft.dateTo} min={eqPlanDraft.dateFrom || undefined} onChange={(e) => { setEqPlanConflict(null); setEqPlanDraft(p => ({ ...p, dateTo: e.target.value })); }} className="border p-2 rounded-lg text-black bg-white" />
+              </div>
+              <input placeholder={tx.planNote} value={eqPlanDraft.note} onChange={(e) => setEqPlanDraft(p => ({ ...p, note: e.target.value }))} className="border p-2 rounded-lg text-black bg-white flex-1 min-w-[8rem]" />
+              <button type="button" disabled={eqPlanSaving} onClick={() => savePlan(false)} className="bg-cyan-700 text-white px-4 py-2.5 rounded-lg text-sm disabled:opacity-50">{eqPlanDraft.id ? `💾 ${t.saveBtn}` : `➕ ${tx.planSave}`}</button>
+              {eqPlanDraft.id && (<button type="button" onClick={() => { setEqPlanConflict(null); setEqPlanDraft({ id: "", equipmentId: "", userId: "", dateFrom: "", dateTo: "", note: "" }); }} className="bg-gray-200 px-4 py-2.5 rounded-lg text-sm">{tx.planCancel}</button>)}
+            </div>
+
+            {eqPlanConflict && (
+              <div className="border border-amber-300 bg-amber-50 rounded-xl p-3 text-sm space-y-2">
+                <p className="font-semibold text-amber-800">⚠️ {tx.planConflictTitle}</p>
+                <p className="text-amber-800">{tx.planConflictText}</p>
+                <ul className="list-disc pl-5 text-amber-900">
+                  {eqPlanConflict.map((c: any) => (<li key={c.id}>👤 {c.user_name || "?"} · {c.date_from} – {c.date_to}</li>))}
+                </ul>
+                <div className="flex gap-2">
+                  <button type="button" disabled={eqPlanSaving} onClick={() => savePlan(true)} className="bg-amber-700 text-white px-3 py-2 rounded-lg text-sm disabled:opacity-50">{tx.planSaveAnyway}</button>
+                  <button type="button" onClick={() => setEqPlanConflict(null)} className="bg-gray-200 px-3 py-2 rounded-lg text-sm">{tx.planCancel}</button>
+                </div>
+              </div>
+            )}
+
+            <div>
+              <p className="font-semibold text-sm mb-2">{tx.planUpcoming}</p>
+              {eqPlans.length === 0 ? (
+                <p className="text-gray-500 text-sm">{tx.planEmpty}</p>
+              ) : (
+                <div className="space-y-2">
+                  {eqPlans.map((p: any) => {
+                    const eq = equipment.find((e: any) => e.id === p.equipment_id);
+                    return (
+                      <div key={p.id} className="border border-slate-200 rounded-xl p-3 bg-gray-50 flex justify-between items-start gap-2 flex-wrap">
+                        <div className="text-sm">
+                          <p className="font-semibold break-words">{eq ? (eq.type === "vehicle" ? "🚚" : "🔧") : "📦"} {eq ? eq.name : "?"}{eq?.identifier ? <span className="text-gray-500 font-normal"> · {eq.identifier}</span> : null}</p>
+                          <p>👤 {p.user_name || "?"} · 🗓️ {p.date_from} – {p.date_to} {p.activated ? <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">{tx.planActive}</span> : <span className="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full">{tx.planPlanned}</span>}</p>
+                          {p.note ? <p className="text-gray-600 text-xs mt-0.5">📝 {p.note}</p> : null}
+                        </div>
+                        <div className="flex gap-1">
+                          <button type="button" onClick={() => { setEqPlanConflict(null); setEqPlanDraft({ id: p.id, equipmentId: p.equipment_id, userId: p.user_id || "", dateFrom: p.date_from, dateTo: p.date_to, note: p.note || "" }); }} className="text-xs px-2 py-1 rounded border">✏️</button>
+                          <button type="button" onClick={() => deletePlan(p.id)} className="text-xs px-2 py-1 rounded border text-red-600">🗑️</button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </section>
+          )}
         </div>
       )}
 
@@ -7150,6 +7337,7 @@ export default function Home() {
               </select>
               <button type="button" onClick={loadTeamReports} className="bg-gray-200 px-3 py-2.5 rounded-lg text-sm">🔄</button>
               <button type="button" onClick={() => downloadHoursCsv()} className="bg-green-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium">⬇️ {t.exportDownload} ({t.filterAll})</button>
+              <button type="button" onClick={() => downloadProjectCsv()} className="bg-cyan-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium">📁 {t.exportDownload} ({t.hoursPerProject})</button>
             </div>
             {gruppen.length === 0 ? (
               <p className="text-gray-500">{t.exportEmpty}</p>
