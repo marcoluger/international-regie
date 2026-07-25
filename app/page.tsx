@@ -3999,6 +3999,7 @@ export default function Home() {
   const [returnNote, setReturnNote] = useState<string>("");
   const [returnKind, setReturnKind] = useState<"none" | "damage" | "other">("none");
   const [eqReportMonth, setEqReportMonth] = useState<string>(() => new Date().toISOString().slice(0, 7));
+  const [eqReportWeek, setEqReportWeek] = useState<string>("");
   const [eqHistory, setEqHistory] = useState<Record<string, any[]>>({});
   const [eqOpenId, setEqOpenId] = useState<string | null>(null);
   const [eqTrans, setEqTrans] = useState<Record<string, string>>({});
@@ -4503,6 +4504,7 @@ export default function Home() {
     const rows = periods
       .filter((p) => (p.type || "tool") === kind)
       .filter((p) => String(p.end || nowIso).slice(0, 7) === eqReportMonth)
+      .filter((p) => !eqReportWeek || getCalendarWeek(String(p.end || nowIso).slice(0, 10)) === eqReportWeek)
       .sort((a, b) => String(a.start || "").localeCompare(String(b.start || "")));
     if (rows.length === 0) { setMessage(t.exportEmpty); return; }
     const clean = (v: any) => String(v ?? "").replace(/;/g, ",").replace(/[\r\n]+/g, " ");
@@ -4526,7 +4528,7 @@ export default function Home() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${isVeh ? "Fahrzeuge" : "Werkzeug"}_${eqReportMonth}.csv`;
+    a.download = `${isVeh ? "Fahrzeuge" : "Werkzeug"}_${eqReportMonth}${eqReportWeek ? "_" + eqReportWeek.replace(/\s+/g, "") : ""}.csv`;
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     URL.revokeObjectURL(url);
   }
@@ -4675,6 +4677,19 @@ export default function Home() {
     const set = new Set<string>();
     for (const row of monthlyHourDetail(month)) {
       const wk = getCalendarWeek(row.date);
+      if (wk) set.add(wk);
+    }
+    return Array.from(set).sort((a2, b2) => Number(a2.replace(/\D/g, "")) - Number(b2.replace(/\D/g, "")));
+  }
+  // Alle Kalenderwochen, die der Monat beruehrt (datenunabhaengig) – fuer den Geraete-Export.
+  function calendarWeeksOfMonth(month: string): string[] {
+    if (!month) return [];
+    const [y, m] = month.split("-").map(Number);
+    if (!y || !m) return [];
+    const days = new Date(y, m, 0).getDate();
+    const set = new Set<string>();
+    for (let d = 1; d <= days; d++) {
+      const wk = getCalendarWeek(`${month}-${String(d).padStart(2, "0")}`);
       if (wk) set.add(wk);
     }
     return Array.from(set).sort((a2, b2) => Number(a2.replace(/\D/g, "")) - Number(b2.replace(/\D/g, "")));
@@ -7399,7 +7414,11 @@ export default function Home() {
             <h2 className="text-xl font-bold">📊 {tx.eqReportTitle}</h2>
             <div className="flex gap-2 flex-wrap items-center">
               <label className="text-sm font-medium">{t.exportMonth}</label>
-              <input type="month" value={eqReportMonth} onChange={(e) => setEqReportMonth(e.target.value)} className="border p-2 rounded-lg text-black bg-white" />
+              <input type="month" value={eqReportMonth} onChange={(e) => { setEqReportMonth(e.target.value); setEqReportWeek(""); }} className="border p-2 rounded-lg text-black bg-white" />
+              <select value={eqReportWeek} onChange={(e) => setEqReportWeek(e.target.value)} className="border p-2 rounded-lg text-black bg-white">
+                <option value="">{t.filterAll}</option>
+                {calendarWeeksOfMonth(eqReportMonth).map((w) => (<option key={w} value={w}>{w}</option>))}
+              </select>
               <button type="button" onClick={() => downloadEquipmentCsv("vehicle")} className="bg-cyan-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium">🚚 {tx.eqReportVehicles}</button>
               <button type="button" onClick={() => downloadEquipmentCsv("tool")} className="bg-green-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium">🔧 {tx.eqReportTools}</button>
             </div>
