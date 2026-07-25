@@ -3833,6 +3833,7 @@ const EXTRA_LABELS: Record<string, Record<string, string>> = {
     planCancel: "Abbrechen", planPick: "— bitte wählen —",
     exportProjectLabel: "Projekt", exportTranslating: "Übersetze Tätigkeiten…",
     exportByEmployee: "Stunden Mitarbeiter", exportByProject: "Stunden Projekt",
+    kmStart: "Start-km", kmEnd: "End-km", kmDriven: "Gefahrene km",
   },
   Englisch: {
     planTitle: "Planning", planNew: "New plan", planEquipment: "Equipment", planEmployee: "Employee",
@@ -3843,6 +3844,7 @@ const EXTRA_LABELS: Record<string, Record<string, string>> = {
     planCancel: "Cancel", planPick: "— please choose —",
     exportProjectLabel: "Project", exportTranslating: "Translating activities…",
     exportByEmployee: "Hours by employee", exportByProject: "Hours by project",
+    kmStart: "Start km", kmEnd: "End km", kmDriven: "Distance (km)",
   },
 };
 
@@ -3975,7 +3977,7 @@ export default function Home() {
   const [exportWeek, setExportWeek] = useState<string>("");
   const [exportProject, setExportProject] = useState<string>("");
   const [equipment, setEquipment] = useState<any[]>([]);
-  const [eqDraft, setEqDraft] = useState<{ id: string; type: string; name: string; identifier: string; note: string }>({ id: "", type: "tool", name: "", identifier: "", note: "" });
+  const [eqDraft, setEqDraft] = useState<{ id: string; type: string; name: string; identifier: string; note: string; startKm: string; endKm: string }>({ id: "", type: "tool", name: "", identifier: "", note: "", startKm: "", endKm: "" });
   const [eqHistory, setEqHistory] = useState<Record<string, any[]>>({});
   const [eqOpenId, setEqOpenId] = useState<string | null>(null);
   const [eqTrans, setEqTrans] = useState<Record<string, string>>({});
@@ -4436,9 +4438,9 @@ export default function Home() {
   }
   async function saveEquipment() {
     if (!eqDraft.name.trim()) { setMessage(t.msgFillRequired); return; }
-    const data = await equipmentCall({ action: "save", id: eqDraft.id || undefined, type: eqDraft.type, name: eqDraft.name.trim(), identifier: eqDraft.identifier, note: eqDraft.note });
+    const data = await equipmentCall({ action: "save", id: eqDraft.id || undefined, type: eqDraft.type, name: eqDraft.name.trim(), identifier: eqDraft.identifier, note: eqDraft.note, startKm: eqDraft.startKm, endKm: eqDraft.endKm });
     if (data?.error) { setMessage("Fehler: " + data.error); return; }
-    setEqDraft({ id: "", type: "tool", name: "", identifier: "", note: "" });
+    setEqDraft({ id: "", type: "tool", name: "", identifier: "", note: "", startKm: "", endKm: "" });
     await loadEquipment();
     setMessage("\u2705 " + t.msgSaved);
   }
@@ -7213,8 +7215,13 @@ export default function Home() {
                 </select>
                 <input placeholder={t.nameLabel} value={eqDraft.name} onChange={(e) => setEqDraft(p => ({ ...p, name: e.target.value }))} className="border p-2 rounded-lg text-black bg-white flex-1 min-w-[10rem]" />
                 <input placeholder={t.equipmentIdentifier} value={eqDraft.identifier} onChange={(e) => setEqDraft(p => ({ ...p, identifier: e.target.value }))} className="border p-2 rounded-lg text-black bg-white" />
+                {eqDraft.type === "vehicle" && (<>
+                  <input type="number" inputMode="numeric" placeholder={tx.kmStart} value={eqDraft.startKm} onChange={(e) => setEqDraft(p => ({ ...p, startKm: e.target.value }))} className="border p-2 rounded-lg text-black bg-white w-28" />
+                  <input type="number" inputMode="numeric" placeholder={tx.kmEnd} value={eqDraft.endKm} onChange={(e) => setEqDraft(p => ({ ...p, endKm: e.target.value }))} className="border p-2 rounded-lg text-black bg-white w-28" />
+                  {eqDraft.startKm !== "" && eqDraft.endKm !== "" && (<span className="text-sm text-gray-700 whitespace-nowrap">= {Math.max(0, (Number(String(eqDraft.endKm).replace(",", ".")) || 0) - (Number(String(eqDraft.startKm).replace(",", ".")) || 0))} {t.km}</span>)}
+                </>)}
                 <button type="button" onClick={saveEquipment} className="bg-cyan-700 text-white px-4 py-2.5 rounded-lg text-sm">{eqDraft.id ? `💾 ${t.saveBtn}` : `➕ ${t.materialAdd}`}</button>
-                {eqDraft.id && (<button type="button" onClick={() => setEqDraft({ id: "", type: "tool", name: "", identifier: "", note: "" })} className="bg-gray-200 px-4 py-2.5 rounded-lg text-sm">{t.cancelBtn}</button>)}
+                {eqDraft.id && (<button type="button" onClick={() => setEqDraft({ id: "", type: "tool", name: "", identifier: "", note: "", startKm: "", endKm: "" })} className="bg-gray-200 px-4 py-2.5 rounded-lg text-sm">{t.cancelBtn}</button>)}
               </div>
             )}
             <div className="flex gap-2 flex-wrap">
@@ -7238,6 +7245,9 @@ export default function Home() {
                             ? <span className="text-amber-700">👤 {eq.assigned_to_name}{eq.assigned_at ? <span className="text-xs text-gray-500"> · {new Date(eq.assigned_at).toLocaleDateString("de-DE")}</span> : null}</span>
                             : <span className="text-green-700">✅ {t.equipmentFree}</span>}
                         </p>
+                        {eq.type === "vehicle" && (eq.start_km != null || eq.end_km != null) && (
+                          <p className="text-sm text-gray-700">🚗 {tx.kmStart}: {eq.start_km != null ? eq.start_km : "–"} · {tx.kmEnd}: {eq.end_km != null ? eq.end_km : "–"}{eq.start_km != null && eq.end_km != null ? <span className="font-semibold"> · {tx.kmDriven}: {Math.max(0, Number(eq.end_km) - Number(eq.start_km))} {t.km}</span> : null}</p>
+                        )}
                       </div>
                       <button type="button" onClick={() => toggleEquipmentHistory(eq.id)} className="text-xs px-2 py-1 rounded border">🕓 {t.equipmentHistory} {eqOpenId === eq.id ? "▲" : "▼"}</button>
                     </div>
@@ -7248,7 +7258,7 @@ export default function Home() {
                           {companyUsers.map((m: any) => (<option key={m.user_id} value={m.user_id}>{m.full_name || m.email}</option>))}
                         </select>
                         {eq.assigned_to && (<button type="button" onClick={() => assignEquipment(eq.id, "")} className="bg-gray-200 px-3 py-2 rounded-lg text-sm">↩️ {t.equipmentReturn}</button>)}
-                        <button type="button" onClick={() => setEqDraft({ id: eq.id, type: eq.type || "tool", name: eq.name || "", identifier: eq.identifier || "", note: eq.note || "" })} className="text-xs px-2 py-1 rounded border">✏️</button>
+                        <button type="button" onClick={() => setEqDraft({ id: eq.id, type: eq.type || "tool", name: eq.name || "", identifier: eq.identifier || "", note: eq.note || "", startKm: eq.start_km != null ? String(eq.start_km) : "", endKm: eq.end_km != null ? String(eq.end_km) : "" })} className="text-xs px-2 py-1 rounded border">✏️</button>
                         <button type="button" onClick={() => deleteEquipment(eq.id)} className="text-xs px-2 py-1 rounded border text-red-600">🗑️</button>
                       </div>
                     )}

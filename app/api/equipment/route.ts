@@ -148,7 +148,7 @@ export async function POST(request: Request) {
       await reconcilePlans(supabaseAdmin, member.company_id, byName);
       const { data, error } = await supabaseAdmin
         .from("equipment")
-        .select("id, type, name, identifier, note, assigned_to, assigned_to_name, assigned_at")
+        .select("id, type, name, identifier, note, assigned_to, assigned_to_name, assigned_at, start_km, end_km")
         .eq("company_id", member.company_id)
         .order("name", { ascending: true })
         .limit(1000);
@@ -192,11 +192,21 @@ export async function POST(request: Request) {
     if (action === "save") {
       const name = String(body?.name ?? "").trim().slice(0, 200);
       if (!name) return Response.json({ error: "Bezeichnung fehlt." }, { status: 400 });
+      const isVehicle = body?.type === "vehicle";
+      // Kilometerstand nur bei Fahrzeugen; leere Eingabe -> null.
+      const kmVal = (v: any): number | null => {
+        const s = String(v ?? "").trim().replace(",", ".");
+        if (!s) return null;
+        const n = Number(s);
+        return Number.isFinite(n) ? n : null;
+      };
       const row = {
-        type: body?.type === "vehicle" ? "vehicle" : "tool",
+        type: isVehicle ? "vehicle" : "tool",
         name,
         identifier: String(body?.identifier ?? "").trim().slice(0, 100),
         note: String(body?.note ?? "").trim().slice(0, 500),
+        start_km: isVehicle ? kmVal(body?.startKm) : null,
+        end_km: isVehicle ? kmVal(body?.endKm) : null,
       };
       if (body?.id) {
         const { error } = await supabaseAdmin
