@@ -239,9 +239,15 @@ export async function POST(request: Request) {
         const n = Number(s);
         return Number.isFinite(n) ? n : null;
       };
+      const startKm = kmVal(body?.startKm);
+      const endKm = kmVal(body?.endKm);
+      // Plausibilitaet: End-km darf nicht kleiner als Start-km sein (keine negativen km).
+      if (startKm != null && endKm != null && endKm < startKm) {
+        return Response.json({ error: "End-km darf nicht kleiner als Start-km sein." }, { status: 400 });
+      }
       const { error } = await supabaseAdmin
         .from("equipment")
-        .update({ start_km: kmVal(body?.startKm), end_km: kmVal(body?.endKm) })
+        .update({ start_km: startKm, end_km: endKm })
         .eq("id", body.id)
         .eq("company_id", member.company_id);
       if (error) return Response.json({ error: error.message }, { status: 500 });

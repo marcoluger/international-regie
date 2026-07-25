@@ -3834,6 +3834,7 @@ const EXTRA_LABELS: Record<string, Record<string, string>> = {
     exportProjectLabel: "Projekt", exportTranslating: "Übersetze Tätigkeiten…",
     exportByEmployee: "Stunden Mitarbeiter", exportByProject: "Stunden Projekt",
     kmStart: "Start-km", kmEnd: "End-km", kmDriven: "Gefahrene km", kmSave: "km speichern",
+    kmWarnNegative: "End-km kleiner als Start-km – bitte prüfen",
     returnTitle: "Rückgabe", returnQuestion: "Beschädigung oder Besonderheit?",
     returnPlaceholder: "z. B. Kratzer hinten links, Werkzeug defekt … (optional)",
     returnConfirm: "Zurückgeben", returnNoteHistory: "Rückgabe-Notiz",
@@ -3851,6 +3852,7 @@ const EXTRA_LABELS: Record<string, Record<string, string>> = {
     exportProjectLabel: "Project", exportTranslating: "Translating activities…",
     exportByEmployee: "Hours by employee", exportByProject: "Hours by project",
     kmStart: "Start km", kmEnd: "End km", kmDriven: "Distance (km)", kmSave: "Save km",
+    kmWarnNegative: "End km lower than start km – please check",
     returnTitle: "Return", returnQuestion: "Damage or anything notable?",
     returnPlaceholder: "e.g. scratch rear left, tool broken … (optional)",
     returnConfirm: "Return", returnNoteHistory: "Return note",
@@ -7341,14 +7343,16 @@ export default function Home() {
                       const s = eqKmDraft[eq.id]?.start ?? (eq.start_km != null ? String(eq.start_km) : "");
                       const e2 = eqKmDraft[eq.id]?.end ?? (eq.end_km != null ? String(eq.end_km) : "");
                       const upd = (patch: { start?: string; end?: string }) => setEqKmDraft(prev => ({ ...prev, [eq.id]: { start: prev[eq.id]?.start ?? (eq.start_km != null ? String(eq.start_km) : ""), end: prev[eq.id]?.end ?? (eq.end_km != null ? String(eq.end_km) : ""), ...patch } }));
-                      const driven = s !== "" && e2 !== "" ? Math.max(0, (Number(String(e2).replace(",", ".")) || 0) - (Number(String(s).replace(",", ".")) || 0)) : null;
+                      const rawDiff = s !== "" && e2 !== "" ? (Number(String(e2).replace(",", ".")) || 0) - (Number(String(s).replace(",", ".")) || 0) : null;
+                      const negative = rawDiff != null && rawDiff < 0;
                       return (
                         <div className="flex gap-2 flex-wrap items-center bg-cyan-50 border border-cyan-100 rounded-lg p-2">
                           <span className="text-sm font-medium">🚗 km</span>
                           <input type="number" inputMode="numeric" placeholder={tx.kmStart} value={s} onChange={(ev) => upd({ start: ev.target.value })} className="border p-2 rounded-lg text-black bg-white w-28" />
-                          <input type="number" inputMode="numeric" placeholder={tx.kmEnd} value={e2} onChange={(ev) => upd({ end: ev.target.value })} className="border p-2 rounded-lg text-black bg-white w-28" />
-                          {driven != null && <span className="text-sm text-gray-700 whitespace-nowrap">= {driven} {t.km}</span>}
-                          <button type="button" onClick={() => setKm(eq.id, s, e2)} className="bg-cyan-700 text-white px-3 py-2 rounded-lg text-sm">💾 {tx.kmSave}</button>
+                          <input type="number" inputMode="numeric" placeholder={tx.kmEnd} value={e2} onChange={(ev) => upd({ end: ev.target.value })} className={`border p-2 rounded-lg text-black bg-white w-28 ${negative ? "border-red-500" : ""}`} />
+                          {rawDiff != null && !negative && <span className="text-sm text-gray-700 whitespace-nowrap">= {rawDiff} {t.km}</span>}
+                          {negative && <span className="text-sm text-red-600 font-medium whitespace-nowrap">⚠️ {tx.kmWarnNegative}</span>}
+                          <button type="button" disabled={negative} onClick={() => setKm(eq.id, s, e2)} className="bg-cyan-700 text-white px-3 py-2 rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed">💾 {tx.kmSave}</button>
                         </div>
                       );
                     })()}
