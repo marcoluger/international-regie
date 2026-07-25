@@ -19,6 +19,45 @@ const PACKAGES: Record<string, { label: string; color: string; defaults: any }> 
 
 const ALL_LANGUAGES = ["Deutsch", "Kroatisch", "Slowenisch", "Polnisch", "Englisch", "Rumänisch", "Ukrainisch", "Ungarisch", "Bulgarisch", "Tschechisch", "Türkisch", "Italienisch", "Serbisch", "Spanisch", "Philippinisch", "Vietnamesisch", "Indisch"];
 
+// Preis-Modell (EUR/Monat, netto). Basis + Add-on je Modul + Mitarbeiter/Sprachen.
+// Zahlen sind Vorschlagswerte – hier zentral anpassbar.
+const PRICING = {
+  base: 19,       // Grundgebuehr inkl. baseSeats Mitarbeiter
+  baseSeats: 5,
+  perSeat: 4,     // je Mitarbeiter ueber baseSeats
+  perLanguage: 6, // je Sprache ueber 1 (Deutsch inklusive)
+  modules: {
+    module_auto_reports: { label: "Automatischer Regiebericht", price: 9 },
+    photos_enabled:      { label: "Foto-Upload", price: 7 },
+    email_enabled:       { label: "E-Mail-Versand", price: 5 },
+    signature_enabled:   { label: "Unterschriften", price: 5 },
+    comments_enabled:    { label: "Kommentar-Chat", price: 5 },
+    material_enabled:    { label: "Materialerfassung", price: 12 },
+    export_enabled:      { label: "Stundenexport", price: 9 },
+    equipment_enabled:   { label: "Fahrzeuge & Werkzeuge", price: 19 },
+    absence_enabled:     { label: "Urlaub & Abwesenheit", price: 9 },
+    translator_enabled:  { label: "Live-Übersetzer", price: 5 },
+    ai_enabled:          { label: "KI-Mehrsprachigkeit", price: 15 },
+    // feedback_enabled & module_reports: in der Basis enthalten (0 EUR)
+  } as Record<string, { label: string; price: number }>,
+};
+
+function computeMonthlyPrice(features: any, employeeCount: number) {
+  const seats = employeeCount || features?.max_employees || 0;
+  const seatExtra = Math.max(0, seats - PRICING.baseSeats) * PRICING.perSeat;
+  const langCount = Array.isArray(features?.allowed_languages) ? features.allowed_languages.length : 0;
+  const langExtra = Math.max(0, langCount - 1) * PRICING.perLanguage;
+  const items: { label: string; price: number }[] = [];
+  items.push({ label: `Basis (bis ${PRICING.baseSeats} MA)`, price: PRICING.base });
+  if (seatExtra > 0) items.push({ label: `${seats - PRICING.baseSeats} weitere MA`, price: seatExtra });
+  for (const key of Object.keys(PRICING.modules)) {
+    if (features?.[key]) items.push({ label: PRICING.modules[key].label, price: PRICING.modules[key].price });
+  }
+  if (langExtra > 0) items.push({ label: `${langCount - 1} weitere Sprache(n)`, price: langExtra });
+  const total = items.reduce((s, i) => s + i.price, 0);
+  return { items, total };
+}
+
 // Holt den aktuellen Anmelde-Token, damit die Server-Route den Aufrufer prüfen kann.
 async function authHeaders(): Promise<Record<string, string>> {
   const { data } = await supabase.auth.getSession();
@@ -75,6 +114,11 @@ export default function AdminPage() {
   const [legalDatenschutz, setLegalDatenschutz] = useState("");
   const [savingLegal, setSavingLegal] = useState(false);
   const [openLegal, setOpenLegal] = useState(false);
+  // Preis-Rechner-Tab
+  const [adminTab, setAdminTab] = useState<"firmen" | "rechner">("firmen");
+  const [calcEmp, setCalcEmp] = useState(5);
+  const [calcLang, setCalcLang] = useState(1);
+  const [calcMods, setCalcMods] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -480,7 +524,66 @@ export default function AdminPage() {
         <button type="button" onClick={async () => { await supabase.auth.signOut(); setIsAdmin(false); }} className="bg-gray-800 text-white px-4 py-2 rounded">Abmelden</button>
       </header>
 
+      <div className="flex gap-2">
+        <button type="button" onClick={() => setAdminTab("firmen")} className={`px-4 py-2 rounded-lg font-medium text-sm ${adminTab === "firmen" ? "bg-cyan-700 text-white" : "bg-white border text-gray-600"}`}>🏢 Firmen &amp; Module</button>
+        <button type="button" onClick={() => setAdminTab("rechner")} className={`px-4 py-2 rounded-lg font-medium text-sm ${adminTab === "rechner" ? "bg-cyan-700 text-white" : "bg-white border text-gray-600"}`}>💶 Preis-Rechner</button>
+      </div>
+
       {message && <div className="border rounded p-3 bg-yellow-50 text-black">{message}</div>}
+
+      {adminTab === "rechner" && (() => {
+        const calcFeatures: any = { ...calcMods, allowed_languages: Array.from({ length: calcLang }) };
+        const { items, total } = computeMonthlyPrice(calcFeatures, calcEmp);
+        return (
+          <section className="bg-white border rounded-xl p-4 md:p-6 space-y-5">
+            <div>
+              <h2 className="text-xl font-bold">💶 Preis-Rechner</h2>
+              <p className="text-gray-500 text-sm">Mitarbeiter, Sprachen und Module wählen – der Monatspreis rechnet sich sofort. Grundlage: die Beträge in der <code>PRICING</code>-Konstante.</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div className="md:col-span-2 space-y-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-sm text-gray-600 block mb-1">Mitarbeiter (aktiv)</label>
+                    <input type="number" min={1} value={calcEmp} onChange={(e) => setCalcEmp(Math.max(1, Number(e.target.value) || 1))} className="border p-2 rounded w-full" />
+                  </div>
+                  <div>
+                    <label className="text-sm text-gray-600 block mb-1">Sprachen gesamt (inkl. Deutsch)</label>
+                    <input type="number" min={1} max={17} value={calcLang} onChange={(e) => setCalcLang(Math.min(17, Math.max(1, Number(e.target.value) || 1)))} className="border p-2 rounded w-full" />
+                  </div>
+                </div>
+                <div>
+                  <h3 className="font-bold mb-2">Module dazubuchen</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {Object.keys(PRICING.modules).map((key) => (
+                      <label key={key} className="flex items-center justify-between border rounded-lg px-3 py-2 cursor-pointer bg-gray-50">
+                        <span className="flex items-center gap-2 text-sm">
+                          <input type="checkbox" checked={!!calcMods[key]} onChange={(e) => setCalcMods((p) => ({ ...p, [key]: e.target.checked }))} />
+                          {PRICING.modules[key].label}
+                        </span>
+                        <span className="text-gray-500 text-sm whitespace-nowrap">+{PRICING.modules[key].price} €</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="bg-emerald-900 text-white rounded-xl p-4 h-fit md:sticky md:top-4">
+                <h3 className="font-bold text-emerald-100 mb-2">Dein Preis</h3>
+                <div className="space-y-1">
+                  {items.map((it, i) => (
+                    <div key={i} className="flex justify-between text-sm text-emerald-50/90"><span>{it.label}</span><span className="tabular-nums">{it.price} €</span></div>
+                  ))}
+                </div>
+                <div className="border-t border-white/25 mt-3 pt-3 flex justify-between items-baseline">
+                  <span>pro Monat</span><span><span className="text-3xl font-extrabold tabular-nums">{total}</span> €</span>
+                </div>
+                <p className="text-emerald-100/80 text-xs mt-2">Jährlich: {total * 12} € · mit 2 Monaten gratis: {total * 10} €</p>
+              </div>
+            </div>
+            <p className="text-xs text-gray-500">Vorschlagspreise (netto). Beträge zentral in <code>PRICING</code> im Code anpassbar.</p>
+          </section>
+        );
+      })()}
 
       {resetCreds && (
         <div className="bg-green-50 border-2 border-green-500 rounded-xl p-4 space-y-2">
@@ -491,6 +594,8 @@ export default function AdminPage() {
           <button type="button" onClick={() => setResetCreds(null)} className="bg-gray-200 px-4 py-2 rounded text-sm">Schließen</button>
         </div>
       )}
+
+      {adminTab === "firmen" && (<div className="space-y-6">
 
       {/* Impressum & Datenschutz */}
       <section className="bg-white border rounded-xl p-4 space-y-3">
@@ -675,6 +780,29 @@ export default function AdminPage() {
                       })}
                     </div>
                   </div>
+                  {(() => {
+                    const { items, total } = computeMonthlyPrice(features, users.length);
+                    return (
+                      <div>
+                        <h3 className="font-bold mb-3">💶 Preis-Vorschlag (netto / Monat)</h3>
+                        <div className="border rounded-lg bg-emerald-50 p-3">
+                          <div className="space-y-1">
+                            {items.map((it, i) => (
+                              <div key={i} className="flex justify-between text-sm">
+                                <span className="text-gray-700">{it.label}</span>
+                                <span className="font-medium tabular-nums">{it.price} €</span>
+                              </div>
+                            ))}
+                          </div>
+                          <div className="border-t mt-2 pt-2 flex justify-between font-bold text-emerald-800">
+                            <span>Gesamt / Monat</span>
+                            <span className="tabular-nums">{total} €</span>
+                          </div>
+                          <p className="text-xs text-gray-500 mt-2">Berechnet aus aktivierten Modulen, {users.length} Mitarbeiter und {(features.allowed_languages || []).length} Sprache(n). Grundlage: PRICING im Code.</p>
+                        </div>
+                      </div>
+                    );
+                  })()}
                   <div>
                     <h3 className="font-bold mb-3">👥 Mitarbeiter ({users.length} / {features.max_employees || 5})</h3>
                     {users.length === 0 ? <p className="text-gray-400 text-sm">Noch keine Mitarbeiter.</p> : (
@@ -771,6 +899,8 @@ export default function AdminPage() {
           );
         })}
       </section>
+
+      </div>)}
     </main>
   );
 }
