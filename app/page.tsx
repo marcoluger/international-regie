@@ -4217,6 +4217,7 @@ export default function Home() {
   const [eqReportMonth, setEqReportMonth] = useState<string>(() => new Date().toISOString().slice(0, 7));
   const [eqReportWeek, setEqReportWeek] = useState<string>("");
   const [eqHistory, setEqHistory] = useState<Record<string, any[]>>({});
+  const [eqHistTrans, setEqHistTrans] = useState<Record<string, string>>({});
   const [eqOpenId, setEqOpenId] = useState<string | null>(null);
   const [eqTrans, setEqTrans] = useState<Record<string, string>>({});
   const [eqFilter, setEqFilter] = useState<string>("all");
@@ -4750,7 +4751,19 @@ export default function Home() {
   }
   async function loadEquipmentHistory(id: string) {
     const data = await equipmentCall({ action: "history", id });
-    if (Array.isArray(data?.history)) setEqHistory(prev => ({ ...prev, [id]: data.history }));
+    if (Array.isArray(data?.history)) {
+      setEqHistory(prev => ({ ...prev, [id]: data.history }));
+      // Verlaufs-Notizen (Rueckgabe, km) in die Anzeige-Sprache uebersetzen.
+      try {
+        const items = data.history
+          .filter((h: any) => h?.note && String(h.note).trim())
+          .map((h: any) => ({ key: String(h.id), text: String(h.note) }));
+        if (items.length > 0) {
+          const out = await translateBatch(items, "automatisch", uiLanguage);
+          setEqHistTrans(prev => ({ ...prev, ...out }));
+        }
+      } catch { /* ohne Uebersetzung weiter */ }
+    }
   }
   async function toggleEquipmentHistory(id: string) {
     if (eqOpenId === id) { setEqOpenId(null); return; }
@@ -7598,7 +7611,7 @@ export default function Home() {
                           <p className="text-xs text-gray-500">–</p>
                         ) : (eqHistory[eq.id] || []).map((h: any) => (
                           <p key={h.id} className="text-xs text-gray-600">
-                            {h.action === "km" ? "🚗" : h.action === "assigned" ? "➡️" : "↩️"} {h.action === "km" ? (h.note || "") : (h.user_name || "?")} · {new Date(h.at).toLocaleString("de-DE")}{h.by_name ? ` · ${h.by_name}` : ""}{h.action !== "km" && h.note ? <span className="text-amber-700"> · ⚠️ {h.note}</span> : null}
+                            {h.action === "km" ? "🚗" : h.action === "assigned" ? "➡️" : "↩️"} {h.action === "km" ? (eqHistTrans[h.id] || h.note || "") : (h.user_name || "?")} · {new Date(h.at).toLocaleString("de-DE")}{h.by_name ? ` · ${h.by_name}` : ""}{h.action !== "km" && h.note ? <span className="text-amber-700"> · ⚠️ {eqHistTrans[h.id] || h.note}</span> : null}
                           </p>
                         ))}
                       </div>
