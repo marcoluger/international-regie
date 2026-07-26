@@ -119,6 +119,7 @@ export default function AdminPage() {
   const [resetCreds, setResetCreds] = useState<{ name: string; email: string } | null>(null);
   const [legalImpressum, setLegalImpressum] = useState("");
   const [legalDatenschutz, setLegalDatenschutz] = useState("");
+  const [legalAgb, setLegalAgb] = useState("");
   const [savingLegal, setSavingLegal] = useState(false);
   const [openLegal, setOpenLegal] = useState(false);
   // Preis-Rechner-Tab
@@ -182,6 +183,7 @@ export default function AdminPage() {
       setSettingsMap(smap);
       setLegalImpressum(data.legal?.impressum || "");
       setLegalDatenschutz(data.legal?.datenschutz || "");
+      setLegalAgb(data.legal?.agb || "");
       // Zentral gespeicherte Preise (falls vorhanden) uebernehmen.
       if (data.pricing && data.pricing.seatTiers && data.pricing.modules) setPrices(data.pricing);
       setMessage("");
@@ -207,7 +209,7 @@ export default function AdminPage() {
       const res = await fetch("/api/admin-data", {
         method: "POST",
         headers: await authHeaders(),
-        body: JSON.stringify({ action: "saveLegal", impressum: legalImpressum, datenschutz: legalDatenschutz }),
+        body: JSON.stringify({ action: "saveLegal", impressum: legalImpressum, datenschutz: legalDatenschutz, agb: legalAgb }),
       });
       const data = await res.json();
       if (data.error) { setMessage("Fehler: " + data.error); }
@@ -726,6 +728,10 @@ export default function AdminPage() {
           <div className="space-y-1">
             <label className="font-medium text-sm">Datenschutzerklärung</label>
             <textarea className="border p-3 w-full rounded text-sm font-mono" rows={16} value={legalDatenschutz} onChange={(e) => setLegalDatenschutz(e.target.value)} placeholder="Datenschutz-Text …" />
+          </div>
+          <div className="space-y-1">
+            <label className="font-medium text-sm">AGB (Allgemeine Geschäftsbedingungen)</label>
+            <textarea className="border p-3 w-full rounded text-sm font-mono" rows={18} value={legalAgb} onChange={(e) => setLegalAgb(e.target.value)} placeholder="AGB-Text …" />
           </div>
           <button type="button" onClick={saveLegal} disabled={savingLegal} className="bg-blue-700 text-white px-4 py-2 rounded disabled:opacity-50">{savingLegal ? "Speichere …" : "Speichern"}</button>
         </div>)}

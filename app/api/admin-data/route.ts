@@ -252,8 +252,8 @@ export async function POST(request: Request) {
   }
 
   if (action === "saveLegal") {
-    const { impressum, datenschutz } = body;
-    const { error } = await supabaseAdmin.from("site_legal").upsert({ id: "main", impressum: impressum ?? "", datenschutz: datenschutz ?? "" }, { onConflict: "id" });
+    const { impressum, datenschutz, agb } = body;
+    const { error } = await supabaseAdmin.from("site_legal").upsert({ id: "main", impressum: impressum ?? "", datenschutz: datenschutz ?? "", agb: agb ?? "" }, { onConflict: "id" });
     if (error) return Response.json({ error: error.message }, { status: 500 });
     return Response.json({ success: true });
   }
