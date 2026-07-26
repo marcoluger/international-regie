@@ -4860,8 +4860,9 @@ export default function Home() {
     await loadEquipmentPlans();
   }
   // km fuer ein (zugewiesenes) Fahrzeug speichern – durch den Mitarbeiter oder Chefs.
-  async function setKm(id: string, start: string, end: string) {
-    const data = await equipmentCall({ action: "set_km", id, startKm: start, endKm: end });
+  // Teil-Update: nur die uebergebenen km-Felder speichern (Start jetzt, Ende spaeter).
+  async function setKm(id: string, patch: { startKm?: string; endKm?: string }) {
+    const data = await equipmentCall({ action: "set_km", id, ...patch });
     if (data?.error) { setMessage(data.error); return; }
     setEqKmDraft((prev) => { const n = { ...prev }; delete n[id]; return n; });
     await loadEquipment();
@@ -7674,16 +7675,27 @@ export default function Home() {
                       const s = eqKmDraft[eq.id]?.start ?? (eq.start_km != null ? String(eq.start_km) : "");
                       const e2 = eqKmDraft[eq.id]?.end ?? (eq.end_km != null ? String(eq.end_km) : "");
                       const upd = (patch: { start?: string; end?: string }) => setEqKmDraft(prev => ({ ...prev, [eq.id]: { start: prev[eq.id]?.start ?? (eq.start_km != null ? String(eq.start_km) : ""), end: prev[eq.id]?.end ?? (eq.end_km != null ? String(eq.end_km) : ""), ...patch } }));
-                      const rawDiff = s !== "" && e2 !== "" ? (Number(String(e2).replace(",", ".")) || 0) - (Number(String(s).replace(",", ".")) || 0) : null;
-                      const negative = rawDiff != null && rawDiff < 0;
+                      const startNum = s !== "" ? (Number(String(s).replace(",", ".")) || 0) : null;
+                      const endNum = e2 !== "" ? (Number(String(e2).replace(",", ".")) || 0) : null;
+                      const negative = startNum != null && endNum != null && endNum < startNum;
+                      const driven = startNum != null && endNum != null && !negative ? endNum - startNum : null;
                       return (
-                        <div className="flex gap-2 flex-wrap items-center bg-cyan-50 border border-cyan-100 rounded-lg p-2">
-                          <span className="text-sm font-medium">🚗 km</span>
-                          <input type="number" inputMode="numeric" placeholder={tx.kmStart} value={s} onChange={(ev) => upd({ start: ev.target.value })} className="border p-2 rounded-lg text-black bg-white w-28" />
-                          <input type="number" inputMode="numeric" placeholder={tx.kmEnd} value={e2} onChange={(ev) => upd({ end: ev.target.value })} className={`border p-2 rounded-lg text-black bg-white w-28 ${negative ? "border-red-500" : ""}`} />
-                          {rawDiff != null && !negative && <span className="text-sm text-gray-700 whitespace-nowrap">= {rawDiff} {t.km}</span>}
-                          {negative && <span className="text-sm text-red-600 font-medium whitespace-nowrap">⚠️ {tx.kmWarnNegative}</span>}
-                          <button type="button" disabled={negative} onClick={() => setKm(eq.id, s, e2)} className="bg-cyan-700 text-white px-3 py-2 rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed">💾 {tx.kmSave}</button>
+                        <div className="bg-cyan-50 border border-cyan-100 rounded-lg p-2 space-y-2">
+                          {/* Schritt 1: Start-km (jetzt speichern) */}
+                          <div className="flex gap-2 flex-wrap items-center">
+                            <span className="text-sm font-medium w-20">🚗 {tx.kmStart}</span>
+                            <input type="number" inputMode="numeric" placeholder={tx.kmStart} value={s} onChange={(ev) => upd({ start: ev.target.value })} className="border p-2 rounded-lg text-black bg-white w-28" />
+                            <button type="button" disabled={s === ""} onClick={() => setKm(eq.id, { startKm: s })} className="bg-cyan-700 text-white px-3 py-2 rounded-lg text-sm disabled:opacity-50">💾 {tx.kmStart}</button>
+                            {eq.start_km != null && <span className="text-xs text-green-700 whitespace-nowrap">✓ {eq.start_km}</span>}
+                          </div>
+                          {/* Schritt 2: End-km (spaeter, nur wenn plausibel) */}
+                          <div className="flex gap-2 flex-wrap items-center">
+                            <span className="text-sm font-medium w-20">🏁 {tx.kmEnd}</span>
+                            <input type="number" inputMode="numeric" placeholder={tx.kmEnd} value={e2} onChange={(ev) => upd({ end: ev.target.value })} className={`border p-2 rounded-lg text-black bg-white w-28 ${negative ? "border-red-500" : ""}`} />
+                            <button type="button" disabled={e2 === "" || startNum == null || negative} onClick={() => setKm(eq.id, { endKm: e2 })} className="bg-cyan-700 text-white px-3 py-2 rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed">💾 {tx.kmEnd}</button>
+                            {driven != null && <span className="text-sm text-gray-700 whitespace-nowrap">= {driven} {t.km}</span>}
+                            {negative && <span className="text-sm text-red-600 font-medium whitespace-nowrap">⚠️ {tx.kmWarnNegative}</span>}
+                          </div>
                         </div>
                       );
                     })()}

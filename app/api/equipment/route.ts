@@ -225,7 +225,7 @@ export async function POST(request: Request) {
       if (!body?.id) return Response.json({ error: "id fehlt." }, { status: 400 });
       const { data: eq } = await supabaseAdmin
         .from("equipment")
-        .select("id, company_id, type, assigned_to")
+        .select("id, company_id, type, assigned_to, start_km, end_km")
         .eq("id", body.id)
         .maybeSingle();
       if (!eq || eq.company_id !== member.company_id) {
@@ -239,8 +239,9 @@ export async function POST(request: Request) {
         const n = Number(s);
         return Number.isFinite(n) ? n : null;
       };
-      const startKm = kmVal(body?.startKm);
-      const endKm = kmVal(body?.endKm);
+      // Teil-Update: nur die uebergebenen Felder aendern, das andere bleibt erhalten.
+      const startKm = ("startKm" in (body || {})) ? kmVal(body.startKm) : (eq.start_km ?? null);
+      const endKm = ("endKm" in (body || {})) ? kmVal(body.endKm) : (eq.end_km ?? null);
       // Plausibilitaet: End-km darf nicht kleiner als Start-km sein (keine negativen km).
       if (startKm != null && endKm != null && endKm < startKm) {
         return Response.json({ error: "End-km darf nicht kleiner als Start-km sein." }, { status: 400 });
