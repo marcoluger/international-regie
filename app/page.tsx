@@ -8565,6 +8565,8 @@ export default function Home() {
         <a href="/impressum" className="underline hover:text-gray-700">Impressum</a>
         <span className="mx-2">·</span>
         <a href="/datenschutz" className="underline hover:text-gray-700">Datenschutz</a>
+        <span className="mx-2">·</span>
+        <a href="/agb" className="underline hover:text-gray-700">AGB</a>
       </footer>
 
     </main>
