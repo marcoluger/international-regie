@@ -4622,6 +4622,12 @@ export default function Home() {
     await loadEquipmentPlans();
   }
   // km fuer ein (zugewiesenes) Fahrzeug speichern – durch den Mitarbeiter oder Chefs.
+  // Freies Geraet selbst uebernehmen (Server weist dem angemeldeten Konto zu).
+  async function takeSelf(id: string) {
+    const data = await equipmentCall({ action: "take_self", id });
+    if (data?.error) { setMessage(data.error); return; }
+    await loadEquipment();
+  }
   // Teil-Update: nur die uebergebenen km-Felder speichern (Start jetzt, Ende spaeter).
   async function setKm(id: string, patch: { startKm?: string; endKm?: string }) {
     const data = await equipmentCall({ action: "set_km", id, ...patch });
@@ -7428,17 +7434,17 @@ export default function Home() {
                         <button type="button" onClick={() => deleteEquipment(eq.id)} className="text-xs px-2 py-1 rounded border text-red-600">🗑️</button>
                       </div>
                     )}
-                    {!eq.assigned_to && user?.id && !(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
+                    {!eq.assigned_to && !(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
                       <div className="flex gap-2 flex-wrap items-center">
-                        <button type="button" onClick={() => assignEquipment(eq.id, user.id)} className="bg-cyan-700 text-white px-3 py-2 rounded-lg text-sm">📥 {tx.take}</button>
+                        <button type="button" onClick={() => takeSelf(eq.id)} className="bg-cyan-700 text-white px-3 py-2 rounded-lg text-sm">📥 {tx.take}</button>
                       </div>
                     )}
-                    {eq.assigned_to && eq.assigned_to === user?.id && !(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
+                    {eq.mine && !(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
                       <div className="flex gap-2 flex-wrap items-center">
                         <button type="button" onClick={() => requestReturn(eq)} className="bg-gray-200 px-3 py-2 rounded-lg text-sm">↩️ {t.equipmentReturn}</button>
                       </div>
                     )}
-                    {eq.type === "vehicle" && eq.assigned_to && (eq.assigned_to === user?.id || currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (() => {
+                    {eq.type === "vehicle" && eq.assigned_to && (eq.mine || currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (() => {
                       const s = eqKmDraft[eq.id]?.start ?? (eq.start_km != null ? String(eq.start_km) : "");
                       const e2 = eqKmDraft[eq.id]?.end ?? (eq.end_km != null ? String(eq.end_km) : "");
                       const upd = (patch: { start?: string; end?: string }) => setEqKmDraft(prev => ({ ...prev, [eq.id]: { start: prev[eq.id]?.start ?? (eq.start_km != null ? String(eq.start_km) : ""), end: prev[eq.id]?.end ?? (eq.end_km != null ? String(eq.end_km) : ""), ...patch } }));

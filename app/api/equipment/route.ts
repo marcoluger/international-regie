@@ -190,7 +190,9 @@ export async function POST(request: Request) {
         .order("name", { ascending: true })
         .limit(1000);
       if (error) return Response.json({ error: error.message }, { status: 500 });
-      return Response.json({ items: data || [] });
+      // "mine" serverseitig anhand des angemeldeten Tokens markieren (robust gegen Browser-ID).
+      const items = (data || []).map((it: any) => ({ ...it, mine: !!caller?.id && it.assigned_to === caller.id }));
+      return Response.json({ items });
     }
 
     // ── Planungen auflisten (alle duerfen sehen) ──
@@ -289,6 +291,40 @@ export async function POST(request: Request) {
         by_name: byName,
         note: returnNote || null,
       });
+      return Response.json({ success: true });
+    }
+
+    // ── Freies Geraet selbst uebernehmen (robust: immer dem Token-Konto zuweisen) ──
+    if (action === "take_self") {
+      if (!body?.id) return Response.json({ error: "id fehlt." }, { status: 400 });
+      const { data: eq } = await supabaseAdmin
+        .from("equipment")
+        .select("id, company_id, assigned_to")
+        .eq("id", body.id)
+        .maybeSingle();
+      if (!eq || eq.company_id !== member.company_id) {
+        return Response.json({ error: "Gerät nicht gefunden." }, { status: 404 });
+      }
+      if (!isManager && eq.assigned_to && eq.assigned_to !== caller.id) {
+        return Response.json({ error: "Gerät ist bereits vergeben." }, { status: 403 });
+      }
+      const selfName = member.full_name || member.email || "";
+      const { error } = await supabaseAdmin
+        .from("equipment")
+        .update({ assigned_to: caller.id, assigned_to_name: selfName, assigned_at: new Date().toISOString() })
+        .eq("id", body.id)
+        .eq("company_id", member.company_id);
+      if (error) return Response.json({ error: error.message }, { status: 500 });
+      if (eq.assigned_to !== caller.id) {
+        await supabaseAdmin.from("equipment_log").insert({
+          company_id: member.company_id,
+          equipment_id: body.id,
+          action: "assigned",
+          user_id: caller.id,
+          user_name: selfName,
+          by_name: byName,
+        });
+      }
       return Response.json({ success: true });
     }
 
