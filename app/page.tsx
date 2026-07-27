@@ -7167,6 +7167,29 @@ export default function Home() {
                 ))}
               </div>
             )}
+            {/* Owner / Admin zuweisen – Mehrfachauswahl */}
+            {companyUsers.filter(m => m.role === "owner" || m.role === "admin").length > 0 && (
+              <div className="border border-slate-200 rounded-xl p-3 shadow-sm bg-gray-50 space-y-2">
+                <h3 className="font-bold text-sm">👑 Owner / Admin</h3>
+                {companyUsers.filter(m => m.role === "owner" || m.role === "admin").map((m) => (
+                  <label key={m.user_id} className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={assignedUserIds.includes(m.user_id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setAssignedUserIds(prev => [...prev, m.user_id]);
+                        } else {
+                          setAssignedUserIds(prev => prev.filter(id => id !== m.user_id));
+                        }
+                      }}
+                      className="w-4 h-4"
+                    />
+                    <span>{m.full_name || m.email}{m.role === "owner" ? " · Owner" : " · Admin"}</span>
+                  </label>
+                ))}
+              </div>
+            )}
             <input className="border p-3 w-full text-black bg-white" placeholder={t.problems} value={instructionProblems} onChange={(e) => setInstructionProblems(e.target.value)} />
             <input className="border p-3 w-full text-black bg-white" placeholder={t.material} value={instructionMaterial} onChange={(e) => setInstructionMaterial(e.target.value)} />
             <input className="border p-3 w-full text-black bg-white" placeholder={t.werkzeug} value={instructionWerkzeug} onChange={(e) => setInstructionWerkzeug(e.target.value)} />
