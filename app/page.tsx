@@ -295,6 +295,7 @@ const texts = {
     msgSaving: "Speichere Arbeitsanweisung...",
     msgNoFirm: "Keine Firma geladen.",
     msgNoTitle: "Bitte Titel der Arbeitsanweisung eintragen.",
+    msgNoDate: "Bitte ein Datum für die Arbeitsanweisung eintragen.",
     msgInstructionSaved: "Arbeitsanweisung gespeichert.",
     msgInstructionDeleted: "Arbeitsanweisung gelöscht.",
     msgFeedbackSaved: "Rückmeldung gespeichert.",
@@ -5687,6 +5688,7 @@ export default function Home() {
     setMessage(t.msgSaving);
     if (!currentCompany) { setMessage(t.msgNoFirm); return; }
     if (!instructionTitle.trim()) { setMessage(t.msgNoTitle); return; }
+    if (!instructionDate) { setMessage((t as any).msgNoDate || "Bitte ein Datum für die Arbeitsanweisung eintragen."); return; }
     await ensureFreshSession();
     const instructionPayload = { company_id: currentCompany.company_id, project_id: selectedProjectId || null, work_date: instructionDate || null, assigned_user_ids: assignedUserIds, title: instructionTitle, project: instructionProject, customer: instructionCustomer, site: instructionSite, street: instructionStreet, zip: instructionZip, city: instructionCity, description: instructionDescription, problems_text: instructionProblems, material: instructionMaterial, werkzeug: instructionWerkzeug, photos: instructionPhotos };
     let instruction: any; let error: any;
