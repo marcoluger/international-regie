@@ -6464,12 +6464,15 @@ export default function Home() {
     // Dateiname = Berichtsname (z. B. "KW 26 - Jasmin 2.pdf"); falls leer -> Projekt_KW_Mitarbeiter
     const illegal = (s: string) => (s || "").replace(/[\\/:*?"<>|]/g, "");
     const nameFromReport = illegal(pdfReportName || "").trim();
+    // Projektnummer(n) aus den Tagen des Berichts – kommt in den Dateinamen.
+    const projectNumbers = Array.from(new Set((pdfDays || []).map((d: any) => (d.projectNumber || "").trim()).filter(Boolean)));
+    const projectLabel = illegal(projectNumbers.join("-")).trim();
     let filename: string;
     if (nameFromReport) {
-      filename = `${nameFromReport}.pdf`;
+      // Projekt voranstellen (falls vorhanden): "P260022 - KW 31 - Nicki 1.pdf"
+      filename = projectLabel ? `${projectLabel} - ${nameFromReport}.pdf` : `${nameFromReport}.pdf`;
     } else {
-      const projectNumbers = Array.from(new Set((pdfDays || []).map((d: any) => (d.projectNumber || "").trim()).filter(Boolean)));
-      const projectPart = illegal(projectNumbers.length === 0 ? "Projekt" : projectNumbers.join("-")).replace(/\s+/g, "_");
+      const projectPart = (projectLabel || "Projekt").replace(/\s+/g, "_");
       const kwPart = illegal(pdfCalendarWeek || "Woche").replace(/\s+/g, "");
       const employeePart = illegal(pdfEmployee || "Mitarbeiter").replace(/\s+/g, "_");
       filename = `${projectPart}_${kwPart}_${employeePart}.pdf`;
