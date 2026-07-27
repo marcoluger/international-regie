@@ -292,6 +292,41 @@ export async function POST(request: Request) {
       return Response.json({ success: true });
     }
 
+    // ── Freies Geraet selbst uebernehmen (Mitarbeiter weist es sich selbst zu) ──
+    if (action === "assign" && body?.userId && body.userId === caller.id) {
+      if (!body?.id) return Response.json({ error: "id fehlt." }, { status: 400 });
+      const { data: eq } = await supabaseAdmin
+        .from("equipment")
+        .select("id, company_id, assigned_to")
+        .eq("id", body.id)
+        .maybeSingle();
+      if (!eq || eq.company_id !== member.company_id) {
+        return Response.json({ error: "Gerät nicht gefunden." }, { status: 404 });
+      }
+      // Nur Chefs duerfen ein bereits vergebenes Geraet an sich ziehen; Mitarbeiter nur freie.
+      if (!isManager && eq.assigned_to && eq.assigned_to !== caller.id) {
+        return Response.json({ error: "Gerät ist bereits vergeben." }, { status: 403 });
+      }
+      const selfName = member.full_name || member.email || "";
+      const { error } = await supabaseAdmin
+        .from("equipment")
+        .update({ assigned_to: caller.id, assigned_to_name: selfName, assigned_at: new Date().toISOString() })
+        .eq("id", body.id)
+        .eq("company_id", member.company_id);
+      if (error) return Response.json({ error: error.message }, { status: 500 });
+      if (eq.assigned_to !== caller.id) {
+        await supabaseAdmin.from("equipment_log").insert({
+          company_id: member.company_id,
+          equipment_id: body.id,
+          action: "assigned",
+          user_id: caller.id,
+          user_name: selfName,
+          by_name: byName,
+        });
+      }
+      return Response.json({ success: true });
+    }
+
     // Ab hier: nur Owner/Admin/Projektleiter
     if (!isManager) {
       return Response.json({ error: "Keine Berechtigung." }, { status: 403 });
