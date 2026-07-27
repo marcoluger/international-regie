@@ -6340,6 +6340,24 @@ export default function Home() {
     const pdfEmployee = src?.employee ?? employee;
     const pdfSigEmployee = src ? (src.sigEmployee || "") : sigEmployee;
     const pdfSigCustomer = src ? (src.sigCustomer || "") : sigCustomer;
+    // WICHTIG: Summen aus den tatsaechlich gedruckten Tagen (pdfDays) berechnen,
+    // nicht aus dem Formular-State `days` (der beim Drucken eines gespeicherten
+    // Berichts leer sein kann -> sonst Gesamtstunden/km = 0).
+    const totalHours = pdfDays.reduce((sum, day) => sum + parseHours(day.hours), 0);
+    const projectTotals = pdfDays.reduce<Record<string, number>>((acc, day) => {
+      if (!day.projectNumber) return acc;
+      acc[day.projectNumber] = (acc[day.projectNumber] || 0) + parseHours(day.hours);
+      return acc;
+    }, {});
+    const totalTravelMinutes = pdfDays.reduce((sum, day) => sum + travelMinutes(day.travelOutStart, day.travelOutEnd) + travelMinutes(day.travelReturnStart, day.travelReturnEnd), 0);
+    const totalTravelKm = pdfDays.reduce((sum, day) => sum + (Number((day.travelOutKm || "").replace(",", ".")) || 0) + (Number((day.travelReturnKm || "").replace(",", ".")) || 0), 0);
+    const totalTravelKmDisplay = (Math.round(totalTravelKm * 10) / 10).toString().replace(".", ",");
+    const travelKmByProject = pdfDays.reduce<Record<string, number>>((acc, day) => {
+      if (!day.projectNumber) return acc;
+      const km = (Number((day.travelOutKm || "").replace(",", ".")) || 0) + (Number((day.travelReturnKm || "").replace(",", ".")) || 0);
+      if (km > 0) acc[day.projectNumber] = (acc[day.projectNumber] || 0) + km;
+      return acc;
+    }, {});
     const p = pdfTexts[uiLanguage as keyof typeof pdfTexts] || pdfTexts["Deutsch" as keyof typeof pdfTexts];
     const doc = new jsPDF("p", "mm", "a4");
     const FONT = await loadPdfFont(doc);
