@@ -3921,6 +3921,7 @@ export default function Home() {
   const [teamReports, setTeamReports] = useState<SavedReport[]>([]);
   const [teamOpenId, setTeamOpenId] = useState<string | null>(null);
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
+  const [teamFilterUid, setTeamFilterUid] = useState<string>("");
   const [transFrom, setTransFrom] = useState<string>("Deutsch");
   const [transTo, setTransTo] = useState<string>("Kroatisch");
   const [transInput, setTransInput] = useState<string>("");
@@ -7287,12 +7288,26 @@ export default function Home() {
           if (!groups[uid]) { const m = companyUsers.find((u: any) => u.user_id === uid); groups[uid] = { name: m?.full_name || m?.email || r.employee || uid, reports: [] }; }
           groups[uid].reports.push(r);
         }
-        const entries = Object.entries(groups);
+        const allEntries = Object.entries(groups).sort((a, b) => a[1].name.localeCompare(b[1].name));
+        // Dropdown-Auswahl: nur den gewaehlten Mitarbeiter zeigen (leer = alle).
+        const entries = teamFilterUid ? allEntries.filter(([uid]) => uid === teamFilterUid) : allEntries;
         return (
           <section className="border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4 bg-white text-black">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center gap-2 flex-wrap">
               <h2 className="text-xl font-bold">👁 {t.teamReports}</h2>
-              <button type="button" onClick={loadTeamReports} className="bg-gray-200 px-3 py-2.5 rounded-lg text-sm">🔄</button>
+              <div className="flex items-center gap-2">
+                <select
+                  value={teamFilterUid}
+                  onChange={(e) => { setTeamFilterUid(e.target.value); setTeamOpenId(null); }}
+                  className="border p-2 rounded-lg text-black bg-white text-sm max-w-[14rem]"
+                >
+                  <option value="">{t.employee} · {allEntries.length}</option>
+                  {allEntries.map(([uid, group]) => (
+                    <option key={uid} value={uid}>{group.name} ({group.reports.length})</option>
+                  ))}
+                </select>
+                <button type="button" onClick={loadTeamReports} className="bg-gray-200 px-3 py-2.5 rounded-lg text-sm">🔄</button>
+              </div>
             </div>
             {teamLoading ? (<p className="text-gray-500">⏳ ...</p>) : entries.length === 0 ? (<p className="text-gray-500">{t.teamNoReports}</p>) : entries.map(([uid, group]) => (
               <div key={uid} className="border rounded-lg overflow-hidden">
