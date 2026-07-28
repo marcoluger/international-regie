@@ -39,6 +39,7 @@ const PRICING_DEFAULT = {
     { key: "export_enabled",      label: "Stundenexport",              price: 9 },
     { key: "equipment_enabled",   label: "Fahrzeuge & Werkzeuge",      price: 19 },
     { key: "absence_enabled",     label: "Urlaub & Abwesenheit",       price: 9 },
+    { key: "phonelist_enabled",   label: "Telefonliste",               price: 5 },
     { key: "translator_enabled",  label: "Live-Übersetzer",            price: 5 },
     { key: "ai_enabled",          label: "KI-Mehrsprachigkeit",        price: 15 },
     // feedback_enabled & module_reports: in der Basis enthalten (0 EUR)
@@ -888,6 +889,7 @@ export default function AdminPage() {
                       <Toggle label="📊 Stundenexport"       value={!!features.export_enabled}      onChange={(v) => updateFeature(company.id, "export_enabled", v)} />
                       <Toggle label="🚚 Fahrzeuge & Werkzeuge" value={!!features.equipment_enabled} onChange={(v) => updateFeature(company.id, "equipment_enabled", v)} />
                       <Toggle label="🌴 Urlaub & Abwesenheit" value={!!features.absence_enabled}  onChange={(v) => updateFeature(company.id, "absence_enabled", v)} />
+                      <Toggle label="📞 Telefonliste"         value={!!features.phonelist_enabled}   onChange={(v) => updateFeature(company.id, "phonelist_enabled", v)} />
                     </div>
                   </div>
                   <div>

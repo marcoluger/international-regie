@@ -136,6 +136,7 @@ type CompanyFeatures = {
   export_enabled?: boolean;
   equipment_enabled?: boolean;
   absence_enabled?: boolean;
+  phonelist_enabled?: boolean;
 };
 
 const texts = {
@@ -7452,7 +7453,9 @@ export default function Home() {
         {companyFeatures?.feedback_enabled && !readOnlyUser && (
         <TabButton label={`💬 ${t.feedbackTab}`} tabName="feedback" activeTab={activeTab} onClick={() => { setActiveTab("feedback"); if (currentCompany && (currentCompany.role === "owner" || currentCompany.role === "admin" || currentCompany.role === "project_manager")) loadFeedback(); }} />
         )}
+        {companyFeatures?.phonelist_enabled && (
         <TabButton label={`📞 ${tx.phoneList}`} tabName="telefon" activeTab={activeTab} onClick={() => { setActiveTab("telefon"); if (currentCompany) { loadCompanyUsers(currentCompany.company_id); loadProjects(currentCompany.company_id); loadWorkInstructions(currentCompany.company_id); } }} />
+        )}
       </nav>
       )}
 
@@ -8694,7 +8697,7 @@ export default function Home() {
         </div>
       )}
 
-      {activeTab === "telefon" && (
+      {activeTab === "telefon" && companyFeatures?.phonelist_enabled && (
         <section className="border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3 bg-white text-black">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-bold">📞 {tx.phoneList}</h2>
