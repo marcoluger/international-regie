@@ -6370,58 +6370,70 @@ export default function Home() {
     const getWerkzeugText = () => currentTranslations.werkzeug || instruction.werkzeug || "";
 
     const currentTexts = texts[uiLanguage];
-    const completedTasks = (instruction.work_instruction_tasks || [])
-      .sort((a: any, b: any) => a.sort_order - b.sort_order)
-      .map((task: any) => {
-        const statusText = task.status === "completed" ? currentTexts.statusCompleted : task.status === "in_progress" ? currentTexts.statusInProgress : task.status === "stopped" ? currentTexts.statusStopped : currentTexts.statusOpen;
-        const taskText = getTaskText(task.id, task.task_text);
-        const lines = [`${statusText}: ${taskText}`];
-        if (task.note) lines.push(`   📝 ${currentTexts.feedbackLabel}: ${task.note}`);
-        const cmtText = freshComments[task.id] || "";
-        if (cmtText) {
-          for (const cl of cmtText.split("\n")) {
-            if (cl.trim()) lines.push(`   💬 ${currentTexts.commentLabel}: ${cl}`);
-          }
+    const buildTaskLine = (task: any) => {
+      const statusText = task.status === "completed" ? currentTexts.statusCompleted : task.status === "in_progress" ? currentTexts.statusInProgress : task.status === "stopped" ? currentTexts.statusStopped : currentTexts.statusOpen;
+      const taskText = getTaskText(task.id, task.task_text);
+      const lines = [`${statusText}: ${taskText}`];
+      if (task.note) lines.push(`   📝 ${currentTexts.feedbackLabel}: ${task.note}`);
+      const cmtText = freshComments[task.id] || "";
+      if (cmtText) {
+        for (const cl of cmtText.split("\n")) {
+          if (cl.trim()) lines.push(`   💬 ${currentTexts.commentLabel}: ${cl}`);
         }
-        return lines.join("\n");
-      });
+      }
+      return lines.join("\n");
+    };
+    const sortedTasks = (instruction.work_instruction_tasks || []).sort((a: any, b: any) => a.sort_order - b.sort_order);
+    const completedTasks = sortedTasks.map(buildTaskLine);
+    // Nur noch NICHT erledigte Arbeitsschritte (fuer die Wiederholung an jedem Tag).
+    const openTaskLines = sortedTasks.filter((task: any) => task.status !== "completed").map(buildTaskLine);
     const titleTranslated = getTitleText();
     const problemsTranslated = getProblemsText();
     const materialTranslated = getMaterialText();
     const werkzeugTranslated = getWerkzeugText();
-    const description = [
+    const buildDescription = (taskBlocks: string[]) => [
       titleTranslated !== instruction.title ? `📋 ${titleTranslated}` : "",
-      ...completedTasks,
+      ...taskBlocks,
       problemsTranslated ? `─────\n⚠️ ${currentTexts.problemsHints}: ${problemsTranslated}` : "",
       materialTranslated ? `📦 ${currentTexts.material}: ${materialTranslated}` : "",
       usedMaterialList(instruction).length > 0 ? `📦 ${currentTexts.materialUsed}: ${usedMaterialList(instruction).map((m: any) => `${m.qty} ${unitLabel(m.unit, uiLanguage)} ${getTranslatedMaterial(instruction.id, m.name)}`).join(", ")}` : "",
       werkzeugTranslated ? `🔧 ${currentTexts.werkzeug}: ${werkzeugTranslated}` : "",
       instruction.employee_note ? `${currentTexts.feedbackLabel}: ${instruction.employee_note}` : ""
     ].filter(Boolean).join("\n─────\n");
+    const description = buildDescription(completedTasks);
+    // Bei Wochen-Anweisungen: an JEDEM Tag nur die noch offenen Arbeitsschritte.
+    const openDescription = buildDescription(openTaskLines);
     const targetDate = instruction.work_date || "";
+    // Block (fuer eine Anweisung) in einen Tag setzen/ersetzen – kein doppelter Text.
+    const putInstrBlock = (dayEntry: DayEntry, text: string): DayEntry => {
+      const existingDesc = (dayEntry.description || "").trim();
+      const prevBlocks = Array.isArray(dayEntry.blocks) ? dayEntry.blocks! : [];
+      const blocks = prevBlocks.length > 0 ? [...prevBlocks] : (existingDesc ? [{ id: "legacy", text: existingDesc }] : []);
+      const bIdx = blocks.findIndex((b) => b.id === instruction.id);
+      if (bIdx >= 0) blocks[bIdx] = { id: instruction.id, text };
+      else blocks.push({ id: instruction.id, text });
+      const mergedDesc = blocks.map((b) => b.text).filter(Boolean).join("\n─────\n");
+      return { ...dayEntry, customer: dayEntry.customer || instruction.customer || "", projectNumber: dayEntry.projectNumber || instruction.project || "", site: dayEntry.site || formatProjectAddress(instruction) || "", description: mergedDesc, blocks };
+    };
+    const isWeek = instruction.scope === "week";
 
     // In einen BESTEHENDEN Bericht einfuegen
     if (targetReport) {
       const baseDays: DayEntry[] = (targetReport.days && targetReport.days.length === 7) ? targetReport.days.map((d: any) => ({ ...d })) : createEmptyDays();
-      let idx = targetDate ? baseDays.findIndex((d) => d.date === targetDate) : -1;
-      if (idx < 0) idx = baseDays.findIndex((d) => !(d.description || "").trim());
-      if (idx < 0) idx = 0;
-      // Bereits uebertragene Anweisungen des Tages. Wird dieselbe Anweisung erneut
-      // uebertragen, wird ihr Block ERSETZT (kein doppelter Text mehr).
-      const existingDesc = (baseDays[idx].description || "").trim();
-      const prevBlocks = Array.isArray(baseDays[idx].blocks) ? baseDays[idx].blocks! : [];
-      const blocks = prevBlocks.length > 0
-        ? [...prevBlocks]
-        : (existingDesc ? [{ id: "legacy", text: existingDesc }] : []);
-      const bIdx = blocks.findIndex((b) => b.id === instruction.id);
-      if (bIdx >= 0) blocks[bIdx] = { id: instruction.id, text: description };
-      else blocks.push({ id: instruction.id, text: description });
-      const mergedDesc = blocks.map((b) => b.text).filter(Boolean).join("\n─────\n");
-      baseDays[idx] = { ...baseDays[idx], customer: baseDays[idx].customer || instruction.customer || "", projectNumber: baseDays[idx].projectNumber || instruction.project || "", site: baseDays[idx].site || formatProjectAddress(instruction) || "", description: mergedDesc, blocks };
-      // Vom Mitarbeiter erfasste Zeiten (Stunden/Pause/Fahrzeit/km) je Tag uebernehmen.
-      for (const date of instrDatesFor(instruction)) {
-        const di = baseDays.findIndex((d) => d.date === date);
-        if (di >= 0) baseDays[di] = applyInstrTimeToDay(baseDays[di], instruction.id, date);
+      if (isWeek) {
+        // Wochen-Anweisung: an JEDEM Tag der Woche die offenen Arbeitsschritte + Zeiten.
+        for (const date of instrDatesFor(instruction)) {
+          const di = baseDays.findIndex((d) => d.date === date);
+          if (di < 0) continue;
+          baseDays[di] = putInstrBlock(baseDays[di], openDescription);
+          baseDays[di] = applyInstrTimeToDay(baseDays[di], instruction.id, date);
+        }
+      } else {
+        let idx = targetDate ? baseDays.findIndex((d) => d.date === targetDate) : -1;
+        if (idx < 0) idx = baseDays.findIndex((d) => !(d.description || "").trim());
+        if (idx < 0) idx = 0;
+        baseDays[idx] = putInstrBlock(baseDays[idx], description);
+        baseDays[idx] = applyInstrTimeToDay(baseDays[idx], instruction.id, targetDate);
       }
       setDays(baseDays); setCurrentReportId(targetReport.id); setReportName(targetReport.report_name || ""); setReportLoaded(true); setReportVersion((v) => v + 1); setReportInstruction(instruction); setActiveTab("regiebericht"); setMessage(t.msgReportPrepared);
       return;
@@ -6437,13 +6449,19 @@ export default function Home() {
       monday.setUTCDate(selectedDate.getUTCDate() - dayNumber + 1);
       for (let i = 0; i < 7; i++) { const nextDate = new Date(monday); nextDate.setUTCDate(monday.getUTCDate() + i); copy[i] = { ...copy[i], date: nextDate.toISOString().split("T")[0] }; }
     }
-    const targetIndex = targetDate ? copy.findIndex((day) => day.date === targetDate) : 0;
-    const indexToUse = targetIndex >= 0 ? targetIndex : 0;
-    copy[indexToUse] = { ...copy[indexToUse], customer: instruction.customer || "", projectNumber: instruction.project || "", site: formatProjectAddress(instruction) || "", description, blocks: [{ id: instruction.id, text: description }], photos: [] };
-    // Vom Mitarbeiter erfasste Zeiten (Stunden/Pause/Fahrzeit/km) je Tag uebernehmen.
-    for (const date of instrDatesFor(instruction)) {
-      const di = copy.findIndex((d) => d.date === date);
-      if (di >= 0) copy[di] = applyInstrTimeToDay(copy[di], instruction.id, date);
+    if (isWeek) {
+      // Wochen-Anweisung: an JEDEM Tag der Woche die offenen Arbeitsschritte + Zeiten.
+      for (const date of instrDatesFor(instruction)) {
+        const di = copy.findIndex((d) => d.date === date);
+        if (di < 0) continue;
+        copy[di] = putInstrBlock(copy[di], openDescription);
+        copy[di] = applyInstrTimeToDay(copy[di], instruction.id, date);
+      }
+    } else {
+      const targetIndex = targetDate ? copy.findIndex((day) => day.date === targetDate) : 0;
+      const indexToUse = targetIndex >= 0 ? targetIndex : 0;
+      copy[indexToUse] = putInstrBlock(copy[indexToUse], description);
+      copy[indexToUse] = applyInstrTimeToDay(copy[indexToUse], instruction.id, targetDate);
     }
     setDays(copy); setCurrentReportId(null); setReportName(""); setReportLoaded(false); setReportVersion((v) => v + 1); setReportInstruction(instruction); setActiveTab("regiebericht"); setMessage(t.msgReportPrepared);
   }
