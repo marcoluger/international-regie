@@ -4123,6 +4123,11 @@ export default function Home() {
   const [selectedProjectDetailId, setSelectedProjectDetailId] = useState("");
   const [instructionDate, setInstructionDate] = useState("");
   const [instructionAddress2, setInstructionAddress2] = useState("");
+  const [instructionAddr2Name, setInstructionAddr2Name] = useState("");
+  const [instructionAddr2Street, setInstructionAddr2Street] = useState("");
+  const [instructionAddr2Zip, setInstructionAddr2Zip] = useState("");
+  const [instructionAddr2City, setInstructionAddr2City] = useState("");
+  const [addr2Open, setAddr2Open] = useState(false);
   const [instructionScope, setInstructionScope] = useState<"day" | "week">("day");
   // Vom Mitarbeiter je Anweisung/Tag erfasste Zeiten (Stunden, Pause, Fahrzeit, km).
   // Aufbau: { [instructionId]: { [YYYY-MM-DD]: { startTime, endTime, breakMinutes, hours, travelOut*, travelReturn* } } }
@@ -5910,6 +5915,11 @@ export default function Home() {
     setInstructionSite(instruction.site || "");
     setInstructionStreet(instruction.street || "");
     setInstructionAddress2(instruction.address2 || "");
+    setInstructionAddr2Name(instruction.address2_name || "");
+    setInstructionAddr2Street(instruction.address2_street || "");
+    setInstructionAddr2Zip(instruction.address2_zip || "");
+    setInstructionAddr2City(instruction.address2_city || "");
+    setAddr2Open(!!(instruction.address2_name || instruction.address2_street || instruction.address2_zip || instruction.address2_city || instruction.address2));
     setInstructionZip(instruction.zip || "");
     setInstructionCity(instruction.city || "");
     setInstructionDescription(instruction.description || "");
@@ -5936,7 +5946,7 @@ export default function Home() {
   // Bearbeiten abbrechen und Formular leeren.
   function cancelEditInstruction() {
     setEditingInstructionId(null);
-    setInstructionTitle(""); setInstructionProject(""); setInstructionCustomer(""); setInstructionSite(""); setInstructionStreet(""); setInstructionZip(""); setInstructionCity(""); setInstructionAddress2(""); setInstructionDescription(""); setInstructionTasks([""]); setInstructionProblems(""); setInstructionMaterial(""); setInstructionWerkzeug(""); setInstructionPhotos([]); setInstructionTaskPhotos({}); setInstructionTaskStatuses({}); setAssignedUserIds([]); setSelectedProjectId(""); setInstructionDate(""); setInstructionScope("day");
+    setInstructionTitle(""); setInstructionProject(""); setInstructionCustomer(""); setInstructionSite(""); setInstructionStreet(""); setInstructionZip(""); setInstructionCity(""); setInstructionAddress2(""); setInstructionAddr2Name(""); setInstructionAddr2Street(""); setInstructionAddr2Zip(""); setInstructionAddr2City(""); setAddr2Open(false); setInstructionDescription(""); setInstructionTasks([""]); setInstructionProblems(""); setInstructionMaterial(""); setInstructionWerkzeug(""); setInstructionPhotos([]); setInstructionTaskPhotos({}); setInstructionTaskStatuses({}); setAssignedUserIds([]); setSelectedProjectId(""); setInstructionDate(""); setInstructionScope("day");
     setMessage("");
   }
 
@@ -5946,7 +5956,7 @@ export default function Home() {
     if (!instructionTitle.trim()) { setMessage(t.msgNoTitle); return; }
     if (!instructionDate) { setMessage((t as any).msgNoDate || "Bitte ein Datum für die Arbeitsanweisung eintragen."); return; }
     await ensureFreshSession();
-    const instructionPayload = { company_id: currentCompany.company_id, project_id: selectedProjectId || null, work_date: instructionDate || null, scope: instructionScope, assigned_user_ids: assignedUserIds, title: instructionTitle, project: instructionProject, customer: instructionCustomer, site: instructionSite, street: instructionStreet, zip: instructionZip, city: instructionCity, address2: instructionAddress2 || null, description: instructionDescription, problems_text: instructionProblems, material: instructionMaterial, werkzeug: instructionWerkzeug, photos: instructionPhotos };
+    const instructionPayload = { company_id: currentCompany.company_id, project_id: selectedProjectId || null, work_date: instructionDate || null, scope: instructionScope, assigned_user_ids: assignedUserIds, title: instructionTitle, project: instructionProject, customer: instructionCustomer, site: instructionSite, street: instructionStreet, zip: instructionZip, city: instructionCity, address2: null, address2_name: instructionAddr2Name || null, address2_street: instructionAddr2Street || null, address2_zip: instructionAddr2Zip || null, address2_city: instructionAddr2City || null, description: instructionDescription, problems_text: instructionProblems, material: instructionMaterial, werkzeug: instructionWerkzeug, photos: instructionPhotos };
     let instruction: any; let error: any;
     if (editingInstructionId) {
       const upd = await dbTimeout(supabase.from("work_instructions").update(instructionPayload).eq("id", editingInstructionId).select().single());
@@ -5973,7 +5983,7 @@ export default function Home() {
       const { error: taskError } = await dbTimeout(supabase.from("work_instruction_tasks").insert(taskRows));
       if (taskError) { setMessage("Arbeitsanweisung gespeichert, aber Schritte nicht: " + taskError.message); return; }
     }
-    setInstructionTitle(""); setInstructionProject(""); setInstructionCustomer(""); setInstructionSite(""); setInstructionStreet(""); setInstructionZip(""); setInstructionCity(""); setInstructionAddress2(""); setInstructionDescription(""); setInstructionTasks([""]); setInstructionProblems(""); setInstructionMaterial(""); setInstructionWerkzeug(""); setInstructionPhotos([]); setInstructionTaskPhotos({}); setInstructionTaskStatuses({}); setAssignedUserIds([]); setEditingInstructionId(null);
+    setInstructionTitle(""); setInstructionProject(""); setInstructionCustomer(""); setInstructionSite(""); setInstructionStreet(""); setInstructionZip(""); setInstructionCity(""); setInstructionAddress2(""); setInstructionAddr2Name(""); setInstructionAddr2Street(""); setInstructionAddr2Zip(""); setInstructionAddr2City(""); setAddr2Open(false); setInstructionDescription(""); setInstructionTasks([""]); setInstructionProblems(""); setInstructionMaterial(""); setInstructionWerkzeug(""); setInstructionPhotos([]); setInstructionTaskPhotos({}); setInstructionTaskStatuses({}); setAssignedUserIds([]); setEditingInstructionId(null);
     await loadWorkInstructions(currentCompany.company_id);
     setMessage(t.msgInstructionSaved);
   }
@@ -6283,6 +6293,13 @@ export default function Home() {
   }
   function navUrlForAddress(address: string): string {
     return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent((address || "").trim())}`;
+  }
+  // Zweite Adresse (Name, Straße, PLZ, Ort) als Zeichenkette; Fallback: altes Freitext-Feld.
+  function instructionAddr2(i: any): string {
+    const zc = [i?.address2_zip, i?.address2_city].filter(Boolean).map((x: any) => String(x).trim()).join(" ");
+    const parts = [i?.address2_name, i?.address2_street, zc].map((x: any) => (x || "").toString().trim()).filter(Boolean);
+    if (parts.length) return parts.join(", ");
+    return (i?.address2 || "").toString().trim();
   }
 
   // Liefert die Projekte, die in einem Bericht vorkommen (fuer die Anzeige hinter dem Namen).
@@ -7569,7 +7586,22 @@ export default function Home() {
                 <input className="border p-3 text-black bg-white" placeholder={t.zip} value={instructionZip} onChange={(e) => setInstructionZip(e.target.value)} />
                 <input className="border p-3 text-black bg-white" placeholder={t.city} value={instructionCity} onChange={(e) => setInstructionCity(e.target.value)} />
               </div>
-              <input className="border p-3 text-black bg-white md:col-span-2" placeholder={`🧭 ${tx.navAddr2}`} value={instructionAddress2} onChange={(e) => setInstructionAddress2(e.target.value)} />
+              <div className="md:col-span-2 border border-slate-200 rounded-xl bg-gray-50">
+                <button type="button" onClick={() => setAddr2Open((v) => !v)} className="w-full flex justify-between items-center px-3 py-2.5 text-sm font-medium text-gray-700">
+                  <span>🧭 {tx.navAddr2}</span>
+                  <span className="text-gray-400">{addr2Open ? "▾" : "▸"}</span>
+                </button>
+                {addr2Open && (
+                  <div className="p-3 pt-0 grid grid-cols-1 gap-2">
+                    <input className="border p-3 text-black bg-white" placeholder={t.name} value={instructionAddr2Name} onChange={(e) => setInstructionAddr2Name(e.target.value)} />
+                    <input className="border p-3 text-black bg-white" placeholder={t.street} value={instructionAddr2Street} onChange={(e) => setInstructionAddr2Street(e.target.value)} />
+                    <div className="grid grid-cols-2 gap-2">
+                      <input className="border p-3 text-black bg-white" placeholder={t.zip} value={instructionAddr2Zip} onChange={(e) => setInstructionAddr2Zip(e.target.value)} />
+                      <input className="border p-3 text-black bg-white" placeholder={t.city} value={instructionAddr2City} onChange={(e) => setInstructionAddr2City(e.target.value)} />
+                    </div>
+                  </div>
+                )}
+              </div>
               {instructionScope === "week" ? (() => {
                 const canonical = instructionDate ? isoWeekToMonday(dateToIsoWeek(instructionDate)) : "";
                 const opts = buildWeekOptions();
@@ -7711,7 +7743,7 @@ export default function Home() {
                           {(instruction.street || instruction.zip || instruction.city) && (<p className="text-sm text-gray-600">{[instruction.street, [instruction.zip, instruction.city].filter(Boolean).join(" ")].filter(Boolean).join(", ")}</p>)}
                           <div className="flex gap-2 flex-wrap">
                             {instructionNavAddress(instruction) && (<a href={instructionNavUrl(instruction)} target="_blank" rel="noopener noreferrer" className="bg-blue-600 text-white px-3 py-2.5 rounded-lg text-sm inline-flex items-center">🧭 {t.navigate}</a>)}
-                            {(instruction.address2 || "").trim() && (<a href={navUrlForAddress(instruction.address2)} target="_blank" rel="noopener noreferrer" className="bg-blue-600 text-white px-3 py-2.5 rounded-lg text-sm inline-flex items-center">🧭 {t.navigate} 2</a>)}
+                            {instructionAddr2(instruction) && (<a href={navUrlForAddress(instructionAddr2(instruction))} target="_blank" rel="noopener noreferrer" className="bg-blue-600 text-white px-3 py-2.5 rounded-lg text-sm inline-flex items-center">🧭 {t.navigate} 2</a>)}
                             <button type="button" onClick={() => createInstructionPDF(instruction)} className="bg-slate-700 text-white px-3 py-2.5 rounded-lg text-sm">📄 PDF</button>
                             {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => startEditInstruction(instruction)} className="bg-amber-600 text-white px-3 py-2.5 rounded-lg text-sm">✏️ {t.loadEdit}</button>)}
                             {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => deleteWorkInstruction(instruction.id)} className="bg-red-600 text-white px-3 py-2.5 rounded-lg text-sm">{t.deleteInstruction}</button>)}
@@ -8390,7 +8422,7 @@ export default function Home() {
                 <p><strong>{t.customer}:</strong> {instruction.customer || "-"}</p>
                 <div className="flex gap-2 flex-wrap">
                   {instructionNavAddress(instruction) && (<a href={instructionNavUrl(instruction)} target="_blank" rel="noopener noreferrer" className="bg-blue-600 text-white px-3 py-2.5 rounded-lg text-sm inline-flex items-center w-fit">🧭 {t.navigate}</a>)}
-                  {(instruction.address2 || "").trim() && (<a href={navUrlForAddress(instruction.address2)} target="_blank" rel="noopener noreferrer" className="bg-blue-600 text-white px-3 py-2.5 rounded-lg text-sm inline-flex items-center w-fit">🧭 {t.navigate} 2</a>)}
+                  {instructionAddr2(instruction) && (<a href={navUrlForAddress(instructionAddr2(instruction))} target="_blank" rel="noopener noreferrer" className="bg-blue-600 text-white px-3 py-2.5 rounded-lg text-sm inline-flex items-center w-fit">🧭 {t.navigate} 2</a>)}
                 </div>
                 {instruction.problems_text && (<div className="bg-yellow-50 border rounded-lg p-2"><strong>{t.problemsHints}:</strong> {getTranslated(instruction.id, "problems_text", instruction.problems_text)}</div>)}
                 {instruction.material && (<div className="bg-cyan-50 border rounded-lg p-2"><strong>{t.material}:</strong> {getTranslated(instruction.id, "material", instruction.material)}</div>)}
