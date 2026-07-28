@@ -6391,8 +6391,6 @@ export default function Home() {
     };
     const sortedTasks = (instruction.work_instruction_tasks || []).sort((a: any, b: any) => a.sort_order - b.sort_order);
     const completedTasks = sortedTasks.map(buildTaskLine);
-    // Nur noch NICHT erledigte Arbeitsschritte (fuer die Wiederholung an jedem Tag).
-    const openTaskLines = sortedTasks.filter((task: any) => task.status !== "completed").map(buildTaskLine);
     const titleTranslated = getTitleText();
     const problemsTranslated = getProblemsText();
     const materialTranslated = getMaterialText();
@@ -6407,8 +6405,6 @@ export default function Home() {
       instruction.employee_note ? `${currentTexts.feedbackLabel}: ${instruction.employee_note}` : ""
     ].filter(Boolean).join("\n─────\n");
     const description = buildDescription(completedTasks);
-    // Bei Wochen-Anweisungen: an JEDEM Tag nur die noch offenen Arbeitsschritte.
-    const openDescription = buildDescription(openTaskLines);
     const targetDate = instruction.work_date || "";
     // Block (fuer eine Anweisung) in einen Tag setzen/ersetzen – kein doppelter Text.
     const putInstrBlock = (dayEntry: DayEntry, text: string): DayEntry => {
@@ -6431,7 +6427,7 @@ export default function Home() {
         for (const date of instrDatesFor(instruction)) {
           const di = baseDays.findIndex((d) => d.date === date);
           if (di < 0) continue;
-          baseDays[di] = putInstrBlock(baseDays[di], openDescription);
+          baseDays[di] = putInstrBlock(baseDays[di], description);
           baseDays[di] = applyInstrTimeToDay(baseDays[di], instruction.id, date);
         }
       } else {
@@ -6460,7 +6456,7 @@ export default function Home() {
       for (const date of instrDatesFor(instruction)) {
         const di = copy.findIndex((d) => d.date === date);
         if (di < 0) continue;
-        copy[di] = putInstrBlock(copy[di], openDescription);
+        copy[di] = putInstrBlock(copy[di], description);
         copy[di] = applyInstrTimeToDay(copy[di], instruction.id, date);
       }
     } else {
