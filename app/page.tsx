@@ -4076,6 +4076,7 @@ export default function Home() {
   const [moreTabsOpen, setMoreTabsOpen] = useState(false);
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [lightboxImg, setLightboxImg] = useState<string | null>(null);
+  const [openPhoneProjects, setOpenPhoneProjects] = useState<Record<string, boolean>>({});
   const [projects, setProjects] = useState<any[]>([]);
   const [projectName, setProjectName] = useState("");
   const [projectCustomer, setProjectCustomer] = useState("");
@@ -4223,8 +4224,9 @@ export default function Home() {
       case "export":
         loadTeamReports(); break;
       case "mitarbeiter":
-      case "telefon":
         loadCompanyUsers(cid); break;
+      case "telefon":
+        loadCompanyUsers(cid); loadProjects(cid); loadWorkInstructions(cid); break;
       case "material":
         loadMaterialCatalog(); break;
       case "bestellungen":
@@ -7450,7 +7452,7 @@ export default function Home() {
         {companyFeatures?.feedback_enabled && !readOnlyUser && (
         <TabButton label={`💬 ${t.feedbackTab}`} tabName="feedback" activeTab={activeTab} onClick={() => { setActiveTab("feedback"); if (currentCompany && (currentCompany.role === "owner" || currentCompany.role === "admin" || currentCompany.role === "project_manager")) loadFeedback(); }} />
         )}
-        <TabButton label={`📞 ${tx.phoneList}`} tabName="telefon" activeTab={activeTab} onClick={() => { setActiveTab("telefon"); if (currentCompany) loadCompanyUsers(currentCompany.company_id); }} />
+        <TabButton label={`📞 ${tx.phoneList}`} tabName="telefon" activeTab={activeTab} onClick={() => { setActiveTab("telefon"); if (currentCompany) { loadCompanyUsers(currentCompany.company_id); loadProjects(currentCompany.company_id); loadWorkInstructions(currentCompany.company_id); } }} />
       </nav>
       )}
 
@@ -8694,30 +8696,53 @@ export default function Home() {
 
       {activeTab === "telefon" && (
         <section className="border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3 bg-white text-black">
-          <h2 className="text-xl font-bold">📞 {tx.phoneList}</h2>
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-bold">📞 {tx.phoneList}</h2>
+            <button type="button" onClick={() => { if (currentCompany) { loadCompanyUsers(currentCompany.company_id); loadProjects(currentCompany.company_id); loadWorkInstructions(currentCompany.company_id); } }} className="bg-gray-200 px-3 py-2.5 rounded-lg text-sm">🔄</button>
+          </div>
           {(() => {
-            const people = (companyUsers as any[])
-              .filter((m) => (m.full_name || m.email))
-              .slice()
-              .sort((a, b) => (a.full_name || a.email || "").localeCompare(b.full_name || b.email || ""));
-            if (people.length === 0) return <p className="text-gray-500">{t.noEntries}</p>;
             const roleLabel = (r: string) => r === "owner" ? "Owner" : r === "admin" ? t.roleAdmin : r === "project_manager" ? t.roleProjectManager : t.roleEmployee;
+            const memberById = (id: string) => (companyUsers as any[]).find((m) => m.user_id === id);
+            // Je Projekt die zugewiesenen Mitarbeiter aus den Arbeitsanweisungen sammeln.
+            const groups = (projects as any[]).map((project) => {
+              const insts = (workInstructions as any[]).filter((i) => i.project_id === project.id);
+              const uids: string[] = [];
+              insts.forEach((i) => (i.assigned_user_ids || []).forEach((id: string) => { if (!uids.includes(id)) uids.push(id); }));
+              const members = uids.map(memberById).filter(Boolean).sort((a: any, b: any) => (a.full_name || a.email || "").localeCompare(b.full_name || b.email || ""));
+              return { project, members };
+            }).filter((g) => g.members.length > 0);
+            if (groups.length === 0) return <p className="text-gray-500">{t.noEntries}</p>;
             return (
-              <ul className="divide-y">
-                {people.map((m) => (
-                  <li key={m.user_id || m.id} className="py-2 flex items-center justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="font-medium break-words">{m.full_name || m.email}</p>
-                      <p className="text-xs text-gray-500">{roleLabel(m.role)}{m.nationality ? ` · ${m.nationality}` : ""}</p>
+              <div className="space-y-2">
+                {groups.map(({ project, members }) => {
+                  const open = openPhoneProjects[project.id] === true;
+                  return (
+                    <div key={project.id} className="border rounded-lg overflow-hidden">
+                      <button type="button" onClick={() => setOpenPhoneProjects((prev) => ({ ...prev, [project.id]: !(prev[project.id] === true) }))} className="w-full bg-gray-100 px-3 py-2 font-bold flex justify-between items-center gap-2 text-left">
+                        <span className="break-words">📁 {project.name}{project.customer ? <span className="font-normal text-gray-500 text-sm"> · {project.customer}</span> : null} ({members.length})</span>
+                        <span className="text-gray-400">{open ? "▾" : "▸"}</span>
+                      </button>
+                      {open && (
+                        <ul className="divide-y">
+                          {members.map((m: any) => (
+                            <li key={m.user_id} className="py-2 px-3 flex items-center justify-between gap-3">
+                              <div className="min-w-0">
+                                <p className="font-medium break-words">{m.full_name || m.email}</p>
+                                <p className="text-xs text-gray-500">{roleLabel(m.role)}{m.nationality ? ` · ${m.nationality}` : ""}</p>
+                              </div>
+                              {m.phone ? (
+                                <a href={`tel:${String(m.phone).replace(/[^+0-9]/g, "")}`} className="bg-cyan-600 text-white px-3 py-2 rounded-lg text-sm whitespace-nowrap shrink-0">📞 {m.phone}</a>
+                              ) : (
+                                <span className="text-sm text-gray-400 shrink-0">—</span>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </div>
-                    {m.phone ? (
-                      <a href={`tel:${String(m.phone).replace(/[^+0-9]/g, "")}`} className="bg-cyan-600 text-white px-3 py-2 rounded-lg text-sm whitespace-nowrap shrink-0">📞 {m.phone}</a>
-                    ) : (
-                      <span className="text-sm text-gray-400 shrink-0">—</span>
-                    )}
-                  </li>
-                ))}
-              </ul>
+                  );
+                })}
+              </div>
             );
           })()}
         </section>
