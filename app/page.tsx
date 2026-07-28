@@ -7241,7 +7241,7 @@ export default function Home() {
         {(currentCompany?.role === "owner" || currentCompany?.role === "admin") && (
           <TabButton label={t.companyData}      tabName="firmendaten"        activeTab={activeTab} onClick={() => setActiveTab("firmendaten")} />
         )}
-        {companyFeatures?.material_enabled && !readOnlyUser && (
+        {companyFeatures?.material_enabled && (currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
         <TabButton label={`📦 ${t.materialCatalog}`} tabName="material" activeTab={activeTab} onClick={() => { setActiveTab("material"); loadMaterialCatalog(); }} />
         )}
         {companyFeatures?.material_enabled && !readOnlyUser && (
@@ -8406,7 +8406,7 @@ export default function Home() {
         </div>
       )}
 
-      {activeTab === "material" && companyFeatures?.material_enabled && !readOnlyUser && (
+      {activeTab === "material" && companyFeatures?.material_enabled && (currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
         <div className="space-y-4">
           <section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black space-y-3">
             <h2 className="text-xl font-bold">📦 {t.materialCatalog}</h2>
