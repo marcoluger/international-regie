@@ -7944,10 +7944,11 @@ export default function Home() {
               </div>
             )}
             {/* Projektleiter zuweisen – Mehrfachauswahl */}
-            {companyUsers.filter(m => m.role === "project_manager").length > 0 && (
+            {/* Projektleiter zuweisen – inkl. Owner und Admin */}
+            {companyUsers.filter(m => m.role === "project_manager" || m.role === "owner" || m.role === "admin").length > 0 && (
               <div className="border border-slate-200 rounded-xl p-3 shadow-sm bg-gray-50 space-y-2">
                 <h3 className="font-bold text-sm">👷 {t.assignProjectManager}</h3>
-                {companyUsers.filter(m => m.role === "project_manager").map((m) => (
+                {companyUsers.filter(m => m.role === "project_manager" || m.role === "owner" || m.role === "admin").map((m) => (
                   <label key={m.user_id} className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"
@@ -7961,30 +7962,7 @@ export default function Home() {
                       }}
                       className="w-4 h-4"
                     />
-                    <span>{m.full_name || m.email}</span>
-                  </label>
-                ))}
-              </div>
-            )}
-            {/* Owner / Admin zuweisen – Mehrfachauswahl */}
-            {companyUsers.filter(m => m.role === "owner" || m.role === "admin").length > 0 && (
-              <div className="border border-slate-200 rounded-xl p-3 shadow-sm bg-gray-50 space-y-2">
-                <h3 className="font-bold text-sm">👑 Owner / Admin</h3>
-                {companyUsers.filter(m => m.role === "owner" || m.role === "admin").map((m) => (
-                  <label key={m.user_id} className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={assignedUserIds.includes(m.user_id)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setAssignedUserIds(prev => [...prev, m.user_id]);
-                        } else {
-                          setAssignedUserIds(prev => prev.filter(id => id !== m.user_id));
-                        }
-                      }}
-                      className="w-4 h-4"
-                    />
-                    <span>{m.full_name || m.email}</span>
+                    <span>{m.full_name || m.email}{(m.role === "owner" || m.role === "admin") ? <span className="text-xs text-gray-500"> · {m.role === "owner" ? "Owner" : t.roleAdmin}</span> : null}</span>
                   </label>
                 ))}
               </div>
