@@ -7888,11 +7888,11 @@ export default function Home() {
             </div>
             {teamLoading ? (<p className="text-gray-500">⏳ ...</p>) : entries.length === 0 ? (<p className="text-gray-500">{t.teamNoReports}</p>) : entries.map(([uid, group]) => (
               <div key={uid} className="border rounded-lg overflow-hidden">
-                <button type="button" onClick={() => setCollapsedGroups((prev) => ({ ...prev, [uid]: !prev[uid] }))} className="w-full bg-gray-100 px-3 py-2 font-bold flex justify-between items-center gap-2">
+                <button type="button" onClick={() => setCollapsedGroups((prev) => ({ ...prev, [uid]: !(prev[uid] ?? true) }))} className="w-full bg-gray-100 px-3 py-2 font-bold flex justify-between items-center gap-2">
                   <span>{group.name} ({group.reports.length})</span>
-                  <span className="text-gray-400">{collapsedGroups[uid] ? "▼" : "▲"}</span>
+                  <span className="text-gray-400">{(collapsedGroups[uid] ?? true) ? "▼" : "▲"}</span>
                 </button>
-                {!collapsedGroups[uid] && (
+                {!(collapsedGroups[uid] ?? true) && (
                 <div className="divide-y">
                   {group.reports.map((r) => (
                     <div key={r.id} className="p-3 space-y-2">
