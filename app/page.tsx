@@ -4138,7 +4138,7 @@ export default function Home() {
   const [instrTimesSaving, setInstrTimesSaving] = useState<string>("");
   const [assignedUserIds, setAssignedUserIds] = useState<string[]>([]);
   const [editingInstructionId, setEditingInstructionId] = useState<string | null>(null);
-  const [openInstrList, setOpenInstrList] = useState(true);
+  const [openInstrList, setOpenInstrList] = useState(false);
   const [openInstrCards, setOpenInstrCards] = useState<Record<string, boolean>>({});
   const [selectedDayDate, setSelectedDayDate] = useState(new Date().toISOString().split("T")[0]);
   const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
@@ -7344,10 +7344,10 @@ export default function Home() {
                 </div>
                 {dashShown.length === 0 && (<div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm text-gray-500 text-center shadow-sm">{built.length === 0 ? t.dashNoProjects : t.dashNothingToday}</div>)}
                 {dashShown.map((b) => {
-                  const dOpen = openDashProjects[b.key] !== false;
+                  const dOpen = openDashProjects[b.key] === true;
                   return (
                   <div key={b.key} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
-                    <div className="flex justify-between items-start gap-3 cursor-pointer select-none" onClick={() => setOpenDashProjects((prev) => ({ ...prev, [b.key]: prev[b.key] === false }))}>
+                    <div className="flex justify-between items-start gap-3 cursor-pointer select-none" onClick={() => setOpenDashProjects((prev) => ({ ...prev, [b.key]: !(prev[b.key] === true) }))}>
                       <div className="min-w-0">
                         <h3 className="font-bold text-lg break-words">{dOpen ? "▾" : "▸"} {b.g.name}</h3>
                         {(b.g.customer || b.g.site) && (<p className="text-gray-500 text-sm break-words">{[b.g.customer, b.g.site].filter(Boolean).join(" · ")}</p>)}
