@@ -4001,6 +4001,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [savedReports, setSavedReports] = useState<SavedReport[]>([]);
+  const [allReports, setAllReports] = useState<SavedReport[]>([]);
   const [teamReports, setTeamReports] = useState<SavedReport[]>([]);
   const [teamOpenId, setTeamOpenId] = useState<string | null>(null);
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
@@ -5337,11 +5338,21 @@ export default function Home() {
     setSavedReports((data || []) as SavedReport[]);
   }
 
+  // Alle Berichte (nur Admin/Owner sehen im Archiv die Berichte ALLER Mitarbeiter).
+  async function loadAllReports() {
+    const role = currentCompany?.role;
+    if (role !== "owner" && role !== "admin") { setAllReports([]); return; }
+    try {
+      const { data } = await supabase.from("reports").select("*").order("created_at", { ascending: false });
+      setAllReports((data || []) as SavedReport[]);
+    } catch { setAllReports([]); }
+  }
   // Bericht ins Archiv verschieben / zurueckholen.
   async function archiveReport(id: string, value: boolean) {
     try {
       await supabase.from("reports").update({ archived: value }).eq("id", id);
       setSavedReports((prev) => prev.map((r: any) => (r.id === id ? { ...r, archived: value } : r)));
+      setAllReports((prev) => prev.map((r: any) => (r.id === id ? { ...r, archived: value } : r)));
     } catch { /* Spalte evtl. noch nicht angelegt */ }
   }
   // KW eines Berichts (aus dem ersten Tag mit Datum, sonst aus dem Namen).
@@ -6269,6 +6280,7 @@ export default function Home() {
     if (error) { setMessage("Fehler beim Löschen: " + error.message); return; }
     if (currentReportId === id) newReport();
     setMessage(t.msgDeleted); await loadReportsFromDatabase();
+    setAllReports((prev) => prev.filter((r: any) => r.id !== id));
   }
 
   function newReport() {
@@ -7209,7 +7221,7 @@ export default function Home() {
       {((currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") || moreTabsOpen || !["dashboard", "tag", "woche", "monat", "uebersetzer"].includes(activeTab)) && (
       <nav className="flex flex-wrap gap-2 border border-slate-200 rounded-2xl p-3 bg-slate-50">
         <TabButton label={t.tabReport}          tabName="regiebericht"       activeTab={activeTab} onClick={() => setActiveTab("regiebericht")} />
-        <TabButton label={t.saveLoad}           tabName="berichte"           activeTab={activeTab} onClick={() => setActiveTab("berichte")} />
+        <TabButton label={t.saveLoad}           tabName="berichte"           activeTab={activeTab} onClick={() => { setActiveTab("berichte"); loadAllReports(); }} />
         {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
           <TabButton label={t.projectsTab}      tabName="projekte"           activeTab={activeTab} onClick={() => { setActiveTab("projekte"); loadProjects(); }} />
         )}
@@ -7505,8 +7517,11 @@ export default function Home() {
             <button type="button" onClick={() => { newReport(); setMessage(t.msgNewReport); }} className="bg-gray-700 text-white px-4 py-3 rounded-lg">{t.newReport}</button>
           </div>
           {(() => {
+            const isAdminOwner = currentCompany?.role === "owner" || currentCompany?.role === "admin";
             const activeReports = savedReports.filter((r: any) => !r.archived);
-            const archivedReports = savedReports.filter((r: any) => r.archived).sort((a: any, b: any) => {
+            // Archiv: Admin/Owner sehen alle, sonst nur eigene.
+            const archiveSource = isAdminOwner ? allReports : savedReports;
+            const archivedReports = archiveSource.filter((r: any) => r.archived).sort((a: any, b: any) => {
               const e = (a.employee || "").localeCompare(b.employee || "");
               if (e !== 0) return e;
               return reportFirstDate(b).localeCompare(reportFirstDate(a));
