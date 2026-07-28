@@ -4204,9 +4204,10 @@ export default function Home() {
         setAbsTrans({});
         return;
       }
-      const items = (absences as any[])
-        .filter((a) => (a?.note || "").trim())
-        .map((a) => ({ key: String(a.id), text: String(a.note) }));
+      const items = [
+        ...(absences as any[]).filter((a) => (a?.note || "").trim()).map((a) => ({ key: String(a.id), text: String(a.note) })),
+        ...(absences as any[]).filter((a) => (a?.reject_reason || "").trim()).map((a) => ({ key: "r_" + String(a.id), text: String(a.reject_reason) })),
+      ];
       if (items.length === 0) { setAbsTrans({}); return; }
       let out: Record<string, string> = {};
       try {
@@ -6573,6 +6574,22 @@ export default function Home() {
       }
       if (lines.length > 0) freshComments[task.id] = lines.join("\n");
     }
+    // Aufgaben-Notizen + Gesamt-Notiz uebersetzen (wie die Kommentare).
+    const trFree = async (raw: string): Promise<string> => {
+      const s = (raw || "").trim();
+      if (!s || uiLanguage === "Deutsch") return s;
+      try {
+        const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: s, fromLanguage: "automatisch", toLanguage: uiLanguage }) });
+        const data = await res.json();
+        if (!data.error && data.translation) return data.translation;
+      } catch { /* Original belassen */ }
+      return s;
+    };
+    const freshNotes: Record<string, string> = {};
+    for (const task of instruction.work_instruction_tasks || []) {
+      if ((task.note || "").trim()) freshNotes[task.id] = await trFree(task.note);
+    }
+    const empNoteTr = await trFree(instruction.employee_note || "");
     const getTaskText = (taskId: string, fallback: string) => mergedTasks[taskId] || fallback;
     const getCommentText = (taskId: string, fallback: string) => freshComments[taskId] || fallback;
     const getTitleText = () => currentTranslations.title || instruction.title;
@@ -6585,7 +6602,7 @@ export default function Home() {
       const statusText = task.status === "completed" ? currentTexts.statusCompleted : task.status === "in_progress" ? currentTexts.statusInProgress : task.status === "stopped" ? currentTexts.statusStopped : currentTexts.statusOpen;
       const taskText = getTaskText(task.id, task.task_text);
       const lines = [`${statusText}: ${taskText}`];
-      if (task.note) lines.push(`   📝 ${currentTexts.feedbackLabel}: ${task.note}`);
+      if (task.note) lines.push(`   📝 ${currentTexts.feedbackLabel}: ${freshNotes[task.id] || task.note}`);
       const cmtText = freshComments[task.id] || "";
       if (cmtText) {
         for (const cl of cmtText.split("\n")) {
@@ -6607,7 +6624,7 @@ export default function Home() {
       materialTranslated ? `📦 ${currentTexts.material}: ${materialTranslated}` : "",
       usedMaterialList(instruction).length > 0 ? `📦 ${currentTexts.materialUsed}: ${usedMaterialList(instruction).map((m: any) => `${m.qty} ${unitLabel(m.unit, uiLanguage)} ${getTranslatedMaterial(instruction.id, m.name)}`).join(", ")}` : "",
       werkzeugTranslated ? `🔧 ${currentTexts.werkzeug}: ${werkzeugTranslated}` : "",
-      instruction.employee_note ? `${currentTexts.feedbackLabel}: ${instruction.employee_note}` : ""
+      instruction.employee_note ? `${currentTexts.feedbackLabel}: ${empNoteTr || instruction.employee_note}` : ""
     ].filter(Boolean).join("\n─────\n");
     const description = buildDescription(completedTasks);
     const targetDate = instruction.work_date || "";
@@ -7040,7 +7057,7 @@ export default function Home() {
         doc.setFont(FONT, "bold"); doc.text(sanitizePdfText(`${nr}. [${statusLabel}]`), marginLeft, y); doc.setFont(FONT, "normal"); y += 5;
         for (const line of doc.splitTextToSize(taskTextTr, contentWidth - 6)) { addNewPageIfNeeded(6); doc.text(line, marginLeft + 6, y); y += 5; }
         if ((task.note || "").trim()) {
-          const noteTr = sanitizePdfText(`${t.feedbackLabel}: ${task.note}`);
+          const noteTr = sanitizePdfText(`${t.feedbackLabel}: ${await tr(task.note)}`);
           for (const line of doc.splitTextToSize(noteTr, contentWidth - 6)) { addNewPageIfNeeded(6); doc.text(line, marginLeft + 6, y); y += 5; }
         }
         for (const entry of taskCommentList(task)) {
@@ -8012,7 +8029,7 @@ export default function Home() {
                       </span>
                     </div>
                     {a.status === "rejected" && (a.reject_reason || "").trim() && (
-                      <p className="text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg px-2 py-1"><strong>{tx.absRejectReason}:</strong> {a.reject_reason}</p>
+                      <p className="text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg px-2 py-1"><strong>{tx.absRejectReason}:</strong> {absTrans["r_" + a.id] || a.reject_reason}</p>
                     )}
                     {rejectingId === a.id && (
                       <div className="flex gap-2 flex-wrap items-center">
