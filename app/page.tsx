@@ -3757,6 +3757,24 @@ function dateToIsoWeek(dateString: string): string {
   const weekNumber = Math.ceil(((date.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
   return `${year}-W${String(weekNumber).padStart(2, "0")}`;
 }
+// Dropdown-Optionen fuer die Kalenderwoche: einige Wochen zurueck bis ~1 Jahr voraus.
+// value = Montag (YYYY-MM-DD), label = "KW 31 · 27.07.–02.08.2026".
+function buildWeekOptions(): { value: string; label: string }[] {
+  const todayStr = new Date().toISOString().split("T")[0];
+  const [ty, tm, td] = todayStr.split("-").map(Number);
+  const base = new Date(Date.UTC(ty, tm - 1, td));
+  const dow = base.getUTCDay() || 7;
+  const curMonday = new Date(base); curMonday.setUTCDate(base.getUTCDate() - dow + 1);
+  const fmt = (d: Date) => `${String(d.getUTCDate()).padStart(2, "0")}.${String(d.getUTCMonth() + 1).padStart(2, "0")}.`;
+  const opts: { value: string; label: string }[] = [];
+  for (let i = -8; i <= 56; i++) {
+    const mon = new Date(curMonday); mon.setUTCDate(curMonday.getUTCDate() + i * 7);
+    const monStr = mon.toISOString().split("T")[0];
+    const sun = new Date(mon); sun.setUTCDate(mon.getUTCDate() + 6);
+    opts.push({ value: monStr, label: `${getCalendarWeek(monStr)} · ${fmt(mon)}–${fmt(sun)}${sun.getUTCFullYear()}` });
+  }
+  return opts;
+}
 
 function TabButton({ label, tabName, activeTab, onClick }: { label: string; tabName: string; activeTab: string; onClick: () => void }) {
   return (
@@ -7238,9 +7256,17 @@ export default function Home() {
                 <input className="border p-3 text-black bg-white" placeholder={t.zip} value={instructionZip} onChange={(e) => setInstructionZip(e.target.value)} />
                 <input className="border p-3 text-black bg-white" placeholder={t.city} value={instructionCity} onChange={(e) => setInstructionCity(e.target.value)} />
               </div>
-              {instructionScope === "week" ? (
-                <input type="week" className="border p-3 text-black bg-white" value={dateToIsoWeek(instructionDate)} onChange={(e) => setInstructionDate(isoWeekToMonday(e.target.value))} />
-              ) : (
+              {instructionScope === "week" ? (() => {
+                const canonical = instructionDate ? isoWeekToMonday(dateToIsoWeek(instructionDate)) : "";
+                const opts = buildWeekOptions();
+                if (canonical && !opts.some((o) => o.value === canonical)) opts.unshift({ value: canonical, label: `${getCalendarWeek(canonical)} · ${canonical}` });
+                return (
+                  <select className="border p-3 text-black bg-white" value={canonical} onChange={(e) => setInstructionDate(e.target.value)}>
+                    <option value="">{tx.scopeWeek} …</option>
+                    {opts.map((o) => (<option key={o.value} value={o.value}>{o.label}</option>))}
+                  </select>
+                );
+              })() : (
                 <input type="date" className="border p-3 text-black bg-white" value={instructionDate} onChange={(e) => setInstructionDate(e.target.value)} />
               )}
               <select className="border p-3 text-black bg-white" value={instructionScope} onChange={(e) => { const v = e.target.value as "day" | "week"; setInstructionScope(v); if (v === "week" && instructionDate) setInstructionDate(isoWeekToMonday(dateToIsoWeek(instructionDate))); }}>
@@ -7276,6 +7302,29 @@ export default function Home() {
               <div className="border border-slate-200 rounded-xl p-3 shadow-sm bg-gray-50 space-y-2">
                 <h3 className="font-bold text-sm">👷 {t.assignProjectManager}</h3>
                 {companyUsers.filter(m => m.role === "project_manager").map((m) => (
+                  <label key={m.user_id} className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={assignedUserIds.includes(m.user_id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setAssignedUserIds(prev => [...prev, m.user_id]);
+                        } else {
+                          setAssignedUserIds(prev => prev.filter(id => id !== m.user_id));
+                        }
+                      }}
+                      className="w-4 h-4"
+                    />
+                    <span>{m.full_name || m.email}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+            {/* Owner / Admin zuweisen – Mehrfachauswahl */}
+            {companyUsers.filter(m => m.role === "owner" || m.role === "admin").length > 0 && (
+              <div className="border border-slate-200 rounded-xl p-3 shadow-sm bg-gray-50 space-y-2">
+                <h3 className="font-bold text-sm">👑 Owner / Admin</h3>
+                {companyUsers.filter(m => m.role === "owner" || m.role === "admin").map((m) => (
                   <label key={m.user_id} className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"
