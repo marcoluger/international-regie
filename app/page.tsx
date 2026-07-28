@@ -7267,14 +7267,14 @@ export default function Home() {
         <section className="border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4 bg-white">
           <h1 className="text-3xl font-bold">{t.loginTitle}</h1>
           {message && <div className="border border-slate-200 rounded-xl p-3 shadow-sm bg-yellow-100 text-black">{message}</div>}
-          <form onSubmit={(e) => { e.preventDefault(); signIn(); }} autoComplete="on" className="space-y-3">
+          <form onSubmit={(e) => { e.preventDefault(); signIn(); }} autoComplete="on" method="post" action="#" className="space-y-3">
           <div className="space-y-3">
-            <input name="company" autoComplete="organization" className="border p-3 w-full text-black bg-white rounded-lg" placeholder="Firmenkürzel (z.B. luger)" value={companySlug} onChange={(e) => setCompanySlug(e.target.value)} />
-            <input name="username" autoComplete="username" className="border p-3 w-full text-black bg-white rounded-lg" placeholder="Benutzername (z.B. max)" value={username} onChange={(e) => setUsername(e.target.value)} />
+            <input id="company" name="company" autoComplete="organization" autoCapitalize="none" autoCorrect="off" spellCheck={false} className="border p-3 w-full text-black bg-white rounded-lg" placeholder="Firmenkürzel (z.B. luger)" value={companySlug} onChange={(e) => setCompanySlug(e.target.value)} />
+            <input id="username" name="username" autoComplete="username" autoCapitalize="none" autoCorrect="off" spellCheck={false} className="border p-3 w-full text-black bg-white rounded-lg" placeholder="Benutzername (z.B. max)" value={username} onChange={(e) => setUsername(e.target.value)} />
           </div>
           <div className="relative">
-            <input name="password" autoComplete="current-password" className="border p-3 w-full text-black bg-white pr-12" placeholder={t.password} type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} />
-            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-lg">{showPassword ? "🙈" : "👁️"}</button>
+            <input id="password" name="password" autoComplete="current-password" className="border p-3 w-full text-black bg-white pr-12 rounded-lg" placeholder={t.password} type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} />
+            <button type="button" tabIndex={-1} onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-lg">{showPassword ? "🙈" : "👁️"}</button>
           </div>
           <button type="submit" className="bg-cyan-600 text-white px-4 py-3 rounded-lg w-full">{t.login}</button>
           </form>
@@ -7296,8 +7296,8 @@ export default function Home() {
         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-5 w-full shadow-lg">
           <div className="text-center"><div className="text-5xl mb-3">🔐</div><h2 className="text-2xl font-bold">Passwort ändern</h2><p className="text-gray-500 text-sm mt-1">Bitte ändern Sie Ihr temporäres Passwort.</p></div>
           {message && <div className="bg-yellow-50 border border-slate-200 rounded-xl p-3 shadow-sm text-sm">{message}</div>}
-          <input className="border p-3 w-full rounded-lg text-black" placeholder="Neues Passwort (min. 8 Zeichen)" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
-          <input className="border p-3 w-full rounded-lg text-black" placeholder="Passwort bestätigen" type="password" value={newPasswordConfirm} onChange={(e) => setNewPasswordConfirm(e.target.value)} />
+          <input name="new-password" autoComplete="new-password" className="border p-3 w-full rounded-lg text-black" placeholder="Neues Passwort (min. 8 Zeichen)" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+          <input name="confirm-password" autoComplete="new-password" className="border p-3 w-full rounded-lg text-black" placeholder="Passwort bestätigen" type="password" value={newPasswordConfirm} onChange={(e) => setNewPasswordConfirm(e.target.value)} />
           <button type="button" onClick={changePassword} disabled={changingPassword} className="w-full bg-cyan-700 text-white py-3 rounded-lg font-bold disabled:opacity-50">{changingPassword ? "Wird gespeichert..." : "Passwort speichern & weiter"}</button>
         </div>
       </main>
