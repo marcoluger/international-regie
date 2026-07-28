@@ -5429,11 +5429,27 @@ export default function Home() {
       return { ...prev, [instrId]: forInstr };
     });
   }
-  async function loadInstrTimes(companyId: string, uid: string) {
+  async function instrTimesCall(payload: any) {
+    let token = tokenRef.current;
+    if (!token) {
+      try {
+        const sess = await dbTimeout(supabase.auth.getSession(), 5000);
+        token = sess?.data?.session?.access_token || "";
+      } catch { /* Route antwortet dann mit 401 */ }
+    }
+    const res = await fetch("/api/instruction-times", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify(payload),
+    });
+    return await res.json().catch(() => ({ error: "Antwort konnte nicht gelesen werden." }));
+  }
+  async function loadInstrTimes(_companyId: string, _uid: string) {
     try {
-      const { data } = await supabase.from("work_instruction_times").select("*").eq("company_id", companyId).eq("user_id", uid);
+      const data = await instrTimesCall({ action: "list" });
+      const rows: any[] = Array.isArray(data?.rows) ? data.rows : [];
       const map: Record<string, Record<string, Record<string, string>>> = {};
-      for (const r of (data as any[]) || []) {
+      for (const r of rows) {
         (map[r.work_instruction_id] ||= {})[r.work_date] = {
           startTime: r.start_time || "", endTime: r.end_time || "", breakMinutes: r.break_minutes || "", hours: r.hours || "",
           travelOutStart: r.travel_out_start || "", travelOutEnd: r.travel_out_end || "", travelOutKm: r.travel_out_km || "",
@@ -5441,7 +5457,7 @@ export default function Home() {
         };
       }
       setInstrTimes(map);
-    } catch { /* Tabelle evtl. noch nicht angelegt */ }
+    } catch { /* still ignorieren */ }
   }
   async function saveInstrTimes(instruction: any) {
     if (!user || !currentCompany) return;
@@ -5449,16 +5465,16 @@ export default function Home() {
     const rows = instrDatesFor(instruction).map((date) => {
       const d = instrTime(instruction.id, date);
       return {
-        work_instruction_id: instruction.id, company_id: currentCompany.company_id, user_id: user.id, work_date: date,
+        work_date: date,
         start_time: d.startTime || null, end_time: d.endTime || null, break_minutes: d.breakMinutes || null, hours: d.hours || null,
         travel_out_start: d.travelOutStart || null, travel_out_end: d.travelOutEnd || null, travel_out_km: d.travelOutKm || null,
         travel_return_start: d.travelReturnStart || null, travel_return_end: d.travelReturnEnd || null, travel_return_km: d.travelReturnKm || null,
       };
     });
     if (rows.length === 0) { setInstrTimesSaving(""); return; }
-    const { error } = await supabase.from("work_instruction_times").upsert(rows, { onConflict: "work_instruction_id,user_id,work_date" });
+    const data = await instrTimesCall({ action: "save", instructionId: instruction.id, rows });
     setInstrTimesSaving("");
-    setMessage(error ? ("Fehler: " + error.message) : (tx.timesSaved || "Zeiten gespeichert."));
+    setMessage(data?.error ? ("Fehler: " + data.error) : (tx.timesSaved || "Zeiten gespeichert."));
   }
   // Zeiten des aktuellen Nutzers in einen Regiebericht-Tag uebernehmen (leere Felder nicht ueberschreiben).
   function applyInstrTimeToDay(dayEntry: DayEntry, instrId: string, date: string): DayEntry {

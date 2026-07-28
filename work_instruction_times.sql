@@ -34,3 +34,8 @@ create table if not exists work_instruction_times (
 create index if not exists idx_wit_company on work_instruction_times (company_id);
 create index if not exists idx_wit_user on work_instruction_times (user_id);
 create index if not exists idx_wit_instruction on work_instruction_times (work_instruction_id);
+
+-- 3) Row Level Security ausschalten (wie bei den uebrigen Tabellen dieser App).
+--    Supabase aktiviert RLS bei NEUEN Tabellen automatisch -> sonst kommt:
+--    "new row violates row-level security policy for table work_instruction_times".
+alter table work_instruction_times disable row level security;
