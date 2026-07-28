@@ -45,6 +45,49 @@ export async function POST(request: Request) {
       return Response.json({ rows: data || [] });
     }
 
+    if (action === "list_team") {
+      if (!isAdminOwner && role !== "project_manager") return Response.json({ rows: [] });
+      const { data, error } = await admin
+        .from("reports").select("*").in("user_id", memberIds).order("created_at", { ascending: false });
+      if (error) return Response.json({ error: error.message }, { status: 500 });
+      return Response.json({ rows: data || [] });
+    }
+
+    if (action === "list_mine") {
+      const { data, error } = await admin
+        .from("reports").select("*").eq("user_id", caller.id).order("created_at", { ascending: false });
+      if (error) return Response.json({ error: error.message }, { status: 500 });
+      return Response.json({ rows: data || [] });
+    }
+
+    if (action === "save") {
+      const r = body?.report || {};
+      const clean: any = {
+        report_name: r.report_name ?? null,
+        employee: r.employee ?? null,
+        from_language: r.from_language ?? null,
+        to_language: r.to_language ?? null,
+        pdf_language: r.pdf_language ?? null,
+        days: r.days ?? [],
+        project_id: r.project_id ?? null,
+        signature_employee: r.signature_employee ?? null,
+        signature_customer: r.signature_customer ?? null,
+      };
+      const id = body?.id;
+      if (id) {
+        const { data: rep } = await admin.from("reports").select("id, user_id").eq("id", id).maybeSingle();
+        if (!rep) return Response.json({ error: "Bericht nicht gefunden." }, { status: 404 });
+        if (!memberIds.includes(rep.user_id)) return Response.json({ error: "Keine Berechtigung (andere Firma)." }, { status: 403 });
+        if (rep.user_id !== caller.id && !isAdminOwner) return Response.json({ error: "Keine Berechtigung." }, { status: 403 });
+        const { error } = await admin.from("reports").update(clean).eq("id", id);
+        if (error) return Response.json({ error: error.message }, { status: 500 });
+        return Response.json({ id });
+      }
+      const { data, error } = await admin.from("reports").insert({ ...clean, user_id: caller.id }).select("id").single();
+      if (error) return Response.json({ error: error.message }, { status: 500 });
+      return Response.json({ id: data?.id });
+    }
+
     if (action === "archive" || action === "delete") {
       const id = body?.id;
       if (!id) return Response.json({ error: "ID fehlt." }, { status: 400 });

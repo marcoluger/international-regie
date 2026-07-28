@@ -5330,12 +5330,9 @@ export default function Home() {
   }
 
   async function loadReportsFromDatabase() {
-    const { data: au } = await supabase.auth.getUser();
-    const uid = au?.user?.id;
-    if (!uid) { setSavedReports([]); return; }
-    const { data, error } = await supabase.from("reports").select("*").eq("user_id", uid).order("created_at", { ascending: false });
-    if (error) { setMessage("Fehler beim Laden: " + error.message); return; }
-    setSavedReports((data || []) as SavedReport[]);
+    const data = await reportsCall({ action: "list_mine" });
+    if (data?.error) { setMessage("Fehler beim Laden: " + data.error); return; }
+    setSavedReports((Array.isArray(data?.rows) ? data.rows : []) as SavedReport[]);
   }
 
   // RLS-sichere Aufrufe fuer berichts-uebergreifende Aktionen (Service-Key serverseitig).
@@ -5380,10 +5377,10 @@ export default function Home() {
     if (role !== "owner" && role !== "admin" && role !== "project_manager") { setTeamReports([]); return; }
     setTeamLoading(true);
     try {
-      // RLS entscheidet serverseitig, welche Berichte ein Manager sehen darf.
-      const { data, error } = await supabase.from("reports").select("*").order("created_at", { ascending: false });
-      if (error) { setMessage("Fehler beim Laden: " + error.message); setTeamReports([]); return; }
-      setTeamReports((data || []) as SavedReport[]);
+      // Ueber die Server-Route (Service-Key) -> RLS-sicher.
+      const data = await reportsCall({ action: "list_team" });
+      if (data?.error) { setMessage("Fehler beim Laden: " + data.error); setTeamReports([]); return; }
+      setTeamReports((Array.isArray(data?.rows) ? data.rows : []) as SavedReport[]);
     } finally { setTeamLoading(false); }
   }
 
@@ -6239,18 +6236,13 @@ export default function Home() {
     if (!user) { setMessage(t.msgPleaseLogin); return; }
     await ensureFreshSession();
     const name = reportName.trim() || buildReportName();
-    const reportData = { report_name: name, employee, from_language: fromLanguage, to_language: toLanguage, pdf_language: pdfLanguage, days, user_id: user.id, project_id: selectedProjectId || null, signature_employee: sigEmployee || null, signature_customer: sigCustomer || null };
-    let error;
-    if (currentReportId) {
-      ({ error } = await dbTimeout(supabase.from("reports").update(reportData).eq("id", currentReportId)));
-    } else {
-      const result = await dbTimeout(supabase.from("reports").insert(reportData).select().single());
-      error = result.error;
-      if (result.data?.id) setCurrentReportId(result.data.id);
-    }
-    if (error) { setMessage("Fehler beim Speichern: " + error.message); return; }
+    const report = { report_name: name, employee, from_language: fromLanguage, to_language: toLanguage, pdf_language: pdfLanguage, days, project_id: selectedProjectId || null, signature_employee: sigEmployee || null, signature_customer: sigCustomer || null };
+    const wasUpdate = !!currentReportId;
+    const data = await reportsCall({ action: "save", id: currentReportId || undefined, report });
+    if (data?.error) { setMessage("Fehler beim Speichern: " + data.error); return; }
+    if (!wasUpdate && data?.id) setCurrentReportId(data.id);
     setReportName(name);
-    setMessage(currentReportId ? t.msgUpdated : t.msgSaved);
+    setMessage(wasUpdate ? t.msgUpdated : t.msgSaved);
     await loadReportsFromDatabase();
   }
 
@@ -6263,10 +6255,10 @@ export default function Home() {
     const typed = reportName.trim();
     const takenNames = new Set(savedReports.map((r: any) => (r.report_name || "").trim()));
     const name = (typed && !takenNames.has(typed)) ? typed : buildReportName();
-    const reportData = { report_name: name, employee, from_language: fromLanguage, to_language: toLanguage, pdf_language: pdfLanguage, days, user_id: user.id, project_id: selectedProjectId || null, signature_employee: sigEmployee || null, signature_customer: sigCustomer || null };
-    const result = await dbTimeout(supabase.from("reports").insert(reportData).select().single());
-    if (result.error) { setMessage("Fehler beim Speichern: " + result.error.message); return; }
-    if (result.data?.id) setCurrentReportId(result.data.id);
+    const report = { report_name: name, employee, from_language: fromLanguage, to_language: toLanguage, pdf_language: pdfLanguage, days, project_id: selectedProjectId || null, signature_employee: sigEmployee || null, signature_customer: sigCustomer || null };
+    const data = await reportsCall({ action: "save", report });
+    if (data?.error) { setMessage("Fehler beim Speichern: " + data.error); return; }
+    if (data?.id) setCurrentReportId(data.id);
     setReportLoaded(false);
     setReportName(name);
     setMessage(t.msgSaved);
