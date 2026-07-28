@@ -6560,7 +6560,7 @@ export default function Home() {
   // Neuen Projektleiter (additiv) allen Anweisungen des Projekts zuweisen, damit er sie sieht.
   async function assignPmToProjectInstructions(projectId: string, pmName: string) {
     if (!currentCompany) return;
-    const member = companyUsers.find((m: any) => m.role === "project_manager" && (m.full_name || m.email) === pmName);
+    const member = companyUsers.find((m: any) => (m.role === "project_manager" || m.role === "owner" || m.role === "admin") && (m.full_name || m.email) === pmName);
     if (!member) { setMessage(t.msgPmNotFound); return; }
     const newId = member.user_id;
     const { data: insts, error: loadErr } = await supabase.from("work_instructions").select("id, assigned_user_ids").eq("project_id", projectId);
@@ -7790,7 +7790,7 @@ export default function Home() {
             </div>
             <select className="border p-3 w-full" value={projectManager} onChange={(e) => setProjectManager(e.target.value)}>
               <option value="">{t.projectManager}</option>
-              {companyUsers.filter((m: any) => m.role === "project_manager").map((m: any) => (<option key={m.user_id} value={m.full_name || m.email || ""}>{m.full_name || m.email}</option>))}
+              {companyUsers.filter((m: any) => m.role === "project_manager" || m.role === "owner" || m.role === "admin").map((m: any) => (<option key={m.user_id} value={m.full_name || m.email || ""}>{m.full_name || m.email}</option>))}
             </select>
           </div>
           <div className="flex gap-2 flex-wrap">
@@ -7809,8 +7809,8 @@ export default function Home() {
                   <span className="text-sm font-medium">{t.projectManager}:</span>
                   <select className="border p-2 rounded-lg text-sm" value={pmEdits[project.id] ?? (project.project_manager || "")} onChange={(e) => setPmEdits((prev) => ({ ...prev, [project.id]: e.target.value }))}>
                     <option value="">—</option>
-                    {project.project_manager && !companyUsers.some((m: any) => (m.full_name || m.email) === project.project_manager && m.role === "project_manager") && (<option value={project.project_manager}>{project.project_manager}</option>)}
-                    {companyUsers.filter((m: any) => m.role === "project_manager").map((m: any) => (<option key={m.user_id} value={m.full_name || m.email || ""}>{m.full_name || m.email}</option>))}
+                    {project.project_manager && !companyUsers.some((m: any) => (m.full_name || m.email) === project.project_manager && (m.role === "project_manager" || m.role === "owner" || m.role === "admin")) && (<option value={project.project_manager}>{project.project_manager}</option>)}
+                    {companyUsers.filter((m: any) => m.role === "project_manager" || m.role === "owner" || m.role === "admin").map((m: any) => (<option key={m.user_id} value={m.full_name || m.email || ""}>{m.full_name || m.email}</option>))}
                   </select>
                   <button type="button" onClick={() => updateProjectManager(project.id, pmEdits[project.id] ?? (project.project_manager || ""))} className="bg-cyan-700 text-white px-3 py-1 rounded-lg text-sm">{t.save}</button>
                   <button type="button" onClick={() => assignPmToProjectInstructions(project.id, pmEdits[project.id] ?? (project.project_manager || ""))} className="bg-green-700 text-white px-3 py-1 rounded-lg text-sm">{t.assignVisibility}</button>
