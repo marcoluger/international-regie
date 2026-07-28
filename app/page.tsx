@@ -5414,6 +5414,12 @@ export default function Home() {
     const monday = new Date(date); monday.setUTCDate(date.getUTCDate() - dayNum + 1);
     return Array.from({ length: 7 }, (_, i) => { const nd = new Date(monday); nd.setUTCDate(monday.getUTCDate() + i); return nd.toISOString().split("T")[0]; });
   }
+  // Deckt eine Anweisung diesen Tag ab? Tag-Anweisung: nur work_date. Wochen-Anweisung: ganze Woche.
+  function instructionCoversDate(instruction: any, dateStr: string): boolean {
+    if (!dateStr) return false;
+    if (instruction?.scope === "week") return instrDatesFor(instruction).includes(dateStr);
+    return instruction?.work_date === dateStr;
+  }
   function instrTime(instrId: string, date: string): Record<string, string> {
     return instrTimes[instrId]?.[date] || {};
   }
@@ -8075,7 +8081,7 @@ export default function Home() {
           </section>
           {(() => {
             const dayInstructions = workInstructions.filter((i) => {
-              if (i.work_date !== selectedDayDate) return false;
+              if (!instructionCoversDate(i, selectedDayDate)) return false;
               return canSeeInstruction(i);
             });
             if (dayInstructions.length === 0) return (<section className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-white text-black"><p className="text-gray-500">{t.noInstructionsDay}</p></section>);
@@ -8283,7 +8289,7 @@ export default function Home() {
             const monday = new Date(date); monday.setUTCDate(date.getUTCDate() - dayNum + 1);
             const weekDates = Array.from({ length: 7 }, (_, i) => { const nd = new Date(monday); nd.setUTCDate(monday.getUTCDate() + i); return nd.toISOString().split("T")[0]; });
             const weekInstructions = workInstructions.filter((i) => {
-              if (!weekDates.includes(i.work_date)) return false;
+              if (!weekDates.some((d) => instructionCoversDate(i, d))) return false;
               return canSeeInstruction(i);
             });
             const todayStr = new Date().toISOString().split("T")[0];
@@ -8294,7 +8300,7 @@ export default function Home() {
                   {/* Handy: Tage untereinander (gut lesbar). Ab Tablet: 7-Spalten-Raster. */}
                   <div className="md:hidden space-y-2">
                     {weekDates.map((dateStr, wi) => {
-                      const entries = weekInstructions.filter((inst) => inst.work_date === dateStr);
+                      const entries = weekInstructions.filter((inst) => instructionCoversDate(inst, dateStr));
                       const isToday = dateStr === todayStr;
                       const [yy, mm, dd] = dateStr.split("-");
                       return (
@@ -8318,7 +8324,7 @@ export default function Home() {
                     <div className="grid grid-cols-7 gap-1 mb-1">{t.weekdays.map((label) => (<div key={label} className="text-center text-xs font-bold text-gray-500 py-1">{label.slice(0, 2)}</div>))}</div>
                     <div className="grid grid-cols-7 gap-1">
                       {weekDates.map((dateStr) => {
-                        const entries = weekInstructions.filter((inst) => inst.work_date === dateStr);
+                        const entries = weekInstructions.filter((inst) => instructionCoversDate(inst, dateStr));
                         const isToday = dateStr === todayStr;
                         const dayNo = Number(dateStr.split("-")[2]);
                         return (<div key={dateStr} onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }} className={`border rounded-lg p-2 min-h-24 min-w-0 cursor-pointer hover:border-cyan-500 transition-colors flex flex-col gap-1 ${isToday ? "border-cyan-600 bg-cyan-50" : entries.length > 0 ? "bg-green-50 border-green-300" : "bg-white"}`}><div className={`text-xs font-bold ${isToday ? "text-cyan-700" : "text-gray-700"}`}>{dayNo}{entries.length > 0 ? ` · ${entries.length} ✓` : ""}</div>{entries.map((e: any) => (<div key={e.id} className="text-xs leading-tight bg-white border border-green-200 rounded px-1 py-0.5 text-gray-700 truncate">{getTranslated(e.id, "title", e.title)}</div>))}</div>);
@@ -8345,7 +8351,7 @@ export default function Home() {
           </section>
           {(() => {
             const monthInstructions = workInstructions.filter((i) => {
-              if (!i.work_date?.startsWith(selectedMonth)) return false;
+              if (!instrDatesFor(i).some((d) => d.startsWith(selectedMonth))) return false;
               return canSeeInstruction(i);
             });
             const [year, month] = selectedMonth.split("-").map(Number);
@@ -8363,7 +8369,7 @@ export default function Home() {
                     {cells.map((day, i) => {
                       if (!day) return <div key={`e-${i}`} />;
                       const dateStr = `${selectedMonth}-${String(day).padStart(2, "0")}`;
-                      const entries = monthInstructions.filter((inst) => inst.work_date === dateStr);
+                      const entries = monthInstructions.filter((inst) => instructionCoversDate(inst, dateStr));
                       const isToday = dateStr === new Date().toISOString().split("T")[0];
                       return (<div key={day} onClick={() => { setSelectedDayDate(dateStr); setActiveTab("tag"); }} className={`border rounded-lg p-1 min-h-14 min-w-0 cursor-pointer hover:border-cyan-500 transition-colors ${isToday ? "border-cyan-600 bg-cyan-50" : entries.length > 0 ? "bg-green-50 border-green-300" : "bg-white"}`}><div className={`text-xs font-bold ${isToday ? "text-cyan-700" : "text-gray-700"}`}>{day}</div>{entries.length > 0 && <div className="text-xs text-green-700 font-medium">{entries.length} ✓</div>}{entries[0] && <div className="text-xs text-gray-500 truncate">{getTranslated(entries[0].id, "title", entries[0].title)}</div>}</div>);
                     })}
