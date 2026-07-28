@@ -5599,8 +5599,9 @@ export default function Home() {
 
   // Markiert eine Arbeitsanweisung als gelesen (Mitarbeiter ODER Projektleiter), einmalig.
   async function markInstructionRead(instructionId: string) {
-    const markRole = currentCompany?.role;
-    if (!user?.id || (markRole !== "employee" && markRole !== "project_manager")) return;
+    // Jeder angemeldete Nutzer kann den Lesestatus setzen (auch Owner/Admin,
+    // wenn ihnen eine Arbeitsanweisung zugewiesen ist).
+    if (!user?.id) return;
     const inst = workInstructions.find((i: any) => i.id === instructionId);
     if ((inst?.instruction_reads || []).some((r: any) => r.user_id === user.id)) return;
     try {
