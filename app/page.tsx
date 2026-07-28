@@ -4196,6 +4196,59 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentSignature, uiLanguage]);
 
+  // Aktualisiert den Datenbestand des aktuell offenen Bereichs. Der Regiebericht
+  // (Eingabe-Formular) wird bewusst NICHT neu geladen, damit laufende Eingaben bleiben.
+  function refreshActiveTab() {
+    const cid = currentCompany?.company_id;
+    if (!cid) return;
+    const role = currentCompany?.role;
+    const isManager = role === "owner" || role === "admin" || role === "project_manager";
+    switch (activeTab) {
+      case "dashboard":
+      case "tag":
+      case "woche":
+      case "monat":
+      case "arbeitsanweisungen":
+        loadWorkInstructions(cid); break;
+      case "berichte":
+        loadReportsFromDatabase(); loadAllReports(); break;
+      case "projekte":
+        loadProjects(cid); loadWorkInstructions(cid); break;
+      case "teamberichte":
+      case "export":
+        loadTeamReports(); break;
+      case "mitarbeiter":
+        loadCompanyUsers(cid); break;
+      case "material":
+        loadMaterialCatalog(); break;
+      case "bestellungen":
+        loadMaterialOrders(); break;
+      case "geraete":
+        loadEquipment(); loadEquipmentPlans(); break;
+      case "urlaub":
+        loadAbsences(); break;
+      case "feedback":
+        if (isManager) loadFeedback(); break;
+      case "firmendaten":
+        if (user?.id) loadCompanySettings(user.id); break;
+      default: break;
+    }
+  }
+  // Automatische Aktualisierung bei jedem Tab-Wechsel.
+  useEffect(() => {
+    refreshActiveTab();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, currentCompany?.company_id]);
+  // Und beim Zurueckkehren in den Browser-Tab (Fokus) den aktuellen Bereich neu laden.
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const onVisible = () => { if (document.visibilityState === "visible") refreshActiveTab(); };
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", onVisible);
+    return () => { document.removeEventListener("visibilitychange", onVisible); window.removeEventListener("focus", onVisible); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, currentCompany?.company_id]);
+
   // Notizen der Abwesenheiten in die Anzeige-Sprache uebersetzen.
   useEffect(() => {
     let abgebrochen = false;
