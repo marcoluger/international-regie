@@ -4204,8 +4204,9 @@ export default function Home() {
     const role = currentCompany?.role;
     const isManager = role === "owner" || role === "admin" || role === "project_manager";
     switch (activeTab) {
+      // Tagesansicht bewusst NICHT auto-aktualisieren: dort werden Stunden/Kommentare
+      // eingetragen und wuerden sonst beim Neuladen verloren gehen.
       case "dashboard":
-      case "tag":
       case "woche":
       case "monat":
       case "arbeitsanweisungen":
