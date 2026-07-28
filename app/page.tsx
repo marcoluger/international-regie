@@ -3735,6 +3735,29 @@ function getCalendarWeek(dateString: string) {
   return `KW ${weekNumber}`;
 }
 
+// ISO-Kalenderwoche <-> Datum (Montag). Fuer das <input type="week"> in der Anweisung.
+function isoWeekToMonday(weekStr: string): string {
+  const m = (weekStr || "").match(/^(\d{4})-W(\d{2})$/);
+  if (!m) return "";
+  const year = Number(m[1]); const week = Number(m[2]);
+  const jan4 = new Date(Date.UTC(year, 0, 4));
+  const jan4Day = jan4.getUTCDay() || 7;
+  const week1Monday = new Date(jan4); week1Monday.setUTCDate(jan4.getUTCDate() - jan4Day + 1);
+  const monday = new Date(week1Monday); monday.setUTCDate(week1Monday.getUTCDate() + (week - 1) * 7);
+  return monday.toISOString().split("T")[0];
+}
+function dateToIsoWeek(dateString: string): string {
+  if (!dateString) return "";
+  const [y, mo, d] = dateString.split("-").map(Number);
+  const date = new Date(Date.UTC(y, mo - 1, d));
+  const dayNumber = date.getUTCDay() || 7;
+  date.setUTCDate(date.getUTCDate() + 4 - dayNumber);
+  const year = date.getUTCFullYear();
+  const yearStart = new Date(Date.UTC(year, 0, 1));
+  const weekNumber = Math.ceil(((date.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+  return `${year}-W${String(weekNumber).padStart(2, "0")}`;
+}
+
 function TabButton({ label, tabName, activeTab, onClick }: { label: string; tabName: string; activeTab: string; onClick: () => void }) {
   return (
     <button type="button" onClick={onClick} className={`px-5 py-3 rounded-full text-sm font-medium transition-colors ${activeTab === tabName ? "bg-cyan-600 text-white shadow-sm" : "bg-white text-slate-600 border border-slate-300 hover:bg-slate-50"}`}>
@@ -7215,8 +7238,12 @@ export default function Home() {
                 <input className="border p-3 text-black bg-white" placeholder={t.zip} value={instructionZip} onChange={(e) => setInstructionZip(e.target.value)} />
                 <input className="border p-3 text-black bg-white" placeholder={t.city} value={instructionCity} onChange={(e) => setInstructionCity(e.target.value)} />
               </div>
-              <input type="date" className="border p-3 text-black bg-white" value={instructionDate} onChange={(e) => setInstructionDate(e.target.value)} />
-              <select className="border p-3 text-black bg-white" value={instructionScope} onChange={(e) => setInstructionScope(e.target.value as "day" | "week")}>
+              {instructionScope === "week" ? (
+                <input type="week" className="border p-3 text-black bg-white" value={dateToIsoWeek(instructionDate)} onChange={(e) => setInstructionDate(isoWeekToMonday(e.target.value))} />
+              ) : (
+                <input type="date" className="border p-3 text-black bg-white" value={instructionDate} onChange={(e) => setInstructionDate(e.target.value)} />
+              )}
+              <select className="border p-3 text-black bg-white" value={instructionScope} onChange={(e) => { const v = e.target.value as "day" | "week"; setInstructionScope(v); if (v === "week" && instructionDate) setInstructionDate(isoWeekToMonday(dateToIsoWeek(instructionDate))); }}>
                 <option value="day">📅 {tx.scopeDay}</option>
                 <option value="week">🗓️ {tx.scopeWeek}</option>
               </select>
