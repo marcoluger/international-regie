@@ -7135,15 +7135,16 @@ export default function Home() {
         {companyFeatures?.translator_enabled && (
         <TabButton label={`🌐 ${t.translatorTab}`} tabName="uebersetzer" activeTab={activeTab} onClick={() => setActiveTab("uebersetzer")} />
         )}
-        {(() => { const showMore = moreTabsOpen || !["dashboard", "tag", "woche", "monat", "uebersetzer"].includes(activeTab); return (
+        {/* Mitarbeiter: "Mehr"-Umschalter. Manager sehen alle Buttons direkt. */}
+        {!(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (() => { const showMore = moreTabsOpen || !["dashboard", "tag", "woche", "monat", "uebersetzer"].includes(activeTab); return (
         <button type="button" onClick={() => setMoreTabsOpen((v) => !v)} className={`px-5 py-3 rounded-full text-sm font-medium transition-colors border ${showMore ? "bg-slate-700 text-white border-slate-700" : "bg-white text-slate-600 border-slate-300 hover:bg-slate-50"}`}>
           {showMore ? "▾" : "▸"} {tx.moreTabs}
         </button>
         ); })()}
       </nav>
 
-      {/* Weitere Ansichten: aufgeklappt oder wenn eine davon aktiv ist */}
-      {(moreTabsOpen || !["dashboard", "tag", "woche", "monat", "uebersetzer"].includes(activeTab)) && (
+      {/* Weitere Ansichten: Manager immer; Mitarbeiter nur aufgeklappt oder wenn eine davon aktiv ist */}
+      {((currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") || moreTabsOpen || !["dashboard", "tag", "woche", "monat", "uebersetzer"].includes(activeTab)) && (
       <nav className="flex flex-wrap gap-2 border border-slate-200 rounded-2xl p-3 bg-slate-50">
         <TabButton label={t.tabReport}          tabName="regiebericht"       activeTab={activeTab} onClick={() => setActiveTab("regiebericht")} />
         <TabButton label={t.saveLoad}           tabName="berichte"           activeTab={activeTab} onClick={() => setActiveTab("berichte")} />
