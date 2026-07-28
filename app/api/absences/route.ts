@@ -59,7 +59,7 @@ export async function POST(request: Request) {
     if (action === "list") {
       let q = supabaseAdmin
         .from("absences")
-        .select("id, user_id, user_name, type, start_date, end_date, note, status, decided_by_name, decided_at, created_at")
+        .select("id, user_id, user_name, type, start_date, end_date, note, status, decided_by_name, decided_at, reject_reason, created_at")
         .eq("company_id", member.company_id)
         .order("start_date", { ascending: false })
         .limit(500);
@@ -110,9 +110,10 @@ export async function POST(request: Request) {
       if (target.type === "sick") {
         return Response.json({ error: "Krankmeldungen werden nicht genehmigt." }, { status: 400 });
       }
+      const rejectReason = status === "rejected" ? (String(body?.reason ?? "").trim().slice(0, 500) || null) : null;
       const { error } = await supabaseAdmin
         .from("absences")
-        .update({ status, decided_by_name: myName, decided_at: new Date().toISOString() })
+        .update({ status, decided_by_name: myName, decided_at: new Date().toISOString(), reject_reason: rejectReason })
         .eq("id", body.id)
         .eq("company_id", member.company_id);
       if (error) return Response.json({ error: error.message }, { status: 500 });
