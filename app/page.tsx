@@ -4006,6 +4006,7 @@ export default function Home() {
   const [teamOpenId, setTeamOpenId] = useState<string | null>(null);
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
   const [teamFilterUid, setTeamFilterUid] = useState<string>("");
+  const [teamShowArchive, setTeamShowArchive] = useState(false);
   const [transFrom, setTransFrom] = useState<string>("Deutsch");
   const [transTo, setTransTo] = useState<string>("Kroatisch");
   const [transInput, setTransInput] = useState<string>("");
@@ -5359,6 +5360,7 @@ export default function Home() {
     if (data?.error) { setMessage("Fehler: " + data.error); return; }
     setSavedReports((prev) => prev.map((r: any) => (r.id === id ? { ...r, archived: value } : r)));
     setAllReports((prev) => prev.map((r: any) => (r.id === id ? { ...r, archived: value } : r)));
+    setTeamReports((prev) => prev.map((r: any) => (r.id === id ? { ...r, archived: value } : r)));
   }
   // KW eines Berichts (aus dem ersten Tag mit Datum, sonst aus dem Namen).
   function reportFirstDate(r: any): string {
@@ -5438,6 +5440,8 @@ export default function Home() {
         return { ...d, translation, extra: (d.extra && d.extra.length) ? extra : d.extra };
       }));
       await createPDF(false, { days: pdfDays, reportName: r.report_name, employee: r.employee, calendarWeek: "", sigEmployee: (r as any).signature_employee || "", sigCustomer: (r as any).signature_customer || "" });
+      // Gedruckt -> Mitarbeiter-Bericht ins Archiv verschieben.
+      await archiveReport(r.id, true);
     } finally {
       setMessage("");
     }
@@ -7857,19 +7861,24 @@ export default function Home() {
       )}
 
       {activeTab === "teamberichte" && (currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (() => {
+        // Aktive oder archivierte Team-Berichte.
+        const source = teamReports.filter((r: any) => (teamShowArchive ? r.archived : !r.archived));
         const groups: Record<string, { name: string; reports: SavedReport[] }> = {};
-        for (const r of teamReports) {
+        for (const r of source) {
           const uid = r.user_id || "unknown";
           if (!groups[uid]) { const m = companyUsers.find((u: any) => u.user_id === uid); groups[uid] = { name: m?.full_name || m?.email || r.employee || uid, reports: [] }; }
           groups[uid].reports.push(r);
         }
+        // Im Archiv innerhalb eines Mitarbeiters nach KW (Datum) sortieren.
+        if (teamShowArchive) { for (const g of Object.values(groups)) g.reports.sort((a: any, b: any) => reportFirstDate(b).localeCompare(reportFirstDate(a))); }
         const allEntries = Object.entries(groups).sort((a, b) => a[1].name.localeCompare(b[1].name));
         const entries = teamFilterUid ? allEntries.filter(([uid]) => uid === teamFilterUid) : allEntries;
         return (
           <section className="border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4 bg-white text-black">
             <div className="flex justify-between items-center gap-2 flex-wrap">
-              <h2 className="text-xl font-bold">👁 {t.teamReports}</h2>
-              <div className="flex items-center gap-2">
+              <h2 className="text-xl font-bold">👁 {t.teamReports}{teamShowArchive ? ` · 🗄️ ${tx.archiveTab}` : ""}</h2>
+              <div className="flex items-center gap-2 flex-wrap">
+                <button type="button" onClick={() => { setTeamShowArchive((v) => !v); setTeamOpenId(null); }} className={`px-3 py-2.5 rounded-lg text-sm border ${teamShowArchive ? "bg-slate-700 text-white border-slate-700" : "bg-white text-slate-600 border-slate-300"}`}>🗄️ {tx.archiveTab}</button>
                 <select value={teamFilterUid} onChange={(e) => { setTeamFilterUid(e.target.value); setTeamOpenId(null); }} className="border p-2 rounded-lg text-black bg-white text-sm max-w-[14rem]">
                   <option value="">{t.employee} · {allEntries.length}</option>
                   {allEntries.map(([uid, group]) => (<option key={uid} value={uid}>{group.name} ({group.reports.length})</option>))}
@@ -7921,7 +7930,12 @@ export default function Home() {
                               )}
                             </div>
                           ))}
-                          <div className="pt-1"><button type="button" onClick={() => createTeamPDF(r)} className="bg-cyan-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium">📄 {"PDF"}</button></div>
+                          <div className="pt-1 flex gap-2 flex-wrap">
+                            <button type="button" onClick={() => createTeamPDF(r)} className="bg-cyan-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium">📄 {"PDF"}</button>
+                            {(r as any).archived
+                              ? (<button type="button" onClick={() => archiveReport(r.id, false)} className="bg-amber-600 text-white px-4 py-2.5 rounded-lg text-sm">📤 {tx.fromArchive}</button>)
+                              : (<button type="button" onClick={() => archiveReport(r.id, true)} className="bg-slate-600 text-white px-4 py-2.5 rounded-lg text-sm">📥 {tx.toArchive}</button>)}
+                          </div>
                         </div>
                       )}
                     </div>
