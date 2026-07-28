@@ -69,6 +69,7 @@ type DaySubEntry = {
   travelReturnEnd?: string;
   travelReturnKm?: string;
   description: string;
+  translation?: string;
 };
 
 function emptySubEntry(): DaySubEntry {
@@ -3998,7 +3999,7 @@ export default function Home() {
   const [feedbackSending, setFeedbackSending] = useState(false);
   const [feedbackList, setFeedbackList] = useState<any[]>([]);
   const [teamLoading, setTeamLoading] = useState(false);
-  const [teamTrans, setTeamTrans] = useState<Record<string, { lang: string; days: Record<number, string> }>>({});
+  const [teamTrans, setTeamTrans] = useState<Record<string, { lang: string; days: Record<number, string>; extras?: Record<string, string> }>>({});
   const [days, setDays] = useState<DayEntry[]>(createEmptyDays());
   const [currentCompany, setCurrentCompany] = useState<CurrentCompany | null>(null);
   const [companyFeatures, setCompanyFeatures] = useState<CompanyFeatures | null>(null);
@@ -4362,19 +4363,29 @@ export default function Home() {
   useEffect(() => {
     let cancelled = false;
     const snapshot = days;
+    const translateOne = async (raw: string): Promise<string> => {
+      const text = (raw || "").trim();
+      if (!text) return "";
+      try {
+        const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: text, fromLanguage: "automatisch", toLanguage: uiLanguage }) });
+        const data = await res.json();
+        if (data.error || !data.translation) return "";
+        return data.translation.trim() === text ? "" : data.translation;
+      } catch { return ""; }
+    };
     (async () => {
       const results = await Promise.all(snapshot.map(async (day) => {
-        const text = (day.description || "").trim();
-        if (!text) return "";
-        try {
-          const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: text, fromLanguage: "automatisch", toLanguage: uiLanguage }) });
-          const data = await res.json();
-          if (data.error || !data.translation) return "";
-          return data.translation.trim() === text ? "" : data.translation;
-        } catch { return ""; }
+        const dayTrans = await translateOne(day.description);
+        const extraTrans = await Promise.all((day.extra || []).map((ex) => translateOne(ex.description)));
+        return { dayTrans, extraTrans };
       }));
       if (cancelled) return;
-      setDays((prev) => prev.map((d, i) => (i < results.length ? { ...d, translation: results[i] } : d)));
+      setDays((prev) => prev.map((d, i) => {
+        if (i >= results.length) return d;
+        const { dayTrans, extraTrans } = results[i];
+        const newExtra = (d.extra || []).map((ex, j) => ({ ...ex, translation: extraTrans[j] || "" }));
+        return { ...d, translation: dayTrans, extra: d.extra && d.extra.length ? newExtra : d.extra };
+      }));
     })();
     return () => { cancelled = true; };
   }, [uiLanguage, reportVersion]);
@@ -5322,16 +5333,26 @@ export default function Home() {
     if (existing && existing.lang === uiLanguage) return;
     const days = r.days || [];
     const out: Record<number, string> = {};
-    await Promise.all(days.map(async (d, i) => {
-      const text = (d.description || "").trim();
-      if (!text) return;
+    const outExtra: Record<string, string> = {};
+    const tr = async (raw: string): Promise<string> => {
+      const text = (raw || "").trim();
+      if (!text) return "";
       try {
         const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: text, fromLanguage: "automatisch", toLanguage: uiLanguage }) });
         const data = await res.json();
-        if (!data.error && data.translation && data.translation.trim() !== text) out[i] = data.translation;
+        if (!data.error && data.translation && data.translation.trim() !== text) return data.translation;
       } catch { /* ignore */ }
+      return "";
+    };
+    await Promise.all(days.map(async (d, i) => {
+      const dt = await tr(d.description);
+      if (dt) out[i] = dt;
+      await Promise.all(((d as any).extra || []).map(async (ex: any, j: number) => {
+        const et = await tr(ex.description);
+        if (et) outExtra[`${i}_${j}`] = et;
+      }));
     }));
-    setTeamTrans((prev) => ({ ...prev, [r.id]: { lang: uiLanguage, days: out } }));
+    setTeamTrans((prev) => ({ ...prev, [r.id]: { lang: uiLanguage, days: out, extras: outExtra } }));
   }
 
   // Bei Sprachwechsel den gerade geoeffneten Bericht neu uebersetzen.
@@ -5345,15 +5366,19 @@ export default function Home() {
   async function createTeamPDF(r: SavedReport) {
     setMessage("⏳ PDF …");
     try {
-      const pdfDays = await Promise.all((r.days || []).map(async (d: DayEntry) => {
-        const text = (d.description || "").trim();
-        if (!text) return { ...d, translation: "" };
+      const trText = async (raw: string): Promise<string> => {
+        const text = (raw || "").trim();
+        if (!text) return "";
         try {
           const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: text, fromLanguage: "automatisch", toLanguage: uiLanguage }) });
           const data = await res.json();
-          const tr = (!data.error && data.translation && data.translation.trim() !== text) ? data.translation : "";
-          return { ...d, translation: tr };
-        } catch { return { ...d, translation: "" }; }
+          return (!data.error && data.translation && data.translation.trim() !== text) ? data.translation : "";
+        } catch { return ""; }
+      };
+      const pdfDays = await Promise.all((r.days || []).map(async (d: any) => {
+        const translation = await trText(d.description);
+        const extra = await Promise.all((d.extra || []).map(async (ex: any) => ({ ...ex, translation: await trText(ex.description) })));
+        return { ...d, translation, extra: (d.extra && d.extra.length) ? extra : d.extra };
       }));
       await createPDF(false, { days: pdfDays, reportName: r.report_name, employee: r.employee, calendarWeek: "", sigEmployee: (r as any).signature_employee || "", sigCustomer: (r as any).signature_customer || "" });
     } finally {
@@ -6785,9 +6810,10 @@ export default function Home() {
           if (ex.travelOutStart || ex.travelOutEnd || ex.travelOutKm) { doc.text(sanitizePdfText(`  ${t.travelOut}: ${ex.travelOutStart || "-"} - ${ex.travelOutEnd || "-"}   ${ex.travelOutKm ? ex.travelOutKm + " km" : "-"}`), marginLeft + 3, y); y += 6; }
           if (ex.travelReturnStart || ex.travelReturnEnd || ex.travelReturnKm) { doc.text(sanitizePdfText(`  ${t.travelReturn}: ${ex.travelReturnStart || "-"} - ${ex.travelReturnEnd || "-"}   ${ex.travelReturnKm ? ex.travelReturnKm + " km" : "-"}`), marginLeft + 3, y); y += 6; }
         }
-        if ((ex.description || "").trim()) {
+        const exText = (ex.translation || "").trim() || (ex.description || "").trim();
+        if (exText) {
           doc.setFont(FONT, "bold"); doc.text(`${p.description}:`, marginLeft + 3, y); y += 6; doc.setFont(FONT, "normal");
-          const exLines = doc.splitTextToSize(sanitizePdfText(ex.description), contentWidth - 8);
+          const exLines = doc.splitTextToSize(sanitizePdfText(exText), contentWidth - 8);
           for (const line of exLines) { addNewPageIfNeeded(6); doc.text(line, marginLeft + 3, y); y += 5; }
         }
         y += 3;
@@ -7363,6 +7389,7 @@ export default function Home() {
                     </div>
                   </div>
                   <AutoTextarea className="border p-3 w-full text-black bg-white resize-none overflow-hidden" placeholder={t.description} value={ex.description} onChange={(v) => updateExtra(index, exIndex, "description", v)} />
+                  {ex.translation && (<div className="border p-3 rounded-lg bg-gray-100 text-black"><strong>{t.translation}:</strong><p className="whitespace-pre-wrap break-words mt-1 leading-relaxed">{ex.translation}</p></div>)}
                 </div>
               ))}
               <button type="button" onClick={() => addExtraEntry(index)} className="bg-cyan-100 text-cyan-800 border border-cyan-300 px-3 py-2 rounded-lg text-sm w-fit">{tx.addEntry}</button>
@@ -7707,7 +7734,7 @@ export default function Home() {
                                   <p>{t.customer}: {ex.customer || "-"} | {t.projectNumber}: {ex.projectNumber || "-"} | {t.hours}: {ex.hours || "-"}</p>
                                   {(ex.startTime || ex.endTime || ex.breakMinutes) && (<p>{t.startTime}: {ex.startTime || "-"} | {t.endTime}: {ex.endTime || "-"} | {t.breakLabel}: {ex.breakMinutes ? `${ex.breakMinutes} min` : "-"}</p>)}
                                   {(ex.travelOutStart || ex.travelOutEnd || ex.travelOutKm || ex.travelReturnStart || ex.travelReturnEnd || ex.travelReturnKm) && (<p className="text-xs text-gray-600">{t.travelTime}: {t.travelOut} {ex.travelOutStart || "-"}–{ex.travelOutEnd || "-"} {ex.travelOutKm ? ex.travelOutKm + " km" : ""} | {t.travelReturn} {ex.travelReturnStart || "-"}–{ex.travelReturnEnd || "-"} {ex.travelReturnKm ? ex.travelReturnKm + " km" : ""}</p>)}
-                                  {ex.description && (<p className="whitespace-pre-wrap break-words">{ex.description}</p>)}
+                                  {ex.description && (<p className="whitespace-pre-wrap break-words">{(teamTrans[r.id] && teamTrans[r.id].lang === uiLanguage && teamTrans[r.id].extras && teamTrans[r.id].extras![`${di}_${exi}`]) || ex.translation || ex.description}</p>)}
                                 </div>
                               ))}
                               {(d.photos || []).length > 0 && (
