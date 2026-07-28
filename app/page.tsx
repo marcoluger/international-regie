@@ -4075,6 +4075,7 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [moreTabsOpen, setMoreTabsOpen] = useState(false);
   const [archiveOpen, setArchiveOpen] = useState(false);
+  const [lightboxImg, setLightboxImg] = useState<string | null>(null);
   const [projects, setProjects] = useState<any[]>([]);
   const [projectName, setProjectName] = useState("");
   const [projectCustomer, setProjectCustomer] = useState("");
@@ -7630,7 +7631,7 @@ export default function Home() {
               <AutoTextarea className="border p-3 w-full text-black bg-white resize-none overflow-hidden" placeholder={t.description} value={day.description} onChange={(v) => updateDay(index, "description", v)} />
               <button type="button" onClick={() => insertWeatherIntoDay(index, day.description)} title={t.weather} className="bg-cyan-50 text-cyan-700 border border-cyan-200 px-3 py-2 rounded-lg text-sm w-fit">🌦️ {t.weather}</button>
               {companyFeatures?.photos_enabled ? <input type="file" accept="image/*" multiple className="border p-3 w-full text-black bg-white" onChange={(e) => handlePhotos(index, e.target.files)} /> : <div className="border border-slate-200 rounded-xl p-3 shadow-sm bg-gray-50 text-sm text-gray-400">🔒 Foto-Upload ist in deinem Paket nicht aktiviert.</div>}
-              {day.photos.length > 0 && (<div className="grid grid-cols-2 gap-3">{day.photos.map((photo, photoIndex) => (<div key={photoIndex} className="border rounded-lg p-2"><img src={photo} alt="Foto" className="w-full h-32 object-cover" /><button type="button" onClick={() => deletePhoto(index, photoIndex)} className="mt-2 bg-red-600 text-white px-2 py-2.5 rounded-lg w-full">{t.deletePhoto}</button></div>))}</div>)}
+              {day.photos.length > 0 && (<div className="grid grid-cols-2 gap-3">{day.photos.map((photo, photoIndex) => (<div key={photoIndex} className="border rounded-lg p-2"><img src={photo} alt="Foto" onClick={() => setLightboxImg(photo)} className="w-full h-32 object-cover cursor-zoom-in" /><button type="button" onClick={() => deletePhoto(index, photoIndex)} className="mt-2 bg-red-600 text-white px-2 py-2.5 rounded-lg w-full">{t.deletePhoto}</button></div>))}</div>)}
               {day.translation && (<div className="border p-3 rounded-lg bg-gray-100 text-black"><strong>{t.translation}:</strong><p className="whitespace-pre-wrap break-words mt-1 leading-relaxed">{day.translation}</p></div>)}
               {/* Zusatzeintraege: zweiter Arbeitsschritt mit eigener Zeit/Fahrzeit/km */}
               {(day.extra || []).map((ex, exIndex) => (
@@ -7988,7 +7989,7 @@ export default function Home() {
               <div>
                 <h3 className="font-bold mb-2">{t.photos}</h3>
                 <input type="file" accept="image/*" multiple className="border p-3 w-full text-black bg-white" onChange={(e) => handleInstructionPhotos(e.target.files)} />
-                {instructionPhotos.length > 0 && (<div className="grid grid-cols-3 gap-2 mt-2">{instructionPhotos.map((photo, i) => (<div key={i} className="relative"><img src={photo} alt="Foto" className="w-full h-24 object-cover rounded-lg" /><button type="button" onClick={() => setInstructionPhotos((prev) => prev.filter((_, idx) => idx !== i))} className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 text-xs">✕</button></div>))}</div>)}
+                {instructionPhotos.length > 0 && (<div className="grid grid-cols-3 gap-2 mt-2">{instructionPhotos.map((photo, i) => (<div key={i} className="relative"><img src={photo} alt="Foto" onClick={() => setLightboxImg(photo)} className="w-full h-24 object-cover rounded-lg cursor-zoom-in" /><button type="button" onClick={() => setInstructionPhotos((prev) => prev.filter((_, idx) => idx !== i))} className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 text-xs">✕</button></div>))}</div>)}
               </div>
             )}
             <div className="flex items-center justify-between flex-wrap gap-2">
@@ -7998,7 +7999,7 @@ export default function Home() {
             {instructionTasks.map((task, index) => (
               <div key={index} className="border border-slate-200 rounded-xl p-3 shadow-sm space-y-2 bg-gray-50">
                 <input className="border p-3 w-full text-black bg-white" placeholder={`${t.workSteps} ${index + 1}`} value={task} onChange={(e) => { const copy = [...instructionTasks]; copy[index] = e.target.value; setInstructionTasks(copy); }} />
-                {companyFeatures?.photos_enabled && (<><input type="file" accept="image/*" multiple className="border p-2 w-full text-black bg-white text-sm" onChange={(e) => handleInstructionTaskPhotos(index, e.target.files)} />{(instructionTaskPhotos[index] || []).length > 0 && (<div className="grid grid-cols-3 gap-2">{(instructionTaskPhotos[index] || []).map((photo, pi) => (<div key={pi} className="relative"><img src={photo} alt="Foto" className="w-full h-20 object-cover rounded-lg" /><button type="button" onClick={() => setInstructionTaskPhotos((prev) => ({ ...prev, [index]: (prev[index] || []).filter((_, idx) => idx !== pi) }))} className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 text-xs">✕</button></div>))}</div>)}</>)}
+                {companyFeatures?.photos_enabled && (<><input type="file" accept="image/*" multiple className="border p-2 w-full text-black bg-white text-sm" onChange={(e) => handleInstructionTaskPhotos(index, e.target.files)} />{(instructionTaskPhotos[index] || []).length > 0 && (<div className="grid grid-cols-3 gap-2">{(instructionTaskPhotos[index] || []).map((photo, pi) => (<div key={pi} className="relative"><img src={photo} alt="Foto" onClick={() => setLightboxImg(photo)} className="w-full h-20 object-cover rounded-lg cursor-zoom-in" /><button type="button" onClick={() => setInstructionTaskPhotos((prev) => ({ ...prev, [index]: (prev[index] || []).filter((_, idx) => idx !== pi) }))} className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 text-xs">✕</button></div>))}</div>)}</>)}
               </div>
             ))}
             <div className="flex gap-3">
@@ -8113,9 +8114,7 @@ export default function Home() {
                               {(d.photos || []).length > 0 && (
                                 <div className="grid grid-cols-3 gap-2 pt-1">
                                   {(d.photos || []).map((photo: string, pi: number) => (
-                                    <a key={pi} href={photo} target="_blank" rel="noopener noreferrer">
-                                      <img src={photo} alt="Foto" className="w-full h-20 object-cover rounded-lg border" />
-                                    </a>
+                                    <img key={pi} src={photo} alt="Foto" onClick={() => setLightboxImg(photo)} className="w-full h-20 object-cover rounded-lg border cursor-zoom-in" />
                                   ))}
                                 </div>
                               )}
@@ -8748,7 +8747,7 @@ export default function Home() {
                 {instruction.problems_text && (<div className="bg-yellow-50 border rounded-lg p-2"><strong>{t.problemsHints}:</strong> {getTranslated(instruction.id, "problems_text", instruction.problems_text)}</div>)}
                 {instruction.material && (<div className="bg-cyan-50 border rounded-lg p-2"><strong>{t.material}:</strong> {getTranslated(instruction.id, "material", instruction.material)}</div>)}
                 {instruction.werkzeug && (<div className="bg-green-50 border rounded-lg p-2"><strong>{t.werkzeug}:</strong> {getTranslated(instruction.id, "werkzeug", instruction.werkzeug)}</div>)}
-                {(instruction.photos || []).length > 0 && companyFeatures?.photos_enabled && (<div className="grid grid-cols-3 gap-2">{(instruction.photos || []).map((photo: string, i: number) => (<img key={i} src={photo} alt="Foto" className="w-full h-24 object-cover rounded-lg border" />))}</div>)}
+                {(instruction.photos || []).length > 0 && companyFeatures?.photos_enabled && (<div className="grid grid-cols-3 gap-2">{(instruction.photos || []).map((photo: string, i: number) => (<img key={i} src={photo} alt="Foto" onClick={() => setLightboxImg(photo)} className="w-full h-24 object-cover rounded-lg border cursor-zoom-in" />))}</div>)}
                 <ul className="space-y-4 mt-2">
                   {(instruction.work_instruction_tasks || []).sort((a: any, b: any) => a.sort_order - b.sort_order).map((task: any) => (
                     <li key={task.id} className="border border-slate-200 rounded-xl p-3 shadow-sm bg-gray-50 space-y-3">
@@ -8759,7 +8758,7 @@ export default function Home() {
                         <span className="font-medium">{getTranslatedTask(instruction.id, task.id, task.task_text)}</span>
                       </div>
                       {task.note && <p className="text-sm text-gray-600 ml-2">{t.feedbackLabel}: {getTranslatedTask(instruction.id, `note_${task.id}`, task.note)}</p>}
-                      {(task.photos || []).length > 0 && companyFeatures?.photos_enabled && (<div className="grid grid-cols-3 gap-1">{(task.photos || []).map((photo: string, pi: number) => (<img key={pi} src={photo} alt="Foto" className="w-full h-16 object-cover rounded-lg" />))}</div>)}
+                      {(task.photos || []).length > 0 && companyFeatures?.photos_enabled && (<div className="grid grid-cols-3 gap-1">{(task.photos || []).map((photo: string, pi: number) => (<img key={pi} src={photo} alt="Foto" onClick={() => setLightboxImg(photo)} className="w-full h-16 object-cover rounded-lg cursor-zoom-in" />))}</div>)}
                       {/* Kommentare. Modul AN = offener Chat (alle sehen alles),
                           Modul AUS = privater Kommentar (jeder sieht nur seinen eigenen). */}
                       <div className="border-t pt-2 space-y-2">
@@ -9265,6 +9264,13 @@ export default function Home() {
             {savedReports.length === 0 && (<p className="text-sm text-gray-500 text-center py-1">{t.transferNoReports}</p>)}
             <button type="button" onClick={() => setTransferInst(null)} className="w-full bg-gray-300 text-black px-4 py-2.5 rounded-lg">{t.copyCancel}</button>
           </div>
+        </div>
+      )}
+
+      {lightboxImg && (
+        <div className="fixed inset-0 z-[60] bg-black/90 flex items-center justify-center p-2" onClick={() => setLightboxImg(null)}>
+          <img src={lightboxImg} alt="Foto" className="max-w-full max-h-full object-contain" />
+          <button type="button" onClick={() => setLightboxImg(null)} className="absolute top-3 right-3 bg-white/90 text-black rounded-full w-10 h-10 text-2xl leading-none flex items-center justify-center">×</button>
         </div>
       )}
 
