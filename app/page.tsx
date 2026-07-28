@@ -5338,22 +5338,30 @@ export default function Home() {
     setSavedReports((data || []) as SavedReport[]);
   }
 
+  // RLS-sichere Aufrufe fuer berichts-uebergreifende Aktionen (Service-Key serverseitig).
+  async function reportsCall(payload: any) {
+    let token = tokenRef.current;
+    if (!token) {
+      try { const sess = await dbTimeout(supabase.auth.getSession(), 5000); token = sess?.data?.session?.access_token || ""; } catch { /* 401 */ }
+    }
+    const res = await fetch("/api/reports", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify(payload) });
+    return await res.json().catch(() => ({ error: "Antwort konnte nicht gelesen werden." }));
+  }
   // Alle Berichte (nur Admin/Owner sehen im Archiv die Berichte ALLER Mitarbeiter).
   async function loadAllReports() {
     const role = currentCompany?.role;
     if (role !== "owner" && role !== "admin") { setAllReports([]); return; }
     try {
-      const { data } = await supabase.from("reports").select("*").order("created_at", { ascending: false });
-      setAllReports((data || []) as SavedReport[]);
+      const data = await reportsCall({ action: "list_all" });
+      setAllReports((Array.isArray(data?.rows) ? data.rows : []) as SavedReport[]);
     } catch { setAllReports([]); }
   }
   // Bericht ins Archiv verschieben / zurueckholen.
   async function archiveReport(id: string, value: boolean) {
-    try {
-      await supabase.from("reports").update({ archived: value }).eq("id", id);
-      setSavedReports((prev) => prev.map((r: any) => (r.id === id ? { ...r, archived: value } : r)));
-      setAllReports((prev) => prev.map((r: any) => (r.id === id ? { ...r, archived: value } : r)));
-    } catch { /* Spalte evtl. noch nicht angelegt */ }
+    const data = await reportsCall({ action: "archive", id, value });
+    if (data?.error) { setMessage("Fehler: " + data.error); return; }
+    setSavedReports((prev) => prev.map((r: any) => (r.id === id ? { ...r, archived: value } : r)));
+    setAllReports((prev) => prev.map((r: any) => (r.id === id ? { ...r, archived: value } : r)));
   }
   // KW eines Berichts (aus dem ersten Tag mit Datum, sonst aus dem Namen).
   function reportFirstDate(r: any): string {
@@ -6276,8 +6284,8 @@ export default function Home() {
   }
 
   async function deleteReport(id: string) {
-    const { error } = await supabase.from("reports").delete().eq("id", id);
-    if (error) { setMessage("Fehler beim Löschen: " + error.message); return; }
+    const data = await reportsCall({ action: "delete", id });
+    if (data?.error) { setMessage("Fehler beim Löschen: " + data.error); return; }
     if (currentReportId === id) newReport();
     setMessage(t.msgDeleted); await loadReportsFromDatabase();
     setAllReports((prev) => prev.filter((r: any) => r.id !== id));
