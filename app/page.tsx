@@ -4079,6 +4079,7 @@ export default function Home() {
   const [lightboxImg, setLightboxImg] = useState<string | null>(null);
   const [openPhoneProjects, setOpenPhoneProjects] = useState<Record<string, boolean>>({});
   const [projects, setProjects] = useState<any[]>([]);
+  const [projectArchiveOpen, setProjectArchiveOpen] = useState(false);
   const [projectName, setProjectName] = useState("");
   const [projectCustomer, setProjectCustomer] = useState("");
   const [projectSite, setProjectSite] = useState("");
@@ -6592,6 +6593,14 @@ export default function Home() {
     await loadProjects(); setMessage(t.msgProjectDeleted);
   }
 
+  async function archiveProject(id: string, value: boolean) {
+    if (!currentCompany) return;
+    const { error } = await supabase.from("projects").update({ archived: value }).eq("id", id);
+    if (error) { setMessage("Fehler beim Archivieren des Projekts: " + error.message); return; }
+    if (value && selectedProjectDetailId === id) setSelectedProjectDetailId("");
+    await loadProjects();
+  }
+
   async function updateTaskStatus(taskId: string, status: string) {
     const { error } = await supabase.from("work_instruction_tasks").update({ status }).eq("id", taskId);
     if (error) { setMessage("Fehler beim Speichern des Status."); return; }
@@ -7488,7 +7497,7 @@ export default function Home() {
             }
             const dashRole = currentCompany?.role;
             if (dashRole === "owner" || dashRole === "admin") {
-              for (const pr of projects) {
+              for (const pr of projects.filter((p: any) => !p.archived)) {
                 if (!groups[pr.id]) groups[pr.id] = { name: pr.name || t.noProject, customer: pr.customer || "", site: pr.site || "", instructions: [] };
               }
             }
@@ -7806,7 +7815,7 @@ export default function Home() {
             {editingProjectId && (<button type="button" onClick={resetProjectForm} className="bg-gray-200 px-4 py-3 rounded-lg">{t.cancelBtn}</button>)}
           </div>
           <div className="space-y-3 mt-4">
-            {projects.map((project) => (
+            {projects.filter((project) => !project.archived).map((project) => (
               <div key={project.id} className="border border-slate-200 rounded-xl p-3 shadow-sm space-y-2">
                 <strong>{project.name}</strong>
                 <p>{t.customer}: {project.customer || "-"}</p>
@@ -7829,6 +7838,7 @@ export default function Home() {
                 <div className="flex gap-2 flex-wrap">
                   <button type="button" onClick={() => setSelectedProjectDetailId(project.id === selectedProjectDetailId ? "" : project.id)} className="bg-gray-700 text-white px-3 py-2.5 rounded-lg">{project.id === selectedProjectDetailId ? t.closeProject : t.openProject}</button>
                   {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => startEditProject(project)} className="bg-amber-600 text-white px-3 py-2.5 rounded-lg">✏️ {t.editBtn}</button>)}
+                  {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => archiveProject(project.id, true)} className="bg-slate-600 text-white px-3 py-2.5 rounded-lg">📦 {tx.toArchive}</button>)}
                   <button type="button" onClick={() => deleteProject(project.id)} className="bg-red-600 text-white px-3 py-2.5 rounded-lg">{t.deleteProject}</button>
                 </div>
                 {selectedProjectDetailId === project.id && (
@@ -7862,7 +7872,26 @@ export default function Home() {
                 )}
               </div>
             ))}
-            {projects.length === 0 && <p className="text-gray-600">{t.noProjectsYet}</p>}
+            {projects.filter((p) => !p.archived).length === 0 && <p className="text-gray-600">{t.noProjectsYet}</p>}
+            {projects.some((p) => p.archived) && (
+              <div className="mt-4 border-t border-slate-200 pt-3">
+                <button type="button" onClick={() => setProjectArchiveOpen((v) => !v)} className="text-sm font-semibold text-slate-600">{projectArchiveOpen ? "▼" : "▶"} 📦 {tx.archiveTab} ({projects.filter((p) => p.archived).length})</button>
+                {projectArchiveOpen && (
+                  <div className="space-y-2 mt-2">
+                    {projects.filter((p) => p.archived).map((project) => (
+                      <div key={project.id} className="border border-slate-200 rounded-xl p-3 shadow-sm bg-gray-50 flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                          <strong>{project.name}</strong>
+                          {project.customer ? <span className="text-sm text-gray-600"> · {project.customer}</span> : null}
+                          {project.site ? <span className="text-sm text-gray-600"> · {project.site}</span> : null}
+                        </div>
+                        {(currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (<button type="button" onClick={() => archiveProject(project.id, false)} className="bg-green-700 text-white px-3 py-2 rounded-lg text-sm">{tx.fromArchive}</button>)}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </section>
       )}
@@ -7876,7 +7905,7 @@ export default function Home() {
               <input className="border p-3 text-black bg-white" placeholder={t.instructionTitle} value={instructionTitle} onChange={(e) => setInstructionTitle(e.target.value)} />
               <select className="border p-3 text-black bg-white" value={selectedProjectId} onChange={(e) => { const pid = e.target.value; setSelectedProjectId(pid); const sp = projects.find((p) => p.id === pid); if (sp) { setInstructionProject(sp.name || ""); setInstructionCustomer(sp.customer || ""); setInstructionSite(sp.site || ""); setInstructionStreet(sp.street || ""); setInstructionZip(sp.zip || ""); setInstructionCity(sp.city || ""); } }}>
                 <option value="">{t.selectProject}</option>
-                {projects.map((project) => <option key={project.id} value={project.id}>{project.name}</option>)}
+                {projects.filter((project) => !project.archived || project.id === selectedProjectId).map((project) => <option key={project.id} value={project.id}>{project.name}</option>)}
               </select>
               <input className="border p-3 text-black bg-white" placeholder={t.customer} value={instructionCustomer} onChange={(e) => setInstructionCustomer(e.target.value)} />
               <input className="border p-3 text-black bg-white" placeholder={t.site} value={instructionSite} onChange={(e) => setInstructionSite(e.target.value)} />
@@ -8685,7 +8714,7 @@ export default function Home() {
             const roleLabel = (r: string) => r === "owner" ? "Owner" : r === "admin" ? t.roleAdmin : r === "project_manager" ? t.roleProjectManager : t.roleEmployee;
             const memberById = (id: string) => (companyUsers as any[]).find((m) => m.user_id === id);
             // Je Projekt die zugewiesenen Mitarbeiter aus den Arbeitsanweisungen sammeln.
-            const groups = (projects as any[]).map((project) => {
+            const groups = (projects as any[]).filter((project) => !project.archived).map((project) => {
               const insts = (workInstructions as any[]).filter((i) => i.project_id === project.id);
               const uids: string[] = [];
               insts.forEach((i) => (i.assigned_user_ids || []).forEach((id: string) => { if (!uids.includes(id)) uids.push(id); }));
