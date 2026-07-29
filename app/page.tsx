@@ -4080,6 +4080,7 @@ export default function Home() {
   const [openPhoneProjects, setOpenPhoneProjects] = useState<Record<string, boolean>>({});
   const [projects, setProjects] = useState<any[]>([]);
   const [projectArchiveOpen, setProjectArchiveOpen] = useState(false);
+  const [projectListOpen, setProjectListOpen] = useState(false);
   const [projectName, setProjectName] = useState("");
   const [projectCustomer, setProjectCustomer] = useState("");
   const [projectSite, setProjectSite] = useState("");
@@ -7815,6 +7816,8 @@ export default function Home() {
             {editingProjectId && (<button type="button" onClick={resetProjectForm} className="bg-gray-200 px-4 py-3 rounded-lg">{t.cancelBtn}</button>)}
           </div>
           <div className="space-y-3 mt-4">
+            <button type="button" onClick={() => setProjectListOpen((v) => !v)} className="text-sm font-semibold text-slate-700">{projectListOpen ? "▼" : "▶"} {t.projectsTab} ({projects.filter((p) => !p.archived).length})</button>
+            {projectListOpen && (<>
             {projects.filter((project) => !project.archived).map((project) => (
               <div key={project.id} className="border border-slate-200 rounded-xl p-3 shadow-sm space-y-2">
                 <strong>{project.name}</strong>
@@ -7873,6 +7876,7 @@ export default function Home() {
               </div>
             ))}
             {projects.filter((p) => !p.archived).length === 0 && <p className="text-gray-600">{t.noProjectsYet}</p>}
+            </>)}
             {projects.some((p) => p.archived) && (
               <div className="mt-4 border-t border-slate-200 pt-3">
                 <button type="button" onClick={() => setProjectArchiveOpen((v) => !v)} className="text-sm font-semibold text-slate-600">{projectArchiveOpen ? "▼" : "▶"} 📦 {tx.archiveTab} ({projects.filter((p) => p.archived).length})</button>
