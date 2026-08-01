@@ -17,6 +17,8 @@ function fmtDate(iso: string) {
   const p = iso.slice(0, 10).split("-");
   return p.length === 3 ? `${p[2]}.${p[1]}.${p[0]}` : iso;
 }
+const VORTEXT_DEFAULT = "Sehr geehrte Damen und Herren, vielen Dank für Ihre Anfrage. Gerne unterbreiten wir Ihnen folgendes Angebot:";
+const NACHTEXT_DEFAULT = "Wir würden uns freuen, den Auftrag für Sie ausführen zu dürfen, und stehen für Rückfragen gerne zur Verfügung.";
 const PV_DEFAULT = "Steuerfreie Leistung \u2013 Nullsteuersatz nach \u00a7 12 Abs. 3 UStG (Lieferung und Installation einer Photovoltaikanlage).";
 const B13_DEFAULT = "Steuerschuldnerschaft des Leistungsempf\u00e4ngers nach \u00a7 13b UStG. Es wird keine Umsatzsteuer ausgewiesen; die Umsatzsteuer schuldet der Leistungsempf\u00e4nger.";
 const UNITS = ["St", "Stk", "Psch", "m", "lfm", "m\u00b2", "m\u00b3", "h", "Std", "Tag", "Wo", "Mon", "kg", "t", "g", "l", "Ltr", "Satz", "Paar", "Rolle", "Pkg", "Bund", "Pkt", "kW", "kWp", "A", "V", "%"];
@@ -68,7 +70,7 @@ function blankOffer() {
     customer_id: "", customer_name: "", customer_anrede: "", customer_street: "", customer_zip: "", customer_city: "",
     vat_rate: "19", rabatt_pct: "0", nachlass: "0", skonto_pct: "0", skonto_tage: "0",
     def_mat_multi: "1.28", def_lohn_multi: "1.28", binde_weeks: "",
-    tax_mode: "standard", tax_note: "",
+    tax_mode: "standard", tax_note: "", vortext: "", nachtext: "", pay1_pct: "50", pay2_pct: "30", pay3_pct: "20",
     items: [] as any[],
   };
 }
@@ -82,7 +84,7 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
   const [custSearch, setCustSearch] = useState("");
   const [pickerOpen, setPickerOpen] = useState(false);
   const [openItem, setOpenItem] = useState<Record<string, boolean>>({});
-  const [settings, setSettings] = useState<any>({ def_mat_multi: "1.28", def_lohn_multi: "1.28", binde_weeks: "4", vat_rate: "19", def_rabatt_pct: "0", def_nachlass: "0", def_skonto_pct: "0", def_skonto_tage: "0", pv_text: PV_DEFAULT, b13_text: B13_DEFAULT });
+  const [settings, setSettings] = useState<any>({ def_mat_multi: "1.28", def_lohn_multi: "1.28", binde_weeks: "4", vat_rate: "19", def_rabatt_pct: "0", def_nachlass: "0", def_skonto_pct: "0", def_skonto_tage: "0", pv_text: PV_DEFAULT, b13_text: B13_DEFAULT, vortext: VORTEXT_DEFAULT, nachtext: NACHTEXT_DEFAULT, pay1_pct: "50", pay2_pct: "30", pay3_pct: "20" });
   const [settingsTab, setSettingsTab] = useState("allgemein");
 
   useEffect(() => { if (companyId) { loadOffers(); loadSettings(); } /* eslint-disable-next-line */ }, [companyId]);
@@ -94,10 +96,10 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
   }
   async function loadSettings() {
     const { data } = await supabase.from("office_offer_settings").select("*").eq("company_id", companyId).maybeSingle();
-    if (data) setSettings({ def_mat_multi: String(data.def_mat_multi ?? "1.28"), def_lohn_multi: String(data.def_lohn_multi ?? "1.28"), binde_weeks: String(data.binde_weeks ?? "4"), vat_rate: String(data.vat_rate ?? "19"), def_rabatt_pct: String(data.def_rabatt_pct ?? "0"), def_nachlass: String(data.def_nachlass ?? "0"), def_skonto_pct: String(data.def_skonto_pct ?? "0"), def_skonto_tage: String(data.def_skonto_tage ?? "0"), pv_text: data.pv_text ?? PV_DEFAULT, b13_text: data.b13_text ?? B13_DEFAULT });
+    if (data) setSettings({ def_mat_multi: String(data.def_mat_multi ?? "1.28"), def_lohn_multi: String(data.def_lohn_multi ?? "1.28"), binde_weeks: String(data.binde_weeks ?? "4"), vat_rate: String(data.vat_rate ?? "19"), def_rabatt_pct: String(data.def_rabatt_pct ?? "0"), def_nachlass: String(data.def_nachlass ?? "0"), def_skonto_pct: String(data.def_skonto_pct ?? "0"), def_skonto_tage: String(data.def_skonto_tage ?? "0"), pv_text: data.pv_text ?? PV_DEFAULT, b13_text: data.b13_text ?? B13_DEFAULT, vortext: data.vortext ?? VORTEXT_DEFAULT, nachtext: data.nachtext ?? NACHTEXT_DEFAULT, pay1_pct: String(data.pay1_pct ?? "50"), pay2_pct: String(data.pay2_pct ?? "30"), pay3_pct: String(data.pay3_pct ?? "20") });
   }
   async function saveSettings() {
-    const { error } = await supabase.from("office_offer_settings").upsert({ company_id: companyId, def_mat_multi: num(settings.def_mat_multi), def_lohn_multi: num(settings.def_lohn_multi), binde_weeks: Math.round(num(settings.binde_weeks)), vat_rate: num(settings.vat_rate), def_rabatt_pct: num(settings.def_rabatt_pct), def_nachlass: num(settings.def_nachlass), def_skonto_pct: num(settings.def_skonto_pct), def_skonto_tage: Math.round(num(settings.def_skonto_tage)), pv_text: settings.pv_text || null, b13_text: settings.b13_text || null, updated_at: new Date().toISOString() }, { onConflict: "company_id" });
+    const { error } = await supabase.from("office_offer_settings").upsert({ company_id: companyId, def_mat_multi: num(settings.def_mat_multi), def_lohn_multi: num(settings.def_lohn_multi), binde_weeks: Math.round(num(settings.binde_weeks)), vat_rate: num(settings.vat_rate), def_rabatt_pct: num(settings.def_rabatt_pct), def_nachlass: num(settings.def_nachlass), def_skonto_pct: num(settings.def_skonto_pct), def_skonto_tage: Math.round(num(settings.def_skonto_tage)), pv_text: settings.pv_text || null, b13_text: settings.b13_text || null, vortext: settings.vortext || null, nachtext: settings.nachtext || null, pay1_pct: num(settings.pay1_pct), pay2_pct: num(settings.pay2_pct), pay3_pct: num(settings.pay3_pct), updated_at: new Date().toISOString() }, { onConflict: "company_id" });
     if (error) { setMsg("Fehler beim Speichern der Einstellungen: " + error.message); return; }
     setMsg("Einstellungen gespeichert.");
   }
@@ -113,11 +115,16 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
     b.skonto_pct = settings.def_skonto_pct || "0";
     b.skonto_tage = settings.def_skonto_tage || "0";
     b.tax_mode = "standard"; b.tax_note = "";
+    b.vortext = settings.vortext || "";
+    b.nachtext = settings.nachtext || "";
+    b.pay1_pct = settings.pay1_pct || "50";
+    b.pay2_pct = settings.pay2_pct || "30";
+    b.pay3_pct = settings.pay3_pct || "20";
     b.offer_date = new Date().toISOString().slice(0, 10);
     setO(b); setMode("edit"); setMsg(""); setCustSearch(""); setPickerOpen(false);
   }
   function editOffer(row: any) {
-    setO({ ...blankOffer(), ...row, vat_rate: String(row.vat_rate ?? "19"), rabatt_pct: String(row.rabatt_pct ?? "0"), nachlass: String(row.nachlass ?? "0"), skonto_pct: String(row.skonto_pct ?? "0"), skonto_tage: String(row.skonto_tage ?? "0"), def_mat_multi: String(row.def_mat_multi ?? "1.28"), def_lohn_multi: String(row.def_lohn_multi ?? "1.28"), binde_weeks: String(row.binde_weeks ?? ""), tax_mode: row.tax_mode || "standard", tax_note: row.tax_note ?? "", items: Array.isArray(row.items) ? row.items : [] });
+    setO({ ...blankOffer(), ...row, vat_rate: String(row.vat_rate ?? "19"), rabatt_pct: String(row.rabatt_pct ?? "0"), nachlass: String(row.nachlass ?? "0"), skonto_pct: String(row.skonto_pct ?? "0"), skonto_tage: String(row.skonto_tage ?? "0"), def_mat_multi: String(row.def_mat_multi ?? "1.28"), def_lohn_multi: String(row.def_lohn_multi ?? "1.28"), binde_weeks: String(row.binde_weeks ?? ""), tax_mode: row.tax_mode || "standard", tax_note: row.tax_note ?? "", vortext: row.vortext ?? "", nachtext: row.nachtext ?? "", pay1_pct: String(row.pay1_pct ?? "50"), pay2_pct: String(row.pay2_pct ?? "30"), pay3_pct: String(row.pay3_pct ?? "20"), items: Array.isArray(row.items) ? row.items : [] });
     setMode("edit"); setMsg("");
   }
 
@@ -163,6 +170,7 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
       vat_rate: num(o.vat_rate), rabatt_pct: num(o.rabatt_pct), nachlass: num(o.nachlass), skonto_pct: num(o.skonto_pct), skonto_tage: num(o.skonto_tage),
       def_mat_multi: num(o.def_mat_multi), def_lohn_multi: num(o.def_lohn_multi),
       tax_mode: o.tax_mode || "standard", tax_note: o.tax_note || null,
+      vortext: o.vortext || null, nachtext: o.nachtext || null, pay1_pct: num(o.pay1_pct), pay2_pct: num(o.pay2_pct), pay3_pct: num(o.pay3_pct),
       items: o.items, net_total: t.netAfter, vat_total: t.vat, gross_total: t.gross, updated_at: new Date().toISOString(),
     };
     if (o.id) {
@@ -195,7 +203,7 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
         </div>
         {msg && <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-lg p-2 text-sm">{msg}</div>}
         <div className="flex flex-wrap gap-2">
-          {[{ k: "allgemein", l: "Allgemein" }, { k: "rabatt", l: "Rabatt & Skonto" }, { k: "steuer", l: "Steuer / Recht" }].map((tb) => (
+          {[{ k: "allgemein", l: "Allgemein" }, { k: "rabatt", l: "Rabatt & Skonto" }, { k: "steuer", l: "Steuer / Recht" }, { k: "texte", l: "Texte & Zahlung" }].map((tb) => (
             <button key={tb.k} type="button" onClick={() => setSettingsTab(tb.k)} className={`px-4 py-2 rounded-full text-sm font-medium ${settingsTab === tb.k ? "bg-cyan-700 text-white" : "bg-white border border-slate-300 text-slate-600"}`}>{tb.l}</button>
           ))}
         </div>
@@ -223,6 +231,19 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
             <p className="text-xs text-gray-500">Diese Texte werden ins Angebot übernommen, wenn du dort den jeweiligen Steuerfall auswählst.</p>
             <label className="flex flex-col text-sm">Photovoltaik 0 % (§ 12 Abs. 3 UStG)<textarea className="border p-2 rounded-lg text-black bg-white" rows={2} value={settings.pv_text} onChange={(e) => setSettings((x: any) => ({ ...x, pv_text: e.target.value }))} /></label>
             <label className="flex flex-col text-sm">Bauleistung § 13b UStG (Reverse Charge)<textarea className="border p-2 rounded-lg text-black bg-white" rows={2} value={settings.b13_text} onChange={(e) => setSettings((x: any) => ({ ...x, b13_text: e.target.value }))} /></label>
+          </div>
+        )}
+        {settingsTab === "texte" && (
+          <div className="space-y-2">
+            <label className="flex flex-col text-sm">Vortext (Einleitung)<textarea className="border p-2 rounded-lg text-black bg-white" rows={3} value={settings.vortext} onChange={(e) => setSettings((x: any) => ({ ...x, vortext: e.target.value }))} /></label>
+            <label className="flex flex-col text-sm">Nachtext (Schluss)<textarea className="border p-2 rounded-lg text-black bg-white" rows={3} value={settings.nachtext} onChange={(e) => setSettings((x: any) => ({ ...x, nachtext: e.target.value }))} /></label>
+            <div className="text-sm font-medium pt-1">Zahlungsbedingungen (Standard)</div>
+            <div className="flex items-center gap-2 flex-wrap text-sm">
+              <input className="border p-1.5 rounded w-16 text-black bg-white" value={settings.pay1_pct} onChange={(e) => setSettings((x: any) => ({ ...x, pay1_pct: e.target.value }))} /> % bei Auftragserteilung,
+              <input className="border p-1.5 rounded w-16 text-black bg-white" value={settings.pay2_pct} onChange={(e) => setSettings((x: any) => ({ ...x, pay2_pct: e.target.value }))} /> % bei Auftragsbeginn,
+              <input className="border p-1.5 rounded w-16 text-black bg-white" value={settings.pay3_pct} onChange={(e) => setSettings((x: any) => ({ ...x, pay3_pct: e.target.value }))} /> % bei Auftragsabschluss
+            </div>
+            <p className="text-xs text-gray-500">Skonto wird aus dem Reiter „Rabatt & Skonto" übernommen.</p>
           </div>
         )}
         <button type="button" onClick={saveSettings} className="bg-cyan-700 text-white px-4 py-2 rounded-lg text-sm">💾 Einstellungen speichern</button>
@@ -319,6 +340,12 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
             {q && custMatches.length === 0 && <p className="text-xs text-gray-500">Kein Kunde gefunden.</p>}
           </div>
         )}
+      </div>
+
+      {/* Vortext */}
+      <div className="border border-slate-200 rounded-xl p-3 bg-gray-50">
+        <label className="text-sm font-medium">Vortext (Einleitung)</label>
+        <textarea className="border p-2 rounded-lg text-black bg-white w-full mt-1 text-sm" rows={3} value={o.vortext} onChange={(e) => set("vortext", e.target.value)} />
       </div>
 
       {/* Positionen */}
@@ -424,6 +451,18 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
           <div className="flex justify-between font-bold text-base border-t pt-1"><span>Gesamt-Betrag</span><span>{fmt(t.gross)} €</span></div>
           {t.skonto > 0 && <div className="flex justify-between text-gray-500 text-xs"><span>Skonto {fmt(num(o.skonto_pct))} % ({num(o.skonto_tage)} Tage)</span><span>−{fmt(t.skonto)} €</span></div>}
         </div>
+      </div>
+      {/* Nachtext & Zahlungsbedingungen */}
+      <div className="border border-slate-200 rounded-xl p-3 bg-gray-50 space-y-2">
+        <label className="text-sm font-medium">Nachtext (Schluss)</label>
+        <textarea className="border p-2 rounded-lg text-black bg-white w-full text-sm" rows={3} value={o.nachtext} onChange={(e) => set("nachtext", e.target.value)} />
+        <div className="text-sm font-medium pt-1">Zahlungsbedingungen</div>
+        <div className="flex items-center gap-2 flex-wrap text-sm">
+          <input className="border p-1.5 rounded w-16 text-black bg-white" value={o.pay1_pct} onChange={(e) => set("pay1_pct", e.target.value)} /> % bei Auftragserteilung,
+          <input className="border p-1.5 rounded w-16 text-black bg-white" value={o.pay2_pct} onChange={(e) => set("pay2_pct", e.target.value)} /> % bei Auftragsbeginn,
+          <input className="border p-1.5 rounded w-16 text-black bg-white" value={o.pay3_pct} onChange={(e) => set("pay3_pct", e.target.value)} /> % bei Auftragsabschluss
+        </div>
+        {num(o.skonto_pct) > 0 && <p className="text-sm text-gray-600">Zahlbar innerhalb {num(o.skonto_tage)} Tagen mit {fmt(num(o.skonto_pct))} % Skonto.</p>}
       </div>
     </section>
   );
