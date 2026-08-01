@@ -10,10 +10,12 @@ function uid() { return Date.now().toString(36) + Math.random().toString(36).sli
 function calcItem(it: any) {
   if (it.kind !== "position") return { ...it, ep: 0, gp: 0, mat_vk: 0, lohn_vk: 0 };
   const matVk = num(it.mat_ek) * (num(it.mat_multi) || 1);
-  const lohnVk = num(it.std_lohn) * (num(it.minutes) / 60);
+  const lohnEk = (it.lohn_ek !== undefined && it.lohn_ek !== "") ? num(it.lohn_ek) : num(it.std_lohn);
+  const lohnSatzVk = lohnEk * (num(it.lohn_multi) || 1);
+  const lohnVk = lohnSatzVk * (num(it.minutes) / 60);
   const ep = matVk + lohnVk + num(it.fremd_vk) + num(it.geraet_vk);
   const gp = ep * num(it.qty) * (1 - num(it.discount_pct) / 100);
-  return { ...it, mat_vk: matVk, lohn_vk: lohnVk, ep, gp };
+  return { ...it, mat_vk: matVk, lohn_satz_vk: lohnSatzVk, lohn_vk: lohnVk, ep, gp };
 }
 
 function offerTotals(items: any[], o: any) {
@@ -42,7 +44,7 @@ function newItem(kind: string) {
   const base: any = { id: uid(), kind, oz: "" };
   if (kind === "titel") return { ...base, title: "" };
   if (kind === "text") return { ...base, short_text: "", long_text: "" };
-  return { ...base, short_text: "", long_text: "", qty: "1", unit: "St", mat_ek: "", mat_multi: "1.28", std_lohn: "", minutes: "", fremd_vk: "", geraet_vk: "", discount_pct: "" };
+  return { ...base, short_text: "", long_text: "", qty: "1", unit: "St", mat_ek: "", mat_multi: "1.28", lohn_ek: "", lohn_multi: "1.28", minutes: "", fremd_vk: "", geraet_vk: "", discount_pct: "" };
 }
 
 function blankOffer() {
@@ -262,10 +264,11 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
                     <label className="flex flex-col">Mat-Multi<input className="border p-1.5 rounded text-black bg-white" value={it.mat_multi} onChange={(e) => setItem(it.id, "mat_multi", e.target.value)} /></label>
                     <label className="flex flex-col text-gray-500">Mat-Vk<input className="border p-1.5 rounded bg-gray-100" value={fmt(it.mat_vk)} readOnly /></label>
                     <label className="flex flex-col">Rabatt %<input className="border p-1.5 rounded text-black bg-white" value={it.discount_pct} onChange={(e) => setItem(it.id, "discount_pct", e.target.value)} /></label>
-                    <label className="flex flex-col">Std.-Satz<input className="border p-1.5 rounded text-black bg-white" value={it.std_lohn} onChange={(e) => setItem(it.id, "std_lohn", e.target.value)} /></label>
+                    <label className="flex flex-col">Lohn-Ek<input className="border p-1.5 rounded text-black bg-white" value={it.lohn_ek} onChange={(e) => setItem(it.id, "lohn_ek", e.target.value)} /></label>
+                    <label className="flex flex-col">Lohn-Multi<input className="border p-1.5 rounded text-black bg-white" value={it.lohn_multi} onChange={(e) => setItem(it.id, "lohn_multi", e.target.value)} /></label>
+                    <label className="flex flex-col text-gray-500">Lohn-Satz Vk<input className="border p-1.5 rounded bg-gray-100" value={fmt(it.lohn_satz_vk)} readOnly /></label>
                     <label className="flex flex-col">Minuten<input className="border p-1.5 rounded text-black bg-white" value={it.minutes} onChange={(e) => setItem(it.id, "minutes", e.target.value)} /></label>
                     <label className="flex flex-col text-gray-500">Lohn-Vk<input className="border p-1.5 rounded bg-gray-100" value={fmt(it.lohn_vk)} readOnly /></label>
-                    <div />
                     <label className="flex flex-col">Fremd-Vk<input className="border p-1.5 rounded text-black bg-white" value={it.fremd_vk} onChange={(e) => setItem(it.id, "fremd_vk", e.target.value)} /></label>
                     <label className="flex flex-col">Gerät-Vk<input className="border p-1.5 rounded text-black bg-white" value={it.geraet_vk} onChange={(e) => setItem(it.id, "geraet_vk", e.target.value)} /></label>
                     <label className="flex flex-col text-gray-500">E-Preis<input className="border p-1.5 rounded bg-gray-100 font-medium" value={fmt(it.ep)} readOnly /></label>
