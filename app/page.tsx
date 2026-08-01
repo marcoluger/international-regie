@@ -7526,7 +7526,7 @@ export default function Home() {
           <TabButton label={t.companyData}      tabName="firmendaten"        activeTab={activeTab} onClick={() => setActiveTab("firmendaten")} />
         )}
         {companyFeatures?.office_enabled && (currentCompany?.role === "owner" || currentCompany?.role === "admin") && (
-          <TabButton label="🏢 Büro" tabName="buero" activeTab={activeTab} onClick={() => { setActiveTab("buero"); loadOfficeSettings(); loadOfficeEmployees(); if (currentCompany) loadCompanyUsers(currentCompany.company_id); }} />
+          <TabButton label="🏢 Büro" tabName="buero" activeTab={activeTab} onClick={() => { window.location.href = "/buero"; }} />
         )}
         {companyFeatures?.material_enabled && (currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
         <TabButton label={`📦 ${t.materialCatalog}`} tabName="material" activeTab={activeTab} onClick={() => { setActiveTab("material"); loadMaterialCatalog(); }} />
