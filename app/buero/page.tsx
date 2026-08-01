@@ -11,6 +11,7 @@ const supabase = createClient(
 const BUERO_TABS = [
   { key: "mitarbeiter", label: "👤 Mitarbeiter" },
   { key: "kunden", label: "👥 Kunden" },
+  { key: "auftraege", label: "🛠 Aufträge" },
   { key: "angebote", label: "🧾 Angebote" },
   { key: "ab", label: "📋 Auftragsbestätigung" },
   { key: "rechnung", label: "💶 Rechnung" },
@@ -55,6 +56,17 @@ export default function BueroPage() {
   const [cDebitor, setCDebitor] = useState("");
   const [cKreditor, setCKreditor] = useState("");
   const [cType, setCType] = useState("debitor");
+  // Auftrags-/Störungsannahme
+  const [orderSearch, setOrderSearch] = useState("");
+  const [orderSelId, setOrderSelId] = useState<string | null>(null);
+  const [orderEntry, setOrderEntry] = useState("");
+  const [newCustOpen, setNewCustOpen] = useState(false);
+  const [qName, setQName] = useState("");
+  const [qStreet, setQStreet] = useState("");
+  const [qZip, setQZip] = useState("");
+  const [qCity, setQCity] = useState("");
+  const [qPhone, setQPhone] = useState("");
+  const [qMobile, setQMobile] = useState("");
   const [cStreet, setCStreet] = useState("");
   const [cZip, setCZip] = useState("");
   const [cCity, setCCity] = useState("");
@@ -150,6 +162,32 @@ export default function BueroPage() {
   function nextKreditorNo() {
     const nums = customers.map((k: any) => parseInt(String(k.kreditor || ""), 10)).filter((n: number) => !isNaN(n) && n < 90000);
     return (nums.length ? Math.max(...nums) : 70000) + 1;
+  }
+  async function addOrderEntry() {
+    const k = customers.find((c: any) => c.id === orderSelId);
+    if (!k) { setMessage("Bitte zuerst einen Kunden auswählen."); return; }
+    const text = orderEntry.trim();
+    if (!text) { setMessage("Bitte einen Text für die Karteikarte eingeben."); return; }
+    const me = companyUsers.find((u: any) => u.user_id === (user && user.id));
+    const author = me ? (me.full_name || me.email || "") : "";
+    const stamp = new Date().toLocaleString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+    const line = "[" + stamp + (author ? " – " + author : "") + "] " + text;
+    const prev = String(k.note || "").trimEnd();
+    const newNote = prev ? (prev + "\n" + line) : line;
+    const { error } = await supabase.from("office_customers").update({ note: newNote }).eq("id", k.id);
+    if (error) { setMessage("Fehler beim Speichern: " + error.message); return; }
+    setOrderEntry(""); await loadCustomers(companyId); setMessage("Eintrag in Karteikarte gespeichert.");
+  }
+  async function createQuickCustomer() {
+    if (!qName.trim()) { setMessage("Bitte einen Namen eingeben."); return; }
+    const deb = String(nextDebitorNo());
+    const payload = { company_id: companyId, name: qName.trim(), debitor: deb, customer_no: deb, kind: "debitor", street: qStreet.trim(), zip: qZip.trim(), city: qCity.trim(), phone: qPhone.trim(), mobile: qMobile.trim() };
+    const { data, error } = await supabase.from("office_customers").insert(payload).select("id").single();
+    if (error) { setMessage("Fehler beim Anlegen: " + error.message); return; }
+    setQName(""); setQStreet(""); setQZip(""); setQCity(""); setQPhone(""); setQMobile(""); setNewCustOpen(false);
+    await loadCustomers(companyId);
+    if (data && data.id) setOrderSelId(data.id);
+    setMessage("Neuer Kunde angelegt (Debitor " + deb + ").");
   }
   function resetCustForm() { setCEditId(null); setCName(""); setCDebitor(""); setCKreditor(""); setCType("debitor"); setCStreet(""); setCZip(""); setCCity(""); setCPhone(""); setCMobile(""); setCEmail(""); setCWebsite(""); setCUid(""); setCNote(""); setNoteOpen(false); }
   function startEditCust(k: any) {
@@ -424,6 +462,69 @@ export default function BueroPage() {
                 })()}
               </section>
             )}
+
+            {/* Tab: Aufträge / Störungsannahme */}
+            {tab === "auftraege" && (() => {
+              const q = orderSearch.trim().toLowerCase();
+              const matches = q ? customers.filter((k: any) => [k.name, k.street, k.zip, k.city, k.phone, k.mobile, k.debitor, k.kreditor].some((x: any) => String(x || "").toLowerCase().includes(q))).slice(0, 25) : [];
+              const sel = customers.find((c: any) => c.id === orderSelId);
+              return (
+                <section className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4">
+                  <div>
+                    <h2 className="text-xl font-bold">🛠 Auftrags-/Störungsannahme</h2>
+                    <p className="text-sm text-gray-500">Kunde über Name, Straße, PLZ, Telefon oder Handy suchen — dann mit Zeitstempel in die Karteikarte eintragen.</p>
+                  </div>
+                  <input className="border p-3 text-black bg-white rounded-lg w-full" placeholder="Suche: Name, Straße, PLZ, Telefon, Handy…" value={orderSearch} onChange={(e) => setOrderSearch(e.target.value)} />
+                  {q && (
+                    <div className="space-y-1">
+                      {matches.map((k: any) => (
+                        <button key={k.id} type="button" onClick={() => setOrderSelId(k.id)} className={`w-full text-left border rounded-lg p-2 text-sm ${orderSelId === k.id ? "border-cyan-600 bg-cyan-50" : "border-slate-200 bg-white"}`}>
+                          <strong>{k.name}</strong>
+                          {k.customer_no ? <span className="text-gray-500"> · {k.customer_no}</span> : null}
+                          {(k.street || k.zip || k.city) ? <span className="text-gray-600"> · {[k.street, [k.zip, k.city].filter(Boolean).join(" ")].filter(Boolean).join(", ")}</span> : null}
+                          {(k.phone || k.mobile) ? <span className="text-gray-600"> · 📞 {[k.phone, k.mobile].filter(Boolean).join(" / ")}</span> : null}
+                        </button>
+                      ))}
+                      {matches.length === 0 && <p className="text-gray-500 text-sm">Kein Kunde gefunden.</p>}
+                    </div>
+                  )}
+                  <div className="border-t pt-3">
+                    <button type="button" onClick={() => { setNewCustOpen((o) => !o); if (!newCustOpen && !qName) setQName(orderSearch); }} className="text-sm font-medium text-cyan-700">{newCustOpen ? "▼" : "▶"} ＋ Neuer Kunde (nicht gefunden)</button>
+                    {newCustOpen && (
+                      <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2 bg-gray-50 border border-slate-200 rounded-xl p-3">
+                        <input className="border p-2 rounded-lg text-black bg-white" placeholder="Name / Firma *" value={qName} onChange={(e) => setQName(e.target.value)} />
+                        <input className="border p-2 rounded-lg text-black bg-white" placeholder="Straße + Nr." value={qStreet} onChange={(e) => setQStreet(e.target.value)} />
+                        <input className="border p-2 rounded-lg text-black bg-white" placeholder="PLZ" value={qZip} onChange={(e) => setQZip(e.target.value)} />
+                        <input className="border p-2 rounded-lg text-black bg-white" placeholder="Ort" value={qCity} onChange={(e) => setQCity(e.target.value)} />
+                        <input className="border p-2 rounded-lg text-black bg-white" placeholder="Telefon" value={qPhone} onChange={(e) => setQPhone(e.target.value)} />
+                        <input className="border p-2 rounded-lg text-black bg-white" placeholder="Handy" value={qMobile} onChange={(e) => setQMobile(e.target.value)} />
+                        <div className="md:col-span-2"><button type="button" onClick={createQuickCustomer} className="bg-cyan-700 text-white px-4 py-2 rounded-lg text-sm">Anlegen & auswählen</button></div>
+                      </div>
+                    )}
+                  </div>
+                  {sel && (
+                    <div className="border border-cyan-200 bg-cyan-50/40 rounded-2xl p-4 space-y-3">
+                      <div>
+                        <strong className="text-lg">{sel.name}</strong>
+                        {sel.customer_no ? <span className="text-gray-500"> · {sel.customer_no}</span> : null}
+                        {(sel.street || sel.zip || sel.city) ? <div className="text-gray-600 text-sm">{[sel.street, [sel.zip, sel.city].filter(Boolean).join(" ")].filter(Boolean).join(", ")}</div> : null}
+                        {(sel.phone || sel.mobile) ? <div className="text-gray-600 text-sm">📞 {[sel.phone, sel.mobile].filter(Boolean).join(" · ")}</div> : null}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-700 mb-1">🗂️ Karteikarte</p>
+                        {String(sel.note || "").trim()
+                          ? <div className="bg-white border border-slate-200 rounded-lg p-2 text-sm whitespace-pre-wrap max-h-64 overflow-y-auto">{sel.note}</div>
+                          : <p className="text-sm text-gray-400">Noch keine Einträge.</p>}
+                      </div>
+                      <div className="space-y-2">
+                        <textarea className="border p-3 w-full rounded-lg text-black bg-white" rows={3} placeholder="Neuer Eintrag (Auftrag / Störung) …" value={orderEntry} onChange={(e) => setOrderEntry(e.target.value)} />
+                        <button type="button" onClick={addOrderEntry} className="bg-cyan-700 text-white px-4 py-3 rounded-lg">＋ Mit Zeitstempel eintragen</button>
+                      </div>
+                    </div>
+                  )}
+                </section>
+              );
+            })()}
 
             {/* Tabs: Angebote / Auftragsbestätigung / Rechnung – folgen */}
             {(tab === "angebote" || tab === "ab" || tab === "rechnung") && (
