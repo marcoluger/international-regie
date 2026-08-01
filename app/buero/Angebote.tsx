@@ -53,6 +53,7 @@ function blankOffer() {
     offer_date: "", valid_until: "",
     customer_id: "", customer_name: "", customer_anrede: "", customer_street: "", customer_zip: "", customer_city: "",
     vat_rate: "19", rabatt_pct: "0", nachlass: "0", skonto_pct: "0", skonto_tage: "0",
+    def_mat_multi: "1.28", def_lohn_multi: "1.28",
     items: [] as any[],
   };
 }
@@ -77,7 +78,7 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
 
   function startNew() { setO(blankOffer()); setMode("edit"); setMsg(""); setCustSearch(""); setPickerOpen(false); }
   function editOffer(row: any) {
-    setO({ ...blankOffer(), ...row, vat_rate: String(row.vat_rate ?? "19"), rabatt_pct: String(row.rabatt_pct ?? "0"), nachlass: String(row.nachlass ?? "0"), skonto_pct: String(row.skonto_pct ?? "0"), skonto_tage: String(row.skonto_tage ?? "0"), items: Array.isArray(row.items) ? row.items : [] });
+    setO({ ...blankOffer(), ...row, vat_rate: String(row.vat_rate ?? "19"), rabatt_pct: String(row.rabatt_pct ?? "0"), nachlass: String(row.nachlass ?? "0"), skonto_pct: String(row.skonto_pct ?? "0"), skonto_tage: String(row.skonto_tage ?? "0"), def_mat_multi: String(row.def_mat_multi ?? "1.28"), def_lohn_multi: String(row.def_lohn_multi ?? "1.28"), items: Array.isArray(row.items) ? row.items : [] });
     setMode("edit"); setMsg("");
   }
 
@@ -85,7 +86,17 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
   function setItem(id: string, field: string, val: any) {
     setO((p: any) => ({ ...p, items: p.items.map((it: any) => it.id === id ? { ...it, [field]: val } : it) }));
   }
-  function addItem(kind: string) { setO((p: any) => ({ ...p, items: [...p.items, newItem(kind)] })); }
+  function addItem(kind: string) {
+    setO((p: any) => {
+      const it: any = newItem(kind);
+      if (kind === "position") { it.mat_multi = p.def_mat_multi || "1.28"; it.lohn_multi = p.def_lohn_multi || "1.28"; }
+      return { ...p, items: [...p.items, it] };
+    });
+  }
+  function applyMultisToAll() {
+    setO((p: any) => ({ ...p, items: p.items.map((it: any) => it.kind === "position" ? { ...it, mat_multi: p.def_mat_multi, lohn_multi: p.def_lohn_multi } : it) }));
+    setMsg("Multiplikatoren auf alle Positionen übernommen.");
+  }
   function removeItem(id: string) { setO((p: any) => ({ ...p, items: p.items.filter((it: any) => it.id !== id) })); }
   function moveItem(id: string, dir: number) {
     setO((p: any) => {
@@ -108,6 +119,7 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
       customer_id: o.customer_id || null, customer_name: o.customer_name || null, customer_anrede: o.customer_anrede || null,
       customer_street: o.customer_street || null, customer_zip: o.customer_zip || null, customer_city: o.customer_city || null,
       vat_rate: num(o.vat_rate), rabatt_pct: num(o.rabatt_pct), nachlass: num(o.nachlass), skonto_pct: num(o.skonto_pct), skonto_tage: num(o.skonto_tage),
+      def_mat_multi: num(o.def_mat_multi), def_lohn_multi: num(o.def_lohn_multi),
       items: o.items, net_total: t.netAfter, vat_total: t.vat, gross_total: t.gross, updated_at: new Date().toISOString(),
     };
     if (o.id) {
@@ -180,6 +192,15 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
         <input className="border p-2 rounded-lg text-black bg-white" placeholder="Betreff / Projekt" value={o.subject} onChange={(e) => set("subject", e.target.value)} />
         <label className="text-sm text-gray-600 flex items-center gap-2">Datum <input type="date" className="border p-2 rounded-lg text-black bg-white flex-1" value={o.offer_date || ""} onChange={(e) => set("offer_date", e.target.value)} /></label>
         <label className="text-sm text-gray-600 flex items-center gap-2">gültig bis <input type="date" className="border p-2 rounded-lg text-black bg-white flex-1" value={o.valid_until || ""} onChange={(e) => set("valid_until", e.target.value)} /></label>
+      </div>
+
+      {/* Kalkulations-Standard */}
+      <div className="border border-slate-200 rounded-xl p-3 bg-gray-50 flex items-center gap-3 flex-wrap">
+        <span className="text-sm font-medium">🧮 Standard-Multiplikatoren:</span>
+        <label className="text-sm flex items-center gap-1">Material <input className="border p-1.5 rounded text-black bg-white w-20" value={o.def_mat_multi} onChange={(e) => set("def_mat_multi", e.target.value)} /></label>
+        <label className="text-sm flex items-center gap-1">Lohn <input className="border p-1.5 rounded text-black bg-white w-20" value={o.def_lohn_multi} onChange={(e) => set("def_lohn_multi", e.target.value)} /></label>
+        <button type="button" onClick={applyMultisToAll} className="bg-slate-700 text-white px-3 py-1.5 rounded-lg text-xs">Auf alle Positionen übernehmen</button>
+        <span className="text-xs text-gray-500">Neue Positionen übernehmen diese Werte automatisch.</span>
       </div>
 
       {/* Kunde */}
