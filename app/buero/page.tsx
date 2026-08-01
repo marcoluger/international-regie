@@ -8,6 +8,13 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
 );
 
+const BUERO_TABS = [
+  { key: "mitarbeiter", label: "👤 Mitarbeiter" },
+  { key: "angebote", label: "🧾 Angebote" },
+  { key: "ab", label: "📋 Auftragsbestätigung" },
+  { key: "rechnung", label: "💶 Rechnung" },
+];
+
 export default function BueroPage() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
@@ -23,6 +30,9 @@ export default function BueroPage() {
   const [unlocked, setUnlocked] = useState(false);
   const [pwInput, setPwInput] = useState("");
   const [newPw, setNewPw] = useState("");
+
+  // Navigation innerhalb des Büro-Bereichs
+  const [tab, setTab] = useState("mitarbeiter");
 
   // Mitarbeiter
   const [companyUsers, setCompanyUsers] = useState<any[]>([]);
@@ -148,63 +158,81 @@ export default function BueroPage() {
             </div>
           )
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="flex items-center justify-between gap-2">
               <p className="text-sm text-green-700 font-medium">🔓 Büro entsperrt</p>
               <button type="button" onClick={() => setUnlocked(false)} className="text-sm text-gray-500 underline">Sperren</button>
             </div>
 
-            {/* Mitarbeiterverwaltung */}
-            <section className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4">
-              <h2 className="text-xl font-bold">👤 Büro-Mitarbeiter</h2>
+            {/* Tab-Leiste */}
+            <div className="flex flex-wrap gap-2">
+              {BUERO_TABS.map((tb) => (
+                <button
+                  key={tb.key}
+                  type="button"
+                  onClick={() => setTab(tb.key)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${tab === tb.key ? "bg-cyan-700 text-white shadow-sm" : "bg-white border border-slate-300 text-slate-600 hover:bg-slate-50"}`}
+                >
+                  {tb.label}
+                </button>
+              ))}
+            </div>
 
-              <div className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-gray-50 space-y-3">
-                <h3 className="font-bold">{eid ? "Mitarbeiter bearbeiten" : "Mitarbeiter anlegen"}</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <input className="border p-3 text-black bg-white rounded-lg" placeholder="Name *" value={oName} onChange={(e) => setOName(e.target.value)} />
-                  <input className="border p-3 text-black bg-white rounded-lg" placeholder="Rolle / Funktion" value={oRole} onChange={(e) => setORole(e.target.value)} />
-                  <input className="border p-3 text-black bg-white rounded-lg" placeholder="Telefon" value={oPhone} onChange={(e) => setOPhone(e.target.value)} />
-                  <input className="border p-3 text-black bg-white rounded-lg" placeholder="E-Mail" value={oEmail} onChange={(e) => setOEmail(e.target.value)} />
-                </div>
-                <div className="flex gap-2 flex-wrap">
-                  <button type="button" onClick={saveEmployee} className="bg-cyan-700 text-white px-4 py-3 rounded-lg">{eid ? "💾 Speichern" : "Anlegen"}</button>
-                  {eid && (<button type="button" onClick={resetForm} className="bg-gray-200 px-4 py-3 rounded-lg">Abbrechen</button>)}
-                </div>
-              </div>
+            {/* Tab: Mitarbeiter */}
+            {tab === "mitarbeiter" && (
+              <section className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4">
+                <h2 className="text-xl font-bold">👤 Büro-Mitarbeiter</h2>
 
-              <div className="space-y-2">
-                {companyUsers.filter((u: any) => u.role === "owner" || u.role === "admin").map((u: any) => (
-                  <div key={"cu-" + u.user_id} className="border border-slate-200 rounded-xl p-3 shadow-sm flex flex-wrap items-center justify-between gap-2 bg-cyan-50">
-                    <div>
-                      <strong>{u.full_name || u.email}</strong>
-                      <span className="text-sm text-gray-600"> · {u.role === "owner" ? "Owner" : "Admin"}</span>
-                      {u.phone ? <span className="text-sm text-gray-600"> · 📞 {u.phone}</span> : null}
-                    </div>
-                    <span className="text-xs text-gray-400">aus App</span>
+                <div className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-gray-50 space-y-3">
+                  <h3 className="font-bold">{eid ? "Mitarbeiter bearbeiten" : "Mitarbeiter anlegen"}</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <input className="border p-3 text-black bg-white rounded-lg" placeholder="Name *" value={oName} onChange={(e) => setOName(e.target.value)} />
+                    <input className="border p-3 text-black bg-white rounded-lg" placeholder="Rolle / Funktion" value={oRole} onChange={(e) => setORole(e.target.value)} />
+                    <input className="border p-3 text-black bg-white rounded-lg" placeholder="Telefon" value={oPhone} onChange={(e) => setOPhone(e.target.value)} />
+                    <input className="border p-3 text-black bg-white rounded-lg" placeholder="E-Mail" value={oEmail} onChange={(e) => setOEmail(e.target.value)} />
                   </div>
-                ))}
-                {officeEmployees.map((m: any) => (
-                  <div key={m.id} className="border border-slate-200 rounded-xl p-3 shadow-sm flex flex-wrap items-center justify-between gap-2">
-                    <div>
-                      <strong>{m.name}</strong>
-                      {m.role ? <span className="text-sm text-gray-600"> · {m.role}</span> : null}
-                      {m.phone ? <span className="text-sm text-gray-600"> · 📞 {m.phone}</span> : null}
-                      {m.email ? <span className="text-sm text-gray-600"> · {m.email}</span> : null}
-                    </div>
-                    <div className="flex gap-2">
-                      <button type="button" onClick={() => startEdit(m)} className="bg-amber-600 text-white px-3 py-2 rounded-lg text-sm">✏️ Bearbeiten</button>
-                      <button type="button" onClick={() => deleteEmployee(m.id)} className="bg-red-600 text-white px-3 py-2 rounded-lg text-sm">Löschen</button>
-                    </div>
+                  <div className="flex gap-2 flex-wrap">
+                    <button type="button" onClick={saveEmployee} className="bg-cyan-700 text-white px-4 py-3 rounded-lg">{eid ? "💾 Speichern" : "Anlegen"}</button>
+                    {eid && (<button type="button" onClick={resetForm} className="bg-gray-200 px-4 py-3 rounded-lg">Abbrechen</button>)}
                   </div>
-                ))}
-                {officeEmployees.length === 0 && <p className="text-gray-600">Noch keine separaten Büro-Mitarbeiter angelegt.</p>}
-              </div>
-            </section>
+                </div>
 
-            {/* Platzhalter für die kaufmännischen Untermodule */}
-            <section className="bg-white border-2 border-dashed border-slate-300 rounded-2xl p-6 text-center text-gray-500">
-              🧾 Angebote · Auftragsbestätigung · Rechnung — folgen als Nächstes hier im Büro-Bereich.
-            </section>
+                <div className="space-y-2">
+                  {companyUsers.filter((u: any) => u.role === "owner" || u.role === "admin").map((u: any) => (
+                    <div key={"cu-" + u.user_id} className="border border-slate-200 rounded-xl p-3 shadow-sm flex flex-wrap items-center justify-between gap-2 bg-cyan-50">
+                      <div>
+                        <strong>{u.full_name || u.email}</strong>
+                        <span className="text-sm text-gray-600"> · {u.role === "owner" ? "Owner" : "Admin"}</span>
+                        {u.phone ? <span className="text-sm text-gray-600"> · 📞 {u.phone}</span> : null}
+                      </div>
+                      <span className="text-xs text-gray-400">aus App</span>
+                    </div>
+                  ))}
+                  {officeEmployees.map((m: any) => (
+                    <div key={m.id} className="border border-slate-200 rounded-xl p-3 shadow-sm flex flex-wrap items-center justify-between gap-2">
+                      <div>
+                        <strong>{m.name}</strong>
+                        {m.role ? <span className="text-sm text-gray-600"> · {m.role}</span> : null}
+                        {m.phone ? <span className="text-sm text-gray-600"> · 📞 {m.phone}</span> : null}
+                        {m.email ? <span className="text-sm text-gray-600"> · {m.email}</span> : null}
+                      </div>
+                      <div className="flex gap-2">
+                        <button type="button" onClick={() => startEdit(m)} className="bg-amber-600 text-white px-3 py-2 rounded-lg text-sm">✏️ Bearbeiten</button>
+                        <button type="button" onClick={() => deleteEmployee(m.id)} className="bg-red-600 text-white px-3 py-2 rounded-lg text-sm">Löschen</button>
+                      </div>
+                    </div>
+                  ))}
+                  {officeEmployees.length === 0 && <p className="text-gray-600">Noch keine separaten Büro-Mitarbeiter angelegt.</p>}
+                </div>
+              </section>
+            )}
+
+            {/* Tabs: Angebote / Auftragsbestätigung / Rechnung – folgen */}
+            {tab !== "mitarbeiter" && (
+              <section className="bg-white border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center text-gray-500">
+                {(BUERO_TABS.find((t) => t.key === tab)?.label || "")} — folgt als Nächstes hier im Büro-Bereich.
+              </section>
+            )}
           </div>
         )}
       </div>
