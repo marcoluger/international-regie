@@ -46,9 +46,11 @@ export default function BueroPage() {
   // Kunden
   const [customers, setCustomers] = useState<any[]>([]);
   const [custSearch, setCustSearch] = useState("");
+  const [custFilter, setCustFilter] = useState("alle");
   const [cEditId, setCEditId] = useState<string | null>(null);
   const [cName, setCName] = useState("");
-  const [cNo, setCNo] = useState("");
+  const [cDebitor, setCDebitor] = useState("");
+  const [cKreditor, setCKreditor] = useState("");
   const [cStreet, setCStreet] = useState("");
   const [cZip, setCZip] = useState("");
   const [cCity, setCCity] = useState("");
@@ -131,20 +133,22 @@ export default function BueroPage() {
     if (error) { setMessage("Fehler beim Laden der Kunden: " + error.message); return; }
     setCustomers(data || []);
   }
-  function resetCustForm() { setCEditId(null); setCName(""); setCNo(""); setCStreet(""); setCZip(""); setCCity(""); setCPhone(""); setCMobile(""); setCEmail(""); setCWebsite(""); setCUid(""); setCNote(""); }
+  function resetCustForm() { setCEditId(null); setCName(""); setCDebitor(""); setCKreditor(""); setCStreet(""); setCZip(""); setCCity(""); setCPhone(""); setCMobile(""); setCEmail(""); setCWebsite(""); setCUid(""); setCNote(""); }
   function startEditCust(k: any) {
-    setCEditId(k.id); setCName(k.name || ""); setCNo(k.customer_no || ""); setCStreet(k.street || ""); setCZip(k.zip || ""); setCCity(k.city || "");
+    setCEditId(k.id); setCName(k.name || ""); setCDebitor(k.debitor || ""); setCKreditor(k.kreditor || ""); setCStreet(k.street || ""); setCZip(k.zip || ""); setCCity(k.city || "");
     setCPhone(k.phone || ""); setCMobile(k.mobile || ""); setCEmail(k.email || ""); setCWebsite(k.website || ""); setCUid(k.uid || ""); setCNote(k.note || "");
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   }
   async function saveCustomer() {
     if (!cName.trim()) { setMessage("Bitte einen Kundennamen eingeben."); return; }
-    const payload = { name: cName.trim(), customer_no: cNo.trim(), street: cStreet.trim(), zip: cZip.trim(), city: cCity.trim(), phone: cPhone.trim(), mobile: cMobile.trim(), email: cEmail.trim(), website: cWebsite.trim(), uid: cUid.trim(), note: cNote.trim() };
+    const deb = cDebitor.trim(); const kre = cKreditor.trim();
+    const kind = deb && kre ? "beides" : kre ? "kreditor" : deb ? "debitor" : "sonstige";
+    const payload = { name: cName.trim(), debitor: deb, kreditor: kre, customer_no: deb || kre, kind, street: cStreet.trim(), zip: cZip.trim(), city: cCity.trim(), phone: cPhone.trim(), mobile: cMobile.trim(), email: cEmail.trim(), website: cWebsite.trim(), uid: cUid.trim(), note: cNote.trim() };
     if (cEditId) {
       const { error } = await supabase.from("office_customers").update(payload).eq("id", cEditId);
       if (error) { setMessage("Fehler beim Speichern: " + error.message); return; }
     } else {
-      const { error } = await supabase.from("office_customers").insert({ company_id: companyId, kind: "kunde", ...payload });
+      const { error } = await supabase.from("office_customers").insert({ company_id: companyId, ...payload });
       if (error) { setMessage("Fehler beim Speichern: " + error.message); return; }
     }
     resetCustForm(); await loadCustomers(companyId); setMessage("Kunde gespeichert.");
@@ -280,13 +284,21 @@ export default function BueroPage() {
               <section className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4">
                 <div className="flex items-center justify-between gap-2 flex-wrap">
                   <h2 className="text-xl font-bold">👥 Kunden <span className="text-sm font-normal text-gray-500">({customers.length})</span></h2>
-                  <input className="border p-2 rounded-lg text-black bg-white w-full sm:w-72" placeholder="Suche: Name, Nr., Ort, E-Mail…" value={custSearch} onChange={(e) => setCustSearch(e.target.value)} />
+                  <div className="flex gap-2 items-center flex-wrap">
+                    <select className="border p-2 rounded-lg text-black bg-white" value={custFilter} onChange={(e) => setCustFilter(e.target.value)}>
+                      <option value="alle">Alle</option>
+                      <option value="debitor">Nur Debitoren (Kunden)</option>
+                      <option value="kreditor">Nur Kreditoren (Lieferanten)</option>
+                    </select>
+                    <input className="border p-2 rounded-lg text-black bg-white w-full sm:w-72" placeholder="Suche: Name, Nr., Ort, E-Mail…" value={custSearch} onChange={(e) => setCustSearch(e.target.value)} />
+                  </div>
                 </div>
                 <div className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-gray-50 space-y-3">
                   <h3 className="font-bold">{cEditId ? "Kunde bearbeiten" : "Neuen Kunden anlegen"}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <input className="border p-3 text-black bg-white rounded-lg" placeholder="Name / Firma *" value={cName} onChange={(e) => setCName(e.target.value)} />
-                    <input className="border p-3 text-black bg-white rounded-lg" placeholder="Kundennummer" value={cNo} onChange={(e) => setCNo(e.target.value)} />
+                    <input className="border p-3 text-black bg-white rounded-lg" placeholder="Debitor-Nr. (Kunde)" value={cDebitor} onChange={(e) => setCDebitor(e.target.value)} />
+                    <input className="border p-3 text-black bg-white rounded-lg" placeholder="Kreditor-Nr. (Lieferant)" value={cKreditor} onChange={(e) => setCKreditor(e.target.value)} />
                     <input className="border p-3 text-black bg-white rounded-lg" placeholder="Straße + Nr." value={cStreet} onChange={(e) => setCStreet(e.target.value)} />
                     <div className="grid grid-cols-3 gap-2">
                       <input className="border p-3 text-black bg-white rounded-lg" placeholder="PLZ" value={cZip} onChange={(e) => setCZip(e.target.value)} />
@@ -306,7 +318,10 @@ export default function BueroPage() {
                 </div>
                 {(() => {
                   const q = custSearch.trim().toLowerCase();
-                  const filtered = q ? customers.filter((k: any) => [k.name, k.customer_no, k.city, k.zip, k.email, k.matchcode].some((x: any) => String(x || "").toLowerCase().includes(q))) : customers;
+                  const hasDeb = (k: any) => !!String(k.debitor || "").trim();
+                  const hasKre = (k: any) => !!String(k.kreditor || "").trim();
+                  const byType = custFilter === "debitor" ? customers.filter(hasDeb) : custFilter === "kreditor" ? customers.filter(hasKre) : customers;
+                  const filtered = q ? byType.filter((k: any) => [k.name, k.debitor, k.kreditor, k.customer_no, k.city, k.zip, k.email, k.matchcode].some((x: any) => String(x || "").toLowerCase().includes(q))) : byType;
                   const shown = filtered.slice(0, 100);
                   return (
                     <div className="space-y-2">
@@ -314,7 +329,11 @@ export default function BueroPage() {
                       {shown.map((k: any) => (
                         <div key={k.id} className="border border-slate-200 rounded-xl p-3 shadow-sm flex flex-wrap items-start justify-between gap-2">
                           <div className="text-sm">
-                            <strong>{k.name}</strong>{k.customer_no ? <span className="text-gray-500"> · Nr. {k.customer_no}</span> : null}
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <strong>{k.name}</strong>
+                              {String(k.debitor || "").trim() ? <span className="text-xs bg-green-100 text-green-800 rounded px-1.5 py-0.5">Debitor {k.debitor}</span> : null}
+                              {String(k.kreditor || "").trim() ? <span className="text-xs bg-orange-100 text-orange-800 rounded px-1.5 py-0.5">Kreditor {k.kreditor}</span> : null}
+                            </div>
                             {(k.street || k.zip || k.city) ? <div className="text-gray-600">{[k.street, [k.zip, k.city].filter(Boolean).join(" ")].filter(Boolean).join(", ")}</div> : null}
                             {(k.phone || k.mobile) ? <div className="text-gray-600">📞 {[k.phone, k.mobile].filter(Boolean).join(" · ")}</div> : null}
                             {k.email ? <div className="text-gray-600">✉️ {k.email}</div> : null}
