@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { generateAngebotPdf } from "./angebotPdf";
 
 // ── Hilfsfunktionen ────────────────────────────────────────────────
 const num = (v: any) => Number(String(v ?? "").replace(",", ".")) || 0;
@@ -206,6 +207,16 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
     await loadOffers(); setMsg("Angebot gespeichert.");
   }
 
+  async function pdfOffer() {
+    try {
+      const cust = customers.find((k: any) => k.id === o.customer_id);
+      const customerNo = cust ? String(cust.customer_no || cust.debitor || cust.kreditor || "") : "";
+      await generateAngebotPdf(o, { customerNo });
+    } catch (e: any) {
+      setMsg("Fehler beim PDF: " + (e?.message || String(e)));
+    }
+  }
+
   async function deleteOffer(id: string) {
     if (typeof window !== "undefined" && !window.confirm("Angebot wirklich löschen?")) return;
     const { error } = await supabase.from("office_offers").delete().eq("id", id);
@@ -339,6 +350,7 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
         <h2 className="text-xl font-bold">🧾 {o.id ? "Angebot bearbeiten" : "Neues Angebot"}</h2>
         <div className="flex gap-2">
           <button type="button" onClick={saveOffer} className="bg-cyan-700 text-white px-4 py-2 rounded-lg text-sm">💾 Speichern</button>
+          <button type="button" onClick={pdfOffer} className="bg-slate-700 text-white px-4 py-2 rounded-lg text-sm">📄 PDF</button>
           <button type="button" onClick={() => { setMode("list"); loadOffers(); }} className="bg-gray-200 px-4 py-2 rounded-lg text-sm">Zurück zur Liste</button>
         </div>
       </div>
