@@ -6,6 +6,17 @@ import { useEffect, useState } from "react";
 const num = (v: any) => Number(String(v ?? "").replace(",", ".")) || 0;
 const fmt = (n: number) => (Math.round(n * 100) / 100).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+function addWeeks(dateStr: string, weeks: number) {
+  if (!dateStr || !weeks) return "";
+  const d = new Date(dateStr + "T00:00:00");
+  d.setDate(d.getDate() + Math.round(weeks * 7));
+  return d.toISOString().slice(0, 10);
+}
+function fmtDate(iso: string) {
+  if (!iso) return "";
+  const p = iso.slice(0, 10).split("-");
+  return p.length === 3 ? `${p[2]}.${p[1]}.${p[0]}` : iso;
+}
 const UNITS = ["St", "Stk", "Psch", "m", "lfm", "m\u00b2", "m\u00b3", "h", "Std", "Tag", "Wo", "Mon", "kg", "t", "g", "l", "Ltr", "Satz", "Paar", "Rolle", "Pkg", "Bund", "Pkt", "kW", "kWp", "A", "V", "%"];
 
 function calcItem(it: any) {
@@ -54,7 +65,7 @@ function blankOffer() {
     offer_date: "", valid_until: "",
     customer_id: "", customer_name: "", customer_anrede: "", customer_street: "", customer_zip: "", customer_city: "",
     vat_rate: "19", rabatt_pct: "0", nachlass: "0", skonto_pct: "0", skonto_tage: "0",
-    def_mat_multi: "1.28", def_lohn_multi: "1.28",
+    def_mat_multi: "1.28", def_lohn_multi: "1.28", binde_weeks: "",
     items: [] as any[],
   };
 }
@@ -62,24 +73,42 @@ function blankOffer() {
 // ── Komponente ─────────────────────────────────────────────────────
 export default function Angebote({ supabase, companyId, customers }: { supabase: any; companyId: string; customers: any[] }) {
   const [offers, setOffers] = useState<any[]>([]);
-  const [mode, setMode] = useState<"list" | "edit">("list");
+  const [mode, setMode] = useState<"list" | "edit" | "settings">("list");
   const [o, setO] = useState<any>(blankOffer());
   const [msg, setMsg] = useState("");
   const [custSearch, setCustSearch] = useState("");
   const [pickerOpen, setPickerOpen] = useState(false);
   const [openItem, setOpenItem] = useState<Record<string, boolean>>({});
+  const [settings, setSettings] = useState<any>({ def_mat_multi: "1.28", def_lohn_multi: "1.28", binde_weeks: "4", vat_rate: "19" });
 
-  useEffect(() => { if (companyId) loadOffers(); /* eslint-disable-next-line */ }, [companyId]);
+  useEffect(() => { if (companyId) { loadOffers(); loadSettings(); } /* eslint-disable-next-line */ }, [companyId]);
 
   async function loadOffers() {
     const { data, error } = await supabase.from("office_offers").select("*").eq("company_id", companyId).order("created_at", { ascending: false });
     if (error) { setMsg("Fehler beim Laden: " + error.message); return; }
     setOffers(data || []);
   }
+  async function loadSettings() {
+    const { data } = await supabase.from("office_offer_settings").select("*").eq("company_id", companyId).maybeSingle();
+    if (data) setSettings({ def_mat_multi: String(data.def_mat_multi ?? "1.28"), def_lohn_multi: String(data.def_lohn_multi ?? "1.28"), binde_weeks: String(data.binde_weeks ?? "4"), vat_rate: String(data.vat_rate ?? "19") });
+  }
+  async function saveSettings() {
+    const { error } = await supabase.from("office_offer_settings").upsert({ company_id: companyId, def_mat_multi: num(settings.def_mat_multi), def_lohn_multi: num(settings.def_lohn_multi), binde_weeks: Math.round(num(settings.binde_weeks)), vat_rate: num(settings.vat_rate), updated_at: new Date().toISOString() }, { onConflict: "company_id" });
+    if (error) { setMsg("Fehler beim Speichern der Einstellungen: " + error.message); return; }
+    setMsg("Einstellungen gespeichert.");
+  }
 
-  function startNew() { setO(blankOffer()); setMode("edit"); setMsg(""); setCustSearch(""); setPickerOpen(false); }
+  function startNew() {
+    const b: any = blankOffer();
+    b.def_mat_multi = settings.def_mat_multi || "1.28";
+    b.def_lohn_multi = settings.def_lohn_multi || "1.28";
+    b.binde_weeks = settings.binde_weeks || "";
+    b.vat_rate = settings.vat_rate || "19";
+    b.offer_date = new Date().toISOString().slice(0, 10);
+    setO(b); setMode("edit"); setMsg(""); setCustSearch(""); setPickerOpen(false);
+  }
   function editOffer(row: any) {
-    setO({ ...blankOffer(), ...row, vat_rate: String(row.vat_rate ?? "19"), rabatt_pct: String(row.rabatt_pct ?? "0"), nachlass: String(row.nachlass ?? "0"), skonto_pct: String(row.skonto_pct ?? "0"), skonto_tage: String(row.skonto_tage ?? "0"), def_mat_multi: String(row.def_mat_multi ?? "1.28"), def_lohn_multi: String(row.def_lohn_multi ?? "1.28"), items: Array.isArray(row.items) ? row.items : [] });
+    setO({ ...blankOffer(), ...row, vat_rate: String(row.vat_rate ?? "19"), rabatt_pct: String(row.rabatt_pct ?? "0"), nachlass: String(row.nachlass ?? "0"), skonto_pct: String(row.skonto_pct ?? "0"), skonto_tage: String(row.skonto_tage ?? "0"), def_mat_multi: String(row.def_mat_multi ?? "1.28"), def_lohn_multi: String(row.def_lohn_multi ?? "1.28"), binde_weeks: String(row.binde_weeks ?? ""), items: Array.isArray(row.items) ? row.items : [] });
     setMode("edit"); setMsg("");
   }
 
@@ -116,7 +145,7 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
     const t = offerTotals(o.items, o);
     const payload: any = {
       company_id: companyId, number: o.number || null, status: o.status || "entwurf", subject: o.subject || null,
-      offer_date: o.offer_date || null, valid_until: o.valid_until || null,
+      offer_date: o.offer_date || null, valid_until: (o.binde_weeks ? addWeeks(o.offer_date, num(o.binde_weeks)) : o.valid_until) || null, binde_weeks: o.binde_weeks ? Math.round(num(o.binde_weeks)) : null,
       customer_id: o.customer_id || null, customer_name: o.customer_name || null, customer_anrede: o.customer_anrede || null,
       customer_street: o.customer_street || null, customer_zip: o.customer_zip || null, customer_city: o.customer_city || null,
       vat_rate: num(o.vat_rate), rabatt_pct: num(o.rabatt_pct), nachlass: num(o.nachlass), skonto_pct: num(o.skonto_pct), skonto_tage: num(o.skonto_tage),
@@ -143,13 +172,37 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
 
   const t = offerTotals(o.items, o);
 
+  // ── Einstellungen ────────────────────────────────────────────────
+  if (mode === "settings") {
+    return (
+      <section className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4">
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          <h2 className="text-xl font-bold">⚙️ Angebots-Einstellungen</h2>
+          <button type="button" onClick={() => setMode("list")} className="bg-gray-200 px-4 py-2 rounded-lg text-sm">Zurück</button>
+        </div>
+        {msg && <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-lg p-2 text-sm">{msg}</div>}
+        <p className="text-sm text-gray-500">Diese Werte werden bei jedem neuen Angebot automatisch übernommen.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-lg">
+          <label className="flex flex-col text-sm">Standard-Multi Material<input className="border p-2 rounded-lg text-black bg-white" value={settings.def_mat_multi} onChange={(e) => setSettings((x: any) => ({ ...x, def_mat_multi: e.target.value }))} /></label>
+          <label className="flex flex-col text-sm">Standard-Multi Lohn<input className="border p-2 rounded-lg text-black bg-white" value={settings.def_lohn_multi} onChange={(e) => setSettings((x: any) => ({ ...x, def_lohn_multi: e.target.value }))} /></label>
+          <label className="flex flex-col text-sm">Bindefrist (Wochen)<input type="number" className="border p-2 rounded-lg text-black bg-white" value={settings.binde_weeks} onChange={(e) => setSettings((x: any) => ({ ...x, binde_weeks: e.target.value }))} /></label>
+          <label className="flex flex-col text-sm">MwSt %<input className="border p-2 rounded-lg text-black bg-white" value={settings.vat_rate} onChange={(e) => setSettings((x: any) => ({ ...x, vat_rate: e.target.value }))} /></label>
+        </div>
+        <button type="button" onClick={saveSettings} className="bg-cyan-700 text-white px-4 py-2 rounded-lg text-sm">💾 Einstellungen speichern</button>
+      </section>
+    );
+  }
+
   // ── Liste ────────────────────────────────────────────────────────
   if (mode === "list") {
     return (
       <section className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4">
         <div className="flex items-center justify-between gap-2 flex-wrap">
           <h2 className="text-xl font-bold">🧾 Angebote <span className="text-sm font-normal text-gray-500">({offers.length})</span></h2>
-          <button type="button" onClick={startNew} className="bg-cyan-700 text-white px-4 py-2 rounded-lg text-sm">＋ Neues Angebot</button>
+          <div className="flex gap-2">
+            <button type="button" onClick={() => { setMode("settings"); setMsg(""); }} className="bg-slate-600 text-white px-4 py-2 rounded-lg text-sm">⚙️ Einstellungen</button>
+            <button type="button" onClick={startNew} className="bg-cyan-700 text-white px-4 py-2 rounded-lg text-sm">＋ Neues Angebot</button>
+          </div>
         </div>
         {msg && <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-lg p-2 text-sm">{msg}</div>}
         <div className="space-y-2">
@@ -192,7 +245,7 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
         <input className="border p-2 rounded-lg text-black bg-white" placeholder="Angebotsnummer (Start später automatisch)" value={o.number} onChange={(e) => set("number", e.target.value)} />
         <input className="border p-2 rounded-lg text-black bg-white" placeholder="Betreff / Projekt" value={o.subject} onChange={(e) => set("subject", e.target.value)} />
         <label className="text-sm text-gray-600 flex items-center gap-2">Datum <input type="date" className="border p-2 rounded-lg text-black bg-white flex-1" value={o.offer_date || ""} onChange={(e) => set("offer_date", e.target.value)} /></label>
-        <label className="text-sm text-gray-600 flex items-center gap-2">gültig bis <input type="date" className="border p-2 rounded-lg text-black bg-white flex-1" value={o.valid_until || ""} onChange={(e) => set("valid_until", e.target.value)} /></label>
+        <div className="text-sm text-gray-600 flex items-center gap-2 flex-wrap">Bindefrist <input type="number" className="border p-2 rounded-lg text-black bg-white w-20" value={o.binde_weeks} onChange={(e) => set("binde_weeks", e.target.value)} /> Wochen <span className="text-gray-500">→ gültig bis {o.binde_weeks && o.offer_date ? fmtDate(addWeeks(o.offer_date, num(o.binde_weeks))) : "—"}</span></div>
       </div>
 
       {/* Kalkulations-Standard */}
