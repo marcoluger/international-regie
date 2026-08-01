@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
+import Angebote from "./Angebote";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || "",
@@ -76,6 +77,7 @@ export default function BueroPage() {
   const [cWebsite, setCWebsite] = useState("");
   const [cUid, setCUid] = useState("");
   const [cNote, setCNote] = useState("");
+  const [cAnrede, setCAnrede] = useState("");
   const [noteOpen, setNoteOpen] = useState(false);
   const noteRef = useRef<HTMLTextAreaElement>(null);
 
@@ -189,10 +191,10 @@ export default function BueroPage() {
     if (data && data.id) setOrderSelId(data.id);
     setMessage("Neuer Kunde angelegt (Debitor " + deb + ").");
   }
-  function resetCustForm() { setCEditId(null); setCName(""); setCDebitor(""); setCKreditor(""); setCType("debitor"); setCStreet(""); setCZip(""); setCCity(""); setCPhone(""); setCMobile(""); setCEmail(""); setCWebsite(""); setCUid(""); setCNote(""); setNoteOpen(false); }
+  function resetCustForm() { setCEditId(null); setCName(""); setCDebitor(""); setCKreditor(""); setCType("debitor"); setCStreet(""); setCZip(""); setCCity(""); setCPhone(""); setCMobile(""); setCEmail(""); setCWebsite(""); setCUid(""); setCNote(""); setCAnrede(""); setNoteOpen(false); }
   function startEditCust(k: any) {
     setCEditId(k.id); setCName(k.name || ""); setCDebitor(k.debitor || ""); setCKreditor(k.kreditor || ""); setCType(k.debitor && String(k.debitor).trim() ? "debitor" : "kreditor"); setCStreet(k.street || ""); setCZip(k.zip || ""); setCCity(k.city || "");
-    setCPhone(k.phone || ""); setCMobile(k.mobile || ""); setCEmail(k.email || ""); setCWebsite(k.website || ""); setCUid(k.uid || ""); setCNote(k.note || ""); setNoteOpen(!!(k.note && String(k.note).trim()));
+    setCPhone(k.phone || ""); setCMobile(k.mobile || ""); setCEmail(k.email || ""); setCWebsite(k.website || ""); setCUid(k.uid || ""); setCNote(k.note || ""); setCAnrede(k.anrede || ""); setNoteOpen(!!(k.note && String(k.note).trim()));
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   }
   async function saveCustomer() {
@@ -203,7 +205,7 @@ export default function BueroPage() {
       else { deb = String(nextDebitorNo()); kre = ""; }
     }
     const kind = deb && kre ? "beides" : kre ? "kreditor" : deb ? "debitor" : "sonstige";
-    const payload = { name: cName.trim(), debitor: deb, kreditor: kre, customer_no: deb || kre, kind, street: cStreet.trim(), zip: cZip.trim(), city: cCity.trim(), phone: cPhone.trim(), mobile: cMobile.trim(), email: cEmail.trim(), website: cWebsite.trim(), uid: cUid.trim(), note: cNote.trim() };
+    const payload = { name: cName.trim(), debitor: deb, kreditor: kre, customer_no: deb || kre, kind, anrede: cAnrede.trim(), street: cStreet.trim(), zip: cZip.trim(), city: cCity.trim(), phone: cPhone.trim(), mobile: cMobile.trim(), email: cEmail.trim(), website: cWebsite.trim(), uid: cUid.trim(), note: cNote.trim() };
     if (cEditId) {
       const { error } = await supabase.from("office_customers").update(payload).eq("id", cEditId);
       if (error) { setMessage("Fehler beim Speichern: " + error.message); return; }
@@ -377,6 +379,7 @@ export default function BueroPage() {
                     <input className="border p-3 text-black bg-white rounded-lg" placeholder="E-Mail" value={cEmail} onChange={(e) => setCEmail(e.target.value)} />
                     <input className="border p-3 text-black bg-white rounded-lg" placeholder="Website" value={cWebsite} onChange={(e) => setCWebsite(e.target.value)} />
                     <input className="border p-3 text-black bg-white rounded-lg" placeholder="UID / USt-ID" value={cUid} onChange={(e) => setCUid(e.target.value)} />
+                    <input className="border p-3 text-black bg-white rounded-lg md:col-span-2" placeholder="Anrede (Briefanrede, z. B. Sehr geehrte Damen und Herren)" value={cAnrede} onChange={(e) => setCAnrede(e.target.value)} />
                     <div className="md:col-span-2">
                       <button type="button" onClick={() => setNoteOpen((o) => !o)} className="text-sm font-medium text-slate-600">{noteOpen ? "▼" : "▶"} 🗂️ Karteikarte / Notiz{cNote.trim() ? ` (${cNote.trim().length} Zeichen)` : ""}</button>
                       {noteOpen && (
@@ -526,8 +529,10 @@ export default function BueroPage() {
               );
             })()}
 
-            {/* Tabs: Angebote / Auftragsbestätigung / Rechnung – folgen */}
-            {(tab === "angebote" || tab === "ab" || tab === "rechnung") && (
+            {tab === "angebote" && <Angebote supabase={supabase} companyId={companyId} customers={customers} />}
+
+            {/* Tabs: Auftragsbestätigung / Rechnung – folgen */}
+            {(tab === "ab" || tab === "rechnung") && (
               <section className="bg-white border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center text-gray-500">
                 {(BUERO_TABS.find((t) => t.key === tab)?.label || "")} — folgt als Nächstes hier im Büro-Bereich.
               </section>
