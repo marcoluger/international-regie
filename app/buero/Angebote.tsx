@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { generateAngebotPdf } from "./angebotPdf";
+import { generateEfbPdf } from "./efbPdf";
 import { parseGaebX83 } from "./gaebImport";
+import { downloadGaebX84 } from "./gaebExport";
 
 // ── Hilfsfunktionen ────────────────────────────────────────────────
 const num = (v: any) => Number(String(v ?? "").replace(",", ".")) || 0;
@@ -218,6 +220,17 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
     }
   }
 
+  async function efbPdf() {
+    try {
+      if (!o.items.some((x: any) => x.kind === "position")) { setMsg("Keine Positionen für EFB-Formblätter vorhanden."); return; }
+      const cust = customers.find((k: any) => k.id === o.customer_id);
+      const customerNo = cust ? String(cust.customer_no || cust.debitor || cust.kreditor || "") : "";
+      await generateEfbPdf(o, { customerNo });
+    } catch (e: any) {
+      setMsg("Fehler beim EFB-PDF: " + (e?.message || String(e)));
+    }
+  }
+
   async function importGaeb(file: File) {
     try {
       const text = await file.text();
@@ -225,9 +238,9 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
       const mm = o.def_mat_multi || "1.28";
       const lm = o.def_lohn_multi || "1.28";
       const imported = res.items.map((g: any) => {
-        if (g.kind === "titel") return { id: uid(), kind: "titel", oz: g.oz || "", title: g.title || "" };
+        if (g.kind === "titel") return { id: uid(), kind: "titel", oz: g.oz || "", rno: g.rno || "", title: g.title || "" };
         return {
-          id: uid(), kind: "position", oz: g.oz || "", short_text: g.short_text || "", long_text: g.long_text || "",
+          id: uid(), kind: "position", oz: g.oz || "", rno: g.rno || "", short_text: g.short_text || "", long_text: g.long_text || "",
           qty: String(g.qty ?? "1"), unit: g.unit || "St",
           mat_ek: "", mat_multi: mm, lohn_ek: "", lohn_multi: lm, minutes: "", fremd_vk: "", geraet_vk: "", discount_pct: "",
         };
@@ -240,6 +253,15 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
       setMsg(`GAEB importiert: ${res.meta.titelCount} Titel, ${res.meta.posCount} Positionen. Bitte Preise kalkulieren.`);
     } catch (e: any) {
       setMsg("GAEB-Import fehlgeschlagen: " + (e?.message || String(e)));
+    }
+  }
+
+  function exportGaeb() {
+    try {
+      if (!o.items.some((x: any) => x.kind === "position")) { setMsg("Keine Positionen zum Export vorhanden."); return; }
+      downloadGaebX84(o);
+    } catch (e: any) {
+      setMsg("GAEB-Export fehlgeschlagen: " + (e?.message || String(e)));
     }
   }
 
@@ -377,6 +399,7 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
         <div className="flex gap-2">
           <button type="button" onClick={saveOffer} className="bg-cyan-700 text-white px-4 py-2 rounded-lg text-sm">💾 Speichern</button>
           <button type="button" onClick={pdfOffer} className="bg-slate-700 text-white px-4 py-2 rounded-lg text-sm">📄 PDF</button>
+          <button type="button" onClick={efbPdf} className="bg-slate-600 text-white px-4 py-2 rounded-lg text-sm" title="EFB-Preisformblätter 221/222/223">📑 EFB</button>
           <button type="button" onClick={() => { setMode("list"); loadOffers(); }} className="bg-gray-200 px-4 py-2 rounded-lg text-sm">Zurück zur Liste</button>
         </div>
       </div>
@@ -448,6 +471,7 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
           <label className="bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs cursor-pointer">⬆ GAEB (X83) importieren
             <input type="file" accept=".x83,.X83,.xml,.X81,.x81" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) importGaeb(f); e.target.value = ""; }} />
           </label>
+          <button type="button" onClick={exportGaeb} className="bg-emerald-800 text-white px-3 py-1.5 rounded-lg text-xs">⬇ GAEB (X84) exportieren</button>
         </div>
 
         {o.items.map((raw: any, idx: number) => {
