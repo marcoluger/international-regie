@@ -40,6 +40,7 @@ const PRICING_DEFAULT = {
     { key: "equipment_enabled",   label: "Fahrzeuge & Werkzeuge",      price: 19 },
     { key: "absence_enabled",     label: "Urlaub & Abwesenheit",       price: 9 },
     { key: "phonelist_enabled",   label: "Telefonliste",               price: 5 },
+    { key: "office_enabled",      label: "Büro (Auftragsverwaltung)",  price: 0 },
     { key: "translator_enabled",  label: "Live-Übersetzer",            price: 5 },
     { key: "ai_enabled",          label: "KI-Mehrsprachigkeit",        price: 15 },
     // feedback_enabled & module_reports: in der Basis enthalten (0 EUR)
@@ -890,6 +891,13 @@ export default function AdminPage() {
                       <Toggle label="🚚 Fahrzeuge & Werkzeuge" value={!!features.equipment_enabled} onChange={(v) => updateFeature(company.id, "equipment_enabled", v)} />
                       <Toggle label="🌴 Urlaub & Abwesenheit" value={!!features.absence_enabled}  onChange={(v) => updateFeature(company.id, "absence_enabled", v)} />
                       <Toggle label="📞 Telefonliste"         value={!!features.phonelist_enabled}   onChange={(v) => updateFeature(company.id, "phonelist_enabled", v)} />
+                      <Toggle label="🏢 Büro" value={!!features.office_enabled} onChange={(v) => updateFeature(company.id, "office_enabled", v)} />
+                      {features.office_enabled && (
+                        <div className="md:col-span-2 mt-1 border-t pt-3">
+                          <h4 className="font-semibold text-sm mb-2">🏢 Büro-Untermodule</h4>
+                          <p className="text-xs text-gray-500">Untermodule folgen (z. B. Angebote, Auftragsbestätigung, Rechnung) – werden hier einzeln zuschaltbar.</p>
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div>

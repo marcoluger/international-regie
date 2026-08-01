@@ -137,6 +137,7 @@ type CompanyFeatures = {
   equipment_enabled?: boolean;
   absence_enabled?: boolean;
   phonelist_enabled?: boolean;
+  office_enabled?: boolean;
 };
 
 const texts = {
@@ -7524,7 +7525,7 @@ export default function Home() {
         {(currentCompany?.role === "owner" || currentCompany?.role === "admin") && (
           <TabButton label={t.companyData}      tabName="firmendaten"        activeTab={activeTab} onClick={() => setActiveTab("firmendaten")} />
         )}
-        {(currentCompany?.role === "owner" || currentCompany?.role === "admin") && (
+        {companyFeatures?.office_enabled && (currentCompany?.role === "owner" || currentCompany?.role === "admin") && (
           <TabButton label="🏢 Büro" tabName="buero" activeTab={activeTab} onClick={() => { setActiveTab("buero"); loadOfficeSettings(); loadOfficeEmployees(); if (currentCompany) loadCompanyUsers(currentCompany.company_id); }} />
         )}
         {companyFeatures?.material_enabled && (currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
@@ -9337,7 +9338,7 @@ export default function Home() {
         </section>
       )}
 
-      {activeTab === "buero" && (currentCompany?.role === "owner" || currentCompany?.role === "admin") && (
+      {activeTab === "buero" && companyFeatures?.office_enabled && (currentCompany?.role === "owner" || currentCompany?.role === "admin") && (
         <section className="border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4 bg-white text-black">
           <h2 className="text-xl font-bold">🏢 Büro</h2>
           {!officeUnlocked ? (
