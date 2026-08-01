@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { generateAngebotPdf } from "./angebotPdf";
+import { parseGaebX83 } from "./gaebImport";
 
 // ── Hilfsfunktionen ────────────────────────────────────────────────
 const num = (v: any) => Number(String(v ?? "").replace(",", ".")) || 0;
@@ -217,6 +218,31 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
     }
   }
 
+  async function importGaeb(file: File) {
+    try {
+      const text = await file.text();
+      const res = parseGaebX83(text);
+      const mm = o.def_mat_multi || "1.28";
+      const lm = o.def_lohn_multi || "1.28";
+      const imported = res.items.map((g: any) => {
+        if (g.kind === "titel") return { id: uid(), kind: "titel", oz: g.oz || "", title: g.title || "" };
+        return {
+          id: uid(), kind: "position", oz: g.oz || "", short_text: g.short_text || "", long_text: g.long_text || "",
+          qty: String(g.qty ?? "1"), unit: g.unit || "St",
+          mat_ek: "", mat_multi: mm, lohn_ek: "", lohn_multi: lm, minutes: "", fremd_vk: "", geraet_vk: "", discount_pct: "",
+        };
+      });
+      setO((p: any) => ({
+        ...p,
+        subject: p.subject || res.meta.boqLabel || res.meta.projectLabel || "",
+        items: [...(p.items || []), ...imported],
+      }));
+      setMsg(`GAEB importiert: ${res.meta.titelCount} Titel, ${res.meta.posCount} Positionen. Bitte Preise kalkulieren.`);
+    } catch (e: any) {
+      setMsg("GAEB-Import fehlgeschlagen: " + (e?.message || String(e)));
+    }
+  }
+
   async function deleteOffer(id: string) {
     if (typeof window !== "undefined" && !window.confirm("Angebot wirklich löschen?")) return;
     const { error } = await supabase.from("office_offers").delete().eq("id", id);
@@ -419,6 +445,9 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
           <button type="button" onClick={() => addItem("titel")} className="bg-slate-700 text-white px-3 py-1.5 rounded-lg text-xs">＋ Titel</button>
           <button type="button" onClick={() => addItem("position")} className="bg-cyan-700 text-white px-3 py-1.5 rounded-lg text-xs">＋ Position</button>
           <button type="button" onClick={() => addItem("text")} className="bg-gray-500 text-white px-3 py-1.5 rounded-lg text-xs">＋ Textposition</button>
+          <label className="bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs cursor-pointer">⬆ GAEB (X83) importieren
+            <input type="file" accept=".x83,.X83,.xml,.X81,.x81" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) importGaeb(f); e.target.value = ""; }} />
+          </label>
         </div>
 
         {o.items.map((raw: any, idx: number) => {
