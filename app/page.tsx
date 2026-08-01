@@ -7525,7 +7525,7 @@ export default function Home() {
           <TabButton label={t.companyData}      tabName="firmendaten"        activeTab={activeTab} onClick={() => setActiveTab("firmendaten")} />
         )}
         {(currentCompany?.role === "owner" || currentCompany?.role === "admin") && (
-          <TabButton label="🏢 Büro" tabName="buero" activeTab={activeTab} onClick={() => { setActiveTab("buero"); loadOfficeSettings(); loadOfficeEmployees(); }} />
+          <TabButton label="🏢 Büro" tabName="buero" activeTab={activeTab} onClick={() => { setActiveTab("buero"); loadOfficeSettings(); loadOfficeEmployees(); if (currentCompany) loadCompanyUsers(currentCompany.company_id); }} />
         )}
         {companyFeatures?.material_enabled && (currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
         <TabButton label={`📦 ${t.materialCatalog}`} tabName="material" activeTab={activeTab} onClick={() => { setActiveTab("material"); loadMaterialCatalog(); }} />
@@ -9374,6 +9374,16 @@ export default function Home() {
                 </div>
               </div>
               <div className="space-y-2">
+                {companyUsers.filter((u: any) => u.role === "owner" || u.role === "admin").map((u: any) => (
+                  <div key={"cu-" + u.user_id} className="border border-slate-200 rounded-xl p-3 shadow-sm flex flex-wrap items-center justify-between gap-2 bg-cyan-50">
+                    <div>
+                      <strong>{u.full_name || u.email}</strong>
+                      <span className="text-sm text-gray-600"> · {u.role === "owner" ? "Owner" : t.roleAdmin}</span>
+                      {u.phone ? <span className="text-sm text-gray-600"> · 📞 {u.phone}</span> : null}
+                    </div>
+                    <span className="text-xs text-gray-400">aus App</span>
+                  </div>
+                ))}
                 {officeEmployees.map((m) => (
                   <div key={m.id} className="border border-slate-200 rounded-xl p-3 shadow-sm flex flex-wrap items-center justify-between gap-2">
                     <div>
