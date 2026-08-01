@@ -86,8 +86,13 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
   const [openItem, setOpenItem] = useState<Record<string, boolean>>({});
   const [settings, setSettings] = useState<any>({ def_mat_multi: "1.28", def_lohn_multi: "1.28", binde_weeks: "4", vat_rate: "19", def_rabatt_pct: "0", def_nachlass: "0", def_skonto_pct: "0", def_skonto_tage: "0", pv_text: PV_DEFAULT, b13_text: B13_DEFAULT, vortext: VORTEXT_DEFAULT, nachtext: NACHTEXT_DEFAULT, pay1_pct: "50", pay2_pct: "30", pay3_pct: "20" });
   const [settingsTab, setSettingsTab] = useState("allgemein");
+  const [textModules, setTextModules] = useState<any[]>([]);
+  const [tmKind, setTmKind] = useState("vor");
+  const [tmTitle, setTmTitle] = useState("");
+  const [tmBody, setTmBody] = useState("");
+  const [tmEditId, setTmEditId] = useState<string | null>(null);
 
-  useEffect(() => { if (companyId) { loadOffers(); loadSettings(); } /* eslint-disable-next-line */ }, [companyId]);
+  useEffect(() => { if (companyId) { loadOffers(); loadSettings(); loadTextModules(); } /* eslint-disable-next-line */ }, [companyId]);
 
   async function loadOffers() {
     const { data, error } = await supabase.from("office_offers").select("*").eq("company_id", companyId).order("created_at", { ascending: false });
@@ -102,6 +107,23 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
     const { error } = await supabase.from("office_offer_settings").upsert({ company_id: companyId, def_mat_multi: num(settings.def_mat_multi), def_lohn_multi: num(settings.def_lohn_multi), binde_weeks: Math.round(num(settings.binde_weeks)), vat_rate: num(settings.vat_rate), def_rabatt_pct: num(settings.def_rabatt_pct), def_nachlass: num(settings.def_nachlass), def_skonto_pct: num(settings.def_skonto_pct), def_skonto_tage: Math.round(num(settings.def_skonto_tage)), pv_text: settings.pv_text || null, b13_text: settings.b13_text || null, vortext: settings.vortext || null, nachtext: settings.nachtext || null, pay1_pct: num(settings.pay1_pct), pay2_pct: num(settings.pay2_pct), pay3_pct: num(settings.pay3_pct), updated_at: new Date().toISOString() }, { onConflict: "company_id" });
     if (error) { setMsg("Fehler beim Speichern der Einstellungen: " + error.message); return; }
     setMsg("Einstellungen gespeichert.");
+  }
+  async function loadTextModules() {
+    const { data } = await supabase.from("office_offer_texts").select("*").eq("company_id", companyId).order("created_at", { ascending: true });
+    setTextModules(data || []);
+  }
+  async function saveTextModule() {
+    if (!tmBody.trim() && !tmTitle.trim()) { setMsg("Bitte Titel oder Text eingeben."); return; }
+    const payload = { company_id: companyId, kind: tmKind, title: tmTitle.trim(), body: tmBody };
+    if (tmEditId) { const { error } = await supabase.from("office_offer_texts").update(payload).eq("id", tmEditId); if (error) { setMsg("Fehler: " + error.message); return; } }
+    else { const { error } = await supabase.from("office_offer_texts").insert(payload); if (error) { setMsg("Fehler: " + error.message); return; } }
+    setTmEditId(null); setTmTitle(""); setTmBody(""); await loadTextModules(); setMsg("Baustein gespeichert.");
+  }
+  async function deleteTextModule(id: string) {
+    const { error } = await supabase.from("office_offer_texts").delete().eq("id", id);
+    if (error) { setMsg("Fehler: " + error.message); return; }
+    if (tmEditId === id) { setTmEditId(null); setTmTitle(""); setTmBody(""); }
+    await loadTextModules();
   }
 
   function startNew() {
@@ -244,6 +266,30 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
               <input className="border p-1.5 rounded w-16 text-black bg-white" value={settings.pay3_pct} onChange={(e) => setSettings((x: any) => ({ ...x, pay3_pct: e.target.value }))} /> % bei Auftragsabschluss
             </div>
             <p className="text-xs text-gray-500">Skonto wird aus dem Reiter „Rabatt & Skonto" übernommen.</p>
+            <div className="pt-2 border-t space-y-2">
+              <div className="text-sm font-medium">Textbausteine (mehrere Vor-/Nachtexte)</div>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-2 items-start">
+                <select value={tmKind} onChange={(e) => setTmKind(e.target.value)} className="border p-2 rounded-lg text-black bg-white text-sm"><option value="vor">Vortext</option><option value="nach">Nachtext</option></select>
+                <input value={tmTitle} onChange={(e) => setTmTitle(e.target.value)} placeholder="Titel" className="border p-2 rounded-lg text-black bg-white text-sm" />
+                <textarea value={tmBody} onChange={(e) => setTmBody(e.target.value)} placeholder="Text" rows={2} className="border p-2 rounded-lg text-black bg-white text-sm md:col-span-2" />
+              </div>
+              <div className="flex gap-2">
+                <button type="button" onClick={saveTextModule} className="bg-cyan-700 text-white px-3 py-1.5 rounded-lg text-xs">{tmEditId ? "Baustein speichern" : "Baustein anlegen"}</button>
+                {tmEditId && <button type="button" onClick={() => { setTmEditId(null); setTmTitle(""); setTmBody(""); }} className="bg-gray-200 px-3 py-1.5 rounded-lg text-xs">Abbrechen</button>}
+              </div>
+              <div className="space-y-1">
+                {textModules.map((m: any) => (
+                  <div key={m.id} className="flex items-center justify-between gap-2 border border-slate-200 rounded-lg p-2 text-sm bg-white">
+                    <div className="min-w-0"><span className="text-xs bg-slate-100 rounded px-1.5 py-0.5">{m.kind === "vor" ? "Vortext" : "Nachtext"}</span> <strong>{m.title || "(ohne Titel)"}</strong> <span className="text-gray-500">{String(m.body || "").slice(0, 50)}</span></div>
+                    <div className="flex gap-1 shrink-0">
+                      <button type="button" onClick={() => { setTmEditId(m.id); setTmKind(m.kind); setTmTitle(m.title || ""); setTmBody(m.body || ""); }} className="text-xs px-2 py-1 rounded bg-white border">✏️</button>
+                      <button type="button" onClick={() => deleteTextModule(m.id)} className="text-xs px-2 py-1 rounded bg-white border text-red-600">🗑️</button>
+                    </div>
+                  </div>
+                ))}
+                {textModules.length === 0 && <p className="text-xs text-gray-500">Noch keine Bausteine.</p>}
+              </div>
+            </div>
           </div>
         )}
         <button type="button" onClick={saveSettings} className="bg-cyan-700 text-white px-4 py-2 rounded-lg text-sm">💾 Einstellungen speichern</button>
@@ -345,6 +391,12 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
       {/* Vortext */}
       <div className="border border-slate-200 rounded-xl p-3 bg-gray-50">
         <label className="text-sm font-medium">Vortext (Einleitung)</label>
+        {textModules.filter((m: any) => m.kind === "vor").length > 0 && (
+          <select className="border p-1.5 rounded-lg text-black bg-white text-sm mt-1 mr-2" value="" onChange={(e) => { const m = textModules.find((x: any) => x.id === e.target.value); if (m) set("vortext", m.body || ""); }}>
+            <option value="">Vortext-Baustein wählen…</option>
+            {textModules.filter((m: any) => m.kind === "vor").map((m: any) => <option key={m.id} value={m.id}>{m.title || "(ohne Titel)"}</option>)}
+          </select>
+        )}
         <textarea className="border p-2 rounded-lg text-black bg-white w-full mt-1 text-sm" rows={3} value={o.vortext} onChange={(e) => set("vortext", e.target.value)} />
       </div>
 
@@ -455,6 +507,12 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
       {/* Nachtext & Zahlungsbedingungen */}
       <div className="border border-slate-200 rounded-xl p-3 bg-gray-50 space-y-2">
         <label className="text-sm font-medium">Nachtext (Schluss)</label>
+        {textModules.filter((m: any) => m.kind === "nach").length > 0 && (
+          <select className="border p-1.5 rounded-lg text-black bg-white text-sm" value="" onChange={(e) => { const m = textModules.find((x: any) => x.id === e.target.value); if (m) set("nachtext", m.body || ""); }}>
+            <option value="">Nachtext-Baustein wählen…</option>
+            {textModules.filter((m: any) => m.kind === "nach").map((m: any) => <option key={m.id} value={m.id}>{m.title || "(ohne Titel)"}</option>)}
+          </select>
+        )}
         <textarea className="border p-2 rounded-lg text-black bg-white w-full text-sm" rows={3} value={o.nachtext} onChange={(e) => set("nachtext", e.target.value)} />
         <div className="text-sm font-medium pt-1">Zahlungsbedingungen</div>
         <div className="flex items-center gap-2 flex-wrap text-sm">
