@@ -17,6 +17,8 @@ function fmtDate(iso: string) {
   const p = iso.slice(0, 10).split("-");
   return p.length === 3 ? `${p[2]}.${p[1]}.${p[0]}` : iso;
 }
+const PV_DEFAULT = "Steuerfreie Leistung \u2013 Nullsteuersatz nach \u00a7 12 Abs. 3 UStG (Lieferung und Installation einer Photovoltaikanlage).";
+const B13_DEFAULT = "Steuerschuldnerschaft des Leistungsempf\u00e4ngers nach \u00a7 13b UStG. Es wird keine Umsatzsteuer ausgewiesen; die Umsatzsteuer schuldet der Leistungsempf\u00e4nger.";
 const UNITS = ["St", "Stk", "Psch", "m", "lfm", "m\u00b2", "m\u00b3", "h", "Std", "Tag", "Wo", "Mon", "kg", "t", "g", "l", "Ltr", "Satz", "Paar", "Rolle", "Pkg", "Bund", "Pkt", "kW", "kWp", "A", "V", "%"];
 
 function calcItem(it: any) {
@@ -66,6 +68,7 @@ function blankOffer() {
     customer_id: "", customer_name: "", customer_anrede: "", customer_street: "", customer_zip: "", customer_city: "",
     vat_rate: "19", rabatt_pct: "0", nachlass: "0", skonto_pct: "0", skonto_tage: "0",
     def_mat_multi: "1.28", def_lohn_multi: "1.28", binde_weeks: "",
+    tax_mode: "standard", tax_note: "",
     items: [] as any[],
   };
 }
@@ -79,7 +82,7 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
   const [custSearch, setCustSearch] = useState("");
   const [pickerOpen, setPickerOpen] = useState(false);
   const [openItem, setOpenItem] = useState<Record<string, boolean>>({});
-  const [settings, setSettings] = useState<any>({ def_mat_multi: "1.28", def_lohn_multi: "1.28", binde_weeks: "4", vat_rate: "19" });
+  const [settings, setSettings] = useState<any>({ def_mat_multi: "1.28", def_lohn_multi: "1.28", binde_weeks: "4", vat_rate: "19", def_rabatt_pct: "0", def_nachlass: "0", def_skonto_pct: "0", def_skonto_tage: "0", pv_text: PV_DEFAULT, b13_text: B13_DEFAULT });
 
   useEffect(() => { if (companyId) { loadOffers(); loadSettings(); } /* eslint-disable-next-line */ }, [companyId]);
 
@@ -90,10 +93,10 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
   }
   async function loadSettings() {
     const { data } = await supabase.from("office_offer_settings").select("*").eq("company_id", companyId).maybeSingle();
-    if (data) setSettings({ def_mat_multi: String(data.def_mat_multi ?? "1.28"), def_lohn_multi: String(data.def_lohn_multi ?? "1.28"), binde_weeks: String(data.binde_weeks ?? "4"), vat_rate: String(data.vat_rate ?? "19") });
+    if (data) setSettings({ def_mat_multi: String(data.def_mat_multi ?? "1.28"), def_lohn_multi: String(data.def_lohn_multi ?? "1.28"), binde_weeks: String(data.binde_weeks ?? "4"), vat_rate: String(data.vat_rate ?? "19"), def_rabatt_pct: String(data.def_rabatt_pct ?? "0"), def_nachlass: String(data.def_nachlass ?? "0"), def_skonto_pct: String(data.def_skonto_pct ?? "0"), def_skonto_tage: String(data.def_skonto_tage ?? "0"), pv_text: data.pv_text ?? PV_DEFAULT, b13_text: data.b13_text ?? B13_DEFAULT });
   }
   async function saveSettings() {
-    const { error } = await supabase.from("office_offer_settings").upsert({ company_id: companyId, def_mat_multi: num(settings.def_mat_multi), def_lohn_multi: num(settings.def_lohn_multi), binde_weeks: Math.round(num(settings.binde_weeks)), vat_rate: num(settings.vat_rate), updated_at: new Date().toISOString() }, { onConflict: "company_id" });
+    const { error } = await supabase.from("office_offer_settings").upsert({ company_id: companyId, def_mat_multi: num(settings.def_mat_multi), def_lohn_multi: num(settings.def_lohn_multi), binde_weeks: Math.round(num(settings.binde_weeks)), vat_rate: num(settings.vat_rate), def_rabatt_pct: num(settings.def_rabatt_pct), def_nachlass: num(settings.def_nachlass), def_skonto_pct: num(settings.def_skonto_pct), def_skonto_tage: Math.round(num(settings.def_skonto_tage)), pv_text: settings.pv_text || null, b13_text: settings.b13_text || null, updated_at: new Date().toISOString() }, { onConflict: "company_id" });
     if (error) { setMsg("Fehler beim Speichern der Einstellungen: " + error.message); return; }
     setMsg("Einstellungen gespeichert.");
   }
@@ -104,11 +107,16 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
     b.def_lohn_multi = settings.def_lohn_multi || "1.28";
     b.binde_weeks = settings.binde_weeks || "";
     b.vat_rate = settings.vat_rate || "19";
+    b.rabatt_pct = settings.def_rabatt_pct || "0";
+    b.nachlass = settings.def_nachlass || "0";
+    b.skonto_pct = settings.def_skonto_pct || "0";
+    b.skonto_tage = settings.def_skonto_tage || "0";
+    b.tax_mode = "standard"; b.tax_note = "";
     b.offer_date = new Date().toISOString().slice(0, 10);
     setO(b); setMode("edit"); setMsg(""); setCustSearch(""); setPickerOpen(false);
   }
   function editOffer(row: any) {
-    setO({ ...blankOffer(), ...row, vat_rate: String(row.vat_rate ?? "19"), rabatt_pct: String(row.rabatt_pct ?? "0"), nachlass: String(row.nachlass ?? "0"), skonto_pct: String(row.skonto_pct ?? "0"), skonto_tage: String(row.skonto_tage ?? "0"), def_mat_multi: String(row.def_mat_multi ?? "1.28"), def_lohn_multi: String(row.def_lohn_multi ?? "1.28"), binde_weeks: String(row.binde_weeks ?? ""), items: Array.isArray(row.items) ? row.items : [] });
+    setO({ ...blankOffer(), ...row, vat_rate: String(row.vat_rate ?? "19"), rabatt_pct: String(row.rabatt_pct ?? "0"), nachlass: String(row.nachlass ?? "0"), skonto_pct: String(row.skonto_pct ?? "0"), skonto_tage: String(row.skonto_tage ?? "0"), def_mat_multi: String(row.def_mat_multi ?? "1.28"), def_lohn_multi: String(row.def_lohn_multi ?? "1.28"), binde_weeks: String(row.binde_weeks ?? ""), tax_mode: row.tax_mode || "standard", tax_note: row.tax_note ?? "", items: Array.isArray(row.items) ? row.items : [] });
     setMode("edit"); setMsg("");
   }
 
@@ -126,6 +134,9 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
   function applyMultisToAll() {
     setO((p: any) => ({ ...p, items: p.items.map((it: any) => it.kind === "position" ? { ...it, mat_multi: p.def_mat_multi, lohn_multi: p.def_lohn_multi } : it) }));
     setMsg("Multiplikatoren auf alle Positionen übernommen.");
+  }
+  function setTaxMode(mode: string) {
+    setO((p: any) => ({ ...p, tax_mode: mode, vat_rate: mode === "standard" ? (settings.vat_rate || "19") : "0", tax_note: mode === "pv" ? (settings.pv_text || PV_DEFAULT) : mode === "b13" ? (settings.b13_text || B13_DEFAULT) : "" }));
   }
   function removeItem(id: string) { setO((p: any) => ({ ...p, items: p.items.filter((it: any) => it.id !== id) })); }
   function moveItem(id: string, dir: number) {
@@ -150,6 +161,7 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
       customer_street: o.customer_street || null, customer_zip: o.customer_zip || null, customer_city: o.customer_city || null,
       vat_rate: num(o.vat_rate), rabatt_pct: num(o.rabatt_pct), nachlass: num(o.nachlass), skonto_pct: num(o.skonto_pct), skonto_tage: num(o.skonto_tage),
       def_mat_multi: num(o.def_mat_multi), def_lohn_multi: num(o.def_lohn_multi),
+      tax_mode: o.tax_mode || "standard", tax_note: o.tax_note || null,
       items: o.items, net_total: t.netAfter, vat_total: t.vat, gross_total: t.gross, updated_at: new Date().toISOString(),
     };
     if (o.id) {
@@ -188,6 +200,17 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
           <label className="flex flex-col text-sm">Bindefrist (Wochen)<input type="number" className="border p-2 rounded-lg text-black bg-white" value={settings.binde_weeks} onChange={(e) => setSettings((x: any) => ({ ...x, binde_weeks: e.target.value }))} /></label>
           <label className="flex flex-col text-sm">MwSt %<input className="border p-2 rounded-lg text-black bg-white" value={settings.vat_rate} onChange={(e) => setSettings((x: any) => ({ ...x, vat_rate: e.target.value }))} /></label>
         </div>
+        <h3 className="font-bold text-sm pt-2 border-t">Rabatt & Skonto (Standard)</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-lg">
+          <label className="flex flex-col text-sm">Rabatt %<input className="border p-2 rounded-lg text-black bg-white" value={settings.def_rabatt_pct} onChange={(e) => setSettings((x: any) => ({ ...x, def_rabatt_pct: e.target.value }))} /></label>
+          <label className="flex flex-col text-sm">Nachlass €<input className="border p-2 rounded-lg text-black bg-white" value={settings.def_nachlass} onChange={(e) => setSettings((x: any) => ({ ...x, def_nachlass: e.target.value }))} /></label>
+          <label className="flex flex-col text-sm">Skonto %<input className="border p-2 rounded-lg text-black bg-white" value={settings.def_skonto_pct} onChange={(e) => setSettings((x: any) => ({ ...x, def_skonto_pct: e.target.value }))} /></label>
+          <label className="flex flex-col text-sm">Skonto Tage<input className="border p-2 rounded-lg text-black bg-white" value={settings.def_skonto_tage} onChange={(e) => setSettings((x: any) => ({ ...x, def_skonto_tage: e.target.value }))} /></label>
+        </div>
+        <h3 className="font-bold text-sm pt-2 border-t">Steuer / rechtliche Hinweise</h3>
+        <p className="text-xs text-gray-500">Diese Texte werden ins Angebot übernommen, wenn du dort den jeweiligen Steuerfall auswählst.</p>
+        <label className="flex flex-col text-sm">Photovoltaik 0 % (§ 12 Abs. 3 UStG)<textarea className="border p-2 rounded-lg text-black bg-white" rows={2} value={settings.pv_text} onChange={(e) => setSettings((x: any) => ({ ...x, pv_text: e.target.value }))} /></label>
+        <label className="flex flex-col text-sm">Bauleistung § 13b UStG (Reverse Charge)<textarea className="border p-2 rounded-lg text-black bg-white" rows={2} value={settings.b13_text} onChange={(e) => setSettings((x: any) => ({ ...x, b13_text: e.target.value }))} /></label>
         <button type="button" onClick={saveSettings} className="bg-cyan-700 text-white px-4 py-2 rounded-lg text-sm">💾 Einstellungen speichern</button>
       </section>
     );
@@ -357,6 +380,17 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
           );
         })}
         {o.items.length === 0 && <p className="text-sm text-gray-500">Noch keine Positionen. Füge einen Titel oder eine Position hinzu.</p>}
+      </div>
+
+      {/* Steuer / Recht */}
+      <div className="border border-slate-200 rounded-xl p-3 bg-gray-50 space-y-2">
+        <span className="text-sm font-medium">Steuer / rechtlicher Hinweis</span>
+        <div className="flex flex-col gap-1 text-sm">
+          <label className="flex items-center gap-2"><input type="radio" name="taxmode" checked={(o.tax_mode || "standard") === "standard"} onChange={() => setTaxMode("standard")} /> Standard ({fmt(num(o.vat_rate || "19"))} % MwSt)</label>
+          <label className="flex items-center gap-2"><input type="radio" name="taxmode" checked={o.tax_mode === "pv"} onChange={() => setTaxMode("pv")} /> Photovoltaik 0 % (§ 12 Abs. 3 UStG)</label>
+          <label className="flex items-center gap-2"><input type="radio" name="taxmode" checked={o.tax_mode === "b13"} onChange={() => setTaxMode("b13")} /> Bauleistung § 13b UStG (Reverse Charge)</label>
+        </div>
+        {o.tax_note ? <textarea className="border p-2 rounded-lg text-black bg-white w-full text-sm" rows={2} value={o.tax_note} onChange={(e) => set("tax_note", e.target.value)} /> : null}
       </div>
 
       {/* Summen */}
