@@ -10,6 +10,7 @@ const supabase = createClient(
 
 const BUERO_TABS = [
   { key: "mitarbeiter", label: "👤 Mitarbeiter" },
+  { key: "kunden", label: "👥 Kunden" },
   { key: "angebote", label: "🧾 Angebote" },
   { key: "ab", label: "📋 Auftragsbestätigung" },
   { key: "rechnung", label: "💶 Rechnung" },
@@ -42,6 +43,21 @@ export default function BueroPage() {
   const [oRole, setORole] = useState("");
   const [oPhone, setOPhone] = useState("");
   const [oEmail, setOEmail] = useState("");
+  // Kunden
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [custSearch, setCustSearch] = useState("");
+  const [cEditId, setCEditId] = useState<string | null>(null);
+  const [cName, setCName] = useState("");
+  const [cNo, setCNo] = useState("");
+  const [cStreet, setCStreet] = useState("");
+  const [cZip, setCZip] = useState("");
+  const [cCity, setCCity] = useState("");
+  const [cPhone, setCPhone] = useState("");
+  const [cMobile, setCMobile] = useState("");
+  const [cEmail, setCEmail] = useState("");
+  const [cWebsite, setCWebsite] = useState("");
+  const [cUid, setCUid] = useState("");
+  const [cNote, setCNote] = useState("");
 
   useEffect(() => { init(); /* eslint-disable-next-line */ }, []);
 
@@ -64,6 +80,7 @@ export default function BueroPage() {
     setOfficePassword((os && os.office_password) ? os.office_password : null);
     setOfficePwLoaded(true);
     await loadOfficeEmployees(cu.company_id);
+    await loadCustomers(cu.company_id);
     setLoading(false);
   }
 
@@ -107,6 +124,37 @@ export default function BueroPage() {
     if (error) { setMessage("Fehler beim Löschen: " + error.message); return; }
     if (eid === id) resetForm();
     await loadOfficeEmployees(companyId);
+  }
+
+  async function loadCustomers(cid: string) {
+    const { data, error } = await supabase.from("office_customers").select("*").eq("company_id", cid).order("name", { ascending: true });
+    if (error) { setMessage("Fehler beim Laden der Kunden: " + error.message); return; }
+    setCustomers(data || []);
+  }
+  function resetCustForm() { setCEditId(null); setCName(""); setCNo(""); setCStreet(""); setCZip(""); setCCity(""); setCPhone(""); setCMobile(""); setCEmail(""); setCWebsite(""); setCUid(""); setCNote(""); }
+  function startEditCust(k: any) {
+    setCEditId(k.id); setCName(k.name || ""); setCNo(k.customer_no || ""); setCStreet(k.street || ""); setCZip(k.zip || ""); setCCity(k.city || "");
+    setCPhone(k.phone || ""); setCMobile(k.mobile || ""); setCEmail(k.email || ""); setCWebsite(k.website || ""); setCUid(k.uid || ""); setCNote(k.note || "");
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  async function saveCustomer() {
+    if (!cName.trim()) { setMessage("Bitte einen Kundennamen eingeben."); return; }
+    const payload = { name: cName.trim(), customer_no: cNo.trim(), street: cStreet.trim(), zip: cZip.trim(), city: cCity.trim(), phone: cPhone.trim(), mobile: cMobile.trim(), email: cEmail.trim(), website: cWebsite.trim(), uid: cUid.trim(), note: cNote.trim() };
+    if (cEditId) {
+      const { error } = await supabase.from("office_customers").update(payload).eq("id", cEditId);
+      if (error) { setMessage("Fehler beim Speichern: " + error.message); return; }
+    } else {
+      const { error } = await supabase.from("office_customers").insert({ company_id: companyId, kind: "kunde", ...payload });
+      if (error) { setMessage("Fehler beim Speichern: " + error.message); return; }
+    }
+    resetCustForm(); await loadCustomers(companyId); setMessage("Kunde gespeichert.");
+  }
+  async function deleteCustomer(id: string) {
+    if (typeof window !== "undefined" && !window.confirm("Diesen Kunden wirklich löschen?")) return;
+    const { error } = await supabase.from("office_customers").delete().eq("id", id);
+    if (error) { setMessage("Fehler beim Löschen: " + error.message); return; }
+    if (cEditId === id) resetCustForm();
+    await loadCustomers(companyId);
   }
 
   const isManager = role === "owner" || role === "admin";
@@ -227,8 +275,66 @@ export default function BueroPage() {
               </section>
             )}
 
+            {/* Tab: Kunden */}
+            {tab === "kunden" && (
+              <section className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <h2 className="text-xl font-bold">👥 Kunden <span className="text-sm font-normal text-gray-500">({customers.length})</span></h2>
+                  <input className="border p-2 rounded-lg text-black bg-white w-full sm:w-72" placeholder="Suche: Name, Nr., Ort, E-Mail…" value={custSearch} onChange={(e) => setCustSearch(e.target.value)} />
+                </div>
+                <div className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-gray-50 space-y-3">
+                  <h3 className="font-bold">{cEditId ? "Kunde bearbeiten" : "Neuen Kunden anlegen"}</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <input className="border p-3 text-black bg-white rounded-lg" placeholder="Name / Firma *" value={cName} onChange={(e) => setCName(e.target.value)} />
+                    <input className="border p-3 text-black bg-white rounded-lg" placeholder="Kundennummer" value={cNo} onChange={(e) => setCNo(e.target.value)} />
+                    <input className="border p-3 text-black bg-white rounded-lg" placeholder="Straße + Nr." value={cStreet} onChange={(e) => setCStreet(e.target.value)} />
+                    <div className="grid grid-cols-3 gap-2">
+                      <input className="border p-3 text-black bg-white rounded-lg" placeholder="PLZ" value={cZip} onChange={(e) => setCZip(e.target.value)} />
+                      <input className="border p-3 text-black bg-white rounded-lg col-span-2" placeholder="Ort" value={cCity} onChange={(e) => setCCity(e.target.value)} />
+                    </div>
+                    <input className="border p-3 text-black bg-white rounded-lg" placeholder="Telefon" value={cPhone} onChange={(e) => setCPhone(e.target.value)} />
+                    <input className="border p-3 text-black bg-white rounded-lg" placeholder="Mobil" value={cMobile} onChange={(e) => setCMobile(e.target.value)} />
+                    <input className="border p-3 text-black bg-white rounded-lg" placeholder="E-Mail" value={cEmail} onChange={(e) => setCEmail(e.target.value)} />
+                    <input className="border p-3 text-black bg-white rounded-lg" placeholder="Website" value={cWebsite} onChange={(e) => setCWebsite(e.target.value)} />
+                    <input className="border p-3 text-black bg-white rounded-lg" placeholder="UID / USt-ID" value={cUid} onChange={(e) => setCUid(e.target.value)} />
+                    <input className="border p-3 text-black bg-white rounded-lg" placeholder="Notiz" value={cNote} onChange={(e) => setCNote(e.target.value)} />
+                  </div>
+                  <div className="flex gap-2 flex-wrap">
+                    <button type="button" onClick={saveCustomer} className="bg-cyan-700 text-white px-4 py-3 rounded-lg">{cEditId ? "💾 Speichern" : "Anlegen"}</button>
+                    {cEditId && (<button type="button" onClick={resetCustForm} className="bg-gray-200 px-4 py-3 rounded-lg">Abbrechen</button>)}
+                  </div>
+                </div>
+                {(() => {
+                  const q = custSearch.trim().toLowerCase();
+                  const filtered = q ? customers.filter((k: any) => [k.name, k.customer_no, k.city, k.zip, k.email, k.matchcode].some((x: any) => String(x || "").toLowerCase().includes(q))) : customers;
+                  const shown = filtered.slice(0, 100);
+                  return (
+                    <div className="space-y-2">
+                      <p className="text-xs text-gray-500">{filtered.length} Treffer{filtered.length > shown.length ? ` · zeige die ersten ${shown.length}` : ""}</p>
+                      {shown.map((k: any) => (
+                        <div key={k.id} className="border border-slate-200 rounded-xl p-3 shadow-sm flex flex-wrap items-start justify-between gap-2">
+                          <div className="text-sm">
+                            <strong>{k.name}</strong>{k.customer_no ? <span className="text-gray-500"> · Nr. {k.customer_no}</span> : null}
+                            {(k.street || k.zip || k.city) ? <div className="text-gray-600">{[k.street, [k.zip, k.city].filter(Boolean).join(" ")].filter(Boolean).join(", ")}</div> : null}
+                            {(k.phone || k.mobile) ? <div className="text-gray-600">📞 {[k.phone, k.mobile].filter(Boolean).join(" · ")}</div> : null}
+                            {k.email ? <div className="text-gray-600">✉️ {k.email}</div> : null}
+                            {k.uid ? <div className="text-gray-500 text-xs">UID: {k.uid}</div> : null}
+                          </div>
+                          <div className="flex gap-2 shrink-0">
+                            <button type="button" onClick={() => startEditCust(k)} className="bg-amber-600 text-white px-3 py-2 rounded-lg text-sm">✏️</button>
+                            <button type="button" onClick={() => deleteCustomer(k.id)} className="bg-red-600 text-white px-3 py-2 rounded-lg text-sm">🗑️</button>
+                          </div>
+                        </div>
+                      ))}
+                      {filtered.length === 0 && <p className="text-gray-600">Keine Kunden gefunden.</p>}
+                    </div>
+                  );
+                })()}
+              </section>
+            )}
+
             {/* Tabs: Angebote / Auftragsbestätigung / Rechnung – folgen */}
-            {tab !== "mitarbeiter" && (
+            {(tab === "angebote" || tab === "ab" || tab === "rechnung") && (
               <section className="bg-white border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center text-gray-500">
                 {(BUERO_TABS.find((t) => t.key === tab)?.label || "")} — folgt als Nächstes hier im Büro-Bereich.
               </section>
