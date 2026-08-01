@@ -47,6 +47,9 @@ export default function BueroPage() {
   const [customers, setCustomers] = useState<any[]>([]);
   const [custSearch, setCustSearch] = useState("");
   const [custFilter, setCustFilter] = useState("alle");
+  const [custSort, setCustSort] = useState("vorname");
+  const [letterFilter, setLetterFilter] = useState("");
+  const [openCusts, setOpenCusts] = useState<Record<string, boolean>>({});
   const [cEditId, setCEditId] = useState<string | null>(null);
   const [cName, setCName] = useState("");
   const [cDebitor, setCDebitor] = useState("");
@@ -296,6 +299,10 @@ export default function BueroPage() {
                       <option value="debitor">Nur Debitoren (Kunden)</option>
                       <option value="kreditor">Nur Kreditoren (Lieferanten)</option>
                     </select>
+                    <select className="border p-2 rounded-lg text-black bg-white" value={custSort} onChange={(e) => setCustSort(e.target.value)}>
+                      <option value="vorname">Sortierung: Vorname</option>
+                      <option value="nachname">Sortierung: Nachname</option>
+                    </select>
                     <input className="border p-2 rounded-lg text-black bg-white w-full sm:w-72" placeholder="Suche: Name, Nr., Ort, Telefon, E-Mail…" value={custSearch} onChange={(e) => setCustSearch(e.target.value)} />
                   </div>
                 </div>
@@ -339,32 +346,62 @@ export default function BueroPage() {
                   const hasDeb = (k: any) => !!String(k.debitor || "").trim();
                   const hasKre = (k: any) => !!String(k.kreditor || "").trim();
                   const byType = custFilter === "debitor" ? customers.filter(hasDeb) : custFilter === "kreditor" ? customers.filter(hasKre) : customers;
-                  const filtered = q ? byType.filter((k: any) => [k.name, k.debitor, k.kreditor, k.customer_no, k.city, k.zip, k.email, k.matchcode, k.phone, k.mobile].some((x: any) => String(x || "").toLowerCase().includes(q))) : byType;
-                  const shown = filtered.slice(0, 100);
+                  const sortKey = (k: any) => {
+                    const nm = String(k.name || "").trim();
+                    if (custSort === "nachname") { const p = nm.split(/\s+/); return (p[p.length - 1] || nm); }
+                    return nm;
+                  };
+                  const firstLetter = (k: any) => {
+                    const ch = (sortKey(k)[0] || "").toUpperCase();
+                    if (ch === "Ä") return "A"; if (ch === "Ö") return "O"; if (ch === "Ü") return "U";
+                    return /[A-Z]/.test(ch) ? ch : "#";
+                  };
+                  const byLetter = letterFilter ? byType.filter((k: any) => firstLetter(k) === letterFilter) : byType;
+                  const searched = q ? byLetter.filter((k: any) => [k.name, k.debitor, k.kreditor, k.customer_no, k.city, k.zip, k.email, k.matchcode, k.phone, k.mobile].some((x: any) => String(x || "").toLowerCase().includes(q))) : byLetter;
+                  const sorted = [...searched].sort((a: any, b: any) => sortKey(a).localeCompare(sortKey(b), "de", { sensitivity: "base" }));
+                  const shown = sorted.slice(0, 200);
+                  const ALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
                   return (
                     <div className="space-y-2">
-                      <p className="text-xs text-gray-500">{filtered.length} Treffer{filtered.length > shown.length ? ` · zeige die ersten ${shown.length}` : ""}</p>
-                      {shown.map((k: any) => (
-                        <div key={k.id} className="border border-slate-200 rounded-xl p-3 shadow-sm flex flex-wrap items-start justify-between gap-2">
-                          <div className="text-sm">
-                            <div className="flex items-center gap-2 flex-wrap">
+                      <div className="flex flex-wrap gap-1">
+                        <button type="button" onClick={() => setLetterFilter("")} className={`text-xs px-2 py-1 rounded ${letterFilter === "" ? "bg-cyan-700 text-white" : "bg-white border border-slate-300 text-slate-600"}`}>Alle</button>
+                        {ALPHA.map((L) => (
+                          <button key={L} type="button" onClick={() => setLetterFilter(letterFilter === L ? "" : L)} className={`text-xs px-2 py-1 rounded ${letterFilter === L ? "bg-cyan-700 text-white" : "bg-white border border-slate-300 text-slate-600"}`}>{L}</button>
+                        ))}
+                        <button type="button" onClick={() => setLetterFilter(letterFilter === "#" ? "" : "#")} className={`text-xs px-2 py-1 rounded ${letterFilter === "#" ? "bg-cyan-700 text-white" : "bg-white border border-slate-300 text-slate-600"}`}>#</button>
+                      </div>
+                      <p className="text-xs text-gray-500">{sorted.length} Treffer{sorted.length > shown.length ? ` · zeige die ersten ${shown.length}` : ""}</p>
+                      {shown.map((k: any) => {
+                        const open = !!openCusts[k.id];
+                        return (
+                        <div key={k.id} className="border border-slate-200 rounded-xl shadow-sm">
+                          <button type="button" onClick={() => setOpenCusts((p) => ({ ...p, [k.id]: !p[k.id] }))} className="w-full text-left p-3 flex items-center justify-between gap-2">
+                            <span className="flex items-center gap-2 flex-wrap text-sm">
+                              <span className="text-gray-400">{open ? "▼" : "▶"}</span>
                               <strong>{k.name}</strong>
                               {String(k.debitor || "").trim() ? <span className="text-xs bg-green-100 text-green-800 rounded px-1.5 py-0.5">Debitor {k.debitor}</span> : null}
                               {String(k.kreditor || "").trim() ? <span className="text-xs bg-orange-100 text-orange-800 rounded px-1.5 py-0.5">Kreditor {k.kreditor}</span> : null}
+                              {k.city ? <span className="text-xs text-gray-500">· {k.city}</span> : null}
+                            </span>
+                          </button>
+                          {open && (
+                            <div className="px-3 pb-3 text-sm space-y-1">
+                              {(k.street || k.zip || k.city) ? <div className="text-gray-600">{[k.street, [k.zip, k.city].filter(Boolean).join(" ")].filter(Boolean).join(", ")}</div> : null}
+                              {(k.phone || k.mobile) ? <div className="text-gray-600">📞 {[k.phone, k.mobile].filter(Boolean).join(" · ")}</div> : null}
+                              {k.email ? <div className="text-gray-600">✉️ {k.email}</div> : null}
+                              {k.website ? <div className="text-gray-600">🌐 {k.website}</div> : null}
+                              {k.uid ? <div className="text-gray-500 text-xs">UID: {k.uid}</div> : null}
+                              {k.note ? <div className="text-amber-900 text-xs mt-1 bg-amber-50 border border-amber-100 rounded px-2 py-1">🗂️ {k.note}</div> : null}
+                              <div className="flex gap-2 pt-2">
+                                <button type="button" onClick={() => startEditCust(k)} className="bg-amber-600 text-white px-3 py-2 rounded-lg text-sm">✏️ Bearbeiten</button>
+                                <button type="button" onClick={() => deleteCustomer(k.id)} className="bg-red-600 text-white px-3 py-2 rounded-lg text-sm">🗑️ Löschen</button>
+                              </div>
                             </div>
-                            {(k.street || k.zip || k.city) ? <div className="text-gray-600">{[k.street, [k.zip, k.city].filter(Boolean).join(" ")].filter(Boolean).join(", ")}</div> : null}
-                            {(k.phone || k.mobile) ? <div className="text-gray-600">📞 {[k.phone, k.mobile].filter(Boolean).join(" · ")}</div> : null}
-                            {k.email ? <div className="text-gray-600">✉️ {k.email}</div> : null}
-                            {k.uid ? <div className="text-gray-500 text-xs">UID: {k.uid}</div> : null}
-                            {k.note ? <div className="text-amber-900 text-xs mt-1 bg-amber-50 border border-amber-100 rounded px-2 py-1">🗂️ {k.note}</div> : null}
-                          </div>
-                          <div className="flex gap-2 shrink-0">
-                            <button type="button" onClick={() => startEditCust(k)} className="bg-amber-600 text-white px-3 py-2 rounded-lg text-sm">✏️</button>
-                            <button type="button" onClick={() => deleteCustomer(k.id)} className="bg-red-600 text-white px-3 py-2 rounded-lg text-sm">🗑️</button>
-                          </div>
+                          )}
                         </div>
-                      ))}
-                      {filtered.length === 0 && <p className="text-gray-600">Keine Kunden gefunden.</p>}
+                        );
+                      })}
+                      {sorted.length === 0 && <p className="text-gray-600">Keine Kunden gefunden.</p>}
                     </div>
                   );
                 })()}
