@@ -4049,6 +4049,18 @@ export default function Home() {
   const [editReadOnly, setEditReadOnly] = useState<boolean>(false);
   const [savingEdit, setSavingEdit] = useState(false);
   const [showOverview, setShowOverview] = useState(false);
+  // Büro-Bereich (passwortgeschützt, separate Mitarbeiterliste)
+  const [officeUnlocked, setOfficeUnlocked] = useState(false);
+  const [officePassword, setOfficePassword] = useState<string | null>(null);
+  const [officePwLoaded, setOfficePwLoaded] = useState(false);
+  const [officePasswordInput, setOfficePasswordInput] = useState("");
+  const [newOfficePw, setNewOfficePw] = useState("");
+  const [officeEmployees, setOfficeEmployees] = useState<any[]>([]);
+  const [officeName, setOfficeName] = useState("");
+  const [officeRole, setOfficeRole] = useState("");
+  const [officePhone, setOfficePhone] = useState("");
+  const [officeEmail, setOfficeEmail] = useState("");
+  const [editOfficeId, setEditOfficeId] = useState<string | null>(null);
   const [taskComments, setTaskComments] = useState<Record<string, string>>({});
   const [commentSaveState, setCommentSaveState] = useState<Record<string, string>>({});
   const [reportInstruction, setReportInstruction] = useState<any>(null);
@@ -6484,6 +6496,63 @@ export default function Home() {
   }
 
   // Baut aus Baustelle + Straße + PLZ + Ort eine Adresszeile (fuer Arbeitsanweisung/Bericht/PDF).
+  // ── Büro-Bereich ──
+  async function loadOfficeSettings(companyId?: string) {
+    const id = companyId ?? currentCompany?.company_id;
+    if (!id) return;
+    const { data } = await supabase.from("office_settings").select("office_password").eq("company_id", id).maybeSingle();
+    setOfficePassword((data && data.office_password) ? data.office_password : null);
+    setOfficePwLoaded(true);
+  }
+  async function saveOfficePassword() {
+    if (!currentCompany) return;
+    const pw = newOfficePw.trim();
+    if (pw.length < 4) { setMessage("Büro-Passwort zu kurz (min. 4 Zeichen)."); return; }
+    const { error } = await supabase.from("office_settings").upsert({ company_id: currentCompany.company_id, office_password: pw }, { onConflict: "company_id" });
+    if (error) { setMessage("Fehler beim Speichern des Passworts: " + error.message); return; }
+    setOfficePassword(pw); setNewOfficePw(""); setOfficeUnlocked(true);
+    await loadOfficeEmployees(); setMessage("Büro-Passwort gespeichert.");
+  }
+  function unlockOffice() {
+    if (officePassword && officePasswordInput === officePassword) {
+      setOfficeUnlocked(true); setOfficePasswordInput(""); setMessage("");
+      loadOfficeEmployees();
+    } else {
+      setMessage("Falsches Büro-Passwort.");
+    }
+  }
+  async function loadOfficeEmployees(companyId?: string) {
+    const id = companyId ?? currentCompany?.company_id;
+    if (!id) return;
+    const { data, error } = await supabase.from("office_employees").select("*").eq("company_id", id).order("created_at", { ascending: false });
+    if (error) { setMessage("Fehler beim Laden der Büro-Mitarbeiter: " + error.message); return; }
+    setOfficeEmployees(data || []);
+  }
+  function resetOfficeForm() { setOfficeName(""); setOfficeRole(""); setOfficePhone(""); setOfficeEmail(""); setEditOfficeId(null); }
+  function startEditOffice(m: any) {
+    setEditOfficeId(m.id); setOfficeName(m.name || ""); setOfficeRole(m.role || ""); setOfficePhone(m.phone || ""); setOfficeEmail(m.email || "");
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  async function saveOfficeEmployee() {
+    if (!currentCompany) return;
+    if (!officeName.trim()) { setMessage("Bitte einen Namen eingeben."); return; }
+    const payload = { name: officeName.trim(), role: officeRole.trim(), phone: officePhone.trim(), email: officeEmail.trim() };
+    if (editOfficeId) {
+      const { error } = await dbTimeout(supabase.from("office_employees").update(payload).eq("id", editOfficeId));
+      if (error) { setMessage("Fehler beim Speichern: " + error.message); return; }
+    } else {
+      const { error } = await dbTimeout(supabase.from("office_employees").insert({ company_id: currentCompany.company_id, ...payload }));
+      if (error) { setMessage("Fehler beim Speichern: " + error.message); return; }
+    }
+    resetOfficeForm(); await loadOfficeEmployees(); setMessage("Büro-Mitarbeiter gespeichert.");
+  }
+  async function deleteOfficeEmployee(id: string) {
+    const { error } = await supabase.from("office_employees").delete().eq("id", id);
+    if (error) { setMessage("Fehler beim Löschen: " + error.message); return; }
+    if (editOfficeId === id) resetOfficeForm();
+    await loadOfficeEmployees();
+  }
+
   function formatProjectAddress(p: any): string {
     const zc = [p?.zip, p?.city].filter(Boolean).map((x: any) => String(x).trim()).join(" ");
     return [p?.site, p?.street, zc].map((x: any) => (x || "").toString().trim()).filter(Boolean).join(", ");
@@ -7454,6 +7523,9 @@ export default function Home() {
         )}
         {(currentCompany?.role === "owner" || currentCompany?.role === "admin") && (
           <TabButton label={t.companyData}      tabName="firmendaten"        activeTab={activeTab} onClick={() => setActiveTab("firmendaten")} />
+        )}
+        {(currentCompany?.role === "owner" || currentCompany?.role === "admin") && (
+          <TabButton label="🏢 Büro" tabName="buero" activeTab={activeTab} onClick={() => { setActiveTab("buero"); loadOfficeSettings(); loadOfficeEmployees(); }} />
         )}
         {companyFeatures?.material_enabled && (currentCompany?.role === "owner" || currentCompany?.role === "admin" || currentCompany?.role === "project_manager") && (
         <TabButton label={`📦 ${t.materialCatalog}`} tabName="material" activeTab={activeTab} onClick={() => { setActiveTab("material"); loadMaterialCatalog(); }} />
@@ -9262,6 +9334,67 @@ export default function Home() {
             <input className="border p-3 text-black bg-white" placeholder={t.taxNumber} value={companySettings?.tax_number || ""} onChange={(e) => updateCompanyField("tax_number", e.target.value)} />
           </div>
           <button type="button" onClick={saveCompanySettings} className="bg-cyan-700 text-white px-4 py-3 rounded-lg">{t.saveCompany}</button>
+        </section>
+      )}
+
+      {activeTab === "buero" && (currentCompany?.role === "owner" || currentCompany?.role === "admin") && (
+        <section className="border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4 bg-white text-black">
+          <h2 className="text-xl font-bold">🏢 Büro</h2>
+          {!officeUnlocked ? (
+            (officePwLoaded && !officePassword) ? (
+              <div className="border border-amber-200 bg-amber-50 rounded-xl p-4 space-y-3 max-w-md">
+                <p className="font-medium">🔒 Für den Büro-Bereich ist noch kein Passwort gesetzt. Bitte lege eines fest.</p>
+                <input type="password" className="border p-3 w-full text-black bg-white" placeholder="Neues Büro-Passwort (min. 4 Zeichen)" value={newOfficePw} onChange={(e) => setNewOfficePw(e.target.value)} />
+                <button type="button" onClick={saveOfficePassword} className="bg-cyan-700 text-white px-4 py-3 rounded-lg">Passwort speichern & öffnen</button>
+              </div>
+            ) : (
+              <div className="border border-slate-200 bg-gray-50 rounded-xl p-4 space-y-3 max-w-md">
+                <p className="font-medium">🔒 Dieser Bereich ist passwortgeschützt.</p>
+                <input type="password" className="border p-3 w-full text-black bg-white" placeholder="Büro-Passwort" value={officePasswordInput} onChange={(e) => setOfficePasswordInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") unlockOffice(); }} />
+                <button type="button" onClick={unlockOffice} className="bg-cyan-700 text-white px-4 py-3 rounded-lg">Öffnen</button>
+              </div>
+            )
+          ) : (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-sm text-green-700 font-medium">🔓 Büro entsperrt</p>
+                <button type="button" onClick={() => setOfficeUnlocked(false)} className="text-sm text-gray-500 underline">Sperren</button>
+              </div>
+              <div className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-gray-50 space-y-3">
+                <h3 className="font-bold">👤 Büro-Mitarbeiter {editOfficeId ? "· bearbeiten" : "anlegen"}</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <input className="border p-3 text-black bg-white" placeholder="Name *" value={officeName} onChange={(e) => setOfficeName(e.target.value)} />
+                  <input className="border p-3 text-black bg-white" placeholder="Rolle / Funktion" value={officeRole} onChange={(e) => setOfficeRole(e.target.value)} />
+                  <input className="border p-3 text-black bg-white" placeholder="Telefon" value={officePhone} onChange={(e) => setOfficePhone(e.target.value)} />
+                  <input className="border p-3 text-black bg-white" placeholder="E-Mail" value={officeEmail} onChange={(e) => setOfficeEmail(e.target.value)} />
+                </div>
+                <div className="flex gap-2 flex-wrap">
+                  <button type="button" onClick={saveOfficeEmployee} className="bg-cyan-700 text-white px-4 py-3 rounded-lg">{editOfficeId ? "💾 Speichern" : "Anlegen"}</button>
+                  {editOfficeId && (<button type="button" onClick={resetOfficeForm} className="bg-gray-200 px-4 py-3 rounded-lg">Abbrechen</button>)}
+                </div>
+              </div>
+              <div className="space-y-2">
+                {officeEmployees.map((m) => (
+                  <div key={m.id} className="border border-slate-200 rounded-xl p-3 shadow-sm flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <strong>{m.name}</strong>
+                      {m.role ? <span className="text-sm text-gray-600"> · {m.role}</span> : null}
+                      {m.phone ? <span className="text-sm text-gray-600"> · 📞 {m.phone}</span> : null}
+                      {m.email ? <span className="text-sm text-gray-600"> · {m.email}</span> : null}
+                    </div>
+                    <div className="flex gap-2">
+                      <button type="button" onClick={() => startEditOffice(m)} className="bg-amber-600 text-white px-3 py-2 rounded-lg text-sm">✏️ Bearbeiten</button>
+                      <button type="button" onClick={() => deleteOfficeEmployee(m.id)} className="bg-red-600 text-white px-3 py-2 rounded-lg text-sm">Löschen</button>
+                    </div>
+                  </div>
+                ))}
+                {officeEmployees.length === 0 && <p className="text-gray-600">Noch keine Büro-Mitarbeiter angelegt.</p>}
+              </div>
+              <div className="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center text-gray-500">
+                🧾 Angebote · Auftragsbestätigung · Rechnung — folgen als Nächstes hier im Büro-Bereich.
+              </div>
+            </div>
+          )}
         </section>
       )}
 
