@@ -9,9 +9,9 @@ const supabase = createClient(
 );
 
 const BUERO_TABS = [
+  { key: "auftraege", label: "🛠 Auftrag/Störung" },
   { key: "mitarbeiter", label: "👤 Mitarbeiter" },
   { key: "kunden", label: "👥 Kunden" },
-  { key: "auftraege", label: "🛠 Aufträge" },
   { key: "angebote", label: "🧾 Angebote" },
   { key: "ab", label: "📋 Auftragsbestätigung" },
   { key: "rechnung", label: "💶 Rechnung" },
@@ -34,7 +34,7 @@ export default function BueroPage() {
   const [newPw, setNewPw] = useState("");
 
   // Navigation innerhalb des Büro-Bereichs
-  const [tab, setTab] = useState("mitarbeiter");
+  const [tab, setTab] = useState("auftraege");
 
   // Mitarbeiter
   const [companyUsers, setCompanyUsers] = useState<any[]>([]);
