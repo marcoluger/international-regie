@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
@@ -60,8 +60,14 @@ export default function BueroPage() {
   const [cWebsite, setCWebsite] = useState("");
   const [cUid, setCUid] = useState("");
   const [cNote, setCNote] = useState("");
+  const [noteOpen, setNoteOpen] = useState(false);
+  const noteRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => { init(); /* eslint-disable-next-line */ }, []);
+  useEffect(() => {
+    const el = noteRef.current;
+    if (el) { el.style.height = "auto"; el.style.height = el.scrollHeight + "px"; }
+  }, [cNote, noteOpen]);
 
   async function init() {
     const { data: sess } = await supabase.auth.getUser();
@@ -133,10 +139,10 @@ export default function BueroPage() {
     if (error) { setMessage("Fehler beim Laden der Kunden: " + error.message); return; }
     setCustomers(data || []);
   }
-  function resetCustForm() { setCEditId(null); setCName(""); setCDebitor(""); setCKreditor(""); setCStreet(""); setCZip(""); setCCity(""); setCPhone(""); setCMobile(""); setCEmail(""); setCWebsite(""); setCUid(""); setCNote(""); }
+  function resetCustForm() { setCEditId(null); setCName(""); setCDebitor(""); setCKreditor(""); setCStreet(""); setCZip(""); setCCity(""); setCPhone(""); setCMobile(""); setCEmail(""); setCWebsite(""); setCUid(""); setCNote(""); setNoteOpen(false); }
   function startEditCust(k: any) {
     setCEditId(k.id); setCName(k.name || ""); setCDebitor(k.debitor || ""); setCKreditor(k.kreditor || ""); setCStreet(k.street || ""); setCZip(k.zip || ""); setCCity(k.city || "");
-    setCPhone(k.phone || ""); setCMobile(k.mobile || ""); setCEmail(k.email || ""); setCWebsite(k.website || ""); setCUid(k.uid || ""); setCNote(k.note || "");
+    setCPhone(k.phone || ""); setCMobile(k.mobile || ""); setCEmail(k.email || ""); setCWebsite(k.website || ""); setCUid(k.uid || ""); setCNote(k.note || ""); setNoteOpen(!!(k.note && String(k.note).trim()));
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   }
   async function saveCustomer() {
@@ -309,7 +315,19 @@ export default function BueroPage() {
                     <input className="border p-3 text-black bg-white rounded-lg" placeholder="E-Mail" value={cEmail} onChange={(e) => setCEmail(e.target.value)} />
                     <input className="border p-3 text-black bg-white rounded-lg" placeholder="Website" value={cWebsite} onChange={(e) => setCWebsite(e.target.value)} />
                     <input className="border p-3 text-black bg-white rounded-lg" placeholder="UID / USt-ID" value={cUid} onChange={(e) => setCUid(e.target.value)} />
-                    <input className="border p-3 text-black bg-white rounded-lg" placeholder="Notiz" value={cNote} onChange={(e) => setCNote(e.target.value)} />
+                    <div className="md:col-span-2">
+                      <button type="button" onClick={() => setNoteOpen((o) => !o)} className="text-sm font-medium text-slate-600">{noteOpen ? "▼" : "▶"} 🗂️ Karteikarte / Notiz{cNote.trim() ? ` (${cNote.trim().length} Zeichen)` : ""}</button>
+                      {noteOpen && (
+                        <textarea
+                          ref={noteRef}
+                          className="border p-3 text-black bg-white rounded-lg w-full mt-2 resize-none overflow-hidden"
+                          rows={2}
+                          placeholder="Karteikarte / Notiz"
+                          value={cNote}
+                          onChange={(e) => { setCNote(e.target.value); e.currentTarget.style.height = "auto"; e.currentTarget.style.height = e.currentTarget.scrollHeight + "px"; }}
+                        />
+                      )}
+                    </div>
                   </div>
                   <div className="flex gap-2 flex-wrap">
                     <button type="button" onClick={saveCustomer} className="bg-cyan-700 text-white px-4 py-3 rounded-lg">{cEditId ? "💾 Speichern" : "Anlegen"}</button>
@@ -338,6 +356,7 @@ export default function BueroPage() {
                             {(k.phone || k.mobile) ? <div className="text-gray-600">📞 {[k.phone, k.mobile].filter(Boolean).join(" · ")}</div> : null}
                             {k.email ? <div className="text-gray-600">✉️ {k.email}</div> : null}
                             {k.uid ? <div className="text-gray-500 text-xs">UID: {k.uid}</div> : null}
+                            {k.note ? <div className="text-amber-900 text-xs mt-1 bg-amber-50 border border-amber-100 rounded px-2 py-1">🗂️ {k.note}</div> : null}
                           </div>
                           <div className="flex gap-2 shrink-0">
                             <button type="button" onClick={() => startEditCust(k)} className="bg-amber-600 text-white px-3 py-2 rounded-lg text-sm">✏️</button>
