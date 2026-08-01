@@ -245,7 +245,7 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
           if (it.kind === "titel") {
             return (
               <div key={it.id} className="border-l-4 border-slate-700 bg-slate-50 rounded-r-lg p-2 flex items-center gap-2">
-                <input className="border p-1.5 rounded text-black bg-white w-16 text-sm" placeholder="OZ" value={it.oz} onChange={(e) => setItem(it.id, "oz", e.target.value)} />
+                <input className="border p-1.5 rounded text-black bg-white w-16 text-sm" placeholder="Pos" value={it.oz} onChange={(e) => setItem(it.id, "oz", e.target.value)} />
                 <input className="border p-1.5 rounded text-black bg-white flex-1 text-sm font-bold" placeholder="Titel / Überschrift" value={it.title} onChange={(e) => setItem(it.id, "title", e.target.value)} />
                 <span className="text-sm font-bold text-slate-700 whitespace-nowrap">{fmt(titleSum(o.items, idx))} €</span>
                 {itemButtons(it.id)}
@@ -256,7 +256,7 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
             return (
               <div key={it.id} className="border border-slate-200 rounded-lg p-2 bg-white space-y-1">
                 <div className="flex items-center gap-2">
-                  <input className="border p-1.5 rounded text-black bg-white w-16 text-sm" placeholder="OZ" value={it.oz} onChange={(e) => setItem(it.id, "oz", e.target.value)} />
+                  <input className="border p-1.5 rounded text-black bg-white w-16 text-sm" placeholder="Pos" value={it.oz} onChange={(e) => setItem(it.id, "oz", e.target.value)} />
                   <input className="border p-1.5 rounded text-black bg-white flex-1 text-sm" placeholder="Kurztext (Textposition)" value={it.short_text} onChange={(e) => setItem(it.id, "short_text", e.target.value)} />
                   {itemButtons(it.id)}
                 </div>
@@ -269,10 +269,10 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
             <div key={it.id} className="border border-slate-200 rounded-lg bg-white">
               <div className="flex items-center gap-2 p-2">
                 <button type="button" onClick={() => setOpenItem((p) => ({ ...p, [it.id]: !p[it.id] }))} className="text-gray-400 text-sm">{opened ? "▼" : "▶"}</button>
-                <input className="border p-1.5 rounded text-black bg-white w-16 text-sm" placeholder="OZ" value={it.oz} onChange={(e) => setItem(it.id, "oz", e.target.value)} />
-                <input className="border p-1.5 rounded text-black bg-white flex-1 text-sm font-medium" placeholder="Kurztext" value={it.short_text} onChange={(e) => setItem(it.id, "short_text", e.target.value)} />
+                <input className="border p-1.5 rounded text-black bg-white w-16 text-sm" placeholder="Pos" value={it.oz} onChange={(e) => setItem(it.id, "oz", e.target.value)} />
                 <input className="border p-1.5 rounded text-black bg-white w-16 text-sm text-right" placeholder="Menge" value={it.qty} onChange={(e) => setItem(it.id, "qty", e.target.value)} />
                 <input className="border p-1.5 rounded text-black bg-white w-14 text-sm" placeholder="Einh." value={it.unit} onChange={(e) => setItem(it.id, "unit", e.target.value)} />
+                <input className="border p-1.5 rounded text-black bg-white flex-1 text-sm font-medium" placeholder="Kurztext" value={it.short_text} onChange={(e) => setItem(it.id, "short_text", e.target.value)} />
                 <span className="text-sm text-right w-20 whitespace-nowrap" title="Einzelpreis">{fmt(it.ep)}</span>
                 <span className="text-sm font-bold text-right w-24 whitespace-nowrap" title="Gesamtpreis">{fmt(it.gp)} €</span>
                 {itemButtons(it.id)}
