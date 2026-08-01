@@ -296,7 +296,7 @@ export default function BueroPage() {
                       <option value="debitor">Nur Debitoren (Kunden)</option>
                       <option value="kreditor">Nur Kreditoren (Lieferanten)</option>
                     </select>
-                    <input className="border p-2 rounded-lg text-black bg-white w-full sm:w-72" placeholder="Suche: Name, Nr., Ort, E-Mail…" value={custSearch} onChange={(e) => setCustSearch(e.target.value)} />
+                    <input className="border p-2 rounded-lg text-black bg-white w-full sm:w-72" placeholder="Suche: Name, Nr., Ort, Telefon, E-Mail…" value={custSearch} onChange={(e) => setCustSearch(e.target.value)} />
                   </div>
                 </div>
                 <div className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-gray-50 space-y-3">
@@ -339,7 +339,7 @@ export default function BueroPage() {
                   const hasDeb = (k: any) => !!String(k.debitor || "").trim();
                   const hasKre = (k: any) => !!String(k.kreditor || "").trim();
                   const byType = custFilter === "debitor" ? customers.filter(hasDeb) : custFilter === "kreditor" ? customers.filter(hasKre) : customers;
-                  const filtered = q ? byType.filter((k: any) => [k.name, k.debitor, k.kreditor, k.customer_no, k.city, k.zip, k.email, k.matchcode].some((x: any) => String(x || "").toLowerCase().includes(q))) : byType;
+                  const filtered = q ? byType.filter((k: any) => [k.name, k.debitor, k.kreditor, k.customer_no, k.city, k.zip, k.email, k.matchcode, k.phone, k.mobile].some((x: any) => String(x || "").toLowerCase().includes(q))) : byType;
                   const shown = filtered.slice(0, 100);
                   return (
                     <div className="space-y-2">
