@@ -54,6 +54,7 @@ export default function BueroPage() {
   const [cName, setCName] = useState("");
   const [cDebitor, setCDebitor] = useState("");
   const [cKreditor, setCKreditor] = useState("");
+  const [cType, setCType] = useState("debitor");
   const [cStreet, setCStreet] = useState("");
   const [cZip, setCZip] = useState("");
   const [cCity, setCCity] = useState("");
@@ -142,15 +143,27 @@ export default function BueroPage() {
     if (error) { setMessage("Fehler beim Laden der Kunden: " + error.message); return; }
     setCustomers(data || []);
   }
-  function resetCustForm() { setCEditId(null); setCName(""); setCDebitor(""); setCKreditor(""); setCStreet(""); setCZip(""); setCCity(""); setCPhone(""); setCMobile(""); setCEmail(""); setCWebsite(""); setCUid(""); setCNote(""); setNoteOpen(false); }
+  function nextDebitorNo() {
+    const nums = customers.map((k: any) => parseInt(String(k.debitor || ""), 10)).filter((n: number) => !isNaN(n) && n < 90000);
+    return (nums.length ? Math.max(...nums) : 10000) + 1;
+  }
+  function nextKreditorNo() {
+    const nums = customers.map((k: any) => parseInt(String(k.kreditor || ""), 10)).filter((n: number) => !isNaN(n) && n < 90000);
+    return (nums.length ? Math.max(...nums) : 70000) + 1;
+  }
+  function resetCustForm() { setCEditId(null); setCName(""); setCDebitor(""); setCKreditor(""); setCType("debitor"); setCStreet(""); setCZip(""); setCCity(""); setCPhone(""); setCMobile(""); setCEmail(""); setCWebsite(""); setCUid(""); setCNote(""); setNoteOpen(false); }
   function startEditCust(k: any) {
-    setCEditId(k.id); setCName(k.name || ""); setCDebitor(k.debitor || ""); setCKreditor(k.kreditor || ""); setCStreet(k.street || ""); setCZip(k.zip || ""); setCCity(k.city || "");
+    setCEditId(k.id); setCName(k.name || ""); setCDebitor(k.debitor || ""); setCKreditor(k.kreditor || ""); setCType(k.debitor && String(k.debitor).trim() ? "debitor" : "kreditor"); setCStreet(k.street || ""); setCZip(k.zip || ""); setCCity(k.city || "");
     setCPhone(k.phone || ""); setCMobile(k.mobile || ""); setCEmail(k.email || ""); setCWebsite(k.website || ""); setCUid(k.uid || ""); setCNote(k.note || ""); setNoteOpen(!!(k.note && String(k.note).trim()));
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   }
   async function saveCustomer() {
     if (!cName.trim()) { setMessage("Bitte einen Kundennamen eingeben."); return; }
-    const deb = cDebitor.trim(); const kre = cKreditor.trim();
+    let deb = cDebitor.trim(); let kre = cKreditor.trim();
+    if (!cEditId) {
+      if (cType === "kreditor") { kre = String(nextKreditorNo()); deb = ""; }
+      else { deb = String(nextDebitorNo()); kre = ""; }
+    }
     const kind = deb && kre ? "beides" : kre ? "kreditor" : deb ? "debitor" : "sonstige";
     const payload = { name: cName.trim(), debitor: deb, kreditor: kre, customer_no: deb || kre, kind, street: cStreet.trim(), zip: cZip.trim(), city: cCity.trim(), phone: cPhone.trim(), mobile: cMobile.trim(), email: cEmail.trim(), website: cWebsite.trim(), uid: cUid.trim(), note: cNote.trim() };
     if (cEditId) {
@@ -310,8 +323,12 @@ export default function BueroPage() {
                   <h3 className="font-bold">{cEditId ? "Kunde bearbeiten" : "Neuen Kunden anlegen"}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <input className="border p-3 text-black bg-white rounded-lg" placeholder="Name / Firma *" value={cName} onChange={(e) => setCName(e.target.value)} />
-                    <input className="border p-3 text-black bg-white rounded-lg" placeholder="Debitor-Nr. (Kunde)" value={cDebitor} onChange={(e) => setCDebitor(e.target.value)} />
-                    <input className="border p-3 text-black bg-white rounded-lg" placeholder="Kreditor-Nr. (Lieferant)" value={cKreditor} onChange={(e) => setCKreditor(e.target.value)} />
+                    <div className="md:col-span-2 flex items-center gap-4 flex-wrap">
+                      <span className="text-sm font-medium">Typ:</span>
+                      <label className="flex items-center gap-1 cursor-pointer text-sm"><input type="radio" name="ctype" checked={cType === "debitor"} onChange={() => setCType("debitor")} /> 🟢 Debitor (Kunde)</label>
+                      <label className="flex items-center gap-1 cursor-pointer text-sm"><input type="radio" name="ctype" checked={cType === "kreditor"} onChange={() => setCType("kreditor")} /> 🟠 Kreditor (Lieferant)</label>
+                      <span className="text-xs text-gray-500">{cEditId ? `Nr.: ${cDebitor || cKreditor || "—"}` : `Automatische Nr.: ${cType === "debitor" ? nextDebitorNo() : nextKreditorNo()}`}</span>
+                    </div>
                     <input className="border p-3 text-black bg-white rounded-lg" placeholder="Straße + Nr." value={cStreet} onChange={(e) => setCStreet(e.target.value)} />
                     <div className="grid grid-cols-3 gap-2">
                       <input className="border p-3 text-black bg-white rounded-lg" placeholder="PLZ" value={cZip} onChange={(e) => setCZip(e.target.value)} />
