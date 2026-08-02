@@ -4,13 +4,16 @@
 
 const num = (v: any) => Number(String(v ?? "").replace(",", ".")) || 0;
 
-function calcItem(it: any) {
+function calcItem(it: any, del: number = 0) {
   if (it.kind !== "position") return { ep: 0, gp: 0 };
-  const matVk = num(it.mat_ek) * (num(it.mat_multi) || 1);
+  const pe = num(it.preiseinheit) || 1;
+  const versch = num(it.verschnitt) || 1;
+  const matVk = num(it.mat_ek) * (num(it.mat_multi) || 1) * versch / pe;
   const lohnEk = it.lohn_ek !== undefined && it.lohn_ek !== "" ? num(it.lohn_ek) : num(it.std_lohn);
   const lohnSatzVk = lohnEk * (num(it.lohn_multi) || 1);
   const lohnVk = lohnSatzVk * (num(it.minutes) / 60);
-  const ep = matVk + lohnVk + num(it.fremd_vk) + num(it.geraet_vk);
+  const kupferVk = num(it.kupfer_kg) * del * (num(it.kupfer_multi) || 1) / pe;
+  const ep = matVk + lohnVk + kupferVk + num(it.fremd_vk) + num(it.geraet_vk);
   const gp = ep * num(it.qty) * (1 - num(it.discount_pct) / 100);
   return { ep, gp };
 }
@@ -60,7 +63,7 @@ export function buildGaebX84Xml(o: any, now: Date = new Date()): string {
     const itemsXml: string[] = [];
     let grpTotal = 0;
     for (const p of g.positions) {
-      const c = calcItem(p);
+      const c = calcItem(p, num(o.del_preis));
       const qty = num(p.qty);
       const up = qty > 0 ? c.gp / qty : c.ep;
       const it = Math.round(up * 1000) / 1000 * qty;

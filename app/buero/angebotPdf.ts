@@ -17,19 +17,23 @@ function addWeeks(dateStr: string, weeks: number) {
   d.setDate(d.getDate() + Math.round(weeks * 7));
   return d.toISOString().slice(0, 10);
 }
-function calcItem(it: any) {
+function calcItem(it: any, del: number = 0) {
   if (it.kind !== "position") return { ...it, ep: 0, gp: 0 };
-  const matVk = num(it.mat_ek) * (num(it.mat_multi) || 1);
+  const pe = num(it.preiseinheit) || 1;
+  const versch = num(it.verschnitt) || 1;
+  const matVk = num(it.mat_ek) * (num(it.mat_multi) || 1) * versch / pe;
   const lohnEk = it.lohn_ek !== undefined && it.lohn_ek !== "" ? num(it.lohn_ek) : num(it.std_lohn);
   const lohnSatzVk = lohnEk * (num(it.lohn_multi) || 1);
   const lohnVk = lohnSatzVk * (num(it.minutes) / 60);
-  const ep = matVk + lohnVk + num(it.fremd_vk) + num(it.geraet_vk);
+  const kupferVk = num(it.kupfer_kg) * del * (num(it.kupfer_multi) || 1) / pe;
+  const ep = matVk + lohnVk + kupferVk + num(it.fremd_vk) + num(it.geraet_vk);
   const gp = ep * num(it.qty) * (1 - num(it.discount_pct) / 100);
   return { ...it, ep, gp };
 }
 function offerTotals(items: any[], o: any) {
   let net = 0;
-  for (const raw of items) if (raw.kind === "position") net += calcItem(raw).gp;
+  const del = num(o.del_preis);
+  for (const raw of items) if (raw.kind === "position") net += calcItem(raw, del).gp;
   const rabatt = net * (num(o.rabatt_pct) / 100);
   const nachlass = num(o.nachlass);
   const netAfter = Math.max(0, net - rabatt - nachlass);
@@ -38,11 +42,11 @@ function offerTotals(items: any[], o: any) {
   const skonto = netAfter * (num(o.skonto_pct) / 100);
   return { net, rabatt, nachlass, netAfter, vat, gross, skonto };
 }
-function titleSum(items: any[], idx: number) {
+function titleSum(items: any[], idx: number, del: number = 0) {
   let s = 0;
   for (let i = idx + 1; i < items.length; i++) {
     if (items[i].kind === "titel") break;
-    if (items[i].kind === "position") s += calcItem(items[i]).gp;
+    if (items[i].kind === "position") s += calcItem(items[i], del).gp;
   }
   return s;
 }
@@ -283,7 +287,7 @@ export async function generateAngebotPdf(o: any, opts: { customerNo?: string } =
   }
 
   function drawPosition(it: any) {
-    const c = calcItem(it);
+    const c = calcItem(it, num(o.del_preis));
     const lines = bezLines(it);
     y += 1.5;
     for (let i = 0; i < lines.length; i++) {
@@ -332,7 +336,7 @@ export async function generateAngebotPdf(o: any, opts: { customerNo?: string } =
     for (let i = 0; i < items.length; i++) {
       if (items[i].kind === "titel") {
         doc.text(String(items[i].title || ""), cxBez, y);
-        doc.text(fmt(titleSum(items, i)), cxGP_R, y, { align: "right" });
+        doc.text(fmt(titleSum(items, i, num(o.del_preis))), cxGP_R, y, { align: "right" });
         y += 5;
       }
     }
@@ -406,7 +410,7 @@ export async function generateAngebotPdf(o: any, opts: { customerNo?: string } =
   for (let idx = 0; idx < items.length; idx++) {
     const it = items[idx];
     if (it.kind === "titel") {
-      if (lastTitel >= 0) drawTitelSum(items[lastTitel].title, titleSum(items, lastTitel));
+      if (lastTitel >= 0) drawTitelSum(items[lastTitel].title, titleSum(items, lastTitel, num(o.del_preis)));
       drawTitel(it);
       lastTitel = idx;
     } else if (it.kind === "text") {
@@ -415,7 +419,7 @@ export async function generateAngebotPdf(o: any, opts: { customerNo?: string } =
       drawPosition(it);
     }
   }
-  if (lastTitel >= 0) drawTitelSum(items[lastTitel].title, titleSum(items, lastTitel));
+  if (lastTitel >= 0) drawTitelSum(items[lastTitel].title, titleSum(items, lastTitel, num(o.del_preis)));
   drawZusammenstellung();
 
   doc.save(`Angebot_${(o.number || "Entwurf").toString().replace(/[^\w.-]+/g, "_")}.pdf`);

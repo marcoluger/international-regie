@@ -26,9 +26,15 @@ function fmtDate(iso: string) {
 
 // Kostenbestandteile je Position (pro Einheit), Rabatt der Position auf die
 // Vk-Anteile eingerechnet, damit die Summe = Einheitspreis ergibt.
-function calcParts(it: any) {
+function calcParts(it: any, del: number = 0) {
   const disc = 1 - num(it.discount_pct) / 100;
-  const matVk = num(it.mat_ek) * (num(it.mat_multi) || 1);
+  const pe = num(it.preiseinheit) || 1;
+  const versch = num(it.verschnitt) || 1;
+  // Kupfer zählt als Stoffkosten (Material) — pro Einheit, über Preiseinheit heruntergeteilt.
+  const kupferEkE = num(it.kupfer_kg) * del / pe;                          // Kupfer-EK je Einheit
+  const kupferVkE = kupferEkE * (num(it.kupfer_multi) || 1);               // Kupfer-VK je Einheit
+  const matEkE = num(it.mat_ek) * versch / pe + kupferEkE;                 // Stoff-EK je Einheit (inkl. Kupfer)
+  const matVk = num(it.mat_ek) * (num(it.mat_multi) || 1) * versch / pe + kupferVkE; // Stoff-VK je Einheit (inkl. Kupfer)
   const lohnEk = it.lohn_ek !== undefined && it.lohn_ek !== "" ? num(it.lohn_ek) : num(it.std_lohn);
   const lohnSatzVk = lohnEk * (num(it.lohn_multi) || 1);
   const zeit = num(it.minutes) / 60;                 // Zeitansatz je Einheit (Std)
@@ -37,7 +43,7 @@ function calcParts(it: any) {
   const ep = (matVk + lohnVk + num(it.fremd_vk) + num(it.geraet_vk)) * disc;
   return {
     zeit,
-    matEk: num(it.mat_ek),
+    matEk: matEkE,
     matVk: matVk * disc,
     lohnEk: lohnEkE,
     lohnVk: lohnVk * disc,
@@ -61,7 +67,7 @@ function aggregate(o: any): Agg {
   for (const raw of items) {
     if (raw.kind !== "position") continue;
     const q = num(raw.qty);
-    const p = calcParts(raw);
+    const p = calcParts(raw, num(o.del_preis));
     a.hours += p.zeit * q;
     a.lohnEk += p.lohnEk * q;
     a.lohnVk += p.lohnVk * q;
@@ -322,7 +328,7 @@ export async function generateEfbPdf(o: any, opts: { customerNo?: string; sheets
       }
       if (it.kind !== "position") continue;
       anyPos = true;
-      const p = calcParts(it);
+      const p = calcParts(it, num(o.del_preis));
       const bez = doc.splitTextToSize(String(it.short_text || it.long_text || "").split("\n")[0] || "", bezRight - cBez);
       const nLines = Math.max(1, bez.length);
       ensure(nLines * LH + 1.5);

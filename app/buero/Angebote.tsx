@@ -27,15 +27,31 @@ const PV_DEFAULT = "Steuerfreie Leistung \u2013 Nullsteuersatz nach \u00a7 12 Ab
 const B13_DEFAULT = "Steuerschuldnerschaft des Leistungsempf\u00e4ngers nach \u00a7 13b UStG. Es wird keine Umsatzsteuer ausgewiesen; die Umsatzsteuer schuldet der Leistungsempf\u00e4nger.";
 const UNITS = ["St", "Stk", "Psch", "m", "lfm", "m\u00b2", "m\u00b3", "h", "Std", "Tag", "Wo", "Mon", "kg", "t", "g", "l", "Ltr", "Satz", "Paar", "Rolle", "Pkg", "Bund", "Pkt", "kW", "kWp", "A", "V", "%"];
 
-function calcItem(it: any) {
-  if (it.kind !== "position") return { ...it, ep: 0, gp: 0, mat_vk: 0, lohn_vk: 0 };
-  const matVk = num(it.mat_ek) * (num(it.mat_multi) || 1);
+// Kupfergewicht (kg je 100 m) aus dem Querschnitt in der Bezeichnung schätzen: "5x16", "5X35", "3G2,5" …
+// Formel: Σ(Adern × mm²) × 0,89 kg je 100 m (Kupferdichte 8,9 g/cm³).
+function cuKgPer100m(text: string): number | null {
+  const m = String(text || "").match(/(\d+)\s*[xXgG*]\s*(\d+(?:[.,]\d+)?)/);
+  if (!m) return null;
+  const n = parseInt(m[1], 10);
+  const q = parseFloat(m[2].replace(",", "."));
+  if (!n || !q) return null;
+  return Math.round(n * q * 0.89 * 100) / 100;
+}
+
+// del = Tages-Kupferpreis (€/kg). Preiseinheit (PE) teilt Material- UND Kupferpreis auf die Einheit herunter.
+function calcItem(it: any, del: number = 0) {
+  if (it.kind !== "position") return { ...it, ep: 0, gp: 0, mat_vk: 0, lohn_vk: 0, kupfer_vk: 0 };
+  const pe = num(it.preiseinheit) || 1;
+  const versch = num(it.verschnitt) || 1;
+  const matVk = num(it.mat_ek) * (num(it.mat_multi) || 1) * versch / pe;
   const lohnEk = (it.lohn_ek !== undefined && it.lohn_ek !== "") ? num(it.lohn_ek) : num(it.std_lohn);
   const lohnSatzVk = lohnEk * (num(it.lohn_multi) || 1);
   const lohnVk = lohnSatzVk * (num(it.minutes) / 60);
-  const ep = matVk + lohnVk + num(it.fremd_vk) + num(it.geraet_vk);
+  const kupferEk = num(it.kupfer_kg) * del;                       // Kupfer-EK je Preiseinheit
+  const kupferVk = kupferEk * (num(it.kupfer_multi) || 1) / pe;   // Kupfer-VK je Einheit
+  const ep = matVk + lohnVk + kupferVk + num(it.fremd_vk) + num(it.geraet_vk);
   const gp = ep * num(it.qty) * (1 - num(it.discount_pct) / 100);
-  return { ...it, mat_vk: matVk, lohn_satz_vk: lohnSatzVk, lohn_vk: lohnVk, ep, gp };
+  return { ...it, mat_vk: matVk, lohn_satz_vk: lohnSatzVk, lohn_vk: lohnVk, kupfer_ek: kupferEk, kupfer_vk: kupferVk, ep, gp };
 }
 
 // Artikel → Angebotsposition (Kalkulationswerte übernehmen, Multis ggf. aus Angebot)
@@ -53,12 +69,14 @@ function articleToItem(a: any, qty: string, defMat: string, defLohn: string) {
     qty: qty && String(qty).trim() ? String(qty) : "1", unit: a.unit || "St",
     mat_ek: s(matEk), mat_multi: mm, lohn_ek: isSup ? "" : s(a.lohn_ek), lohn_multi: lm,
     minutes: isSup ? "" : s(a.minutes), fremd_vk: "", geraet_vk: "", discount_pct: "",
+    preiseinheit: "1", verschnitt: "1", kupfer_kg: "", kupfer_multi: "1.05",
   };
 }
 
 function offerTotals(items: any[], o: any) {
   let net = 0;
-  for (const raw of items) if (raw.kind === "position") net += calcItem(raw).gp;
+  const del = num(o.del_preis);
+  for (const raw of items) if (raw.kind === "position") net += calcItem(raw, del).gp;
   const rabatt = net * (num(o.rabatt_pct) / 100);
   const nachlass = num(o.nachlass);
   const netAfter = Math.max(0, net - rabatt - nachlass);
@@ -69,11 +87,11 @@ function offerTotals(items: any[], o: any) {
 }
 
 // Titelsumme: Summe der G-Preise der Positionen bis zum naechsten Titel
-function titleSum(items: any[], idx: number) {
+function titleSum(items: any[], idx: number, del: number = 0) {
   let s = 0;
   for (let i = idx + 1; i < items.length; i++) {
     if (items[i].kind === "titel") break;
-    if (items[i].kind === "position") s += calcItem(items[i]).gp;
+    if (items[i].kind === "position") s += calcItem(items[i], del).gp;
   }
   return s;
 }
@@ -82,7 +100,7 @@ function newItem(kind: string) {
   const base: any = { id: uid(), kind, oz: "" };
   if (kind === "titel") return { ...base, title: "" };
   if (kind === "text") return { ...base, short_text: "", long_text: "" };
-  return { ...base, short_text: "", long_text: "", qty: "1", unit: "St", mat_ek: "", mat_multi: "1.28", lohn_ek: "", lohn_multi: "1.28", minutes: "", fremd_vk: "", geraet_vk: "", discount_pct: "" };
+  return { ...base, short_text: "", long_text: "", qty: "1", unit: "St", mat_ek: "", mat_multi: "1.28", lohn_ek: "", lohn_multi: "1.28", minutes: "", fremd_vk: "", geraet_vk: "", discount_pct: "", preiseinheit: "1", verschnitt: "1", kupfer_kg: "", kupfer_multi: "1.05" };
 }
 
 function blankOffer() {
@@ -93,6 +111,7 @@ function blankOffer() {
     vat_rate: "19", rabatt_pct: "0", nachlass: "0", skonto_pct: "0", skonto_tage: "0",
     def_mat_multi: "1.28", def_lohn_multi: "1.28", binde_weeks: "",
     tax_mode: "standard", tax_note: "", vortext: "", nachtext: "", pay1_pct: "50", pay2_pct: "30", pay3_pct: "20",
+    del_preis: "0",
     items: [] as any[],
   };
 }
@@ -106,7 +125,7 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
   const [custSearch, setCustSearch] = useState("");
   const [pickerOpen, setPickerOpen] = useState(false);
   const [openItem, setOpenItem] = useState<Record<string, boolean>>({});
-  const [settings, setSettings] = useState<any>({ def_mat_multi: "1.28", def_lohn_multi: "1.28", binde_weeks: "4", vat_rate: "19", def_rabatt_pct: "0", def_nachlass: "0", def_skonto_pct: "0", def_skonto_tage: "0", pv_text: PV_DEFAULT, b13_text: B13_DEFAULT, vortext: VORTEXT_DEFAULT, nachtext: NACHTEXT_DEFAULT, pay1_pct: "50", pay2_pct: "30", pay3_pct: "20" });
+  const [settings, setSettings] = useState<any>({ def_mat_multi: "1.28", def_lohn_multi: "1.28", binde_weeks: "4", vat_rate: "19", def_rabatt_pct: "0", def_nachlass: "0", def_skonto_pct: "0", def_skonto_tage: "0", pv_text: PV_DEFAULT, b13_text: B13_DEFAULT, vortext: VORTEXT_DEFAULT, nachtext: NACHTEXT_DEFAULT, pay1_pct: "50", pay2_pct: "30", pay3_pct: "20", del_preis: "0", def_kupfer_multi: "1.05" });
   const [settingsTab, setSettingsTab] = useState("allgemein");
   const [textModules, setTextModules] = useState<any[]>([]);
   const [tmKind, setTmKind] = useState("vor");
@@ -150,10 +169,10 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
   }
   async function loadSettings() {
     const { data } = await supabase.from("office_offer_settings").select("*").eq("company_id", companyId).maybeSingle();
-    if (data) setSettings({ def_mat_multi: String(data.def_mat_multi ?? "1.28"), def_lohn_multi: String(data.def_lohn_multi ?? "1.28"), binde_weeks: String(data.binde_weeks ?? "4"), vat_rate: String(data.vat_rate ?? "19"), def_rabatt_pct: String(data.def_rabatt_pct ?? "0"), def_nachlass: String(data.def_nachlass ?? "0"), def_skonto_pct: String(data.def_skonto_pct ?? "0"), def_skonto_tage: String(data.def_skonto_tage ?? "0"), pv_text: data.pv_text ?? PV_DEFAULT, b13_text: data.b13_text ?? B13_DEFAULT, vortext: data.vortext ?? VORTEXT_DEFAULT, nachtext: data.nachtext ?? NACHTEXT_DEFAULT, pay1_pct: String(data.pay1_pct ?? "50"), pay2_pct: String(data.pay2_pct ?? "30"), pay3_pct: String(data.pay3_pct ?? "20") });
+    if (data) setSettings({ def_mat_multi: String(data.def_mat_multi ?? "1.28"), def_lohn_multi: String(data.def_lohn_multi ?? "1.28"), binde_weeks: String(data.binde_weeks ?? "4"), vat_rate: String(data.vat_rate ?? "19"), def_rabatt_pct: String(data.def_rabatt_pct ?? "0"), def_nachlass: String(data.def_nachlass ?? "0"), def_skonto_pct: String(data.def_skonto_pct ?? "0"), def_skonto_tage: String(data.def_skonto_tage ?? "0"), pv_text: data.pv_text ?? PV_DEFAULT, b13_text: data.b13_text ?? B13_DEFAULT, vortext: data.vortext ?? VORTEXT_DEFAULT, nachtext: data.nachtext ?? NACHTEXT_DEFAULT, pay1_pct: String(data.pay1_pct ?? "50"), pay2_pct: String(data.pay2_pct ?? "30"), pay3_pct: String(data.pay3_pct ?? "20"), del_preis: String(data.del_preis ?? "0"), def_kupfer_multi: String(data.def_kupfer_multi ?? "1.05") });
   }
   async function saveSettings() {
-    const { error } = await supabase.from("office_offer_settings").upsert({ company_id: companyId, def_mat_multi: num(settings.def_mat_multi), def_lohn_multi: num(settings.def_lohn_multi), binde_weeks: Math.round(num(settings.binde_weeks)), vat_rate: num(settings.vat_rate), def_rabatt_pct: num(settings.def_rabatt_pct), def_nachlass: num(settings.def_nachlass), def_skonto_pct: num(settings.def_skonto_pct), def_skonto_tage: Math.round(num(settings.def_skonto_tage)), pv_text: settings.pv_text || null, b13_text: settings.b13_text || null, vortext: settings.vortext || null, nachtext: settings.nachtext || null, pay1_pct: num(settings.pay1_pct), pay2_pct: num(settings.pay2_pct), pay3_pct: num(settings.pay3_pct), updated_at: new Date().toISOString() }, { onConflict: "company_id" });
+    const { error } = await supabase.from("office_offer_settings").upsert({ company_id: companyId, def_mat_multi: num(settings.def_mat_multi), def_lohn_multi: num(settings.def_lohn_multi), binde_weeks: Math.round(num(settings.binde_weeks)), vat_rate: num(settings.vat_rate), def_rabatt_pct: num(settings.def_rabatt_pct), def_nachlass: num(settings.def_nachlass), def_skonto_pct: num(settings.def_skonto_pct), def_skonto_tage: Math.round(num(settings.def_skonto_tage)), pv_text: settings.pv_text || null, b13_text: settings.b13_text || null, vortext: settings.vortext || null, nachtext: settings.nachtext || null, pay1_pct: num(settings.pay1_pct), pay2_pct: num(settings.pay2_pct), pay3_pct: num(settings.pay3_pct), del_preis: num(settings.del_preis), def_kupfer_multi: num(settings.def_kupfer_multi), updated_at: new Date().toISOString() }, { onConflict: "company_id" });
     if (error) { setMsg("Fehler beim Speichern der Einstellungen: " + error.message); return; }
     setMsg("Einstellungen gespeichert.");
   }
@@ -214,11 +233,12 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
     b.pay1_pct = settings.pay1_pct || "50";
     b.pay2_pct = settings.pay2_pct || "30";
     b.pay3_pct = settings.pay3_pct || "20";
+    b.del_preis = settings.del_preis || "0";
     b.offer_date = new Date().toISOString().slice(0, 10);
     setO(b); setMode("edit"); setMsg(""); setCustSearch(""); setPickerOpen(false);
   }
   function editOffer(row: any) {
-    setO({ ...blankOffer(), ...row, vat_rate: String(row.vat_rate ?? "19"), rabatt_pct: String(row.rabatt_pct ?? "0"), nachlass: String(row.nachlass ?? "0"), skonto_pct: String(row.skonto_pct ?? "0"), skonto_tage: String(row.skonto_tage ?? "0"), def_mat_multi: String(row.def_mat_multi ?? "1.28"), def_lohn_multi: String(row.def_lohn_multi ?? "1.28"), binde_weeks: String(row.binde_weeks ?? ""), tax_mode: row.tax_mode || "standard", tax_note: row.tax_note ?? "", vortext: row.vortext ?? "", nachtext: row.nachtext ?? "", pay1_pct: String(row.pay1_pct ?? "50"), pay2_pct: String(row.pay2_pct ?? "30"), pay3_pct: String(row.pay3_pct ?? "20"), items: Array.isArray(row.items) ? row.items : [] });
+    setO({ ...blankOffer(), ...row, vat_rate: String(row.vat_rate ?? "19"), rabatt_pct: String(row.rabatt_pct ?? "0"), nachlass: String(row.nachlass ?? "0"), skonto_pct: String(row.skonto_pct ?? "0"), skonto_tage: String(row.skonto_tage ?? "0"), def_mat_multi: String(row.def_mat_multi ?? "1.28"), def_lohn_multi: String(row.def_lohn_multi ?? "1.28"), binde_weeks: String(row.binde_weeks ?? ""), tax_mode: row.tax_mode || "standard", tax_note: row.tax_note ?? "", vortext: row.vortext ?? "", nachtext: row.nachtext ?? "", pay1_pct: String(row.pay1_pct ?? "50"), pay2_pct: String(row.pay2_pct ?? "30"), pay3_pct: String(row.pay3_pct ?? "20"), del_preis: String(row.del_preis ?? "0"), items: Array.isArray(row.items) ? row.items : [] });
     setMode("edit"); setMsg("");
   }
 
@@ -229,7 +249,7 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
   function addItem(kind: string) {
     setO((p: any) => {
       const it: any = newItem(kind);
-      if (kind === "position") { it.mat_multi = p.def_mat_multi || "1.28"; it.lohn_multi = p.def_lohn_multi || "1.28"; }
+      if (kind === "position") { it.mat_multi = p.def_mat_multi || "1.28"; it.lohn_multi = p.def_lohn_multi || "1.28"; it.kupfer_multi = settings.def_kupfer_multi || "1.05"; }
       return { ...p, items: [...p.items, it] };
     });
   }
@@ -265,6 +285,7 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
       def_mat_multi: num(o.def_mat_multi), def_lohn_multi: num(o.def_lohn_multi),
       tax_mode: o.tax_mode || "standard", tax_note: o.tax_note || null,
       vortext: o.vortext || null, nachtext: o.nachtext || null, pay1_pct: num(o.pay1_pct), pay2_pct: num(o.pay2_pct), pay3_pct: num(o.pay3_pct),
+      del_preis: num(o.del_preis),
       items: o.items, net_total: t.netAfter, vat_total: t.vat, gross_total: t.gross, updated_at: new Date().toISOString(),
     };
     if (o.id) {
@@ -364,6 +385,8 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
               <label className="flex flex-col text-sm">Standard-Multi Lohn<input className="border p-2 rounded-lg text-black bg-white" value={settings.def_lohn_multi} onChange={(e) => setSettings((x: any) => ({ ...x, def_lohn_multi: e.target.value }))} /></label>
               <label className="flex flex-col text-sm">Bindefrist (Wochen)<input type="number" className="border p-2 rounded-lg text-black bg-white" value={settings.binde_weeks} onChange={(e) => setSettings((x: any) => ({ ...x, binde_weeks: e.target.value }))} /></label>
               <label className="flex flex-col text-sm">MwSt %<input className="border p-2 rounded-lg text-black bg-white" value={settings.vat_rate} onChange={(e) => setSettings((x: any) => ({ ...x, vat_rate: e.target.value }))} /></label>
+              <label className="flex flex-col text-sm">Kupfer €/kg (DEL, Standard)<input className="border p-2 rounded-lg text-black bg-white" value={settings.del_preis} onChange={(e) => setSettings((x: any) => ({ ...x, del_preis: e.target.value }))} /></label>
+              <label className="flex flex-col text-sm">Standard-Kupfer-Multi<input className="border p-2 rounded-lg text-black bg-white" value={settings.def_kupfer_multi} onChange={(e) => setSettings((x: any) => ({ ...x, def_kupfer_multi: e.target.value }))} /></label>
             </div>
           </div>
         )}
@@ -495,7 +518,9 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
         <label className="text-sm flex items-center gap-1">Material <input className="border p-1.5 rounded text-black bg-white w-20" value={o.def_mat_multi} onChange={(e) => set("def_mat_multi", e.target.value)} /></label>
         <label className="text-sm flex items-center gap-1">Lohn <input className="border p-1.5 rounded text-black bg-white w-20" value={o.def_lohn_multi} onChange={(e) => set("def_lohn_multi", e.target.value)} /></label>
         <button type="button" onClick={applyMultisToAll} className="bg-slate-700 text-white px-3 py-1.5 rounded-lg text-xs">Auf alle Positionen übernehmen</button>
-        <span className="text-xs text-gray-500">Neue Positionen übernehmen diese Werte automatisch.</span>
+        <span className="mx-1 text-slate-300">|</span>
+        <label className="text-sm flex items-center gap-1" title="Tages-Kupferpreis (DEL) in € pro kg — für den Kupferzuschlag bei Kabeln">🟠 Kupfer €/kg <input className="border p-1.5 rounded text-black bg-white w-24" value={o.del_preis} onChange={(e) => set("del_preis", e.target.value)} /></label>
+        <span className="text-xs text-gray-500">Neue Positionen übernehmen die Standard-Werte automatisch.</span>
       </div>
 
       {/* Kunde */}
@@ -582,7 +607,7 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
             <div className="max-h-72 overflow-y-auto space-y-1">
               {pickerRows.map((a: any) => {
                 const inCart = a.id in cart;
-                const it = calcItem(articleToItem(a, "1", o.def_mat_multi, o.def_lohn_multi));
+                const it = calcItem(articleToItem(a, "1", o.def_mat_multi, o.def_lohn_multi), num(o.del_preis));
                 const isSup = "ek" in a;
                 return (
                   <div key={a.id} className={`flex items-center gap-2 border rounded-lg p-2 text-sm ${inCart ? "border-indigo-300 bg-indigo-50" : "border-slate-200 bg-white"}`}>
@@ -618,14 +643,14 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
         )}
 
         {o.items.map((raw: any, idx: number) => {
-          const it = calcItem(raw);
+          const it = calcItem(raw, num(o.del_preis));
           const opened = !!openItem[it.id];
           if (it.kind === "titel") {
             return (
               <div key={it.id} className="border-l-4 border-slate-700 bg-slate-50 rounded-r-lg p-2 flex items-center gap-2">
                 <input className="border p-1.5 rounded text-black bg-white w-16 text-sm" placeholder="Pos" value={it.oz} onChange={(e) => setItem(it.id, "oz", e.target.value)} />
                 <input className="border p-1.5 rounded text-black bg-white flex-1 text-sm font-bold" placeholder="Titel / Überschrift" value={it.title} onChange={(e) => setItem(it.id, "title", e.target.value)} />
-                <span className="text-sm font-bold text-slate-700 whitespace-nowrap">{fmt(titleSum(o.items, idx))} €</span>
+                <span className="text-sm font-bold text-slate-700 whitespace-nowrap">{fmt(titleSum(o.items, idx, num(o.del_preis)))} €</span>
                 {itemButtons(it.id)}
               </div>
             );
@@ -674,6 +699,16 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
                     <label className="flex flex-col">Gerät-Vk<input className="border p-1.5 rounded text-black bg-white" value={it.geraet_vk} onChange={(e) => setItem(it.id, "geraet_vk", e.target.value)} /></label>
                     <label className="flex flex-col text-gray-500">E-Preis<input className="border p-1.5 rounded bg-gray-100 font-medium" value={fmt(it.ep)} readOnly /></label>
                     <label className="flex flex-col text-gray-500">G-Preis<input className="border p-1.5 rounded bg-gray-100 font-bold" value={fmt(it.gp)} readOnly /></label>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs border-t border-slate-100 pt-2">
+                    <label className="flex flex-col" title="Preis gilt je … Einheiten (z. B. 100 = Preis pro 100 m). Teilt Material- und Kupferpreis auf die Einheit herunter.">Preiseinheit<input className="border p-1.5 rounded text-black bg-white" value={it.preiseinheit ?? "1"} onChange={(e) => setItem(it.id, "preiseinheit", e.target.value)} /></label>
+                    <label className="flex flex-col" title="Verschnitt-Faktor auf das Material (1 = kein Verschnitt, 1.05 = 5 %)">Verschnitt<input className="border p-1.5 rounded text-black bg-white" value={it.verschnitt ?? "1"} onChange={(e) => setItem(it.id, "verschnitt", e.target.value)} /></label>
+                    <div className="col-span-2 flex items-end gap-1">
+                      <label className="flex flex-col flex-1" title="Kupfergewicht in kg je Preiseinheit (z. B. kg pro 100 m). × Kupfer €/kg × Kupfer-Multi = Kupferzuschlag.">🟠 Kupfer kg<input className="border p-1.5 rounded text-black bg-white w-full" value={it.kupfer_kg ?? ""} onChange={(e) => setItem(it.id, "kupfer_kg", e.target.value)} /></label>
+                      <button type="button" onClick={() => { const cu = cuKgPer100m((it.short_text || "") + " " + (it.long_text || "")); if (cu != null) { const pe = num(it.preiseinheit) || 1; setItem(it.id, "kupfer_kg", String(Math.round(cu * pe / 100 * 100) / 100)); } else setMsg("Kein Querschnitt (z. B. 5x16) in der Bezeichnung erkannt."); }} className="bg-slate-600 text-white px-2 py-1 rounded text-xs mb-[1px] whitespace-nowrap" title="Kupfergewicht aus dem Querschnitt in der Bezeichnung schätzen">Cu schätzen</button>
+                    </div>
+                    <label className="flex flex-col">Kupfer-Multi<input className="border p-1.5 rounded text-black bg-white" value={it.kupfer_multi ?? "1.05"} onChange={(e) => setItem(it.id, "kupfer_multi", e.target.value)} /></label>
+                    <label className="flex flex-col text-gray-500" title="Kupferzuschlag je Einheit (fließt in den E-Preis)">Kupfer-Vk<input className="border p-1.5 rounded bg-gray-100" value={fmt(it.kupfer_vk)} readOnly /></label>
                   </div>
                 </div>
               )}
