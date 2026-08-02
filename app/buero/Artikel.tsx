@@ -33,6 +33,13 @@ export default function Artikel({ supabase, companyId }: { supabase: any; compan
   const [catFilter, setCatFilter] = useState("");
   const [formOpen, setFormOpen] = useState(false);
 
+  // DATANORM-Übernahme in die Artikel-Maske
+  const [dnOpen, setDnOpen] = useState(false);
+  const [dnSup, setDnSup] = useState<string>("");
+  const [dnSearch, setDnSearch] = useState("");
+  const [dnResults, setDnResults] = useState<any[]>([]);
+  const [dnLoading, setDnLoading] = useState(false);
+
   // Lieferanten-Kataloge (DATANORM)
   const [suppliers, setSuppliers] = useState<any[]>([]);
   const [supName, setSupName] = useState("");
@@ -41,6 +48,38 @@ export default function Artikel({ supabase, companyId }: { supabase: any; compan
   const [busy, setBusy] = useState(false);
 
   useEffect(() => { if (companyId) { loadArticles(); loadSuppliers(); } /* eslint-disable-next-line */ }, [companyId]);
+
+  // Serverseitige Suche im Lieferanten-Katalog für die Übernahme in die Artikel-Maske (entprellt).
+  useEffect(() => {
+    if (!dnOpen) { setDnResults([]); return; }
+    let active = true;
+    setDnLoading(true);
+    const safe = dnSearch.trim().replace(/[,()%*]/g, " ").trim();
+    const h = setTimeout(async () => {
+      let query = supabase.from("office_supplier_articles").select("*").eq("company_id", companyId);
+      if (dnSup) query = query.eq("supplier_id", dnSup);
+      if (safe) query = query.or(`short_text.ilike.*${safe}*,article_no.ilike.*${safe}*`);
+      const { data } = await query.order("short_text", { ascending: true }).limit(30);
+      if (active) { setDnResults(data || []); setDnLoading(false); }
+    }, 300);
+    return () => { active = false; clearTimeout(h); };
+    // eslint-disable-next-line
+  }, [dnOpen, dnSup, dnSearch, companyId]);
+
+  const supName2 = (id: string) => suppliers.find((s: any) => s.id === id)?.name || "";
+  function openDnPicker() { setDnSup(""); setDnSearch(f.number || ""); setDnOpen(true); }
+  function fillFromCatalog(a: any) {
+    setF((p: any) => ({
+      ...p,
+      number: a.article_no || p.number,
+      short_text: a.short_text || (a.article_no ? "Art. " + a.article_no : p.short_text),
+      long_text: a.long_text || p.long_text,
+      unit: a.unit || p.unit,
+      mat_ek: a.ek != null ? String(a.ek) : (a.net_ek != null ? String(a.net_ek) : p.mat_ek),
+    }));
+    setDnOpen(false);
+    setMsg(`Aus Katalog übernommen: ${a.short_text || a.article_no || ""}. EK/Bezeichnung geprüft, dann speichern.`);
+  }
 
   // ── Eigener Artikelstamm ─────────────────────────────────────────
   async function loadArticles() {
@@ -200,7 +239,40 @@ export default function Artikel({ supabase, companyId }: { supabase: any; compan
 
           {formOpen && (
             <div className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-gray-50 space-y-3">
-              <h3 className="font-bold">{f.id ? "Artikel bearbeiten" : "Neuen Artikel anlegen"}</h3>
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <h3 className="font-bold">{f.id ? "Artikel bearbeiten" : "Neuen Artikel anlegen"}</h3>
+                <button type="button" onClick={openDnPicker} className="bg-emerald-700 text-white px-3 py-2 rounded-lg text-sm">🏭 aus Lieferanten-Katalog übernehmen</button>
+              </div>
+
+              {dnOpen && (
+                <div className="border border-emerald-200 bg-emerald-50/50 rounded-xl p-3 space-y-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-sm font-medium">🏭 Katalog</span>
+                    <select className="border p-2 rounded-lg text-black bg-white text-sm" value={dnSup} onChange={(e) => setDnSup(e.target.value)}>
+                      <option value="">Alle Lieferanten</option>
+                      {suppliers.map((s: any) => <option key={s.id} value={s.id}>{s.name}</option>)}
+                    </select>
+                    <input className="border p-2 rounded-lg text-black bg-white flex-1 min-w-[12rem] text-sm" placeholder="Suche: Artikelnummer oder Bezeichnung…" value={dnSearch} onChange={(e) => setDnSearch(e.target.value)} />
+                    {dnLoading && <span className="text-xs text-gray-500">sucht…</span>}
+                    <button type="button" onClick={() => setDnOpen(false)} className="bg-gray-200 px-3 py-2 rounded-lg text-xs">Schließen</button>
+                  </div>
+                  <div className="max-h-64 overflow-y-auto space-y-1">
+                    {dnResults.map((a: any) => (
+                      <button key={a.id} type="button" onClick={() => fillFromCatalog(a)} className="w-full text-left border border-slate-200 rounded-lg p-2 text-sm bg-white hover:bg-emerald-50">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-xs bg-slate-100 text-slate-700 rounded px-1.5 py-0.5">{supName2(a.supplier_id)}</span>
+                          {a.article_no ? <span className="text-xs text-gray-500">Nr. {a.article_no}</span> : null}
+                          <strong>{a.short_text || (a.article_no ? "Art. " + a.article_no : "(ohne Bezeichnung)")}</strong>
+                        </div>
+                        <div className="text-xs text-gray-500">EK {a.ek != null ? fmt(num(a.ek)) + " €" : "—"}{a.unit ? " / " + a.unit : ""}</div>
+                      </button>
+                    ))}
+                    {dnResults.length === 0 && <p className="text-xs text-gray-500">{dnLoading ? "Suche läuft…" : dnSearch.trim() ? "Kein Treffer – nach Artikelnummer suchen (Rexel hat keine Bezeichnungen)." : "Suchbegriff eingeben."}</p>}
+                  </div>
+                  <p className="text-xs text-gray-500">Übernimmt Nummer, Bezeichnung, Einheit und Netto-EK in die Maske. Deine Multiplikatoren/Lohn bleiben; danach speichern.</p>
+                </div>
+              )}
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <label className="flex flex-col text-sm">Artikelnummer
                   <input className="border p-2 rounded-lg text-black bg-white" placeholder="z. B. Lieferanten- oder interne Nr." value={f.number} onChange={(e) => setField("number", e.target.value)} />
