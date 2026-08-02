@@ -213,6 +213,6 @@ export function parseDatanormFiles(files: InFile[]): DnResult {
     if (a.ean) stats.withEan++;
   }
 
-  if (!articles.length) warnings.push("Keine Artikel gefunden.");
+  if (!articles.length && !discounts.length) warnings.push("Keine Artikel und keine Rabattgruppen gefunden.");
   return { version, currency, supplierHint, catalogDate, articles, discounts, stats, warnings };
 }

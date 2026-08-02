@@ -122,28 +122,46 @@ export default function Artikel({ supabase, companyId }: { supabase: any; compan
     setBusy(false);
   }
   async function runImport(s: any, res: DnResult) {
+    const hasArt = res.articles.length > 0;
+    const hasDisc = res.discounts.length > 0;
+    if (!hasArt && !hasDisc) { setImpMsg("Nichts zu importieren."); return; }
     setBusy(true); setImpMsg("Bereite Import vor…");
-    await supabase.from("office_supplier_articles").delete().eq("supplier_id", s.id);
-    await supabase.from("office_supplier_discounts").delete().eq("supplier_id", s.id);
-    if (res.discounts.length) {
+
+    // Rabattgruppen: nur ersetzen, wenn welche in der Datei sind.
+    if (hasDisc) {
+      await supabase.from("office_supplier_discounts").delete().eq("supplier_id", s.id);
       const drows = res.discounts.map((d) => ({ company_id: companyId, supplier_id: s.id, discount_group: d.discount_group, discount_pct: d.discount_pct, description: d.description || null }));
       for (let i = 0; i < drows.length; i += 1000) {
         const { error } = await supabase.from("office_supplier_discounts").insert(drows.slice(i, i + 1000));
         if (error) { setImpMsg("Fehler bei Rabattgruppen: " + error.message); setBusy(false); return; }
+        setImpMsg(`Importiere Rabattgruppen… ${int(Math.min(i + 1000, drows.length))} / ${int(drows.length)}`);
       }
     }
-    const rows = res.articles.map((a) => ({
-      company_id: companyId, supplier_id: s.id, article_no: a.article_no, short_text: a.short_text || null, long_text: a.long_text || null,
-      unit: a.unit || null, ean: a.ean || null, discount_group: a.discount_group || null, list_ek: a.list_ek, net_ek: a.net_ek, ek: a.ek,
-    }));
-    const B = 1000;
-    for (let i = 0; i < rows.length; i += B) {
-      const { error } = await supabase.from("office_supplier_articles").insert(rows.slice(i, i + B));
-      if (error) { setImpMsg("Fehler beim Import: " + error.message); setBusy(false); await loadSuppliers(); return; }
-      setImpMsg(`Importiere… ${int(Math.min(i + B, rows.length))} / ${int(rows.length)} Artikel`);
+
+    // Artikel: nur ersetzen, wenn die Datei Artikel enthält (sonst bleiben bestehende erhalten).
+    if (hasArt) {
+      await supabase.from("office_supplier_articles").delete().eq("supplier_id", s.id);
+      const rows = res.articles.map((a) => ({
+        company_id: companyId, supplier_id: s.id, article_no: a.article_no, short_text: a.short_text || null, long_text: a.long_text || null,
+        unit: a.unit || null, ean: a.ean || null, discount_group: a.discount_group || null, list_ek: a.list_ek, net_ek: a.net_ek, ek: a.ek,
+      }));
+      const B = 1000;
+      for (let i = 0; i < rows.length; i += B) {
+        const { error } = await supabase.from("office_supplier_articles").insert(rows.slice(i, i + B));
+        if (error) { setImpMsg("Fehler beim Import: " + error.message); setBusy(false); await loadSuppliers(); return; }
+        setImpMsg(`Importiere… ${int(Math.min(i + B, rows.length))} / ${int(rows.length)} Artikel`);
+      }
+      await supabase.from("office_suppliers").update({ datanorm_version: res.version, currency: res.currency, catalog_date: res.catalogDate || null, article_count: rows.length, updated_at: new Date().toISOString() }).eq("id", s.id);
+    } else {
+      // Nur Rabatte importiert – Artikelzahl unverändert lassen, Zeitstempel aktualisieren.
+      await supabase.from("office_suppliers").update({ updated_at: new Date().toISOString() }).eq("id", s.id);
     }
-    await supabase.from("office_suppliers").update({ datanorm_version: res.version, currency: res.currency, catalog_date: res.catalogDate || null, article_count: rows.length, updated_at: new Date().toISOString() }).eq("id", s.id);
-    setBusy(false); setPreview(null); setImpMsg(`Fertig: ${int(rows.length)} Artikel importiert${res.discounts.length ? `, ${int(res.discounts.length)} Rabattgruppen` : ""}.`);
+
+    setBusy(false); setPreview(null);
+    const parts: string[] = [];
+    if (hasArt) parts.push(`${int(res.articles.length)} Artikel`);
+    if (hasDisc) parts.push(`${int(res.discounts.length)} Rabattgruppen`);
+    setImpMsg(`Fertig: ${parts.join(" und ")} importiert.`);
     await loadSuppliers();
   }
 
@@ -306,11 +324,14 @@ export default function Artikel({ supabase, companyId }: { supabase: any; compan
                       </div>
                     ))}
                   </div>
+                  {preview.res.articles.length === 0 && preview.res.discounts.length > 0 && (
+                    <p className="text-xs text-slate-600">Nur Rabattgruppen in dieser Datei — beim Import bleiben die bereits importierten Artikel dieses Lieferanten erhalten.</p>
+                  )}
                   <div className="flex gap-2">
-                    <button type="button" onClick={() => runImport(s, preview.res)} disabled={busy || !preview.res.articles.length} className="bg-cyan-700 disabled:bg-gray-300 text-white px-4 py-2 rounded-lg text-sm">{busy ? "Import läuft…" : `Importieren (${int(preview.res.articles.length)})`}</button>
+                    <button type="button" onClick={() => runImport(s, preview.res)} disabled={busy || (!preview.res.articles.length && !preview.res.discounts.length)} className="bg-cyan-700 disabled:bg-gray-300 text-white px-4 py-2 rounded-lg text-sm">{busy ? "Import läuft…" : preview.res.articles.length ? `Importieren (${int(preview.res.articles.length)} Artikel)` : `Rabattgruppen importieren (${int(preview.res.discounts.length)})`}</button>
                     <button type="button" onClick={() => setPreview(null)} disabled={busy} className="bg-gray-200 px-4 py-2 rounded-lg text-sm">Abbrechen</button>
                   </div>
-                  <p className="text-xs text-gray-500">Beim Import wird der bestehende Katalog dieses Lieferanten ersetzt. Große Kataloge (100.000+ Artikel) können einige Minuten dauern — Fenster offen lassen.</p>
+                  <p className="text-xs text-gray-500">Beim Import wird der jeweilige Datenbestand (Artikel bzw. Rabattgruppen) dieses Lieferanten ersetzt. Große Kataloge (100.000+ Artikel) können einige Minuten dauern — Fenster offen lassen.</p>
                 </div>
               )}
             </div>
