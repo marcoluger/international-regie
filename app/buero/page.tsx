@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import Angebote from "./Angebote";
+import Artikel from "./Artikel";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || "",
@@ -13,6 +14,7 @@ const BUERO_TABS = [
   { key: "auftraege", label: "🛠 Auftrag/Störung" },
   { key: "mitarbeiter", label: "👤 Mitarbeiter" },
   { key: "kunden", label: "👥 Kunden" },
+  { key: "artikel", label: "📦 Artikel" },
   { key: "angebote", label: "🧾 Angebote" },
   { key: "ab", label: "📋 Auftragsbestätigung" },
   { key: "rechnung", label: "💶 Rechnung" },
@@ -528,6 +530,8 @@ export default function BueroPage() {
                 </section>
               );
             })()}
+
+            {tab === "artikel" && <Artikel supabase={supabase} companyId={companyId} />}
 
             {tab === "angebote" && <Angebote supabase={supabase} companyId={companyId} customers={customers} />}
 
