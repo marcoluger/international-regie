@@ -133,7 +133,8 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
     const safe = artSearch.trim().replace(/[,()%*]/g, " ").trim();
     const h = setTimeout(async () => {
       let query = supabase.from("office_supplier_articles").select("*").eq("company_id", companyId).eq("supplier_id", artSource);
-      if (safe) query = query.or(`short_text.ilike.%${safe}%,article_no.ilike.%${safe}%`);
+      // PostgREST-Platzhalter in .or() ist "*" (nicht "%") – "%" würde in der URL als Prozent-Kodierung fehlinterpretiert.
+      if (safe) query = query.or(`short_text.ilike.*${safe}*,article_no.ilike.*${safe}*`);
       const { data } = await query.order("short_text", { ascending: true }).limit(50);
       if (active) { setSupResults(data || []); setSupLoading(false); }
     }, 300);
