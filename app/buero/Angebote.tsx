@@ -39,16 +39,20 @@ function calcItem(it: any) {
 }
 
 // Artikel → Angebotsposition (Kalkulationswerte übernehmen, Multis ggf. aus Angebot)
+// Funktioniert für eigene Artikel (office_articles) UND Lieferanten-Katalogzeilen (office_supplier_articles, Feld „ek").
 function articleToItem(a: any, qty: string, defMat: string, defLohn: string) {
   const s = (v: any) => (v === null || v === undefined ? "" : String(v));
+  const isSup = "ek" in a; // Lieferanten-Katalogzeile: Netto-EK steht in a.ek
+  const matEk = isSup ? (a.ek ?? a.net_ek ?? a.list_ek) : a.mat_ek;
   const mm = (a.mat_multi === null || a.mat_multi === undefined || a.mat_multi === "") ? (defMat || "1.28") : String(a.mat_multi);
   const lm = (a.lohn_multi === null || a.lohn_multi === undefined || a.lohn_multi === "") ? (defLohn || "1.28") : String(a.lohn_multi);
+  const text = a.short_text || (isSup && a.article_no ? "Art. " + a.article_no : "");
   return {
     id: uid(), kind: "position", oz: "", article_id: a.id || null,
-    short_text: a.short_text || "", long_text: a.long_text || "",
+    short_text: text, long_text: a.long_text || "",
     qty: qty && String(qty).trim() ? String(qty) : "1", unit: a.unit || "St",
-    mat_ek: s(a.mat_ek), mat_multi: mm, lohn_ek: s(a.lohn_ek), lohn_multi: lm,
-    minutes: s(a.minutes), fremd_vk: "", geraet_vk: "", discount_pct: "",
+    mat_ek: s(matEk), mat_multi: mm, lohn_ek: isSup ? "" : s(a.lohn_ek), lohn_multi: lm,
+    minutes: isSup ? "" : s(a.minutes), fremd_vk: "", geraet_vk: "", discount_pct: "",
   };
 }
 
@@ -110,12 +114,32 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
   const [tmBody, setTmBody] = useState("");
   const [tmEditId, setTmEditId] = useState<string | null>(null);
   const [articles, setArticles] = useState<any[]>([]);
+  const [suppliers, setSuppliers] = useState<any[]>([]);
   const [artPickerOpen, setArtPickerOpen] = useState(false);
+  const [artSource, setArtSource] = useState<string>("own"); // "own" oder supplier_id
   const [artSearch, setArtSearch] = useState("");
   const [artCat, setArtCat] = useState("");
-  const [cart, setCart] = useState<Record<string, string>>({});
+  const [supResults, setSupResults] = useState<any[]>([]);
+  const [supLoading, setSupLoading] = useState(false);
+  const [cart, setCart] = useState<Record<string, { qty: string; art: any }>>({});
 
-  useEffect(() => { if (companyId) { loadOffers(); loadSettings(); loadTextModules(); loadArticles(); } /* eslint-disable-next-line */ }, [companyId]);
+  useEffect(() => { if (companyId) { loadOffers(); loadSettings(); loadTextModules(); loadArticles(); loadSuppliers(); } /* eslint-disable-next-line */ }, [companyId]);
+
+  // Serverseitige Suche im Lieferanten-Katalog (große Kataloge nicht komplett laden), entprellt.
+  useEffect(() => {
+    if (!artPickerOpen || artSource === "own") { setSupResults([]); return; }
+    let active = true;
+    setSupLoading(true);
+    const safe = artSearch.trim().replace(/[,()%*]/g, " ").trim();
+    const h = setTimeout(async () => {
+      let query = supabase.from("office_supplier_articles").select("*").eq("company_id", companyId).eq("supplier_id", artSource);
+      if (safe) query = query.or(`short_text.ilike.%${safe}%,article_no.ilike.%${safe}%`);
+      const { data } = await query.order("short_text", { ascending: true }).limit(50);
+      if (active) { setSupResults(data || []); setSupLoading(false); }
+    }, 300);
+    return () => { active = false; clearTimeout(h); };
+    // eslint-disable-next-line
+  }, [artPickerOpen, artSource, artSearch, companyId]);
 
   async function loadOffers() {
     const { data, error } = await supabase.from("office_offers").select("*").eq("company_id", companyId).order("created_at", { ascending: false });
@@ -153,19 +177,23 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
     const { data } = await supabase.from("office_articles").select("*").eq("company_id", companyId).order("short_text", { ascending: true });
     setArticles(data || []);
   }
-  function openArtPicker() { setArtPickerOpen((v) => { const nv = !v; if (nv) loadArticles(); return nv; }); }
+  async function loadSuppliers() {
+    const { data } = await supabase.from("office_suppliers").select("id,name,article_count").eq("company_id", companyId).order("name", { ascending: true });
+    setSuppliers(data || []);
+  }
+  function openArtPicker() { setArtPickerOpen((v) => { const nv = !v; if (nv) { loadArticles(); loadSuppliers(); setArtSource("own"); setArtSearch(""); setArtCat(""); } return nv; }); }
   function addArticleSingle(a: any) {
     setO((p: any) => ({ ...p, items: [...p.items, articleToItem(a, "1", p.def_mat_multi, p.def_lohn_multi)] }));
-    setMsg(`Artikel „${a.short_text || ""}“ als Position hinzugefügt.`);
+    setMsg(`Artikel „${a.short_text || a.article_no || ""}“ als Position hinzugefügt.`);
   }
-  function toggleCart(id: string) { setCart((c) => { const n = { ...c }; if (id in n) delete n[id]; else n[id] = "1"; return n; }); }
-  function setCartQty(id: string, val: string) { setCart((c) => ({ ...c, [id]: val })); }
+  function toggleCart(a: any) { setCart((c) => { const n = { ...c }; if (a.id in n) delete n[a.id]; else n[a.id] = { qty: "1", art: a }; return n; }); }
+  function setCartQty(id: string, val: string) { setCart((c) => (c[id] ? { ...c, [id]: { ...c[id], qty: val } } : c)); }
   function addCartToOffer() {
-    const chosen = articles.filter((a: any) => a.id in cart);
-    if (!chosen.length) { setMsg("Keine Artikel im Warenkorb ausgewählt."); return; }
-    setO((p: any) => ({ ...p, items: [...p.items, ...chosen.map((a: any) => articleToItem(a, cart[a.id] || "1", p.def_mat_multi, p.def_lohn_multi))] }));
+    const entries = Object.values(cart);
+    if (!entries.length) { setMsg("Keine Artikel im Warenkorb ausgewählt."); return; }
+    setO((p: any) => ({ ...p, items: [...p.items, ...entries.map((e) => articleToItem(e.art, e.qty || "1", p.def_mat_multi, p.def_lohn_multi))] }));
     setCart({}); setArtPickerOpen(false);
-    setMsg(`${chosen.length} Artikel aus dem Warenkorb übernommen.`);
+    setMsg(`${entries.length} Artikel aus dem Warenkorb übernommen.`);
   }
 
   function startNew() {
@@ -436,6 +464,7 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
     .filter((a: any) => (aq ? [a.number, a.short_text, a.long_text, a.category].some((x: any) => String(x || "").toLowerCase().includes(aq)) : true))
     .slice(0, 100);
   const cartCount = Object.keys(cart).length;
+  const pickerRows: any[] = artSource === "own" ? artMatches : supResults;
 
   return (
     <section className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4">
@@ -522,37 +551,55 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
 
         {artPickerOpen && (
           <div className="border border-indigo-200 bg-indigo-50/40 rounded-xl p-3 space-y-2">
+            {/* Quelle: eigener Artikelstamm oder Lieferanten-Katalog */}
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-sm font-medium mr-1">Quelle:</span>
+              <button type="button" onClick={() => setArtSource("own")} className={`px-2.5 py-1 rounded-full text-xs font-medium ${artSource === "own" ? "bg-cyan-700 text-white" : "bg-white border border-slate-300 text-slate-600"}`}>📦 Eigene Artikel</button>
+              {suppliers.map((s: any) => (
+                <button key={s.id} type="button" onClick={() => setArtSource(s.id)} className={`px-2.5 py-1 rounded-full text-xs font-medium ${artSource === s.id ? "bg-cyan-700 text-white" : "bg-white border border-slate-300 text-slate-600"}`}>🏭 {s.name}</button>
+              ))}
+              <button type="button" onClick={() => { setArtPickerOpen(false); setCart({}); }} className="bg-gray-200 px-3 py-1.5 rounded-lg text-xs ml-auto">Schließen</button>
+            </div>
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-sm font-medium">📦 Artikelstamm</span>
-              <input className="border p-2 rounded-lg text-black bg-white flex-1 min-w-[12rem] text-sm" placeholder="Suche: Nr., Kurztext, Kategorie…" value={artSearch} onChange={(e) => setArtSearch(e.target.value)} />
-              {artCategories.length > 0 && (
+              <input className="border p-2 rounded-lg text-black bg-white flex-1 min-w-[12rem] text-sm" placeholder={artSource === "own" ? "Suche: Nr., Kurztext, Kategorie…" : "Suche im Katalog: Artikelnummer oder Bezeichnung…"} value={artSearch} onChange={(e) => setArtSearch(e.target.value)} />
+              {artSource === "own" && artCategories.length > 0 && (
                 <select className="border p-2 rounded-lg text-black bg-white text-sm" value={artCat} onChange={(e) => setArtCat(e.target.value)}>
                   <option value="">Alle Kategorien</option>
                   {artCategories.map((c) => <option key={c} value={c}>{c}</option>)}
                 </select>
               )}
-              <button type="button" onClick={() => { setArtPickerOpen(false); setCart({}); }} className="bg-gray-200 px-3 py-2 rounded-lg text-xs">Schließen</button>
+              {artSource !== "own" && supLoading && <span className="text-xs text-gray-500">sucht…</span>}
             </div>
             <div className="max-h-72 overflow-y-auto space-y-1">
-              {artMatches.map((a: any) => {
+              {pickerRows.map((a: any) => {
                 const inCart = a.id in cart;
+                const it = calcItem(articleToItem(a, "1", o.def_mat_multi, o.def_lohn_multi));
+                const isSup = "ek" in a;
                 return (
                   <div key={a.id} className={`flex items-center gap-2 border rounded-lg p-2 text-sm ${inCart ? "border-indigo-300 bg-indigo-50" : "border-slate-200 bg-white"}`}>
-                    <input type="checkbox" checked={inCart} onChange={() => toggleCart(a.id)} title="in Warenkorb" />
+                    <input type="checkbox" checked={inCart} onChange={() => toggleCart(a)} title="in Warenkorb" />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
                         {a.category ? <span className="text-xs bg-slate-100 text-slate-700 rounded px-1.5 py-0.5">{a.category}</span> : null}
-                        {a.number ? <span className="text-xs text-gray-500">Nr. {a.number}</span> : null}
-                        <strong>{a.short_text || "(ohne Kurztext)"}</strong>
+                        {(a.number || a.article_no) ? <span className="text-xs text-gray-500">Nr. {a.number || a.article_no}</span> : null}
+                        <strong>{a.short_text || (isSup && a.article_no ? "Art. " + a.article_no : "(ohne Kurztext)")}</strong>
                       </div>
-                      <div className="text-xs text-gray-500">EP ca. {fmt(calcItem(articleToItem(a, "1", o.def_mat_multi, o.def_lohn_multi)).ep)} € · {a.unit || "St"}</div>
+                      <div className="text-xs text-gray-500">
+                        {isSup ? <>EK {a.ek != null ? fmt(num(a.ek)) + " €" : "—"} → </> : null}EP ca. {fmt(it.ep)} € · {a.unit || "St"}
+                      </div>
                     </div>
-                    {inCart && <input value={cart[a.id]} onChange={(e) => setCartQty(a.id, e.target.value)} className="border p-1 rounded w-16 text-right text-black bg-white text-sm" title="Menge" />}
+                    {inCart && <input value={cart[a.id].qty} onChange={(e) => setCartQty(a.id, e.target.value)} className="border p-1 rounded w-16 text-right text-black bg-white text-sm" title="Menge" />}
                     <button type="button" onClick={() => addArticleSingle(a)} className="bg-cyan-700 text-white px-2 py-1 rounded text-xs whitespace-nowrap">＋ einzeln</button>
                   </div>
                 );
               })}
-              {artMatches.length === 0 && <p className="text-xs text-gray-500">Kein Artikel gefunden. Artikel im Reiter „📦 Artikel“ anlegen.</p>}
+              {pickerRows.length === 0 && (
+                <p className="text-xs text-gray-500">
+                  {artSource === "own"
+                    ? "Kein Artikel gefunden. Artikel im Reiter „📦 Artikel“ anlegen."
+                    : supLoading ? "Suche läuft…" : artSearch.trim() ? "Kein Treffer – bei Katalogen ohne Bezeichnung nach Artikelnummer suchen." : "Suchbegriff eingeben (Artikelnummer oder Bezeichnung)."}
+                </p>
+              )}
             </div>
             <div className="flex items-center justify-between gap-2">
               <span className="text-xs text-gray-500">{cartCount} im Warenkorb</span>
