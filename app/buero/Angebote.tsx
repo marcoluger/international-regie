@@ -121,6 +121,7 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
   const [artCat, setArtCat] = useState("");
   const [supResults, setSupResults] = useState<any[]>([]);
   const [supLoading, setSupLoading] = useState(false);
+  const [supErr, setSupErr] = useState("");
   const [cart, setCart] = useState<Record<string, { qty: string; art: any }>>({});
 
   useEffect(() => { if (companyId) { loadOffers(); loadSettings(); loadTextModules(); loadArticles(); loadSuppliers(); } /* eslint-disable-next-line */ }, [companyId]);
@@ -135,8 +136,8 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
       let query = supabase.from("office_supplier_articles").select("*").eq("company_id", companyId).eq("supplier_id", artSource);
       // PostgREST-Platzhalter in .or() ist "*" (nicht "%") – "%" würde in der URL als Prozent-Kodierung fehlinterpretiert.
       if (safe) query = query.or(`short_text.ilike.*${safe}*,article_no.ilike.*${safe}*`);
-      const { data } = await query.order("short_text", { ascending: true }).limit(50);
-      if (active) { setSupResults(data || []); setSupLoading(false); }
+      const { data, error } = await query.order("short_text", { ascending: true }).limit(50);
+      if (active) { setSupResults(data || []); setSupErr(error ? error.message : ""); setSupLoading(false); }
     }, 300);
     return () => { active = false; clearTimeout(h); };
     // eslint-disable-next-line
@@ -571,6 +572,13 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
               )}
               {artSource !== "own" && supLoading && <span className="text-xs text-gray-500">sucht…</span>}
             </div>
+            {artSource !== "own" && (() => {
+              const sup = suppliers.find((x: any) => x.id === artSource);
+              const cnt = Math.round(num(sup?.article_count));
+              if (supErr) return <div className="text-xs text-red-600">Fehler bei der Suche: {supErr}</div>;
+              if (cnt === 0) return <div className="text-xs text-amber-700">Für „{sup?.name}“ sind noch keine Katalog-Artikel importiert (evtl. nur Preise/Rabatte). Bitte die Artikel-/Preisdatei (z. B. Datpreis.001) unter „📦 Artikel → 🏭 Lieferanten-Kataloge“ importieren.</div>;
+              return <div className="text-xs text-gray-500">Katalog: {cnt.toLocaleString("de-DE")} Artikel</div>;
+            })()}
             <div className="max-h-72 overflow-y-auto space-y-1">
               {pickerRows.map((a: any) => {
                 const inCart = a.id in cart;
