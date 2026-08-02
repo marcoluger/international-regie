@@ -6,6 +6,7 @@
 export type GaebItem = {
   kind: "titel" | "position";
   oz: string;
+  rno?: string; // roher RNoPart (für exakten X84-Roundtrip)
   title?: string;
   qty?: string;
   unit?: string;
@@ -117,6 +118,7 @@ function parseItem(itemEl: Element, titelOz: string): GaebItem {
   return {
     kind: "position",
     oz: titelOz ? `${titelOz}.${rno}` : rno,
+    rno,
     qty,
     unit,
     short_text: shortText,
@@ -147,7 +149,7 @@ export function parseGaebX83(xmlText: string): GaebParseResult {
         const oz = prefix ? `${prefix}.${rno}` : rno;
         const lblEl = childrenByLocal(node, "LblTx")[0];
         const title = inlineText(lblEl || null);
-        items.push({ kind: "titel", oz, title });
+        items.push({ kind: "titel", oz, rno, title });
         titelCount++;
         const innerBodies = childrenByLocal(node, "BoQBody");
         for (const ib of innerBodies) walkBody(ib, oz);
