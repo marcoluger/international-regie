@@ -8973,7 +8973,7 @@ export default function Home() {
                     </div>
                   </div>
                 )}
-                {companyFeatures?.module_auto_reports && !readOnlyUser && (
+                {companyFeatures?.module_auto_reports && (
                   <div className="border-t pt-3 mt-2 space-y-3">
                     <p className="text-sm font-semibold text-gray-700">⏱️ {tx.myTimes}</p>
                     {instrDatesFor(instruction).map((date) => {
