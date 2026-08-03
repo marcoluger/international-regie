@@ -9,28 +9,16 @@ const fmt = (n: number) => (Math.round(n * 100) / 100).toLocaleString("de-DE", {
 const int = (n: number) => Math.round(n).toLocaleString("de-DE");
 const UNITS = ["St", "Stk", "Psch", "m", "lfm", "m²", "m³", "h", "Std", "Tag", "Wo", "Mon", "kg", "t", "g", "l", "Ltr", "Satz", "Paar", "Rolle", "Pkg", "Bund", "Pkt", "kW", "kWp", "A", "V", "%"];
 
-// Kupfergewicht aus dem Querschnitt in der Bezeichnung schaetzen ("5x16", "3G2,5").
-// kg/100 m ~ Summe(Adern x mm2) x 0,89 (Cu-Dichte 8,9 g/cm3). Identisch zu Angebote.tsx.
-function cuKgPer100m(text: string): number | null {
-  const m = String(text || "").match(/(\d+)\s*[xXgG]\s*(\d+(?:[.,]\d+)?)/);
-  if (!m) return null;
-  const adern = Number(m[1]);
-  const qmm = Number(String(m[2]).replace(",", "."));
-  if (!adern || !qmm) return null;
-  return Math.round(adern * qmm * 0.89 * 100) / 100;
-}
-
 function articleEp(a: any) {
   // Leere/0-Multiplikatoren fallen auf den App-Standard 1,28 zurück (wie im Angebot).
-  const pe = num(a.preiseinheit) || 1;
-  const matVk = num(a.mat_ek) * (num(a.mat_multi) || 1.28) / pe;
+  const matVk = num(a.mat_ek) * (num(a.mat_multi) || 1.28);
   const lohnSatzVk = num(a.lohn_ek) * (num(a.lohn_multi) || 1.28);
   const lohnVk = lohnSatzVk * (num(a.minutes) / 60);
   return matVk + lohnVk;
 }
 
 function blankForm() {
-  return { id: null as string | null, number: "", category: "", short_text: "", long_text: "", unit: "St", mat_ek: "", mat_multi: "1.28", lohn_ek: "", lohn_multi: "1.28", minutes: "", preiseinheit: "1", kupfer_kg: "", kupfer_multi: "" };
+  return { id: null as string | null, number: "", category: "", short_text: "", long_text: "", unit: "St", mat_ek: "", mat_multi: "1.28", lohn_ek: "", lohn_multi: "1.28", minutes: "" };
 }
 
 // ── Komponente ─────────────────────────────────────────────────────
@@ -102,7 +90,7 @@ export default function Artikel({ supabase, companyId }: { supabase: any; compan
   function setField(field: string, val: any) { setF((p: any) => ({ ...p, [field]: val })); }
   function startNew() { setF(blankForm()); setFormOpen(true); setMsg(""); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }
   function startEdit(a: any) {
-    setF({ id: a.id, number: a.number ?? "", category: a.category ?? "", short_text: a.short_text ?? "", long_text: a.long_text ?? "", unit: a.unit || "St", mat_ek: a.mat_ek ?? "", mat_multi: a.mat_multi ?? "1.28", lohn_ek: a.lohn_ek ?? "", lohn_multi: a.lohn_multi ?? "1.28", minutes: a.minutes ?? "", preiseinheit: a.preiseinheit ?? "1", kupfer_kg: a.kupfer_kg ?? "", kupfer_multi: a.kupfer_multi ?? "" });
+    setF({ id: a.id, number: a.number ?? "", category: a.category ?? "", short_text: a.short_text ?? "", long_text: a.long_text ?? "", unit: a.unit || "St", mat_ek: a.mat_ek ?? "", mat_multi: a.mat_multi ?? "1.28", lohn_ek: a.lohn_ek ?? "", lohn_multi: a.lohn_multi ?? "1.28", minutes: a.minutes ?? "" });
     setFormOpen(true); setMsg("");
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -113,11 +101,7 @@ export default function Artikel({ supabase, companyId }: { supabase: any; compan
       number: f.number.trim() || null, category: f.category.trim() || null, short_text: f.short_text.trim(), long_text: f.long_text.trim() || null, unit: f.unit || "St",
       mat_ek: f.mat_ek === "" ? null : num(f.mat_ek), mat_multi: f.mat_multi === "" ? null : num(f.mat_multi),
       lohn_ek: f.lohn_ek === "" ? null : num(f.lohn_ek), lohn_multi: f.lohn_multi === "" ? null : num(f.lohn_multi),
-      minutes: f.minutes === "" ? null : num(f.minutes),
-      preiseinheit: f.preiseinheit === "" ? null : num(f.preiseinheit),
-      kupfer_kg: f.kupfer_kg === "" ? null : num(f.kupfer_kg),
-      kupfer_multi: f.kupfer_multi === "" ? null : num(f.kupfer_multi),
-      updated_at: new Date().toISOString(),
+      minutes: f.minutes === "" ? null : num(f.minutes), updated_at: new Date().toISOString(),
     };
     if (f.id) {
       const { error } = await supabase.from("office_articles").update(payload).eq("id", f.id);
@@ -324,21 +308,8 @@ export default function Artikel({ supabase, companyId }: { supabase: any; compan
                 <label className="flex flex-col text-sm">Minuten / Einheit
                   <input className="border p-2 rounded-lg text-black bg-white" value={f.minutes} onChange={(e) => setField("minutes", e.target.value)} />
                 </label>
-                <label className="flex flex-col text-sm" title="Preis gilt je … Einheiten (z. B. 100 = Preis pro 100 m). Leer = 1.">Preiseinheit
-                  <input className="border p-2 rounded-lg text-black bg-white" value={f.preiseinheit} onChange={(e) => setField("preiseinheit", e.target.value)} />
-                </label>
-                <div className="flex flex-col text-sm">🟠 Kupfer kg / Preiseinheit
-                  <div className="flex gap-1 items-stretch">
-                    <input className="border p-2 rounded-lg text-black bg-white w-full" value={f.kupfer_kg} onChange={(e) => setField("kupfer_kg", e.target.value)} />
-                    <button type="button" onClick={() => { const cu = cuKgPer100m((f.short_text || "") + " " + (f.long_text || "")); if (cu != null) { const pe = num(f.preiseinheit) || 1; setField("kupfer_kg", String(Math.round(cu * pe / 100 * 100) / 100)); setMsg(""); } else setMsg("Kein Querschnitt (z. B. 5x16) in der Bezeichnung erkannt."); }} className="bg-slate-600 text-white px-2 rounded-lg text-xs whitespace-nowrap" title="Kupfergewicht aus dem Querschnitt in der Bezeichnung schätzen">Cu schätzen</button>
-                  </div>
-                </div>
-                <label className="flex flex-col text-sm" title="Eigener Multiplikator auf den Kupferanteil. Leer = Standard aus den Angebots-Einstellungen.">Kupfer-Multi
-                  <input className="border p-2 rounded-lg text-black bg-white" placeholder="Standard" value={f.kupfer_multi} onChange={(e) => setField("kupfer_multi", e.target.value)} />
-                </label>
                 <div className="flex flex-col text-sm text-gray-500">Einzelpreis (Vk, Vorschau)
                   <div className="border p-2 rounded-lg bg-gray-100 font-medium">{fmt(articleEp(f))} €</div>
-                  {num(f.kupfer_kg) > 0 && <span className="text-xs text-amber-700">ohne Kupfer — Tageskurs steht im Angebot</span>}
                 </div>
               </div>
               <div className="flex gap-2 flex-wrap">
@@ -417,18 +388,6 @@ export default function Artikel({ supabase, companyId }: { supabase: any; compan
                     {preview.res.discounts.length ? <span>{int(preview.res.discounts.length)} Rabattgruppen</span> : null}
                   </div>
                   {preview.res.warnings.map((w, i) => <div key={i} className="text-xs text-amber-700">⚠️ {w}</div>)}
-                  {(() => {
-                    const hint = String(preview.res.supplierHint || "").trim();
-                    if (!hint) return null;
-                    const norm = (x: string) => x.toLowerCase().replace(/[^a-z0-9äöüß]/g, "");
-                    const a = norm(hint), b = norm(s.name || "");
-                    if (!b || a.includes(b) || b.includes(a)) return null;
-                    return (
-                      <div className="text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg px-2 py-1">
-                        ⚠️ Die Datei nennt im Vorlauf <strong>„{hint}"</strong>, importiert wird aber nach <strong>„{s.name}"</strong>. Bitte prüfen, ob der richtige Lieferant gewählt ist.
-                      </div>
-                    );
-                  })()}
                   <div className="max-h-40 overflow-y-auto text-xs bg-white border border-slate-200 rounded p-2 space-y-0.5">
                     {preview.res.articles.slice(0, 8).map((a, i) => (
                       <div key={i} className="flex justify-between gap-2">

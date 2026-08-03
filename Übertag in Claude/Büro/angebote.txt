@@ -56,25 +56,20 @@ function calcItem(it: any, del: number = 0) {
 
 // Artikel → Angebotsposition (Kalkulationswerte übernehmen, Multis ggf. aus Angebot)
 // Funktioniert für eigene Artikel (office_articles) UND Lieferanten-Katalogzeilen (office_supplier_articles, Feld „ek").
-function articleToItem(a: any, qty: string, defMat: string, defLohn: string, defKupfer?: string) {
+function articleToItem(a: any, qty: string, defMat: string, defLohn: string) {
   const s = (v: any) => (v === null || v === undefined ? "" : String(v));
   const isSup = "ek" in a; // Lieferanten-Katalogzeile: Netto-EK steht in a.ek
   const matEk = isSup ? (a.ek ?? a.net_ek ?? a.list_ek) : a.mat_ek;
   const mm = (a.mat_multi === null || a.mat_multi === undefined || a.mat_multi === "") ? (defMat || "1.28") : String(a.mat_multi);
   const lm = (a.lohn_multi === null || a.lohn_multi === undefined || a.lohn_multi === "") ? (defLohn || "1.28") : String(a.lohn_multi);
   const text = a.short_text || (isSup && a.article_no ? "Art. " + a.article_no : "");
-  // Preiseinheit + Kupfer nur bei eigenen Artikeln; Katalogpreise sind bereits je Einheit umgerechnet.
-  const has = (v: any) => !isSup && v !== null && v !== undefined && String(v) !== "";
-  const pe = has(a.preiseinheit) ? String(a.preiseinheit) : "1";
-  const cuKg = has(a.kupfer_kg) ? String(a.kupfer_kg) : "";
-  const cuMulti = has(a.kupfer_multi) ? String(a.kupfer_multi) : (defKupfer && String(defKupfer).trim() ? String(defKupfer) : "1.05");
   return {
     id: uid(), kind: "position", oz: "", article_id: a.id || null,
     short_text: text, long_text: a.long_text || "",
     qty: qty && String(qty).trim() ? String(qty) : "1", unit: a.unit || "St",
     mat_ek: s(matEk), mat_multi: mm, lohn_ek: isSup ? "" : s(a.lohn_ek), lohn_multi: lm,
     minutes: isSup ? "" : s(a.minutes), fremd_vk: "", geraet_vk: "", discount_pct: "",
-    preiseinheit: pe, verschnitt: "1", kupfer_kg: cuKg, kupfer_multi: cuMulti,
+    preiseinheit: "1", verschnitt: "1", kupfer_kg: "", kupfer_multi: "1.05",
   };
 }
 
@@ -209,7 +204,7 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
   }
   function openArtPicker() { setArtPickerOpen((v) => { const nv = !v; if (nv) { loadArticles(); loadSuppliers(); setArtSource("own"); setArtSearch(""); setArtCat(""); } return nv; }); }
   function addArticleSingle(a: any) {
-    setO((p: any) => ({ ...p, items: [...p.items, articleToItem(a, "1", p.def_mat_multi, p.def_lohn_multi, settings.def_kupfer_multi)] }));
+    setO((p: any) => ({ ...p, items: [...p.items, articleToItem(a, "1", p.def_mat_multi, p.def_lohn_multi)] }));
     setMsg(`Artikel „${a.short_text || a.article_no || ""}“ als Position hinzugefügt.`);
   }
   function toggleCart(a: any) { setCart((c) => { const n = { ...c }; if (a.id in n) delete n[a.id]; else n[a.id] = { qty: "1", art: a }; return n; }); }
@@ -217,7 +212,7 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
   function addCartToOffer() {
     const entries = Object.values(cart);
     if (!entries.length) { setMsg("Keine Artikel im Warenkorb ausgewählt."); return; }
-    setO((p: any) => ({ ...p, items: [...p.items, ...entries.map((e) => articleToItem(e.art, e.qty || "1", p.def_mat_multi, p.def_lohn_multi, settings.def_kupfer_multi))] }));
+    setO((p: any) => ({ ...p, items: [...p.items, ...entries.map((e) => articleToItem(e.art, e.qty || "1", p.def_mat_multi, p.def_lohn_multi))] }));
     setCart({}); setArtPickerOpen(false);
     setMsg(`${entries.length} Artikel aus dem Warenkorb übernommen.`);
   }
@@ -612,7 +607,7 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
             <div className="max-h-72 overflow-y-auto space-y-1">
               {pickerRows.map((a: any) => {
                 const inCart = a.id in cart;
-                const it = calcItem(articleToItem(a, "1", o.def_mat_multi, o.def_lohn_multi, settings.def_kupfer_multi), num(o.del_preis));
+                const it = calcItem(articleToItem(a, "1", o.def_mat_multi, o.def_lohn_multi), num(o.del_preis));
                 const isSup = "ek" in a;
                 return (
                   <div key={a.id} className={`flex items-center gap-2 border rounded-lg p-2 text-sm ${inCart ? "border-indigo-300 bg-indigo-50" : "border-slate-200 bg-white"}`}>
