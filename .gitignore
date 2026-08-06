@@ -42,3 +42,6 @@ next-env.d.ts
 
 translator.env.local
 .env.local
+
+# Grosse DATANORM-Katalogdateien / Scan-Hilfen nicht ins Repo
+/Datanorm/

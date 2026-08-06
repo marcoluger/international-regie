@@ -3973,6 +3973,8 @@ export default function Home() {
   const [companyBlocked, setCompanyBlocked] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [openDashProjects, setOpenDashProjects] = useState<Record<string, boolean>>({});
+  // Dashboard: aufgeklappte "Erledigt"-Listen je Projekt
+  const [openDashDone, setOpenDashDone] = useState<Record<string, boolean>>({});
   const [dashRange, setDashRange] = useState("today");
   const [helpOpen, setHelpOpen] = useState(false);
   const [helpText, setHelpText] = useState<string | null>(null);
@@ -6613,9 +6615,33 @@ export default function Home() {
     return (i?.foreman_user_ids || []).includes(user?.id);
   }
 
+  // Status eines Arbeitsschritts ueber die Server-Route setzen.
+  // Bei "Erledigt" zieht der Server aeltere Kopien desselben Schritts im Projekt mit
+  // (entstehen beim Uebernehmen offener Schritte in eine neue Anweisung).
   async function updateTaskStatus(taskId: string, status: string) {
-    const { error } = await supabase.from("work_instruction_tasks").update({ status }).eq("id", taskId);
-    if (error) { setMessage("Fehler beim Speichern des Status."); return; }
+    try {
+      let token = tokenRef.current;
+      if (!token) {
+        try {
+          const sess = await dbTimeout(supabase.auth.getSession(), 5000);
+          token = sess?.data?.session?.access_token || "";
+        } catch { /* Route antwortet dann mit 401 */ }
+      }
+      const res = await withTimeout(
+        fetch("/api/update-task-status", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ taskId, status }),
+        }),
+        15000,
+        "Zeitüberschreitung beim Speichern des Status (15s). Bitte erneut versuchen."
+      );
+      const data = await res.json();
+      if (!res.ok || data?.error) { setMessage("Fehler beim Speichern des Status: " + (data?.error || `HTTP ${res.status}`)); return; }
+    } catch (e: any) {
+      setMessage("Fehler beim Speichern des Status: " + String(e?.message || e));
+      return;
+    }
     if (currentCompany) await loadWorkInstructions(currentCompany.company_id);
   }
 
@@ -7520,23 +7546,29 @@ export default function Home() {
             const statusRank: Record<string, number> = { stopped: 0, in_progress: 1, open: 2, completed: 3 };
             const built = Object.entries(groups).map(([gkey, g]: [string, any]) => {
               const rows: any[] = [];
+              const doneRows: any[] = [];
               const relevant = new Set<any>();
               let winTotal = 0, winDone = 0;
               for (const inst of g.instructions) {
                 const wd = inst.work_date || "";
                 const inWindow = !!wd && wd >= winStart && wd <= winEnd;
-                for (const task of (inst.work_instruction_tasks || [])) {
+                const tasks = inst.work_instruction_tasks || [];
+                // Relevant = Anweisung liegt im Zeitraum ODER hat noch ueberfaellige offene Schritte.
+                // Von relevanten Anweisungen zaehlen ALLE Schritte (offen wie erledigt) in den
+                // Zaehler "x / y fertig" - sonst verschwinden erledigte ueberfaellige Schritte
+                // ersatzlos und der Zaehler bleibt bei 0, obwohl abgehakt wird.
+                const hasOverdueOpen = !!wd && wd < today && tasks.some((task: any) => (task.status || "open") !== "completed");
+                if (!inWindow && !hasOverdueOpen) continue;
+                relevant.add(inst);
+                for (const task of tasks) {
                   const st = task.status || "open";
-                  const overdueOpen = !!wd && wd < today && st !== "completed";
-                  if (inWindow || overdueOpen) {
-                    winTotal++;
-                    relevant.add(inst);
-                    if (st === "completed") { winDone++; }
-                    else { rows.push({ task, inst, date: wd, overdue: wd < today && st !== "completed" }); }
-                  }
+                  winTotal++;
+                  if (st === "completed") { winDone++; doneRows.push({ task, inst, date: wd }); }
+                  else { rows.push({ task, inst, date: wd, overdue: !!wd && wd < today }); }
                 }
               }
               rows.sort((a, b) => (a.date || "").localeCompare(b.date || "") || ((statusRank[a.task.status || "open"] ?? 2) - (statusRank[b.task.status || "open"] ?? 2)));
+              doneRows.sort((a, b) => (a.date || "").localeCompare(b.date || ""));
               const stoppedN = rows.filter((r) => r.task.status === "stopped").length;
               const doneN = winDone;
               let unread = 0, totalAssign = 0;
@@ -7544,14 +7576,14 @@ export default function Home() {
                 const readerIds = new Set((inst.instruction_reads || []).map((r: any) => r.user_id));
                 for (const uid of (inst.assigned_user_ids || [])) { totalAssign++; if (!readerIds.has(uid)) unread++; }
               });
-              return { key: gkey, g, rows, stoppedN, doneN, winTotal, unread, totalAssign };
+              return { key: gkey, g, rows, doneRows, stoppedN, doneN, winTotal, unread, totalAssign };
             });
             built.sort((a, b) => {
               const ra = a.stoppedN > 0 ? 0 : a.rows.length > 0 ? 1 : 2;
               const rb = b.stoppedN > 0 ? 0 : b.rows.length > 0 ? 1 : 2;
               return ra - rb;
             });
-            const dashShown = built.filter((b: any) => b.rows.length > 0);
+            const dashShown = built.filter((b: any) => b.rows.length > 0 || b.doneRows.length > 0);
             return (
               <>
                 <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
@@ -7576,15 +7608,16 @@ export default function Home() {
                       </div>
                       {b.stoppedN > 0 ? (
                         <span className="text-xs text-red-700 bg-red-50 px-2 py-1 rounded-lg whitespace-nowrap">{b.stoppedN} {t.statusStopped}</span>
-                      ) : b.rows.length > 0 ? (
+                      ) : (b.rows.length > 0 || b.doneRows.length > 0) ? (
                         <span className="text-xs text-green-700 bg-green-50 px-2 py-1 rounded-lg whitespace-nowrap">{b.doneN} / {b.winTotal} {t.dashDone}</span>
                       ) : null}
                     </div>
-                    {dOpen && (b.rows.length === 0 ? (
+                    {dOpen && (<>
+                    {b.rows.length === 0 && b.doneRows.length === 0 ? (
                       <p className="text-gray-400 text-sm">{t.dashNothingToday}</p>
-                    ) : (
+                    ) : b.rows.length > 0 ? (
                       <div className="space-y-2">
-                        {b.rows.map((r, ri) => {
+                        {b.rows.map((r: any, ri: number) => {
                           const s = r.task.status || "open";
                           const icon = s === "completed" ? "✅" : s === "stopped" ? "⛔" : s === "in_progress" ? "🟡" : "⚪";
                           return (
@@ -7597,7 +7630,27 @@ export default function Home() {
                           );
                         })}
                       </div>
-                    ))}
+                    ) : null}
+                    {b.doneRows.length > 0 && (
+                      <div className={b.rows.length > 0 ? "border-t border-slate-100 pt-2" : ""}>
+                        <button type="button" className="text-sm text-gray-500 hover:text-gray-700 select-none" onClick={() => setOpenDashDone((prev) => ({ ...prev, [b.key]: !(prev[b.key] === true) }))}>
+                          {openDashDone[b.key] === true ? "▾" : "▸"} ✅ {b.doneRows.length} {t.dashDone}
+                        </button>
+                        {openDashDone[b.key] === true && (
+                          <div className="space-y-1 mt-2">
+                            {b.doneRows.map((r: any, ri: number) => (
+                              <div key={ri} className="flex items-center gap-2 text-sm">
+                                <span>✅</span>
+                                <span className="flex-1 break-words line-through text-gray-400">{getTranslatedTask(r.inst.id, r.task.id, r.task.task_text)}</span>
+                                {r.date && r.date !== today ? (<span className="text-xs text-gray-400 whitespace-nowrap">{r.date}</span>) : null}
+                                <button type="button" onClick={() => openInstructionFromDashboard(r.inst)} title={t.dashOpen} aria-label={t.dashOpen} className="text-cyan-700 hover:text-cyan-800 shrink-0 px-1 font-bold">→</button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    </>)}
                   </div>
                   );
                 })}
