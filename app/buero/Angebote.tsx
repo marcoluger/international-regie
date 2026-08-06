@@ -578,7 +578,11 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
           {dt === "angebot" && (<>
             <button type="button" onClick={pdfOffer} className="bg-slate-700 text-white px-4 py-2 rounded-lg text-sm">📄 PDF</button>
             <button type="button" onClick={efbPdf} className="bg-slate-600 text-white px-4 py-2 rounded-lg text-sm" title="EFB-Preisformblätter 221/222/223">📑 EFB</button>
+            <button type="button" disabled={!o.id} onClick={() => deriveDoc(o, "ab")} title={o.id ? "Auftragsbestätigung aus diesem Angebot erzeugen" : "Zuerst speichern, dann AB erzeugen"} className="bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm disabled:opacity-50">→ 📋 AB</button>
           </>)}
+          {(dt === "angebot" || dt === "ab") && (
+            <button type="button" disabled={!o.id} onClick={() => deriveDoc(o, "rechnung")} title={o.id ? "Rechnung aus diesem Dokument erzeugen" : "Zuerst speichern, dann Rechnung erzeugen"} className="bg-emerald-800 text-white px-4 py-2 rounded-lg text-sm disabled:opacity-50">→ 💶 Rechnung</button>
+          )}
           <button type="button" onClick={() => { setMode("list"); loadOffers(); }} className="bg-gray-200 px-4 py-2 rounded-lg text-sm">Zurück zur Liste</button>
         </div>
       </div>
