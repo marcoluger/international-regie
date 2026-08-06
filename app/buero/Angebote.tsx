@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { generateAngebotPdf } from "./angebotPdf";
+import { generateAngebotPdf, generateAbPdf } from "./angebotPdf";
 import { generateEfbPdf } from "./efbPdf";
 import { parseGaebX83 } from "./gaebImport";
 import { downloadGaebX84 } from "./gaebExport";
@@ -365,6 +365,21 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
     }
   }
 
+  // Stufe 6b: AB-PDF (Luger-Layout, Bezug aufs Angebot, ohne Bindefrist)
+  async function pdfAb() {
+    try {
+      const cust = customers.find((k: any) => k.id === o.customer_id);
+      const customerNo = cust ? String(cust.customer_no || cust.debitor || cust.kreditor || "") : "";
+      const parent: any = o.parent_id ? offers.find((r: any) => r.id === o.parent_id) : null;
+      const parentInfo = parent
+        ? `${DOC_LABEL[parent.doc_type || "angebot"]} Nr. ${parent.number || "(ohne Nr.)"}${parent.offer_date ? ` vom ${fmtDate(parent.offer_date)}` : ""}`
+        : "";
+      await generateAbPdf(o, { customerNo, parentInfo });
+    } catch (e: any) {
+      setMsg("Fehler beim PDF: " + (e?.message || String(e)));
+    }
+  }
+
   async function efbPdf() {
     try {
       if (!o.items.some((x: any) => x.kind === "position")) { setMsg("Keine Positionen für EFB-Formblätter vorhanden."); return; }
@@ -580,6 +595,9 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
             <button type="button" onClick={efbPdf} className="bg-slate-600 text-white px-4 py-2 rounded-lg text-sm" title="EFB-Preisformblätter 221/222/223">📑 EFB</button>
             <button type="button" disabled={!o.id} onClick={() => deriveDoc(o, "ab")} title={o.id ? "Auftragsbestätigung aus diesem Angebot erzeugen" : "Zuerst speichern, dann AB erzeugen"} className="bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm disabled:opacity-50">→ 📋 AB</button>
           </>)}
+          {dt === "ab" && (
+            <button type="button" onClick={pdfAb} className="bg-slate-700 text-white px-4 py-2 rounded-lg text-sm" title="Auftragsbestätigung als PDF">📄 PDF</button>
+          )}
           {(dt === "angebot" || dt === "ab") && (
             <button type="button" disabled={!o.id} onClick={() => deriveDoc(o, "rechnung")} title={o.id ? "Rechnung aus diesem Dokument erzeugen" : "Zuerst speichern, dann Rechnung erzeugen"} className="bg-emerald-800 text-white px-4 py-2 rounded-lg text-sm disabled:opacity-50">→ 💶 Rechnung</button>
           )}

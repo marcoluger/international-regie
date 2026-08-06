@@ -52,7 +52,20 @@ function titleSum(items: any[], idx: number, del: number = 0) {
 }
 
 // ── PDF-Erzeugung ───────────────────────────────────────────────────
-export async function generateAngebotPdf(o: any, opts: { customerNo?: string } = {}) {
+// Gemeinsamer Generator für Angebot (und ab Stufe 6b: Auftragsbestätigung).
+// cfg steuert die dokumentart-spezifischen Unterschiede; Layout/Kalkulation
+// sind identisch (gleiche calcItem-/Kupferlogik wie Angebote.tsx).
+type DocPdfConfig = {
+  title: string;        // Kopfzeile, z. B. "A N G E B O T"
+  filePrefix: string;   // Dateiname, z. B. "Angebot"
+  docDate: string;      // Belegdatum (ISO) für den Infoblock
+  refLine?: string;     // Bezugszeile unter der Titelzeile (Seite 1)
+  showBindefrist: boolean;   // Gültigkeits-Satz (nur Angebot)
+  showSignature: boolean;    // "Auftrag erteilt"-Block (nur Angebot)
+  closingText?: string;      // Schlusssatz (z. B. Dank bei AB)
+};
+
+async function generateDocPdf(o: any, opts: { customerNo?: string } = {}, cfg: DocPdfConfig) {
   const { jsPDF } = await import("jspdf");
   const doc = new jsPDF({ unit: "mm", format: "a4" });
 
@@ -123,11 +136,15 @@ export async function generateAngebotPdf(o: any, opts: { customerNo?: string } =
     doc.setFontSize(9.5);
     const ix = 128, ic = 152, iv = 158;
     doc.text("Seite", ix, iy); doc.text(":", ic, iy); doc.text("1", iv, iy); iy += 5;
-    doc.text("Datum", ix, iy); doc.text(":", ic, iy); doc.text(fmtDate(o.offer_date) || "", iv, iy); iy += 5;
+    doc.text("Datum", ix, iy); doc.text(":", ic, iy); doc.text(fmtDate(cfg.docDate) || "", iv, iy); iy += 5;
     if (opts.customerNo) { doc.text("Kunden-Nr.", ix, iy); doc.text(":", ic, iy); doc.text(String(opts.customerNo), iv, iy); iy += 5; }
-    // ANGEBOT-Nr links
+    // Dokument-Titel + Nr. links
     doc.setFontSize(11);
-    doc.text(`A N G E B O T - Nr.: ${o.number || ""}`, mL, 72);
+    doc.text(`${cfg.title} - Nr.: ${o.number || ""}`, mL, 72);
+    if (cfg.refLine) {
+      doc.setFontSize(9);
+      doc.text(String(cfg.refLine), mL, 77.5);
+    }
   }
 
   function letterheadCont() {
@@ -137,7 +154,7 @@ export async function generateAngebotPdf(o: any, opts: { customerNo?: string } =
     doc.setFont("helvetica", "normal");
     doc.setFontSize(11);
     black();
-    doc.text(`A N G E B O T - Nr.: ${o.number || ""}`, mL, 44);
+    doc.text(`${cfg.title} - Nr.: ${o.number || ""}`, mL, 44);
     doc.setFontSize(9.5);
     doc.text("Seite:", 160, 44);
     doc.text(String(page + 1), mR, 44, { align: "right" });
@@ -365,14 +382,16 @@ export async function generateAngebotPdf(o: any, opts: { customerNo?: string } =
       for (const wl of doc.splitTextToSize(String(o.tax_note), mR - mL)) { ensurePlain(6); doc.text(wl, mL, y); y += 4.4; }
       y += 3;
     }
-    // Bindefrist
-    const valid = o.binde_weeks && o.offer_date ? addWeeks(o.offer_date, num(o.binde_weeks)) : o.valid_until;
-    if (valid) {
-      ensurePlain(8);
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(9.5);
-      doc.text(`Bitte beachten Sie, dass das vorliegende Angebot nur bis zum ${fmtDate(valid)} gültig ist.`, mL, y);
-      y += 9;
+    // Bindefrist (nur Angebot)
+    if (cfg.showBindefrist) {
+      const valid = o.binde_weeks && o.offer_date ? addWeeks(o.offer_date, num(o.binde_weeks)) : o.valid_until;
+      if (valid) {
+        ensurePlain(8);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9.5);
+        doc.text(`Bitte beachten Sie, dass das vorliegende Angebot nur bis zum ${fmtDate(valid)} gültig ist.`, mL, y);
+        y += 9;
+      }
     }
     // Nachtext
     if (o.nachtext) {
@@ -394,14 +413,24 @@ export async function generateAngebotPdf(o: any, opts: { customerNo?: string } =
       if (num(o.skonto_pct) > 0) { ensurePlain(6); doc.text(`Zahlbar innerhalb ${num(o.skonto_tage)} Tagen mit ${fmt(num(o.skonto_pct))} % Skonto.`, mL, y); y += 5; }
       y += 4;
     }
-    // Auftrag erteilt / Unterschrift
-    ensurePlain(26);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9.5);
-    doc.text("Auftrag erteilt:", mL, y); y += 9;
-    doc.setFont("helvetica", "normal");
-    doc.text("Ort, Datum, Unterschrift: ______________________________________________", mL, y); y += 8;
-    doc.text("Bitte um Rücksendung an E-Mail: marco@elektrotechnik-luger.de", mL, y);
+    // Schlusssatz (z. B. Dank bei AB)
+    if (cfg.closingText) {
+      ensurePlain(10);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9.5);
+      for (const wl of doc.splitTextToSize(String(cfg.closingText), mR - mL)) { ensurePlain(6); doc.text(wl, mL, y); y += 4.6; }
+      y += 4;
+    }
+    // Auftrag erteilt / Unterschrift (nur Angebot)
+    if (cfg.showSignature) {
+      ensurePlain(26);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9.5);
+      doc.text("Auftrag erteilt:", mL, y); y += 9;
+      doc.setFont("helvetica", "normal");
+      doc.text("Ort, Datum, Unterschrift: ______________________________________________", mL, y); y += 8;
+      doc.text("Bitte um Rücksendung an E-Mail: marco@elektrotechnik-luger.de", mL, y);
+    }
   }
 
   // ── Ablauf ────────────────────────────────────────────────────────
@@ -422,5 +451,30 @@ export async function generateAngebotPdf(o: any, opts: { customerNo?: string } =
   if (lastTitel >= 0) drawTitelSum(items[lastTitel].title, titleSum(items, lastTitel, num(o.del_preis)));
   drawZusammenstellung();
 
-  doc.save(`Angebot_${(o.number || "Entwurf").toString().replace(/[^\w.-]+/g, "_")}.pdf`);
+  doc.save(`${cfg.filePrefix}_${(o.number || "Entwurf").toString().replace(/[^\w.-]+/g, "_")}.pdf`);
+}
+
+// ── Öffentliche Einstiege je Dokumentart ────────────────────────────
+export async function generateAngebotPdf(o: any, opts: { customerNo?: string } = {}) {
+  return generateDocPdf(o, opts, {
+    title: "A N G E B O T",
+    filePrefix: "Angebot",
+    docDate: o.offer_date,
+    showBindefrist: true,
+    showSignature: true,
+  });
+}
+
+// Stufe 6b: Auftragsbestätigungs-PDF im gleichen Luger-Layout.
+// parentInfo z. B. "Angebot Nr. 1234567 vom 05.08.2026" (Bezugszeile Seite 1).
+export async function generateAbPdf(o: any, opts: { customerNo?: string; parentInfo?: string } = {}) {
+  return generateDocPdf(o, { customerNo: opts.customerNo }, {
+    title: "A U F T R A G S B E S T Ä T I G U N G",
+    filePrefix: "AB",
+    docDate: o.doc_date || o.offer_date,
+    refLine: opts.parentInfo ? `Bezug: ${opts.parentInfo}` : undefined,
+    showBindefrist: false,
+    showSignature: false,
+    closingText: "Wir bedanken uns für Ihren Auftrag und bestätigen die Ausführung der oben aufgeführten Leistungen.",
+  });
 }
