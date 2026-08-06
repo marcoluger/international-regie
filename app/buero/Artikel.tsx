@@ -30,11 +30,28 @@ function articleEp(a: any) {
 }
 
 function blankForm() {
-  return { id: null as string | null, number: "", category: "", short_text: "", long_text: "", unit: "St", mat_ek: "", mat_multi: "1.28", lohn_ek: "", lohn_multi: "1.28", minutes: "", preiseinheit: "1", kupfer_kg: "", kupfer_multi: "" };
+  return { id: null as string | null, number: "", category: "", short_text: "", long_text: "", unit: "St", mat_ek: "", mat_multi: "1.28", lohn_ek: "", lohn_multi: "1.28", minutes: "", preiseinheit: "1", kupfer_kg: "", kupfer_multi: "", components: [] as any[] };
+}
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+
+// Stückliste: Material-EK und Kupfer je 1 Einheit der Leistung (EK der Teile / deren Preiseinheit × Menge).
+function compSums(comps: any[]) {
+  let mat = 0, cu = 0;
+  for (const c of comps || []) {
+    const pe = num(c.preiseinheit) || 1;
+    mat += (num(c.ek) / pe) * num(c.qty);
+    cu += (num(c.kupfer_kg) / pe) * num(c.qty);
+  }
+  return { mat: Math.round(mat * 100) / 100, cu: Math.round(cu * 100) / 100 };
 }
 
 // ── Komponente ─────────────────────────────────────────────────────
-export default function Artikel({ supabase, companyId }: { supabase: any; companyId: string }) {
+// art: "leistung" (mit Arbeitszeit + Stückliste, Standard) oder "artikel" (reines Material) — Stufe 7a.
+export default function Artikel({ supabase, companyId, art = "leistung" }: { supabase: any; companyId: string; art?: "leistung" | "artikel" }) {
+  const isLeistung = art === "leistung";
+  const TYP = isLeistung ? "Leistung" : "Artikel";
+  const TYP_ICON = isLeistung ? "🔧" : "📦";
   const [view, setView] = useState<"own" | "suppliers">("own");
 
   // Eigener Artikelstamm
@@ -45,12 +62,19 @@ export default function Artikel({ supabase, companyId }: { supabase: any; compan
   const [catFilter, setCatFilter] = useState("");
   const [formOpen, setFormOpen] = useState(false);
 
-  // DATANORM-Übernahme in die Artikel-Maske
+  // DATANORM-Übernahme in die Maske ("form") oder in die Stückliste ("bom")
   const [dnOpen, setDnOpen] = useState(false);
+  const [dnTarget, setDnTarget] = useState<"form" | "bom">("form");
   const [dnSup, setDnSup] = useState<string>("");
   const [dnSearch, setDnSearch] = useState("");
   const [dnResults, setDnResults] = useState<any[]>([]);
   const [dnLoading, setDnLoading] = useState(false);
+
+  // Eigene Artikel in die Stückliste übernehmen (nur Leistungen)
+  const [bomOpen, setBomOpen] = useState(false);
+  const [bomSearch, setBomSearch] = useState("");
+  const [bomResults, setBomResults] = useState<any[]>([]);
+  const [bomLoading, setBomLoading] = useState(false);
 
   // Lieferanten-Kataloge (DATANORM)
   const [suppliers, setSuppliers] = useState<any[]>([]);
@@ -79,8 +103,17 @@ export default function Artikel({ supabase, companyId }: { supabase: any; compan
   }, [dnOpen, dnSup, dnSearch, companyId]);
 
   const supName2 = (id: string) => suppliers.find((s: any) => s.id === id)?.name || "";
-  function openDnPicker() { setDnSup(""); setDnSearch(f.number || ""); setDnOpen(true); }
+  function openDnPicker() { setDnTarget("form"); setDnSup(""); setDnSearch(f.number || ""); setDnOpen(true); }
+  function openDnBom() { setDnTarget("bom"); setDnSup(""); setDnSearch(""); setDnOpen(true); }
   function fillFromCatalog(a: any) {
+    if (dnTarget === "bom") {
+      const ek = a.ek != null ? a.ek : a.net_ek;
+      const c = { id: uid(), source: "datanorm", supplier_id: a.supplier_id, number: a.article_no || "", short_text: a.short_text || (a.article_no ? "Art. " + a.article_no : ""), unit: a.unit || "St", qty: "1", ek: ek != null ? String(ek) : "", preiseinheit: "1", kupfer_kg: "" };
+      setF((p: any) => ({ ...p, components: [...(p.components || []), c] }));
+      setDnOpen(false);
+      setMsg(`In die Stückliste übernommen: ${c.short_text || c.number}. Menge/EK prüfen.`);
+      return;
+    }
     setF((p: any) => ({
       ...p,
       number: a.article_no || p.number,
@@ -93,30 +126,97 @@ export default function Artikel({ supabase, companyId }: { supabase: any; compan
     setMsg(`Aus Katalog übernommen: ${a.short_text || a.article_no || ""}. EK/Bezeichnung geprüft, dann speichern.`);
   }
 
+  // Serverseitige Suche im eigenen Artikelstamm (nur art='artikel') für die Stückliste (entprellt).
+  useEffect(() => {
+    if (!bomOpen) { setBomResults([]); return; }
+    let active = true;
+    setBomLoading(true);
+    const safe = bomSearch.trim().replace(/[,()%*]/g, " ").trim();
+    const h = setTimeout(async () => {
+      let query = supabase.from("office_articles").select("*").eq("company_id", companyId).eq("art", "artikel");
+      if (safe) query = query.or(`short_text.ilike.*${safe}*,number.ilike.*${safe}*,category.ilike.*${safe}*`);
+      const { data } = await query.order("short_text", { ascending: true }).limit(30);
+      if (active) { setBomResults(data || []); setBomLoading(false); }
+    }, 300);
+    return () => { active = false; clearTimeout(h); };
+    // eslint-disable-next-line
+  }, [bomOpen, bomSearch, companyId]);
+
+  function addCompFromOwn(a: any) {
+    const c = { id: uid(), source: "own", article_id: a.id, number: a.number || "", short_text: a.short_text || "", unit: a.unit || "St", qty: "1", ek: a.mat_ek != null ? String(a.mat_ek) : "", preiseinheit: a.preiseinheit != null ? String(a.preiseinheit) : "1", kupfer_kg: a.kupfer_kg != null ? String(a.kupfer_kg) : "" };
+    setF((p: any) => ({ ...p, components: [...(p.components || []), c] }));
+    setBomOpen(false);
+    setMsg(`In die Stückliste übernommen: ${c.short_text || c.number}. Menge prüfen.`);
+  }
+  function setComp(i: number, field: string, val: any) {
+    setF((p: any) => { const arr = [...(p.components || [])]; arr[i] = { ...arr[i], [field]: val }; return { ...p, components: arr }; });
+  }
+  function removeComp(i: number) {
+    setF((p: any) => ({ ...p, components: (p.components || []).filter((_: any, j: number) => j !== i) }));
+  }
+
+  // Eingefrorene Stücklisten-Preise auf Wunsch aktualisieren (eigene Artikel + DATANORM-Katalog).
+  async function refreshCompPrices() {
+    const comps: any[] = f.components || [];
+    if (!comps.length) return;
+    setMsg("Aktualisiere Preise…");
+    const out = [...comps];
+    let changed = 0, missing = 0;
+    for (let i = 0; i < out.length; i++) {
+      const c = { ...out[i] };
+      try {
+        if (c.source === "own" && c.article_id) {
+          const { data } = await supabase.from("office_articles").select("mat_ek,preiseinheit,kupfer_kg").eq("id", c.article_id).maybeSingle();
+          if (data) {
+            const neu = data.mat_ek != null ? String(data.mat_ek) : c.ek;
+            if (num(neu) !== num(c.ek)) changed++;
+            c.ek = neu;
+            c.preiseinheit = data.preiseinheit != null ? String(data.preiseinheit) : c.preiseinheit;
+            c.kupfer_kg = data.kupfer_kg != null ? String(data.kupfer_kg) : c.kupfer_kg;
+          } else missing++;
+        } else if (c.source === "datanorm" && c.supplier_id && c.number) {
+          const { data } = await supabase.from("office_supplier_articles").select("ek,net_ek").eq("company_id", companyId).eq("supplier_id", c.supplier_id).eq("article_no", c.number).limit(1);
+          const row = data && data[0];
+          const ek = row ? (row.ek != null ? row.ek : row.net_ek) : null;
+          if (ek != null) { if (num(ek) !== num(c.ek)) changed++; c.ek = String(ek); } else missing++;
+        }
+      } catch { /* Zeile überspringen, eingefrorener Preis bleibt */ }
+      out[i] = c;
+    }
+    setF((p: any) => ({ ...p, components: out }));
+    setMsg(`Preise aktualisiert: ${changed} geändert${missing ? `, ${missing} nicht gefunden (Preis eingefroren gelassen)` : ""}.`);
+  }
+
   // ── Eigener Artikelstamm ─────────────────────────────────────────
   async function loadArticles() {
-    const { data, error } = await supabase.from("office_articles").select("*").eq("company_id", companyId).order("short_text", { ascending: true });
+    // Alt-Daten ohne art-Spalte zählen als Leistung (Migration setzt Default 'leistung').
+    const { data, error } = await supabase.from("office_articles").select("*").eq("company_id", companyId).eq("art", art).order("short_text", { ascending: true });
     if (error) { setMsg("Fehler beim Laden: " + error.message); return; }
     setArticles(data || []);
   }
   function setField(field: string, val: any) { setF((p: any) => ({ ...p, [field]: val })); }
   function startNew() { setF(blankForm()); setFormOpen(true); setMsg(""); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }
   function startEdit(a: any) {
-    setF({ id: a.id, number: a.number ?? "", category: a.category ?? "", short_text: a.short_text ?? "", long_text: a.long_text ?? "", unit: a.unit || "St", mat_ek: a.mat_ek ?? "", mat_multi: a.mat_multi ?? "1.28", lohn_ek: a.lohn_ek ?? "", lohn_multi: a.lohn_multi ?? "1.28", minutes: a.minutes ?? "", preiseinheit: a.preiseinheit ?? "1", kupfer_kg: a.kupfer_kg ?? "", kupfer_multi: a.kupfer_multi ?? "" });
+    setF({ id: a.id, number: a.number ?? "", category: a.category ?? "", short_text: a.short_text ?? "", long_text: a.long_text ?? "", unit: a.unit || "St", mat_ek: a.mat_ek ?? "", mat_multi: a.mat_multi ?? "1.28", lohn_ek: a.lohn_ek ?? "", lohn_multi: a.lohn_multi ?? "1.28", minutes: a.minutes ?? "", preiseinheit: a.preiseinheit ?? "1", kupfer_kg: a.kupfer_kg ?? "", kupfer_multi: a.kupfer_multi ?? "", components: Array.isArray(a.components) ? a.components : [] });
     setFormOpen(true); setMsg("");
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   }
   function resetForm() { setF(blankForm()); setFormOpen(false); }
   async function saveArticle() {
     if (!f.short_text.trim()) { setMsg("Bitte einen Kurztext eingeben."); return; }
+    // Mit Stückliste: Material-EK (und Kupfer, falls Teile Kupfer tragen) automatisch aus der Summe.
+    const comps: any[] = isLeistung && Array.isArray(f.components) ? f.components.filter((c: any) => num(c.qty) > 0) : [];
+    const sums = compSums(comps);
     const payload: any = {
+      art,
       number: f.number.trim() || null, category: f.category.trim() || null, short_text: f.short_text.trim(), long_text: f.long_text.trim() || null, unit: f.unit || "St",
-      mat_ek: f.mat_ek === "" ? null : num(f.mat_ek), mat_multi: f.mat_multi === "" ? null : num(f.mat_multi),
-      lohn_ek: f.lohn_ek === "" ? null : num(f.lohn_ek), lohn_multi: f.lohn_multi === "" ? null : num(f.lohn_multi),
-      minutes: f.minutes === "" ? null : num(f.minutes),
+      mat_ek: comps.length ? sums.mat : (f.mat_ek === "" ? null : num(f.mat_ek)), mat_multi: f.mat_multi === "" ? null : num(f.mat_multi),
+      lohn_ek: isLeistung ? (f.lohn_ek === "" ? null : num(f.lohn_ek)) : null, lohn_multi: isLeistung ? (f.lohn_multi === "" ? null : num(f.lohn_multi)) : null,
+      minutes: isLeistung ? (f.minutes === "" ? null : num(f.minutes)) : null,
       preiseinheit: f.preiseinheit === "" ? null : num(f.preiseinheit),
-      kupfer_kg: f.kupfer_kg === "" ? null : num(f.kupfer_kg),
+      kupfer_kg: comps.length && sums.cu > 0 ? sums.cu : (f.kupfer_kg === "" ? null : num(f.kupfer_kg)),
       kupfer_multi: f.kupfer_multi === "" ? null : num(f.kupfer_multi),
+      components: comps.length ? comps : null,
       updated_at: new Date().toISOString(),
     };
     if (f.id) {
@@ -126,10 +226,10 @@ export default function Artikel({ supabase, companyId }: { supabase: any; compan
       const { error } = await supabase.from("office_articles").insert({ company_id: companyId, ...payload });
       if (error) { setMsg("Fehler beim Speichern: " + error.message); return; }
     }
-    resetForm(); await loadArticles(); setMsg("Artikel gespeichert.");
+    resetForm(); await loadArticles(); setMsg(`${TYP} gespeichert.`);
   }
   async function deleteArticle(id: string) {
-    if (typeof window !== "undefined" && !window.confirm("Diesen Artikel wirklich löschen?")) return;
+    if (typeof window !== "undefined" && !window.confirm(isLeistung ? "Diese Leistung wirklich löschen?" : "Diesen Artikel wirklich löschen?")) return;
     const { error } = await supabase.from("office_articles").delete().eq("id", id);
     if (error) { setMsg("Fehler beim Löschen: " + error.message); return; }
     if (f.id === id) resetForm();
@@ -227,19 +327,24 @@ export default function Artikel({ supabase, companyId }: { supabase: any; compan
     .filter((a: any) => (catFilter ? String(a.category || "").trim() === catFilter : true))
     .filter((a: any) => (q ? [a.number, a.short_text, a.long_text, a.category].some((x: any) => String(x || "").toLowerCase().includes(q)) : true));
   const shown = filtered.slice(0, 300);
+  const fComps: any[] = isLeistung && Array.isArray(f.components) ? f.components : [];
+  const hasComps = fComps.length > 0;
+  const fSums = compSums(fComps);
 
   return (
     <section className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4">
-      {/* Ansicht-Umschalter */}
-      <div className="flex flex-wrap gap-2">
-        <button type="button" onClick={() => setView("own")} className={`px-4 py-2 rounded-full text-sm font-medium ${view === "own" ? "bg-cyan-700 text-white" : "bg-white border border-slate-300 text-slate-600"}`}>📦 Eigene Artikel</button>
-        <button type="button" onClick={() => setView("suppliers")} className={`px-4 py-2 rounded-full text-sm font-medium ${view === "suppliers" ? "bg-cyan-700 text-white" : "bg-white border border-slate-300 text-slate-600"}`}>🏭 Lieferanten-Kataloge (DATANORM)</button>
-      </div>
+      {/* Ansicht-Umschalter: Lieferanten-Kataloge nur im Artikel-Reiter */}
+      {!isLeistung && (
+        <div className="flex flex-wrap gap-2">
+          <button type="button" onClick={() => setView("own")} className={`px-4 py-2 rounded-full text-sm font-medium ${view === "own" ? "bg-cyan-700 text-white" : "bg-white border border-slate-300 text-slate-600"}`}>📦 Eigene Artikel</button>
+          <button type="button" onClick={() => setView("suppliers")} className={`px-4 py-2 rounded-full text-sm font-medium ${view === "suppliers" ? "bg-cyan-700 text-white" : "bg-white border border-slate-300 text-slate-600"}`}>🏭 Lieferanten-Kataloge (DATANORM)</button>
+        </div>
+      )}
 
       {view === "own" && (
         <div className="space-y-4">
           <div className="flex items-center justify-between gap-2 flex-wrap">
-            <h2 className="text-xl font-bold">📦 Artikelstamm <span className="text-sm font-normal text-gray-500">({articles.length})</span></h2>
+            <h2 className="text-xl font-bold">{TYP_ICON} {isLeistung ? "Leistungen" : "Artikelstamm"} <span className="text-sm font-normal text-gray-500">({articles.length})</span></h2>
             <div className="flex gap-2 items-center flex-wrap">
               {categories.length > 0 && (
                 <select className="border p-2 rounded-lg text-black bg-white" value={catFilter} onChange={(e) => setCatFilter(e.target.value)}>
@@ -248,7 +353,7 @@ export default function Artikel({ supabase, companyId }: { supabase: any; compan
                 </select>
               )}
               <input className="border p-2 rounded-lg text-black bg-white w-full sm:w-72" placeholder="Suche: Nr., Kurztext, Kategorie…" value={search} onChange={(e) => setSearch(e.target.value)} />
-              <button type="button" onClick={startNew} className="bg-cyan-700 text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap">＋ Neuer Artikel</button>
+              <button type="button" onClick={startNew} className="bg-cyan-700 text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap">＋ {isLeistung ? "Neue Leistung" : "Neuer Artikel"}</button>
             </div>
           </div>
           {msg && <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-lg p-2 text-sm">{msg}</div>}
@@ -256,7 +361,7 @@ export default function Artikel({ supabase, companyId }: { supabase: any; compan
           {formOpen && (
             <div className="border border-slate-200 rounded-2xl p-4 shadow-sm bg-gray-50 space-y-3">
               <div className="flex items-center justify-between gap-2 flex-wrap">
-                <h3 className="font-bold">{f.id ? "Artikel bearbeiten" : "Neuen Artikel anlegen"}</h3>
+                <h3 className="font-bold">{f.id ? `${TYP} bearbeiten` : (isLeistung ? "Neue Leistung anlegen" : "Neuen Artikel anlegen")}</h3>
                 <button type="button" onClick={openDnPicker} className="bg-emerald-700 text-white px-3 py-2 rounded-lg text-sm">🏭 aus Lieferanten-Katalog übernehmen</button>
               </div>
 
@@ -309,12 +414,13 @@ export default function Artikel({ supabase, companyId }: { supabase: any; compan
                   </select>
                 </label>
                 <div />
-                <label className="flex flex-col text-sm">Mat-Ek (€)
-                  <input className="border p-2 rounded-lg text-black bg-white" value={f.mat_ek} onChange={(e) => setField("mat_ek", e.target.value)} />
+                <label className="flex flex-col text-sm" title={hasComps ? "Wird automatisch aus der Stückliste berechnet." : undefined}>Mat-Ek (€){hasComps ? " — aus Stückliste" : ""}
+                  <input disabled={hasComps} className={`border p-2 rounded-lg text-black ${hasComps ? "bg-gray-100" : "bg-white"}`} value={hasComps ? String(fSums.mat) : f.mat_ek} onChange={(e) => setField("mat_ek", e.target.value)} />
                 </label>
                 <label className="flex flex-col text-sm">Multi Material
                   <input className="border p-2 rounded-lg text-black bg-white" value={f.mat_multi} onChange={(e) => setField("mat_multi", e.target.value)} />
                 </label>
+                {isLeistung && (<>
                 <label className="flex flex-col text-sm">Lohn-Ek (€/h)
                   <input className="border p-2 rounded-lg text-black bg-white" value={f.lohn_ek} onChange={(e) => setField("lohn_ek", e.target.value)} />
                 </label>
@@ -324,12 +430,13 @@ export default function Artikel({ supabase, companyId }: { supabase: any; compan
                 <label className="flex flex-col text-sm">Minuten / Einheit
                   <input className="border p-2 rounded-lg text-black bg-white" value={f.minutes} onChange={(e) => setField("minutes", e.target.value)} />
                 </label>
+                </>)}
                 <label className="flex flex-col text-sm" title="Preis gilt je … Einheiten (z. B. 100 = Preis pro 100 m). Leer = 1.">Preiseinheit
                   <input className="border p-2 rounded-lg text-black bg-white" value={f.preiseinheit} onChange={(e) => setField("preiseinheit", e.target.value)} />
                 </label>
-                <div className="flex flex-col text-sm">🟠 Kupfer kg / Preiseinheit
+                <div className="flex flex-col text-sm">🟠 Kupfer kg / Preiseinheit{hasComps && fSums.cu > 0 ? " — aus Stückliste" : ""}
                   <div className="flex gap-1 items-stretch">
-                    <input className="border p-2 rounded-lg text-black bg-white w-full" value={f.kupfer_kg} onChange={(e) => setField("kupfer_kg", e.target.value)} />
+                    <input disabled={hasComps && fSums.cu > 0} className={`border p-2 rounded-lg text-black w-full ${hasComps && fSums.cu > 0 ? "bg-gray-100" : "bg-white"}`} value={hasComps && fSums.cu > 0 ? String(fSums.cu) : f.kupfer_kg} onChange={(e) => setField("kupfer_kg", e.target.value)} />
                     <button type="button" onClick={() => { const cu = cuKgPer100m((f.short_text || "") + " " + (f.long_text || "")); if (cu != null) { const pe = num(f.preiseinheit) || 1; setField("kupfer_kg", String(Math.round(cu * pe / 100 * 100) / 100)); setMsg(""); } else setMsg("Kein Querschnitt (z. B. 5x16) in der Bezeichnung erkannt."); }} className="bg-slate-600 text-white px-2 rounded-lg text-xs whitespace-nowrap" title="Kupfergewicht aus dem Querschnitt in der Bezeichnung schätzen">Cu schätzen</button>
                   </div>
                 </div>
@@ -337,10 +444,71 @@ export default function Artikel({ supabase, companyId }: { supabase: any; compan
                   <input className="border p-2 rounded-lg text-black bg-white" placeholder="Standard" value={f.kupfer_multi} onChange={(e) => setField("kupfer_multi", e.target.value)} />
                 </label>
                 <div className="flex flex-col text-sm text-gray-500">Einzelpreis (Vk, Vorschau)
-                  <div className="border p-2 rounded-lg bg-gray-100 font-medium">{fmt(articleEp(f))} €</div>
-                  {num(f.kupfer_kg) > 0 && <span className="text-xs text-amber-700">ohne Kupfer — Tageskurs steht im Angebot</span>}
+                  <div className="border p-2 rounded-lg bg-gray-100 font-medium">{fmt(articleEp(hasComps ? { ...f, mat_ek: String(fSums.mat) } : f))} €</div>
+                  {(hasComps && fSums.cu > 0) || num(f.kupfer_kg) > 0 ? <span className="text-xs text-amber-700">ohne Kupfer — Tageskurs steht im Angebot</span> : null}
                 </div>
               </div>
+              {/* Stückliste (nur Leistungen, Stufe 7a): Material-Teile aus eigenem Artikelstamm + DATANORM. */}
+              {isLeistung && (
+                <div className="border border-slate-200 rounded-xl p-3 bg-white space-y-2">
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <h4 className="font-bold text-sm">🧩 Stückliste (Material) <span className="font-normal text-gray-500">— nur intern für die Kalkulation, erscheint nicht im Angebot</span></h4>
+                    <div className="flex gap-2 flex-wrap">
+                      <button type="button" onClick={() => { setBomSearch(""); setBomOpen(true); }} className="bg-cyan-700 text-white px-3 py-1.5 rounded-lg text-xs">＋ 📦 Artikel</button>
+                      <button type="button" onClick={openDnBom} className="bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs">＋ 🏭 Katalog (DATANORM)</button>
+                      {hasComps && <button type="button" onClick={refreshCompPrices} className="bg-slate-600 text-white px-3 py-1.5 rounded-lg text-xs" title="Eingefrorene EKs mit den aktuellen Preisen aus Artikelstamm/Katalog abgleichen">🔄 Preise aktualisieren</button>}
+                    </div>
+                  </div>
+
+                  {bomOpen && (
+                    <div className="border border-cyan-200 bg-cyan-50/50 rounded-xl p-3 space-y-2">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-sm font-medium">📦 Eigener Artikelstamm</span>
+                        <input className="border p-2 rounded-lg text-black bg-white flex-1 min-w-[12rem] text-sm" placeholder="Suche: Nr., Kurztext, Kategorie…" value={bomSearch} onChange={(e) => setBomSearch(e.target.value)} />
+                        {bomLoading && <span className="text-xs text-gray-500">sucht…</span>}
+                        <button type="button" onClick={() => setBomOpen(false)} className="bg-gray-200 px-3 py-2 rounded-lg text-xs">Schließen</button>
+                      </div>
+                      <div className="max-h-64 overflow-y-auto space-y-1">
+                        {bomResults.map((a: any) => (
+                          <button key={a.id} type="button" onClick={() => addCompFromOwn(a)} className="w-full text-left border border-slate-200 rounded-lg p-2 text-sm bg-white hover:bg-cyan-50">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              {a.category ? <span className="text-xs bg-slate-100 text-slate-700 rounded px-1.5 py-0.5">{a.category}</span> : null}
+                              {a.number ? <span className="text-xs text-gray-500">Nr. {a.number}</span> : null}
+                              <strong>{a.short_text || "(ohne Kurztext)"}</strong>
+                            </div>
+                            <div className="text-xs text-gray-500">EK {a.mat_ek != null ? fmt(num(a.mat_ek)) + " €" : "—"}{num(a.preiseinheit) > 1 ? " / " + a.preiseinheit : ""}{a.unit ? " " + a.unit : ""}</div>
+                          </button>
+                        ))}
+                        {bomResults.length === 0 && <p className="text-xs text-gray-500">{bomLoading ? "Suche läuft…" : "Kein Artikel gefunden. Reine Material-Artikel legst du im Reiter „📦 Artikel“ an."}</p>}
+                      </div>
+                    </div>
+                  )}
+
+                  {fComps.map((c: any, i: number) => (
+                    <div key={c.id || i} className="flex flex-wrap items-center gap-2 border border-slate-200 rounded-lg p-2 text-sm bg-gray-50">
+                      <span className="text-xs bg-slate-100 text-slate-700 rounded px-1.5 py-0.5 whitespace-nowrap">{c.source === "datanorm" ? "🏭 " + (supName2(c.supplier_id) || "Katalog") : "📦 Artikel"}</span>
+                      {c.number ? <span className="text-xs text-gray-500 whitespace-nowrap">Nr. {c.number}</span> : null}
+                      <strong className="min-w-0 flex-1 truncate" title={c.short_text}>{c.short_text || "(ohne Bezeichnung)"}</strong>
+                      <label className="flex items-center gap-1 text-xs">Menge
+                        <input className="border p-1.5 rounded text-black bg-white w-16" value={c.qty} onChange={(e) => setComp(i, "qty", e.target.value)} />
+                      </label>
+                      <span className="text-xs text-gray-500">{c.unit || "St"}</span>
+                      <label className="flex items-center gap-1 text-xs">EK €
+                        <input className="border p-1.5 rounded text-black bg-white w-20" value={c.ek} onChange={(e) => setComp(i, "ek", e.target.value)} />
+                      </label>
+                      {num(c.preiseinheit) > 1 ? <span className="text-xs text-gray-500">/ {c.preiseinheit}</span> : null}
+                      <span className="text-xs font-medium whitespace-nowrap">= {fmt((num(c.ek) / (num(c.preiseinheit) || 1)) * num(c.qty))} €</span>
+                      <button type="button" onClick={() => removeComp(i)} className="bg-red-600 text-white px-2 py-1 rounded text-xs" title="Aus der Stückliste entfernen">🗑️</button>
+                    </div>
+                  ))}
+                  {hasComps ? (
+                    <p className="text-xs text-gray-600">Material-EK aus Stückliste: <strong>{fmt(fSums.mat)} €</strong>{fSums.cu > 0 ? <> · 🟠 Kupfer: <strong>{fmt(fSums.cu)} kg</strong></> : null} — Preise sind eingefroren, „🔄 Preise aktualisieren“ holt die aktuellen EKs.</p>
+                  ) : (
+                    <p className="text-xs text-gray-500">Noch keine Teile. Ohne Stückliste gilt das Mat-Ek-Feld oben wie bisher.</p>
+                  )}
+                </div>
+              )}
+
               <div className="flex gap-2 flex-wrap">
                 <button type="button" onClick={saveArticle} className="bg-cyan-700 text-white px-4 py-2 rounded-lg text-sm">{f.id ? "💾 Speichern" : "Anlegen"}</button>
                 <button type="button" onClick={resetForm} className="bg-gray-200 px-4 py-2 rounded-lg text-sm">Abbrechen</button>
@@ -357,10 +525,13 @@ export default function Artikel({ supabase, companyId }: { supabase: any; compan
                     {a.category ? <span className="text-xs bg-slate-100 text-slate-700 rounded px-1.5 py-0.5">{a.category}</span> : null}
                     {a.number ? <span className="text-xs text-gray-500">Nr. {a.number}</span> : null}
                     <strong>{a.short_text || "(ohne Kurztext)"}</strong>
+                    {Array.isArray(a.components) && a.components.length > 0 ? <span className="text-xs bg-cyan-50 text-cyan-800 border border-cyan-200 rounded px-1.5 py-0.5">🧩 {a.components.length} Teile</span> : null}
                   </div>
                   {a.long_text ? <div className="text-gray-500 text-xs mt-0.5 line-clamp-2">{a.long_text}</div> : null}
                   <div className="text-gray-500 text-xs mt-0.5">
-                    {fmt(num(a.mat_ek))} € Mat · {fmt(num(a.lohn_ek))} €/h Lohn · {num(a.minutes)} min/{a.unit || "St"} · EP ca. {fmt(articleEp(a))} €
+                    {isLeistung
+                      ? <>{fmt(num(a.mat_ek))} € Mat · {fmt(num(a.lohn_ek))} €/h Lohn · {num(a.minutes)} min/{a.unit || "St"} · EP ca. {fmt(articleEp(a))} €</>
+                      : <>{fmt(num(a.mat_ek))} € EK / {num(a.preiseinheit) > 1 ? `${num(a.preiseinheit)} ` : ""}{a.unit || "St"} · VK ca. {fmt(articleEp(a))} €</>}
                   </div>
                 </div>
                 <div className="flex gap-2 shrink-0">
@@ -369,8 +540,8 @@ export default function Artikel({ supabase, companyId }: { supabase: any; compan
                 </div>
               </div>
             ))}
-            {articles.length === 0 && <p className="text-gray-600">Noch keine Artikel. Lege den ersten Artikel an.</p>}
-            {articles.length > 0 && filtered.length === 0 && <p className="text-gray-600">Kein Artikel gefunden.</p>}
+            {articles.length === 0 && <p className="text-gray-600">{isLeistung ? "Noch keine Leistungen. Lege die erste Leistung an — deine bisherigen Artikel mit Arbeitszeit findest du hier." : "Noch keine Artikel. Lege den ersten Artikel an oder übernimm einen aus dem Lieferanten-Katalog."}</p>}
+            {articles.length > 0 && filtered.length === 0 && <p className="text-gray-600">{isLeistung ? "Keine Leistung gefunden." : "Kein Artikel gefunden."}</p>}
           </div>
         </div>
       )}

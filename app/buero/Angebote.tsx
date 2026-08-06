@@ -156,7 +156,8 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
   const [articles, setArticles] = useState<any[]>([]);
   const [suppliers, setSuppliers] = useState<any[]>([]);
   const [artPickerOpen, setArtPickerOpen] = useState(false);
-  const [artSource, setArtSource] = useState<string>("own"); // "own" oder supplier_id
+  const [artSource, setArtSource] = useState<string>("leistung"); // "leistung" | "artikel" oder supplier_id
+  const isOwnSrc = (s: string) => s === "leistung" || s === "artikel"; // eigener Stamm (nach Art) vs. Lieferanten-Katalog
   const [artSearch, setArtSearch] = useState("");
   const [artCat, setArtCat] = useState("");
   const [supResults, setSupResults] = useState<any[]>([]);
@@ -168,7 +169,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
 
   // Serverseitige Suche im Lieferanten-Katalog (große Kataloge nicht komplett laden), entprellt.
   useEffect(() => {
-    if (!artPickerOpen || artSource === "own") { setSupResults([]); return; }
+    if (!artPickerOpen || isOwnSrc(artSource)) { setSupResults([]); return; }
     let active = true;
     setSupLoading(true);
     const safe = artSearch.trim().replace(/[,()%*]/g, " ").trim();
@@ -592,11 +593,12 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
   const aq = artSearch.trim().toLowerCase();
   const artCategories = Array.from(new Set(articles.map((a: any) => String(a.category || "").trim()).filter(Boolean))).sort((a, b) => a.localeCompare(b, "de", { sensitivity: "base" }));
   const artMatches = articles
+    .filter((a: any) => (a.art || "leistung") === (isOwnSrc(artSource) ? artSource : "")) // Alt-Daten ohne art zählen als Leistung
     .filter((a: any) => (artCat ? String(a.category || "").trim() === artCat : true))
     .filter((a: any) => (aq ? [a.number, a.short_text, a.long_text, a.category].some((x: any) => String(x || "").toLowerCase().includes(aq)) : true))
     .slice(0, 100);
   const cartCount = Object.keys(cart).length;
-  const pickerRows: any[] = artSource === "own" ? artMatches : supResults;
+  const pickerRows: any[] = isOwnSrc(artSource) ? artMatches : supResults;
 
   const dt = o.doc_type || "angebot";
   const parentRow: any = o.parent_id ? offers.find((r: any) => r.id === o.parent_id) : null;
@@ -724,23 +726,24 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
             {/* Quelle: eigener Artikelstamm oder Lieferanten-Katalog */}
             <div className="flex items-center gap-1.5 flex-wrap">
               <span className="text-sm font-medium mr-1">Quelle:</span>
-              <button type="button" onClick={() => setArtSource("own")} className={`px-2.5 py-1 rounded-full text-xs font-medium ${artSource === "own" ? "bg-cyan-700 text-white" : "bg-white border border-slate-300 text-slate-600"}`}>📦 Eigene Artikel</button>
+              <button type="button" onClick={() => setArtSource("leistung")} className={`px-2.5 py-1 rounded-full text-xs font-medium ${artSource === "leistung" ? "bg-cyan-700 text-white" : "bg-white border border-slate-300 text-slate-600"}`}>🔧 Leistungen</button>
+              <button type="button" onClick={() => setArtSource("artikel")} className={`px-2.5 py-1 rounded-full text-xs font-medium ${artSource === "artikel" ? "bg-cyan-700 text-white" : "bg-white border border-slate-300 text-slate-600"}`}>📦 Artikel</button>
               {suppliers.map((s: any) => (
                 <button key={s.id} type="button" onClick={() => setArtSource(s.id)} className={`px-2.5 py-1 rounded-full text-xs font-medium ${artSource === s.id ? "bg-cyan-700 text-white" : "bg-white border border-slate-300 text-slate-600"}`}>🏭 {s.name}</button>
               ))}
               <button type="button" onClick={() => { setArtPickerOpen(false); setCart({}); }} className="bg-gray-200 px-3 py-1.5 rounded-lg text-xs ml-auto">Schließen</button>
             </div>
             <div className="flex items-center gap-2 flex-wrap">
-              <input className="border p-2 rounded-lg text-black bg-white flex-1 min-w-[12rem] text-sm" placeholder={artSource === "own" ? "Suche: Nr., Kurztext, Kategorie…" : "Suche im Katalog: Artikelnummer oder Bezeichnung…"} value={artSearch} onChange={(e) => setArtSearch(e.target.value)} />
-              {artSource === "own" && artCategories.length > 0 && (
+              <input className="border p-2 rounded-lg text-black bg-white flex-1 min-w-[12rem] text-sm" placeholder={isOwnSrc(artSource) ? "Suche: Nr., Kurztext, Kategorie…" : "Suche im Katalog: Artikelnummer oder Bezeichnung…"} value={artSearch} onChange={(e) => setArtSearch(e.target.value)} />
+              {isOwnSrc(artSource) && artCategories.length > 0 && (
                 <select className="border p-2 rounded-lg text-black bg-white text-sm" value={artCat} onChange={(e) => setArtCat(e.target.value)}>
                   <option value="">Alle Kategorien</option>
                   {artCategories.map((c) => <option key={c} value={c}>{c}</option>)}
                 </select>
               )}
-              {artSource !== "own" && supLoading && <span className="text-xs text-gray-500">sucht…</span>}
+              {!isOwnSrc(artSource) && supLoading && <span className="text-xs text-gray-500">sucht…</span>}
             </div>
-            {artSource !== "own" && (() => {
+            {!isOwnSrc(artSource) && (() => {
               const sup = suppliers.find((x: any) => x.id === artSource);
               const cnt = Math.round(num(sup?.article_count));
               if (supErr) return <div className="text-xs text-red-600">Fehler bei der Suche: {supErr}</div>;
@@ -772,7 +775,9 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
               })}
               {pickerRows.length === 0 && (
                 <p className="text-xs text-gray-500">
-                  {artSource === "own"
+                  {artSource === "leistung"
+                    ? "Keine Leistung gefunden. Leistungen im Reiter „🔧 Leistungen“ anlegen."
+                    : artSource === "artikel"
                     ? "Kein Artikel gefunden. Artikel im Reiter „📦 Artikel“ anlegen."
                     : supLoading ? "Suche läuft…" : artSearch.trim() ? "Kein Treffer – bei Katalogen ohne Bezeichnung nach Artikelnummer suchen." : "Suchbegriff eingeben (Artikelnummer oder Bezeichnung)."}
                 </p>

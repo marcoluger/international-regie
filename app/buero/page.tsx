@@ -14,6 +14,7 @@ const BUERO_TABS = [
   { key: "auftraege", label: "🛠 Auftrag/Störung" },
   { key: "mitarbeiter", label: "👤 Mitarbeiter" },
   { key: "kunden", label: "👥 Kunden" },
+  { key: "leistungen", label: "🔧 Leistungen" },
   { key: "artikel", label: "📦 Artikel" },
   { key: "angebote", label: "🧾 Angebote" },
   { key: "ab", label: "📋 Auftragsbestätigung" },
@@ -531,7 +532,10 @@ export default function BueroPage() {
               );
             })()}
 
-            {tab === "artikel" && <Artikel supabase={supabase} companyId={companyId} />}
+            {/* Leistungen (mit Arbeitszeit + Stückliste) und Artikel (reines Material): gleiche Komponente, art-Prop (Stufe 7a) */}
+            {tab === "leistungen" && <Artikel supabase={supabase} companyId={companyId} art="leistung" />}
+
+            {tab === "artikel" && <Artikel supabase={supabase} companyId={companyId} art="artikel" />}
 
             {tab === "angebote" && <Angebote supabase={supabase} companyId={companyId} customers={customers} doc="angebot" />}
 
