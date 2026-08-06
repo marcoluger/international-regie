@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import Angebote from "./Angebote";
 import Artikel from "./Artikel";
+import Datev from "./Datev";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || "",
@@ -19,6 +20,7 @@ const BUERO_TABS = [
   { key: "angebote", label: "🧾 Angebote" },
   { key: "ab", label: "📋 Auftragsbestätigung" },
   { key: "rechnung", label: "💶 Rechnung" },
+  { key: "datev", label: "📚 Buchhaltung" },
 ];
 
 export default function BueroPage() {
@@ -543,6 +545,9 @@ export default function BueroPage() {
             {tab === "ab" && <Angebote supabase={supabase} companyId={companyId} customers={customers} doc="ab" />}
 
             {tab === "rechnung" && <Angebote supabase={supabase} companyId={companyId} customers={customers} doc="rechnung" />}
+
+            {/* Buchhaltung: DATEV-Export der Ausgangsrechnungen (Stufe 8a) */}
+            {tab === "datev" && <Datev supabase={supabase} companyId={companyId} customers={customers} />}
           </div>
         )}
       </div>
