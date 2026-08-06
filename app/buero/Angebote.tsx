@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { generateAngebotPdf, generateAbPdf } from "./angebotPdf";
+import { generateAngebotPdf, generateAbPdf, generateRechnungPdf } from "./angebotPdf";
 import { generateEfbPdf } from "./efbPdf";
 import { parseGaebX83 } from "./gaebImport";
 import { downloadGaebX84 } from "./gaebExport";
@@ -365,16 +365,32 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
     }
   }
 
+  // Bezugstext fürs PDF: "Angebot Nr. 1234567 vom 05.08.2026" / "Auftragsbestätigung Nr. …"
+  function parentInfoText() {
+    const parent: any = o.parent_id ? offers.find((r: any) => r.id === o.parent_id) : null;
+    if (!parent) return "";
+    const pdt = parent.doc_type || "angebot";
+    const pdate = pdt === "angebot" ? parent.offer_date : (parent.doc_date || parent.offer_date);
+    return `${DOC_LABEL[pdt]} Nr. ${parent.number || "(ohne Nr.)"}${pdate ? ` vom ${fmtDate(pdate)}` : ""}`;
+  }
+
   // Stufe 6b: AB-PDF (Luger-Layout, Bezug aufs Angebot, ohne Bindefrist)
   async function pdfAb() {
     try {
       const cust = customers.find((k: any) => k.id === o.customer_id);
       const customerNo = cust ? String(cust.customer_no || cust.debitor || cust.kreditor || "") : "";
-      const parent: any = o.parent_id ? offers.find((r: any) => r.id === o.parent_id) : null;
-      const parentInfo = parent
-        ? `${DOC_LABEL[parent.doc_type || "angebot"]} Nr. ${parent.number || "(ohne Nr.)"}${parent.offer_date ? ` vom ${fmtDate(parent.offer_date)}` : ""}`
-        : "";
-      await generateAbPdf(o, { customerNo, parentInfo });
+      await generateAbPdf(o, { customerNo, parentInfo: parentInfoText() });
+    } catch (e: any) {
+      setMsg("Fehler beim PDF: " + (e?.message || String(e)));
+    }
+  }
+
+  // Stufe 6c: Rechnungs-PDF (Leistungszeitraum, Fälligkeit/Skonto, Bezug auf AB/Angebot)
+  async function pdfRechnung() {
+    try {
+      const cust = customers.find((k: any) => k.id === o.customer_id);
+      const customerNo = cust ? String(cust.customer_no || cust.debitor || cust.kreditor || "") : "";
+      await generateRechnungPdf(o, { customerNo, parentInfo: parentInfoText() });
     } catch (e: any) {
       setMsg("Fehler beim PDF: " + (e?.message || String(e)));
     }
@@ -597,6 +613,9 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
           </>)}
           {dt === "ab" && (
             <button type="button" onClick={pdfAb} className="bg-slate-700 text-white px-4 py-2 rounded-lg text-sm" title="Auftragsbestätigung als PDF">📄 PDF</button>
+          )}
+          {dt === "rechnung" && (
+            <button type="button" onClick={pdfRechnung} className="bg-slate-700 text-white px-4 py-2 rounded-lg text-sm" title="Rechnung als PDF">📄 PDF</button>
           )}
           {(dt === "angebot" || dt === "ab") && (
             <button type="button" disabled={!o.id} onClick={() => deriveDoc(o, "rechnung")} title={o.id ? "Rechnung aus diesem Dokument erzeugen" : "Zuerst speichern, dann Rechnung erzeugen"} className="bg-emerald-800 text-white px-4 py-2 rounded-lg text-sm disabled:opacity-50">→ 💶 Rechnung</button>

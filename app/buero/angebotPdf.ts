@@ -59,11 +59,20 @@ type DocPdfConfig = {
   title: string;        // Kopfzeile, z. B. "A N G E B O T"
   filePrefix: string;   // Dateiname, z. B. "Angebot"
   docDate: string;      // Belegdatum (ISO) für den Infoblock
-  refLine?: string;     // Bezugszeile unter der Titelzeile (Seite 1)
+  refLines?: string[];  // Bezugszeilen unter der Titelzeile (Seite 1), z. B. Bezug + Leistungszeitraum
   showBindefrist: boolean;   // Gültigkeits-Satz (nur Angebot)
   showSignature: boolean;    // "Auftrag erteilt"-Block (nur Angebot)
+  showPayTerms: boolean;     // Abschlags-Zahlungsbedingungen 50/30/20 (Angebot/AB)
+  extraLines?: string[];     // Zusatzzeilen nach der Zusammenstellung (z. B. Fälligkeit/Skonto bei Rechnung)
   closingText?: string;      // Schlusssatz (z. B. Dank bei AB)
 };
+
+function addDays(dateStr: string, days: number) {
+  if (!dateStr || !days) return "";
+  const d = new Date(dateStr + "T00:00:00");
+  d.setDate(d.getDate() + Math.round(days));
+  return d.toISOString().slice(0, 10);
+}
 
 async function generateDocPdf(o: any, opts: { customerNo?: string } = {}, cfg: DocPdfConfig) {
   const { jsPDF } = await import("jspdf");
@@ -141,9 +150,10 @@ async function generateDocPdf(o: any, opts: { customerNo?: string } = {}, cfg: D
     // Dokument-Titel + Nr. links
     doc.setFontSize(11);
     doc.text(`${cfg.title} - Nr.: ${o.number || ""}`, mL, 72);
-    if (cfg.refLine) {
+    if (cfg.refLines && cfg.refLines.length) {
       doc.setFontSize(9);
-      doc.text(String(cfg.refLine), mL, 77.5);
+      let ry2 = 77.5;
+      for (const rl of cfg.refLines) { doc.text(String(rl), mL, ry2); ry2 += 4; }
     }
   }
 
@@ -203,7 +213,7 @@ async function generateDocPdf(o: any, opts: { customerNo?: string } = {}, cfg: D
     page = 0;
     footer();
     letterheadFirst();
-    let py = 84;
+    let py = 84 + Math.max(0, (cfg.refLines?.length || 0) - 1) * 4;
     if (o.subject) {
       doc.setFont("helvetica", "bold");
       doc.setFontSize(10.5);
@@ -400,17 +410,29 @@ async function generateDocPdf(o: any, opts: { customerNo?: string } = {}, cfg: D
       for (const wl of doc.splitTextToSize(String(o.nachtext), mR - mL)) { ensurePlain(6); doc.text(wl, mL, y); y += 4.6; }
       y += 4;
     }
-    // Zahlungsbedingungen
-    const p1 = num(o.pay1_pct), p2 = num(o.pay2_pct), p3 = num(o.pay3_pct);
-    if (p1 || p2 || p3) {
-      ensurePlain(12);
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(9.5);
-      doc.text("Zahlungsbedingungen:", mL, y); y += 5;
+    // Zahlungsbedingungen (Abschläge – Angebot/AB)
+    if (cfg.showPayTerms) {
+      const p1 = num(o.pay1_pct), p2 = num(o.pay2_pct), p3 = num(o.pay3_pct);
+      if (p1 || p2 || p3) {
+        ensurePlain(12);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9.5);
+        doc.text("Zahlungsbedingungen:", mL, y); y += 5;
+        doc.setFont("helvetica", "normal");
+        const zb = `${fmt(p1)} % bei Auftragserteilung, ${fmt(p2)} % bei Auftragsbeginn, ${fmt(p3)} % bei Auftragsabschluss.`;
+        for (const wl of doc.splitTextToSize(zb, mR - mL)) { ensurePlain(6); doc.text(wl, mL, y); y += 4.6; }
+        if (num(o.skonto_pct) > 0) { ensurePlain(6); doc.text(`Zahlbar innerhalb ${num(o.skonto_tage)} Tagen mit ${fmt(num(o.skonto_pct))} % Skonto.`, mL, y); y += 5; }
+        y += 4;
+      }
+    }
+    // Zusatzzeilen (z. B. Fälligkeit/Skonto bei Rechnung)
+    if (cfg.extraLines && cfg.extraLines.length) {
+      ensurePlain(6 + cfg.extraLines.length * 5);
       doc.setFont("helvetica", "normal");
-      const zb = `${fmt(p1)} % bei Auftragserteilung, ${fmt(p2)} % bei Auftragsbeginn, ${fmt(p3)} % bei Auftragsabschluss.`;
-      for (const wl of doc.splitTextToSize(zb, mR - mL)) { ensurePlain(6); doc.text(wl, mL, y); y += 4.6; }
-      if (num(o.skonto_pct) > 0) { ensurePlain(6); doc.text(`Zahlbar innerhalb ${num(o.skonto_tage)} Tagen mit ${fmt(num(o.skonto_pct))} % Skonto.`, mL, y); y += 5; }
+      doc.setFontSize(9.5);
+      for (const xl of cfg.extraLines) {
+        for (const wl of doc.splitTextToSize(String(xl), mR - mL)) { ensurePlain(6); doc.text(wl, mL, y); y += 4.6; }
+      }
       y += 4;
     }
     // Schlusssatz (z. B. Dank bei AB)
@@ -462,6 +484,7 @@ export async function generateAngebotPdf(o: any, opts: { customerNo?: string } =
     docDate: o.offer_date,
     showBindefrist: true,
     showSignature: true,
+    showPayTerms: true,
   });
 }
 
@@ -472,9 +495,42 @@ export async function generateAbPdf(o: any, opts: { customerNo?: string; parentI
     title: "A U F T R A G S B E S T Ä T I G U N G",
     filePrefix: "AB",
     docDate: o.doc_date || o.offer_date,
-    refLine: opts.parentInfo ? `Bezug: ${opts.parentInfo}` : undefined,
+    refLines: opts.parentInfo ? [`Bezug: ${opts.parentInfo}`] : undefined,
     showBindefrist: false,
     showSignature: false,
+    showPayTerms: true,
     closingText: "Wir bedanken uns für Ihren Auftrag und bestätigen die Ausführung der oben aufgeführten Leistungen.",
+  });
+}
+
+// Stufe 6c: Rechnungs-PDF im gleichen Luger-Layout.
+// Leistungszeitraum im Kopf, Fälligkeit/Skonto nach der Zusammenstellung,
+// Steuer-Ausweisung läuft wie gehabt über vat_rate/tax_note (Standard/PV/§13b).
+export async function generateRechnungPdf(o: any, opts: { customerNo?: string; parentInfo?: string } = {}) {
+  const refLines: string[] = [];
+  if (opts.parentInfo) refLines.push(`Bezug: ${opts.parentInfo}`);
+  if (o.leistung_von || o.leistung_bis) {
+    const von = fmtDate(o.leistung_von), bis = fmtDate(o.leistung_bis);
+    refLines.push(`Leistungszeitraum: ${von && bis ? `${von} bis ${bis}` : von || bis}`);
+  }
+  const extraLines: string[] = [];
+  const zt = num(o.zahlungsziel_tage);
+  const belegDatum = o.doc_date || o.offer_date;
+  if (zt > 0 && belegDatum) {
+    extraLines.push(`Zahlbar ohne Abzug bis zum ${fmtDate(addDays(belegDatum, zt))} (${Math.round(zt)} Tage netto).`);
+  }
+  if (num(o.skonto_pct) > 0 && num(o.skonto_tage) > 0 && belegDatum) {
+    extraLines.push(`Bei Zahlung bis zum ${fmtDate(addDays(belegDatum, num(o.skonto_tage)))} gewähren wir ${fmt(num(o.skonto_pct))} % Skonto.`);
+  }
+  return generateDocPdf(o, { customerNo: opts.customerNo }, {
+    title: "R E C H N U N G",
+    filePrefix: "Rechnung",
+    docDate: belegDatum,
+    refLines: refLines.length ? refLines : undefined,
+    showBindefrist: false,
+    showSignature: false,
+    showPayTerms: false,
+    extraLines: extraLines.length ? extraLines : undefined,
+    closingText: "Wir bedanken uns für Ihren Auftrag und die angenehme Zusammenarbeit.",
   });
 }
