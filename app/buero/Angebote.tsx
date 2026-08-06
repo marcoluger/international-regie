@@ -108,9 +108,23 @@ function newItem(kind: string) {
   return { ...base, short_text: "", long_text: "", qty: "1", unit: "St", mat_ek: "", mat_multi: "1.28", lohn_ek: "", lohn_multi: "1.28", minutes: "", fremd_vk: "", geraet_vk: "", discount_pct: "", preiseinheit: "1", verschnitt: "1", kupfer_kg: "", kupfer_multi: "1.05" };
 }
 
+// ── Dokumentarten (Stufe 6a): Angebot -> Auftragsbestätigung -> Rechnung ──
+const DOC_LABEL: Record<string, string> = { angebot: "Angebot", ab: "Auftragsbestätigung", rechnung: "Rechnung" };
+const DOC_LABEL_NEW: Record<string, string> = { angebot: "Neues Angebot", ab: "Neue Auftragsbestätigung", rechnung: "Neue Rechnung" };
+const DOC_LABEL_PLURAL: Record<string, string> = { angebot: "Angebote", ab: "Auftragsbestätigungen", rechnung: "Rechnungen" };
+const DOC_ICON: Record<string, string> = { angebot: "🧾", ab: "📋", rechnung: "💶" };
+// Status je Dokumentart (Freitext in der DB; hier nur die Auswahl)
+const DOC_STATUS: Record<string, string[]> = {
+  angebot: ["entwurf", "versendet", "beauftragt", "abgelehnt"],
+  ab: ["entwurf", "versendet", "bestätigt"],
+  rechnung: ["entwurf", "versendet", "bezahlt"],
+};
+
 function blankOffer() {
   return {
     id: null as string | null, number: "", status: "entwurf", subject: "",
+    doc_type: "angebot", parent_id: null as string | null, doc_date: "",
+    leistung_von: "", leistung_bis: "", zahlungsziel_tage: "",
     offer_date: "", valid_until: "",
     customer_id: "", customer_name: "", customer_anrede: "", customer_street: "", customer_zip: "", customer_city: "",
     vat_rate: "19", rabatt_pct: "0", nachlass: "0", skonto_pct: "0", skonto_tage: "0",
@@ -125,6 +139,7 @@ function blankOffer() {
 export default function Angebote({ supabase, companyId, customers }: { supabase: any; companyId: string; customers: any[] }) {
   const [offers, setOffers] = useState<any[]>([]);
   const [mode, setMode] = useState<"list" | "edit" | "settings">("list");
+  const [docFilter, setDocFilter] = useState("angebot");
   const [o, setO] = useState<any>(blankOffer());
   const [msg, setMsg] = useState("");
   const [custSearch, setCustSearch] = useState("");
@@ -242,9 +257,41 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
     b.offer_date = new Date().toISOString().slice(0, 10);
     setO(b); setMode("edit"); setMsg(""); setCustSearch(""); setPickerOpen(false);
   }
+  // DB-Zeile in den bearbeitbaren Zustand normalisieren (Zahlen als Strings).
+  function rowToState(row: any) {
+    return { ...blankOffer(), ...row, vat_rate: String(row.vat_rate ?? "19"), rabatt_pct: String(row.rabatt_pct ?? "0"), nachlass: String(row.nachlass ?? "0"), skonto_pct: String(row.skonto_pct ?? "0"), skonto_tage: String(row.skonto_tage ?? "0"), def_mat_multi: String(row.def_mat_multi ?? "1.28"), def_lohn_multi: String(row.def_lohn_multi ?? "1.28"), binde_weeks: String(row.binde_weeks ?? ""), tax_mode: row.tax_mode || "standard", tax_note: row.tax_note ?? "", vortext: row.vortext ?? "", nachtext: row.nachtext ?? "", pay1_pct: String(row.pay1_pct ?? "50"), pay2_pct: String(row.pay2_pct ?? "30"), pay3_pct: String(row.pay3_pct ?? "20"), del_preis: String(row.del_preis ?? "0"), doc_type: row.doc_type || "angebot", parent_id: row.parent_id || null, doc_date: row.doc_date || "", leistung_von: row.leistung_von || "", leistung_bis: row.leistung_bis || "", zahlungsziel_tage: row.zahlungsziel_tage != null ? String(row.zahlungsziel_tage) : "", items: Array.isArray(row.items) ? row.items : [] };
+  }
   function editOffer(row: any) {
-    setO({ ...blankOffer(), ...row, vat_rate: String(row.vat_rate ?? "19"), rabatt_pct: String(row.rabatt_pct ?? "0"), nachlass: String(row.nachlass ?? "0"), skonto_pct: String(row.skonto_pct ?? "0"), skonto_tage: String(row.skonto_tage ?? "0"), def_mat_multi: String(row.def_mat_multi ?? "1.28"), def_lohn_multi: String(row.def_lohn_multi ?? "1.28"), binde_weeks: String(row.binde_weeks ?? ""), tax_mode: row.tax_mode || "standard", tax_note: row.tax_note ?? "", vortext: row.vortext ?? "", nachtext: row.nachtext ?? "", pay1_pct: String(row.pay1_pct ?? "50"), pay2_pct: String(row.pay2_pct ?? "30"), pay3_pct: String(row.pay3_pct ?? "20"), del_preis: String(row.del_preis ?? "0"), items: Array.isArray(row.items) ? row.items : [] });
+    setO(rowToState(row));
     setMode("edit"); setMsg("");
+  }
+  // Folgedokument erzeugen (Angebot -> AB, Angebot/AB -> Rechnung).
+  // Kopiert alle Positionen (neue IDs), verweist per parent_id auf die Quelle.
+  // Nummer wird als editierbarer Vorschlag von der Quelle uebernommen (Nummernkreise kommen spaeter).
+  function deriveDoc(row: any, newType: string) {
+    const s: any = rowToState(row);
+    s.id = null;
+    s.doc_type = newType;
+    s.parent_id = row.id;
+    s.status = "entwurf";
+    s.doc_date = new Date().toISOString().slice(0, 10);
+    s.items = (Array.isArray(row.items) ? row.items : []).map((it: any) => ({ ...it, id: uid() }));
+    if (newType === "rechnung" && !s.zahlungsziel_tage) s.zahlungsziel_tage = "14";
+    setO(s); setMode("edit"); setCustSearch(""); setPickerOpen(false);
+    setMsg(`${DOC_LABEL[newType]} aus ${DOC_LABEL[row.doc_type || "angebot"]} ${row.number || "(ohne Nr.)"} erzeugt – noch nicht gespeichert.`);
+  }
+  // Dokument gleicher Art als Vorlage duplizieren (ohne Nummer, ohne Verweis).
+  function duplicateDoc(row: any) {
+    const s: any = rowToState(row);
+    s.id = null;
+    s.parent_id = null;
+    s.number = "";
+    s.status = "entwurf";
+    const heute = new Date().toISOString().slice(0, 10);
+    if ((s.doc_type || "angebot") === "angebot") s.offer_date = heute; else s.doc_date = heute;
+    s.items = (Array.isArray(row.items) ? row.items : []).map((it: any) => ({ ...it, id: uid() }));
+    setO(s); setMode("edit"); setCustSearch(""); setPickerOpen(false);
+    setMsg(`Kopie von ${row.number || "(ohne Nr.)"} erzeugt – noch nicht gespeichert.`);
   }
 
   function set(field: string, val: any) { setO((p: any) => ({ ...p, [field]: val })); }
@@ -291,6 +338,9 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
       tax_mode: o.tax_mode || "standard", tax_note: o.tax_note || null,
       vortext: o.vortext || null, nachtext: o.nachtext || null, pay1_pct: num(o.pay1_pct), pay2_pct: num(o.pay2_pct), pay3_pct: num(o.pay3_pct),
       del_preis: num(o.del_preis),
+      doc_type: o.doc_type || "angebot", parent_id: o.parent_id || null, doc_date: o.doc_date || null,
+      leistung_von: o.leistung_von || null, leistung_bis: o.leistung_bis || null,
+      zahlungsziel_tage: o.zahlungsziel_tage ? Math.round(num(o.zahlungsziel_tage)) : null,
       items: o.items, net_total: t.netAfter, vat_total: t.vat, gross_total: t.gross, updated_at: new Date().toISOString(),
     };
     if (o.id) {
@@ -301,7 +351,7 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
       if (error) { setMsg("Fehler beim Speichern: " + error.message); return; }
       if (data?.id) setO((p: any) => ({ ...p, id: data.id }));
     }
-    await loadOffers(); setMsg("Angebot gespeichert.");
+    await loadOffers(); setMsg(`${DOC_LABEL[o.doc_type || "angebot"]} gespeichert.`);
   }
 
   async function pdfOffer() {
@@ -360,7 +410,7 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
   }
 
   async function deleteOffer(id: string) {
-    if (typeof window !== "undefined" && !window.confirm("Angebot wirklich löschen?")) return;
+    if (typeof window !== "undefined" && !window.confirm("Dokument wirklich löschen?")) return;
     const { error } = await supabase.from("office_offers").delete().eq("id", id);
     if (error) { setMsg("Fehler beim Löschen: " + error.message); return; }
     await loadOffers();
@@ -454,31 +504,59 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
 
   // ── Liste ────────────────────────────────────────────────────────
   if (mode === "list") {
+    const docType = (r: any) => r.doc_type || "angebot";
+    const listRows = offers.filter((r: any) => docType(r) === docFilter);
+    const byId = new Map(offers.map((r: any) => [r.id, r]));
+    const parentRef = (r: any) => {
+      if (!r.parent_id) return null;
+      const p: any = byId.get(r.parent_id);
+      return p ? `aus ${DOC_LABEL[docType(p)]} ${p.number || "(ohne Nr.)"}` : "aus gelöschtem Dokument";
+    };
     return (
       <section className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4">
         <div className="flex items-center justify-between gap-2 flex-wrap">
-          <h2 className="text-xl font-bold">🧾 Angebote <span className="text-sm font-normal text-gray-500">({offers.length})</span></h2>
+          <h2 className="text-xl font-bold">{DOC_ICON[docFilter]} {DOC_LABEL_PLURAL[docFilter]} <span className="text-sm font-normal text-gray-500">({listRows.length})</span></h2>
           <div className="flex gap-2">
             <button type="button" onClick={() => { setMode("settings"); setMsg(""); }} className="bg-slate-600 text-white px-4 py-2 rounded-lg text-sm">⚙️ Einstellungen</button>
             <button type="button" onClick={startNew} className="bg-cyan-700 text-white px-4 py-2 rounded-lg text-sm">＋ Neues Angebot</button>
           </div>
         </div>
+        <div className="flex gap-2 flex-wrap">
+          {(["angebot", "ab", "rechnung"] as string[]).map((dt) => {
+            const n = offers.filter((r: any) => docType(r) === dt).length;
+            return (
+              <button key={dt} type="button" onClick={() => setDocFilter(dt)} className={`px-4 py-2 rounded-full text-sm font-medium ${docFilter === dt ? "bg-cyan-700 text-white" : "bg-gray-100 text-gray-700"}`}>
+                {DOC_ICON[dt]} {DOC_LABEL_PLURAL[dt]} ({n})
+              </button>
+            );
+          })}
+        </div>
         {msg && <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-lg p-2 text-sm">{msg}</div>}
         <div className="space-y-2">
-          {offers.map((row: any) => (
+          {listRows.map((row: any) => (
             <div key={row.id} className="border border-slate-200 rounded-xl p-3 shadow-sm flex flex-wrap items-center justify-between gap-2">
               <div className="text-sm">
                 <strong>{row.number || "(ohne Nr.)"}</strong>{row.subject ? <span> · {row.subject}</span> : null}
                 {row.customer_name ? <div className="text-gray-600">{row.customer_name}</div> : null}
-                <div className="text-gray-500 text-xs">{row.status} · Brutto {fmt(num(row.gross_total))} €</div>
+                <div className="text-gray-500 text-xs">
+                  {row.status} · Brutto {fmt(num(row.gross_total))} €
+                  {parentRef(row) ? <span className="ml-1 text-cyan-700">· {parentRef(row)}</span> : null}
+                </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap">
+                {docType(row) === "angebot" && (
+                  <button type="button" onClick={() => deriveDoc(row, "ab")} title="Auftragsbestätigung aus diesem Angebot erzeugen" className="bg-emerald-700 text-white px-3 py-2 rounded-lg text-sm">→ 📋 AB</button>
+                )}
+                {(docType(row) === "angebot" || docType(row) === "ab") && (
+                  <button type="button" onClick={() => deriveDoc(row, "rechnung")} title="Rechnung aus diesem Dokument erzeugen" className="bg-emerald-800 text-white px-3 py-2 rounded-lg text-sm">→ 💶 Rechnung</button>
+                )}
+                <button type="button" onClick={() => duplicateDoc(row)} title="Als Vorlage duplizieren" className="bg-slate-600 text-white px-3 py-2 rounded-lg text-sm">⧉</button>
                 <button type="button" onClick={() => editOffer(row)} className="bg-amber-600 text-white px-3 py-2 rounded-lg text-sm">✏️ Öffnen</button>
                 <button type="button" onClick={() => deleteOffer(row.id)} className="bg-red-600 text-white px-3 py-2 rounded-lg text-sm">🗑️</button>
               </div>
             </div>
           ))}
-          {offers.length === 0 && <p className="text-gray-600">Noch keine Angebote.</p>}
+          {listRows.length === 0 && <p className="text-gray-600">{docFilter === "angebot" ? "Noch keine Angebote." : `Noch keine ${DOC_LABEL_PLURAL[docFilter]} – entstehen über „→“ aus einem Angebot${docFilter === "rechnung" ? " oder einer AB" : ""}.`}</p>}
         </div>
       </section>
     );
@@ -496,25 +574,51 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
   const cartCount = Object.keys(cart).length;
   const pickerRows: any[] = artSource === "own" ? artMatches : supResults;
 
+  const dt = o.doc_type || "angebot";
+  const parentRow: any = o.parent_id ? offers.find((r: any) => r.id === o.parent_id) : null;
   return (
     <section className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4">
       <div className="flex items-center justify-between gap-2 flex-wrap">
-        <h2 className="text-xl font-bold">🧾 {o.id ? "Angebot bearbeiten" : "Neues Angebot"}</h2>
-        <div className="flex gap-2">
+        <h2 className="text-xl font-bold">{DOC_ICON[dt]} {o.id ? `${DOC_LABEL[dt]} bearbeiten` : DOC_LABEL_NEW[dt]}</h2>
+        <div className="flex gap-2 flex-wrap">
           <button type="button" onClick={saveOffer} className="bg-cyan-700 text-white px-4 py-2 rounded-lg text-sm">💾 Speichern</button>
-          <button type="button" onClick={pdfOffer} className="bg-slate-700 text-white px-4 py-2 rounded-lg text-sm">📄 PDF</button>
-          <button type="button" onClick={efbPdf} className="bg-slate-600 text-white px-4 py-2 rounded-lg text-sm" title="EFB-Preisformblätter 221/222/223">📑 EFB</button>
+          {dt === "angebot" && (<>
+            <button type="button" onClick={pdfOffer} className="bg-slate-700 text-white px-4 py-2 rounded-lg text-sm">📄 PDF</button>
+            <button type="button" onClick={efbPdf} className="bg-slate-600 text-white px-4 py-2 rounded-lg text-sm" title="EFB-Preisformblätter 221/222/223">📑 EFB</button>
+          </>)}
           <button type="button" onClick={() => { setMode("list"); loadOffers(); }} className="bg-gray-200 px-4 py-2 rounded-lg text-sm">Zurück zur Liste</button>
         </div>
       </div>
       {msg && <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-lg p-2 text-sm">{msg}</div>}
+      {o.parent_id ? (
+        <div className="text-sm text-gray-600 bg-cyan-50 border border-cyan-200 rounded-lg px-3 py-2">
+          🔗 Erstellt aus {parentRow ? `${DOC_LABEL[parentRow.doc_type || "angebot"]} ${parentRow.number || "(ohne Nr.)"}` : "einem gelöschten Dokument"}
+          {parentRow ? <button type="button" onClick={() => editOffer(parentRow)} className="ml-2 text-cyan-700 underline">öffnen</button> : null}
+        </div>
+      ) : null}
 
       {/* Kopf */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 border border-slate-200 rounded-xl p-3 bg-gray-50">
-        <input className="border p-2 rounded-lg text-black bg-white" placeholder="Angebotsnummer (Start später automatisch)" value={o.number} onChange={(e) => set("number", e.target.value)} />
+        <input className="border p-2 rounded-lg text-black bg-white" placeholder={`${DOC_LABEL[dt]}snummer (Start später automatisch)`} value={o.number} onChange={(e) => set("number", e.target.value)} />
         <input className="border p-2 rounded-lg text-black bg-white" placeholder="Betreff / Projekt" value={o.subject} onChange={(e) => set("subject", e.target.value)} />
-        <label className="text-sm text-gray-600 flex items-center gap-2">Datum <input type="date" className="border p-2 rounded-lg text-black bg-white flex-1" value={o.offer_date || ""} onChange={(e) => set("offer_date", e.target.value)} /></label>
-        <div className="text-sm text-gray-600 flex items-center gap-2 flex-wrap">Bindefrist <input type="number" className="border p-2 rounded-lg text-black bg-white w-20" value={o.binde_weeks} onChange={(e) => set("binde_weeks", e.target.value)} /> Wochen <span className="text-gray-500">→ gültig bis {o.binde_weeks && o.offer_date ? fmtDate(addWeeks(o.offer_date, num(o.binde_weeks))) : "—"}</span></div>
+        {dt === "angebot" ? (
+          <label className="text-sm text-gray-600 flex items-center gap-2">Datum <input type="date" className="border p-2 rounded-lg text-black bg-white flex-1" value={o.offer_date || ""} onChange={(e) => set("offer_date", e.target.value)} /></label>
+        ) : (
+          <label className="text-sm text-gray-600 flex items-center gap-2">Belegdatum <input type="date" className="border p-2 rounded-lg text-black bg-white flex-1" value={o.doc_date || ""} onChange={(e) => set("doc_date", e.target.value)} /></label>
+        )}
+        <label className="text-sm text-gray-600 flex items-center gap-2">Status
+          <select className="border p-2 rounded-lg text-black bg-white flex-1" value={o.status || "entwurf"} onChange={(e) => set("status", e.target.value)}>
+            {(DOC_STATUS[dt] || DOC_STATUS.angebot).concat((DOC_STATUS[dt] || []).includes(o.status) || !o.status ? [] : [o.status]).map((s) => (<option key={s} value={s}>{s}</option>))}
+          </select>
+        </label>
+        {dt === "angebot" && (
+          <div className="text-sm text-gray-600 flex items-center gap-2 flex-wrap md:col-span-2">Bindefrist <input type="number" className="border p-2 rounded-lg text-black bg-white w-20" value={o.binde_weeks} onChange={(e) => set("binde_weeks", e.target.value)} /> Wochen <span className="text-gray-500">→ gültig bis {o.binde_weeks && o.offer_date ? fmtDate(addWeeks(o.offer_date, num(o.binde_weeks))) : "—"}</span></div>
+        )}
+        {dt === "rechnung" && (<>
+          <label className="text-sm text-gray-600 flex items-center gap-2">Leistung von <input type="date" className="border p-2 rounded-lg text-black bg-white flex-1" value={o.leistung_von || ""} onChange={(e) => set("leistung_von", e.target.value)} /></label>
+          <label className="text-sm text-gray-600 flex items-center gap-2">Leistung bis <input type="date" className="border p-2 rounded-lg text-black bg-white flex-1" value={o.leistung_bis || ""} onChange={(e) => set("leistung_bis", e.target.value)} /></label>
+          <div className="text-sm text-gray-600 flex items-center gap-2 flex-wrap md:col-span-2">Zahlungsziel <input type="number" className="border p-2 rounded-lg text-black bg-white w-20" value={o.zahlungsziel_tage} onChange={(e) => set("zahlungsziel_tage", e.target.value)} /> Tage <span className="text-gray-500">→ fällig am {o.zahlungsziel_tage && o.doc_date ? fmtDate(addWeeks(o.doc_date, num(o.zahlungsziel_tage) / 7)) : "—"}</span></div>
+        </>)}
       </div>
 
       {/* Kalkulations-Standard */}
