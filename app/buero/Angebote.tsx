@@ -49,7 +49,9 @@ function calcItem(it: any, del: number = 0) {
   const lohnVk = lohnSatzVk * (num(it.minutes) / 60);
   const kupferEk = num(it.kupfer_kg) * del;                       // Kupfer-EK je Preiseinheit
   const kupferVk = kupferEk * (num(it.kupfer_multi) || 1) / pe;   // Kupfer-VK je Einheit
-  const ep = matVk + lohnVk + kupferVk + num(it.fremd_vk) + num(it.geraet_vk);
+  const epCalc = matVk + lohnVk + kupferVk + num(it.fremd_vk) + num(it.geraet_vk);
+  // Fester E-Preis (ep_fix): manuell eingetippter Preis überschreibt die Kalkulation. Leer = automatisch.
+  const ep = it.ep_fix !== undefined && it.ep_fix !== null && String(it.ep_fix).trim() !== "" ? num(it.ep_fix) : epCalc;
   const gp = ep * num(it.qty) * (1 - num(it.discount_pct) / 100);
   return { ...it, mat_vk: matVk, lohn_satz_vk: lohnSatzVk, lohn_vk: lohnVk, kupfer_ek: kupferEk, kupfer_vk: kupferVk, ep, gp };
 }
@@ -826,7 +828,13 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
                   {(it.unit && !UNITS.includes(it.unit) ? [it.unit, ...UNITS] : UNITS).map((u: string) => <option key={u} value={u}>{u}</option>)}
                 </select>
                 <input className="border p-1.5 rounded text-black bg-white flex-1 text-sm font-medium" placeholder="Kurztext" value={it.short_text} onChange={(e) => setItem(it.id, "short_text", e.target.value)} />
-                <span className="text-sm text-right w-20 whitespace-nowrap" title="Einzelpreis">{fmt(it.ep)}</span>
+                <input
+                  className={`border p-1.5 rounded text-sm text-right w-20 ${String(it.ep_fix ?? "").trim() !== "" ? "bg-amber-50 border-amber-400 text-black font-medium" : "bg-white text-black"}`}
+                  placeholder={fmt(it.ep)}
+                  title="E-Preis: Zahl eintippen = fester Preis (überschreibt die Kalkulation, Feld wird gelb). Feld leeren = wieder automatisch aus EK/Lohn."
+                  value={it.ep_fix ?? ""}
+                  onChange={(e) => setItem(it.id, "ep_fix", e.target.value)}
+                />
                 <span className="text-sm font-bold text-right w-24 whitespace-nowrap" title="Gesamtpreis">{fmt(it.gp)} €</span>
                 {itemButtons(it.id)}
               </div>
@@ -845,7 +853,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
                     <label className="flex flex-col text-gray-500">Lohn-Vk<input className="border p-1.5 rounded bg-gray-100" value={fmt(it.lohn_vk)} readOnly /></label>
                     <label className="flex flex-col">Fremd-Vk<input className="border p-1.5 rounded text-black bg-white" value={it.fremd_vk} onChange={(e) => setItem(it.id, "fremd_vk", e.target.value)} /></label>
                     <label className="flex flex-col">Gerät-Vk<input className="border p-1.5 rounded text-black bg-white" value={it.geraet_vk} onChange={(e) => setItem(it.id, "geraet_vk", e.target.value)} /></label>
-                    <label className="flex flex-col text-gray-500">E-Preis<input className="border p-1.5 rounded bg-gray-100 font-medium" value={fmt(it.ep)} readOnly /></label>
+                    <label className="flex flex-col text-gray-500">E-Preis{String(it.ep_fix ?? "").trim() !== "" ? " (fest, s. Zeile oben)" : ""}<input className="border p-1.5 rounded bg-gray-100 font-medium" value={fmt(it.ep)} readOnly /></label>
                     <label className="flex flex-col text-gray-500">G-Preis<input className="border p-1.5 rounded bg-gray-100 font-bold" value={fmt(it.gp)} readOnly /></label>
                   </div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs border-t border-slate-100 pt-2">

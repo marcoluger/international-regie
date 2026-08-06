@@ -26,7 +26,9 @@ function calcItem(it: any, del: number = 0) {
   const lohnSatzVk = lohnEk * (num(it.lohn_multi) || 1);
   const lohnVk = lohnSatzVk * (num(it.minutes) / 60);
   const kupferVk = num(it.kupfer_kg) * del * (num(it.kupfer_multi) || 1) / pe;
-  const ep = matVk + lohnVk + kupferVk + num(it.fremd_vk) + num(it.geraet_vk);
+  const epCalc = matVk + lohnVk + kupferVk + num(it.fremd_vk) + num(it.geraet_vk);
+  // Fester E-Preis (ep_fix) überschreibt die Kalkulation — identisch zu Angebote.tsx.
+  const ep = it.ep_fix !== undefined && it.ep_fix !== null && String(it.ep_fix).trim() !== "" ? num(it.ep_fix) : epCalc;
   const gp = ep * num(it.qty) * (1 - num(it.discount_pct) / 100);
   return { ...it, ep, gp };
 }
