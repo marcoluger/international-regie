@@ -136,10 +136,11 @@ function blankOffer() {
 }
 
 // ── Komponente ─────────────────────────────────────────────────────
-export default function Angebote({ supabase, companyId, customers }: { supabase: any; companyId: string; customers: any[] }) {
+export default function Angebote({ supabase, companyId, customers, doc = "angebot" }: { supabase: any; companyId: string; customers: any[]; doc?: string }) {
   const [offers, setOffers] = useState<any[]>([]);
   const [mode, setMode] = useState<"list" | "edit" | "settings">("list");
-  const [docFilter, setDocFilter] = useState("angebot");
+  // Die angezeigte Dokumentart kommt vom Buero-Reiter (Angebote / AB / Rechnung).
+  const docFilter = doc;
   const [o, setO] = useState<any>(blankOffer());
   const [msg, setMsg] = useState("");
   const [custSearch, setCustSearch] = useState("");
@@ -278,7 +279,7 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
     s.items = (Array.isArray(row.items) ? row.items : []).map((it: any) => ({ ...it, id: uid() }));
     if (newType === "rechnung" && !s.zahlungsziel_tage) s.zahlungsziel_tage = "14";
     setO(s); setMode("edit"); setCustSearch(""); setPickerOpen(false);
-    setMsg(`${DOC_LABEL[newType]} aus ${DOC_LABEL[row.doc_type || "angebot"]} ${row.number || "(ohne Nr.)"} erzeugt – noch nicht gespeichert.`);
+    setMsg(`${DOC_LABEL[newType]} aus ${DOC_LABEL[row.doc_type || "angebot"]} ${row.number || "(ohne Nr.)"} erzeugt – noch nicht gespeichert. Nach dem Speichern zu finden im Reiter ${DOC_ICON[newType]} ${DOC_LABEL[newType]}.`);
   }
   // Dokument gleicher Art als Vorlage duplizieren (ohne Nummer, ohne Verweis).
   function duplicateDoc(row: any) {
@@ -517,19 +518,11 @@ export default function Angebote({ supabase, companyId, customers }: { supabase:
         <div className="flex items-center justify-between gap-2 flex-wrap">
           <h2 className="text-xl font-bold">{DOC_ICON[docFilter]} {DOC_LABEL_PLURAL[docFilter]} <span className="text-sm font-normal text-gray-500">({listRows.length})</span></h2>
           <div className="flex gap-2">
-            <button type="button" onClick={() => { setMode("settings"); setMsg(""); }} className="bg-slate-600 text-white px-4 py-2 rounded-lg text-sm">⚙️ Einstellungen</button>
-            <button type="button" onClick={startNew} className="bg-cyan-700 text-white px-4 py-2 rounded-lg text-sm">＋ Neues Angebot</button>
+            {docFilter === "angebot" && (<>
+              <button type="button" onClick={() => { setMode("settings"); setMsg(""); }} className="bg-slate-600 text-white px-4 py-2 rounded-lg text-sm">⚙️ Einstellungen</button>
+              <button type="button" onClick={startNew} className="bg-cyan-700 text-white px-4 py-2 rounded-lg text-sm">＋ Neues Angebot</button>
+            </>)}
           </div>
-        </div>
-        <div className="flex gap-2 flex-wrap">
-          {(["angebot", "ab", "rechnung"] as string[]).map((dt) => {
-            const n = offers.filter((r: any) => docType(r) === dt).length;
-            return (
-              <button key={dt} type="button" onClick={() => setDocFilter(dt)} className={`px-4 py-2 rounded-full text-sm font-medium ${docFilter === dt ? "bg-cyan-700 text-white" : "bg-gray-100 text-gray-700"}`}>
-                {DOC_ICON[dt]} {DOC_LABEL_PLURAL[dt]} ({n})
-              </button>
-            );
-          })}
         </div>
         {msg && <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-lg p-2 text-sm">{msg}</div>}
         <div className="space-y-2">

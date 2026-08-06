@@ -533,14 +533,12 @@ export default function BueroPage() {
 
             {tab === "artikel" && <Artikel supabase={supabase} companyId={companyId} />}
 
-            {tab === "angebote" && <Angebote supabase={supabase} companyId={companyId} customers={customers} />}
+            {tab === "angebote" && <Angebote supabase={supabase} companyId={companyId} customers={customers} doc="angebot" />}
 
-            {/* Tabs: Auftragsbestätigung / Rechnung – folgen */}
-            {(tab === "ab" || tab === "rechnung") && (
-              <section className="bg-white border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center text-gray-500">
-                {(BUERO_TABS.find((t) => t.key === tab)?.label || "")} — folgt als Nächstes hier im Büro-Bereich.
-              </section>
-            )}
+            {/* Auftragsbestätigungen und Rechnungen: gleiche Komponente, eigene Dokumentart (Stufe 6a) */}
+            {tab === "ab" && <Angebote supabase={supabase} companyId={companyId} customers={customers} doc="ab" />}
+
+            {tab === "rechnung" && <Angebote supabase={supabase} companyId={companyId} customers={customers} doc="rechnung" />}
           </div>
         )}
       </div>
