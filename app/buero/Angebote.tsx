@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { generateAngebotPdf, generateAbPdf, generateRechnungPdf } from "./angebotPdf";
 import { parseTaifunXlsx, normTokens, topMatches } from "./taifunArchiv";
 import { generateEfbPdf } from "./efbPdf";
@@ -474,6 +474,32 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
     setSugList((p) => p.filter((e) => e.id !== itemId));
   }
 
+  // Kandidaten-Block direkt unter der jeweiligen Position (Zeilen- und Tabellenansicht).
+  function suggBlockFor(itemId: string) {
+    const e = sugList.find((x) => x.id === itemId);
+    if (!e) return null;
+    return (
+      <div className="border-t border-amber-200 bg-amber-50/60 p-2 space-y-1">
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-xs font-medium text-amber-900">💡 Vorschläge aus dem Preisarchiv — anklicken = übernehmen</span>
+          <button type="button" onClick={() => skipSuggestion(itemId)} className="bg-gray-200 px-2 py-0.5 rounded text-xs whitespace-nowrap">Überspringen</button>
+        </div>
+        {e.cands.map((c, i) => (
+          <button key={i} type="button" onClick={() => pickSuggestion(e.id, c)}
+            className="w-full text-left border border-slate-200 rounded-lg p-1.5 text-xs bg-white hover:bg-emerald-50 flex flex-wrap items-center gap-x-3 gap-y-0.5"
+            title={String(c.row.text)}>
+            <span className={`font-bold rounded px-1.5 py-0.5 ${c.score >= 0.6 ? "bg-emerald-100 text-emerald-800" : c.score >= 0.4 ? "bg-amber-100 text-amber-800" : "bg-slate-100 text-slate-600"}`}>{Math.round(c.score * 100)} %</span>
+            <span className="min-w-0 flex-1 truncate font-medium">{String(c.row.text).split("\n")[0]}</span>
+            <span className="text-gray-600 whitespace-nowrap">Mat {c.row.mat_ek != null ? fmt(num(c.row.mat_ek)) + " €" : "—"}{c.row.mat_multi != null && num(c.row.mat_multi) > 0 ? ` ×${c.row.mat_multi}` : ""}</span>
+            <span className="text-gray-600 whitespace-nowrap">Lohn {c.row.lohn_ek != null && num(c.row.lohn_ek) > 0 ? fmt(num(c.row.lohn_ek)) + " €/h" : "—"} · {c.row.minutes != null ? num(c.row.minutes) + " min" : "—"}</span>
+            <span className="text-gray-800 font-medium whitespace-nowrap">EP damals {c.row.ep != null ? fmt(num(c.row.ep)) + " €" : "—"}</span>
+            <span className="text-gray-400 whitespace-nowrap">{c.row.source || ""}</span>
+          </button>
+        ))}
+      </div>
+    );
+  }
+
   // 💡 Unkalkulierte Positionen (kein Mat-EK, keine Minuten, kein fester EP) aus dem Archiv befüllen.
   // Sehr sichere Treffer (>= 80 %) werden direkt übernommen; alles Ähnliche (>= 25 %) landet in
   // der Prüfliste — dort wählt Marco je Position, WELCHER Kandidat (Preis/Zeit) übernommen wird.
@@ -916,37 +942,11 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
           </div>
         )}
 
-        {/* 💡 Prüfliste: unsichere Vorschläge — je Position Kandidaten zur Auswahl */}
+        {/* 💡 Offene Vorschläge: Kandidaten stehen direkt unter der jeweiligen Position */}
         {sugList.length > 0 && (
-          <div className="border border-amber-300 bg-amber-50/50 rounded-xl p-3 space-y-3">
-            <div className="flex items-center justify-between gap-2 flex-wrap">
-              <h4 className="font-bold text-sm">💡 Vorschläge prüfen <span className="font-normal text-gray-600">({sugList.length} Position{sugList.length === 1 ? "" : "en"} — Kandidat anklicken = übernehmen)</span></h4>
-              <button type="button" onClick={() => setSugList([])} className="bg-gray-200 px-3 py-1.5 rounded-lg text-xs">Alle überspringen / schließen</button>
-            </div>
-            {sugList.slice(0, 15).map((e) => (
-              <div key={e.id} className="border border-amber-200 bg-white rounded-lg p-2 space-y-1.5">
-                <div className="flex items-center gap-2 text-sm">
-                  {e.oz ? <span className="text-xs text-gray-500">Pos {e.oz}</span> : null}
-                  <strong className="min-w-0 flex-1 truncate" title={e.text}>{e.text}</strong>
-                  <button type="button" onClick={() => skipSuggestion(e.id)} className="bg-gray-200 px-2 py-1 rounded text-xs whitespace-nowrap">Überspringen</button>
-                </div>
-                <div className="space-y-1">
-                  {e.cands.map((c, i) => (
-                    <button key={i} type="button" onClick={() => pickSuggestion(e.id, c)}
-                      className="w-full text-left border border-slate-200 rounded-lg p-1.5 text-xs bg-white hover:bg-emerald-50 flex flex-wrap items-center gap-x-3 gap-y-0.5"
-                      title={String(c.row.text)}>
-                      <span className={`font-bold rounded px-1.5 py-0.5 ${c.score >= 0.6 ? "bg-emerald-100 text-emerald-800" : c.score >= 0.4 ? "bg-amber-100 text-amber-800" : "bg-slate-100 text-slate-600"}`}>{Math.round(c.score * 100)} %</span>
-                      <span className="min-w-0 flex-1 truncate font-medium">{String(c.row.text).split("\n")[0]}</span>
-                      <span className="text-gray-600 whitespace-nowrap">Mat {c.row.mat_ek != null ? fmt(num(c.row.mat_ek)) + " €" : "—"}{c.row.mat_multi != null && num(c.row.mat_multi) > 0 ? ` ×${c.row.mat_multi}` : ""}</span>
-                      <span className="text-gray-600 whitespace-nowrap">Lohn {c.row.lohn_ek != null && num(c.row.lohn_ek) > 0 ? fmt(num(c.row.lohn_ek)) + " €/h" : "—"} · {c.row.minutes != null ? num(c.row.minutes) + " min" : "—"}</span>
-                      <span className="text-gray-800 font-medium whitespace-nowrap">EP damals {c.row.ep != null ? fmt(num(c.row.ep)) + " €" : "—"}</span>
-                      <span className="text-gray-400 whitespace-nowrap">{c.row.source || ""}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ))}
-            {sugList.length > 15 && <p className="text-xs text-gray-600">… und {sugList.length - 15} weitere — erst die obigen entscheiden, dann rücken die nächsten nach.</p>}
+          <div className="flex items-center justify-between gap-2 flex-wrap border border-amber-300 bg-amber-50 rounded-lg px-3 py-2 text-sm">
+            <span>💡 <strong>{sugList.length}</strong> Position{sugList.length === 1 ? "" : "en"} mit offenen Vorschlägen — die Kandidaten stehen direkt unter der Position, anklicken = übernehmen.</span>
+            <button type="button" onClick={() => setSugList([])} className="bg-gray-200 px-3 py-1.5 rounded-lg text-xs whitespace-nowrap">Alle überspringen</button>
           </div>
         )}
 
@@ -990,8 +990,10 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
                     );
                   }
                   const epFixed = String(it.ep_fix ?? "").trim() !== "";
+                  const sugg = suggBlockFor(it.id);
                   return (
-                    <tr key={it.id} className={`border-t border-slate-200 ${it.suggest_note ? "bg-amber-50/60" : ""}`}>
+                    <Fragment key={it.id}>
+                    <tr className={`border-t border-slate-200 ${it.suggest_note ? "bg-amber-50/60" : ""}`}>
                       <td className="px-1 py-1 w-16"><input className={tin} value={it.oz} onChange={(e) => setItem(it.id, "oz", e.target.value)} /></td>
                       <td className="px-1 py-1 w-16"><input className={`${tin} text-right`} value={it.qty} onChange={(e) => setItem(it.id, "qty", e.target.value)} /></td>
                       <td className="px-1 py-1 w-16">
@@ -1020,6 +1022,8 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
                       <td className="px-1.5 text-right font-bold whitespace-nowrap">{fmt(it.gp)}</td>
                       <td className="px-1 py-1 whitespace-nowrap">{itemButtons(it.id)}</td>
                     </tr>
+                    {sugg && <tr><td colSpan={15} className="p-0">{sugg}</td></tr>}
+                    </Fragment>
                   );
                 })}
               </tbody>
@@ -1075,6 +1079,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
                 <span className="text-sm font-bold text-right w-24 whitespace-nowrap" title="Gesamtpreis">{fmt(it.gp)} €</span>
                 {itemButtons(it.id)}
               </div>
+              {suggBlockFor(it.id)}
               {opened && (
                 <div className="px-2 pb-2 space-y-2">
                   <textarea className="border p-1.5 rounded text-black bg-white w-full text-sm" rows={2} placeholder="Langtext" value={it.long_text} onChange={(e) => setItem(it.id, "long_text", e.target.value)} />
