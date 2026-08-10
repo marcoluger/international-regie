@@ -720,24 +720,47 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
               <label className="flex flex-col text-sm">MwSt %<input className="border p-2 rounded-lg text-black bg-white" value={settings.vat_rate} onChange={(e) => setSettings((x: any) => ({ ...x, vat_rate: e.target.value }))} /></label>
               <label className="flex flex-col text-sm">Kupfer €/kg (DEL, Standard)<input className="border p-2 rounded-lg text-black bg-white" value={settings.del_preis} onChange={(e) => setSettings((x: any) => ({ ...x, del_preis: e.target.value }))} /></label>
               <label className="flex flex-col text-sm">Standard-Kupfer-Multi<input className="border p-2 rounded-lg text-black bg-white" value={settings.def_kupfer_multi} onChange={(e) => setSettings((x: any) => ({ ...x, def_kupfer_multi: e.target.value }))} /></label>
-              <div className="md:col-span-2 border-t border-slate-200 pt-2 mt-1 space-y-2">
-                <p className="text-sm font-medium">EFB-Formblatt 221 — Zuschläge <span className="font-normal text-gray-500">(je Kostenart; Wagnis und Gewinn = Rest nach Baustellengemeinkosten + Allgemeinen Geschäftskosten, aufgeteilt nach den Anteilen unten)</span></p>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                  <label className="flex flex-col text-xs">Lohn: Baustellengemeinkosten (BGK) %<input className="border p-1.5 rounded text-black bg-white" value={settings.efb_bgk_lohn} onChange={(e) => setSettings((x: any) => ({ ...x, efb_bgk_lohn: e.target.value }))} /></label>
-                  <label className="flex flex-col text-xs">Lohn: Allgemeine Geschäftskosten (AGK) %<input className="border p-1.5 rounded text-black bg-white" value={settings.efb_agk_lohn} onChange={(e) => setSettings((x: any) => ({ ...x, efb_agk_lohn: e.target.value }))} /></label>
-                  <label className="flex flex-col text-xs">Material: Baustellengemeinkosten (BGK) %<input className="border p-1.5 rounded text-black bg-white" value={settings.efb_bgk_mat} onChange={(e) => setSettings((x: any) => ({ ...x, efb_bgk_mat: e.target.value }))} /></label>
-                  <label className="flex flex-col text-xs">Material: Allgemeine Geschäftskosten (AGK) %<input className="border p-1.5 rounded text-black bg-white" value={settings.efb_agk_mat} onChange={(e) => setSettings((x: any) => ({ ...x, efb_agk_mat: e.target.value }))} /></label>
-                  <label className="flex flex-col text-xs">Geräte: Baustellengemeinkosten (BGK) %<input className="border p-1.5 rounded text-black bg-white" value={settings.efb_bgk_geraet} onChange={(e) => setSettings((x: any) => ({ ...x, efb_bgk_geraet: e.target.value }))} /></label>
-                  <label className="flex flex-col text-xs">Geräte: Allgemeine Geschäftskosten (AGK) %<input className="border p-1.5 rounded text-black bg-white" value={settings.efb_agk_geraet} onChange={(e) => setSettings((x: any) => ({ ...x, efb_agk_geraet: e.target.value }))} /></label>
-                  <label className="flex flex-col text-xs">Fremdleistung: Baustellengemeinkosten (BGK) %<input className="border p-1.5 rounded text-black bg-white" value={settings.efb_bgk_fremd} onChange={(e) => setSettings((x: any) => ({ ...x, efb_bgk_fremd: e.target.value }))} /></label>
-                  <label className="flex flex-col text-xs">Fremdleistung: Allgemeine Geschäftskosten (AGK) %<input className="border p-1.5 rounded text-black bg-white" value={settings.efb_agk_fremd} onChange={(e) => setSettings((x: any) => ({ ...x, efb_agk_fremd: e.target.value }))} /></label>
+              <div className="md:col-span-2 border-t border-slate-200 pt-3 mt-1 space-y-4">
+                <div>
+                  <p className="text-sm font-medium">EFB-Formblatt 221 — Zuschläge</p>
+                  <p className="text-xs text-gray-500">Je Kostenart. Wagnis und Gewinn ergibt sich als Rest (Gesamtzuschlag minus Baustellengemeinkosten minus Allgemeine Geschäftskosten) und wird nach den Anteilen unten aufgeteilt.</p>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
-                  <label className="flex flex-col text-xs">Anteil Gewinn %<input className="border p-1.5 rounded text-black bg-white" value={settings.efb_anteil_gewinn} onChange={(e) => setSettings((x: any) => ({ ...x, efb_anteil_gewinn: e.target.value }))} /></label>
-                  <label className="flex flex-col text-xs">Anteil betriebsbezogenes Wagnis %<input className="border p-1.5 rounded text-black bg-white" value={settings.efb_anteil_wagnis_betrieb} onChange={(e) => setSettings((x: any) => ({ ...x, efb_anteil_wagnis_betrieb: e.target.value }))} /></label>
-                  <label className="flex flex-col text-xs">Anteil leistungsbezogenes Wagnis %<input className="border p-1.5 rounded text-black bg-white" value={settings.efb_anteil_wagnis_leistung} onChange={(e) => setSettings((x: any) => ({ ...x, efb_anteil_wagnis_leistung: e.target.value }))} /></label>
-                  <label className="flex flex-col text-xs">Zeile 1.2 Lohnzusatzkosten (Sozialkosten) %<input className="border p-1.5 rounded text-black bg-white" value={settings.efb_lohnzusatz} onChange={(e) => setSettings((x: any) => ({ ...x, efb_lohnzusatz: e.target.value }))} /></label>
-                  <label className="flex flex-col text-xs">Zeile 1.3 Lohnnebenkosten (Auslösung, Fahrgelder) %<input className="border p-1.5 rounded text-black bg-white" value={settings.efb_lohnneben} onChange={(e) => setSettings((x: any) => ({ ...x, efb_lohnneben: e.target.value }))} /></label>
+                <div className="grid grid-cols-[6.5rem_1fr_1fr] gap-x-5 gap-y-2 items-center">
+                  <span className="text-xs font-medium text-gray-600">Kostenart</span>
+                  <span className="text-xs font-medium text-gray-600">Baustellengemeinkosten (BGK) in %</span>
+                  <span className="text-xs font-medium text-gray-600">Allgemeine Geschäftskosten (AGK) in %</span>
+                  <span className="text-sm">Lohn</span>
+                  <input className="border p-2 rounded-lg text-black bg-white w-full" value={settings.efb_bgk_lohn} onChange={(e) => setSettings((x: any) => ({ ...x, efb_bgk_lohn: e.target.value }))} />
+                  <input className="border p-2 rounded-lg text-black bg-white w-full" value={settings.efb_agk_lohn} onChange={(e) => setSettings((x: any) => ({ ...x, efb_agk_lohn: e.target.value }))} />
+                  <span className="text-sm">Material</span>
+                  <input className="border p-2 rounded-lg text-black bg-white w-full" value={settings.efb_bgk_mat} onChange={(e) => setSettings((x: any) => ({ ...x, efb_bgk_mat: e.target.value }))} />
+                  <input className="border p-2 rounded-lg text-black bg-white w-full" value={settings.efb_agk_mat} onChange={(e) => setSettings((x: any) => ({ ...x, efb_agk_mat: e.target.value }))} />
+                  <span className="text-sm">Geräte</span>
+                  <input className="border p-2 rounded-lg text-black bg-white w-full" value={settings.efb_bgk_geraet} onChange={(e) => setSettings((x: any) => ({ ...x, efb_bgk_geraet: e.target.value }))} />
+                  <input className="border p-2 rounded-lg text-black bg-white w-full" value={settings.efb_agk_geraet} onChange={(e) => setSettings((x: any) => ({ ...x, efb_agk_geraet: e.target.value }))} />
+                  <span className="text-sm">Fremdleistung</span>
+                  <input className="border p-2 rounded-lg text-black bg-white w-full" value={settings.efb_bgk_fremd} onChange={(e) => setSettings((x: any) => ({ ...x, efb_bgk_fremd: e.target.value }))} />
+                  <input className="border p-2 rounded-lg text-black bg-white w-full" value={settings.efb_agk_fremd} onChange={(e) => setSettings((x: any) => ({ ...x, efb_agk_fremd: e.target.value }))} />
+                </div>
+                <div className="space-y-2 border-t border-slate-100 pt-3">
+                  <p className="text-xs font-medium text-gray-600">Wagnis und Gewinn — Aufteilung des Rests</p>
+                  <div className="grid grid-cols-[1fr_9rem] gap-x-5 gap-y-2 items-center">
+                    <span className="text-sm">Anteil Gewinn in %</span>
+                    <input className="border p-2 rounded-lg text-black bg-white w-full" value={settings.efb_anteil_gewinn} onChange={(e) => setSettings((x: any) => ({ ...x, efb_anteil_gewinn: e.target.value }))} />
+                    <span className="text-sm">Anteil betriebsbezogenes Wagnis in %</span>
+                    <input className="border p-2 rounded-lg text-black bg-white w-full" value={settings.efb_anteil_wagnis_betrieb} onChange={(e) => setSettings((x: any) => ({ ...x, efb_anteil_wagnis_betrieb: e.target.value }))} />
+                    <span className="text-sm">Anteil leistungsbezogenes Wagnis in %</span>
+                    <input className="border p-2 rounded-lg text-black bg-white w-full" value={settings.efb_anteil_wagnis_leistung} onChange={(e) => setSettings((x: any) => ({ ...x, efb_anteil_wagnis_leistung: e.target.value }))} />
+                  </div>
+                </div>
+                <div className="space-y-2 border-t border-slate-100 pt-3">
+                  <p className="text-xs font-medium text-gray-600">Lohnkosten (Tabelle 1 des Formblatts)</p>
+                  <div className="grid grid-cols-[1fr_9rem] gap-x-5 gap-y-2 items-center">
+                    <span className="text-sm">Zeile 1.2 — Lohnzusatzkosten (Sozialkosten) in %</span>
+                    <input className="border p-2 rounded-lg text-black bg-white w-full" value={settings.efb_lohnzusatz} onChange={(e) => setSettings((x: any) => ({ ...x, efb_lohnzusatz: e.target.value }))} />
+                    <span className="text-sm">Zeile 1.3 — Lohnnebenkosten (Auslösung, Fahrgelder) in %</span>
+                    <input className="border p-2 rounded-lg text-black bg-white w-full" value={settings.efb_lohnneben} onChange={(e) => setSettings((x: any) => ({ ...x, efb_lohnneben: e.target.value }))} />
+                  </div>
                 </div>
               </div>
             </div>
