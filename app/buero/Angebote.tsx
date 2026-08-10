@@ -170,6 +170,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
   const [archMsg, setArchMsg] = useState("");
   // Prüfliste des Preisvorschlags: je unsicherer Position bis zu 5 Kandidaten zur Auswahl.
   const [sugList, setSugList] = useState<{ id: string; oz: string; text: string; cands: { row: any; score: number }[] }[]>([]);
+  const [kiBusy, setKiBusy] = useState(false);
   const [artSearch, setArtSearch] = useState("");
   const [artCat, setArtCat] = useState("");
   const [supResults, setSupResults] = useState<any[]>([]);
@@ -528,6 +529,64 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
     setMsg(`💡 ${filled} sicher übernommen (≥ 80 %)${review.length ? ` · ${review.length} zum Auswählen (Prüfliste unten)` : ""}${none ? ` · ${none} ohne Treffer` : ""}${hadCalc ? ` · ${hadCalc} bereits kalkuliert` : ""}.`);
   }
 
+  // 🤖 Stufe 9c: KI-Schätzung für ALLE Positionen ohne Preis (Route /api/price-ai, gpt-4o-mini).
+  // Werte kommen als 🤖-Vorschlag (mat_ek + minutes je Einheit) — Kennzeichnung wie beim Archiv.
+  async function suggestPricesAi() {
+    const targets = o.items.filter((it: any) =>
+      it.kind === "position" &&
+      num(it.mat_ek) === 0 && num(it.minutes) === 0 && String(it.ep_fix ?? "").trim() === "" &&
+      String(it.short_text || it.long_text || "").trim() !== ""
+    );
+    if (!targets.length) { setMsg("🤖 Alle Positionen haben schon Preise — nichts zu schätzen."); return; }
+    setKiBusy(true);
+    setMsg(`🤖 KI schätzt ${targets.length} Position${targets.length === 1 ? "" : "en"}…`);
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      const token = sess?.session?.access_token;
+      if (!token) { setMsg("Nicht angemeldet — bitte neu einloggen."); setKiBusy(false); return; }
+      const byId: Record<string, { mat_ek: number | null; minutes: number | null; note: string }> = {};
+      for (let i = 0; i < targets.length; i += 25) {
+        const chunk = targets.slice(i, i + 25).map((it: any) => ({
+          id: it.id,
+          text: [it.short_text, it.long_text].filter(Boolean).join("\n").slice(0, 500),
+          unit: it.unit || "St",
+          qty: num(it.qty) || 1,
+        }));
+        const res = await fetch("/api/price-ai", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ positions: chunk }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data?.error || `Fehler ${res.status}`);
+        for (const r of data?.items || []) byId[r.id] = r;
+        setMsg(`🤖 KI schätzt… ${Math.min(i + 25, targets.length)} / ${targets.length}`);
+      }
+      let filled = 0;
+      setO((p: any) => ({
+        ...p,
+        items: p.items.map((it: any) => {
+          const r = byId[it.id];
+          if (!r) return it;
+          filled++;
+          return {
+            ...it,
+            mat_ek: r.mat_ek != null ? String(r.mat_ek) : it.mat_ek,
+            minutes: r.minutes != null ? String(r.minutes) : it.minutes,
+            suggest_note: `🤖 KI-Schätzung${r.note ? ` (${r.note})` : ""} — Marktpreis-Schätzung, bitte prüfen!`,
+          };
+        }),
+      }));
+      // Positionen mit KI-Werten aus der Archiv-Prüfliste nehmen (sie sind jetzt kalkuliert).
+      setSugList((p) => p.filter((e) => !byId[e.id]));
+      const ohne = targets.length - Object.keys(byId).length;
+      setMsg(`🤖 ${Object.keys(byId).length} Position${Object.keys(byId).length === 1 ? "" : "en"} von der KI geschätzt (🤖-Kennzeichnung — Schätzwerte, bitte prüfen!)${ohne > 0 ? ` · ${ohne} ohne Schätzung` : ""}.`);
+    } catch (e: any) {
+      setMsg("Fehler bei der KI-Schätzung: " + (e?.message || String(e)));
+    }
+    setKiBusy(false);
+  }
+
   async function efbPdf() {
     try {
       if (!o.items.some((x: any) => x.kind === "position")) { setMsg("Keine Positionen für EFB-Formblätter vorhanden."); return; }
@@ -870,6 +929,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
           <button type="button" onClick={exportGaeb} className="bg-emerald-800 text-white px-3 py-1.5 rounded-lg text-xs">⬇ GAEB (X84) exportieren</button>
           <button type="button" onClick={openArtPicker} className="bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-xs">📦 aus Artikelstamm</button>
           <button type="button" onClick={suggestPrices} className="bg-amber-600 text-white px-3 py-1.5 rounded-lg text-xs" title="Unkalkulierte Positionen mit der ähnlichsten Alt-Position aus dem Taifun-Preisarchiv befüllen">💡 Preise vorschlagen</button>
+          <button type="button" onClick={suggestPricesAi} disabled={kiBusy} className="bg-purple-700 disabled:bg-gray-300 text-white px-3 py-1.5 rounded-lg text-xs" title="Alle Positionen ohne Preis von der KI schätzen lassen (Material-EK + Minuten je Einheit) — Schätzwerte, bitte prüfen">{kiBusy ? "🤖 schätzt…" : "🤖 Preise durch KI"}</button>
           <button type="button" onClick={() => setPosView((p) => (p === "zeilen" ? "tabelle" : "zeilen"))} className="bg-slate-500 text-white px-3 py-1.5 rounded-lg text-xs ml-auto" title="Zwischen Zeilenansicht und Taifun-Kalkulationstabelle wechseln">{posView === "zeilen" ? "📊 Tabelle" : "📋 Zeilen"}</button>
         </div>
 
@@ -1003,7 +1063,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
                       </td>
                       <td className="px-1 py-1 min-w-[16rem]">
                         <div className="flex items-center gap-1">
-                          {it.suggest_note ? <span title={`Vorschlag aus Preisarchiv — ${it.suggest_note}`}>💡</span> : null}
+                          {it.suggest_note ? <span title={it.suggest_note}>{String(it.suggest_note).startsWith("🤖") ? "🤖" : "💡"}</span> : null}
                           <input className={`${tin} font-medium`} placeholder="Kurztext" value={it.short_text} onChange={(e) => setItem(it.id, "short_text", e.target.value)} />
                         </div>
                         {it.long_text ? <div className="text-[10px] text-gray-400 truncate max-w-[24rem]" title={it.long_text}>{String(it.long_text).split("\n")[0]}</div> : null}
@@ -1067,7 +1127,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
                 <select className="border p-1.5 rounded text-black bg-white w-20 text-sm" value={it.unit} onChange={(e) => setItem(it.id, "unit", e.target.value)}>
                   {(it.unit && !UNITS.includes(it.unit) ? [it.unit, ...UNITS] : UNITS).map((u: string) => <option key={u} value={u}>{u}</option>)}
                 </select>
-                {it.suggest_note ? <span className="text-sm" title={`Vorschlag aus Preisarchiv — ${it.suggest_note}`}>💡</span> : null}
+                {it.suggest_note ? <span className="text-sm" title={it.suggest_note}>{String(it.suggest_note).startsWith("🤖") ? "🤖" : "💡"}</span> : null}
                 <input className="border p-1.5 rounded text-black bg-white flex-1 text-sm font-medium" placeholder="Kurztext" value={it.short_text} onChange={(e) => setItem(it.id, "short_text", e.target.value)} />
                 <input
                   className={`border p-1.5 rounded text-sm text-right w-20 ${String(it.ep_fix ?? "").trim() !== "" ? "bg-amber-50 border-amber-400 text-black font-medium" : "bg-white text-black"}`}
