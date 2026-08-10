@@ -152,7 +152,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
   const [custSearch, setCustSearch] = useState("");
   const [pickerOpen, setPickerOpen] = useState(false);
   const [openItem, setOpenItem] = useState<Record<string, boolean>>({});
-  const [settings, setSettings] = useState<any>({ def_mat_multi: "1.28", def_lohn_multi: "1.5715", binde_weeks: "4", vat_rate: "19", def_rabatt_pct: "0", def_nachlass: "0", def_skonto_pct: "0", def_skonto_tage: "0", pv_text: PV_DEFAULT, b13_text: B13_DEFAULT, vortext: VORTEXT_DEFAULT, nachtext: NACHTEXT_DEFAULT, pay1_pct: "50", pay2_pct: "30", pay3_pct: "20", del_preis: "0", def_kupfer_multi: "1.05" });
+  const [settings, setSettings] = useState<any>({ def_mat_multi: "1.28", def_lohn_multi: "1.5715", binde_weeks: "4", vat_rate: "19", def_rabatt_pct: "0", def_nachlass: "0", def_skonto_pct: "0", def_skonto_tage: "0", pv_text: PV_DEFAULT, b13_text: B13_DEFAULT, vortext: VORTEXT_DEFAULT, nachtext: NACHTEXT_DEFAULT, pay1_pct: "50", pay2_pct: "30", pay3_pct: "20", del_preis: "0", def_kupfer_multi: "1.05", efb_bgk: "10", efb_gewinn: "4.45", efb_wagnis_betrieb: "2.22", efb_wagnis_leistung: "2.22" });
   const [settingsTab, setSettingsTab] = useState("allgemein");
   const [textModules, setTextModules] = useState<any[]>([]);
   const [tmKind, setTmKind] = useState("vor");
@@ -207,10 +207,10 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
   }
   async function loadSettings() {
     const { data } = await supabase.from("office_offer_settings").select("*").eq("company_id", companyId).maybeSingle();
-    if (data) setSettings({ def_mat_multi: String(data.def_mat_multi ?? "1.28"), def_lohn_multi: String(data.def_lohn_multi ?? "1.5715"), binde_weeks: String(data.binde_weeks ?? "4"), vat_rate: String(data.vat_rate ?? "19"), def_rabatt_pct: String(data.def_rabatt_pct ?? "0"), def_nachlass: String(data.def_nachlass ?? "0"), def_skonto_pct: String(data.def_skonto_pct ?? "0"), def_skonto_tage: String(data.def_skonto_tage ?? "0"), pv_text: data.pv_text ?? PV_DEFAULT, b13_text: data.b13_text ?? B13_DEFAULT, vortext: data.vortext ?? VORTEXT_DEFAULT, nachtext: data.nachtext ?? NACHTEXT_DEFAULT, pay1_pct: String(data.pay1_pct ?? "50"), pay2_pct: String(data.pay2_pct ?? "30"), pay3_pct: String(data.pay3_pct ?? "20"), del_preis: String(data.del_preis ?? "0"), def_kupfer_multi: String(data.def_kupfer_multi ?? "1.05") });
+    if (data) setSettings({ def_mat_multi: String(data.def_mat_multi ?? "1.28"), def_lohn_multi: String(data.def_lohn_multi ?? "1.5715"), binde_weeks: String(data.binde_weeks ?? "4"), vat_rate: String(data.vat_rate ?? "19"), def_rabatt_pct: String(data.def_rabatt_pct ?? "0"), def_nachlass: String(data.def_nachlass ?? "0"), def_skonto_pct: String(data.def_skonto_pct ?? "0"), def_skonto_tage: String(data.def_skonto_tage ?? "0"), pv_text: data.pv_text ?? PV_DEFAULT, b13_text: data.b13_text ?? B13_DEFAULT, vortext: data.vortext ?? VORTEXT_DEFAULT, nachtext: data.nachtext ?? NACHTEXT_DEFAULT, pay1_pct: String(data.pay1_pct ?? "50"), pay2_pct: String(data.pay2_pct ?? "30"), pay3_pct: String(data.pay3_pct ?? "20"), del_preis: String(data.del_preis ?? "0"), def_kupfer_multi: String(data.def_kupfer_multi ?? "1.05"), efb_bgk: String(data.efb_bgk ?? "10"), efb_gewinn: String(data.efb_gewinn ?? "4.45"), efb_wagnis_betrieb: String(data.efb_wagnis_betrieb ?? "2.22"), efb_wagnis_leistung: String(data.efb_wagnis_leistung ?? "2.22") });
   }
   async function saveSettings() {
-    const { error } = await supabase.from("office_offer_settings").upsert({ company_id: companyId, def_mat_multi: num(settings.def_mat_multi), def_lohn_multi: num(settings.def_lohn_multi), binde_weeks: Math.round(num(settings.binde_weeks)), vat_rate: num(settings.vat_rate), def_rabatt_pct: num(settings.def_rabatt_pct), def_nachlass: num(settings.def_nachlass), def_skonto_pct: num(settings.def_skonto_pct), def_skonto_tage: Math.round(num(settings.def_skonto_tage)), pv_text: settings.pv_text || null, b13_text: settings.b13_text || null, vortext: settings.vortext || null, nachtext: settings.nachtext || null, pay1_pct: num(settings.pay1_pct), pay2_pct: num(settings.pay2_pct), pay3_pct: num(settings.pay3_pct), del_preis: num(settings.del_preis), def_kupfer_multi: num(settings.def_kupfer_multi), updated_at: new Date().toISOString() }, { onConflict: "company_id" });
+    const { error } = await supabase.from("office_offer_settings").upsert({ company_id: companyId, def_mat_multi: num(settings.def_mat_multi), def_lohn_multi: num(settings.def_lohn_multi), binde_weeks: Math.round(num(settings.binde_weeks)), vat_rate: num(settings.vat_rate), def_rabatt_pct: num(settings.def_rabatt_pct), def_nachlass: num(settings.def_nachlass), def_skonto_pct: num(settings.def_skonto_pct), def_skonto_tage: Math.round(num(settings.def_skonto_tage)), pv_text: settings.pv_text || null, b13_text: settings.b13_text || null, vortext: settings.vortext || null, nachtext: settings.nachtext || null, pay1_pct: num(settings.pay1_pct), pay2_pct: num(settings.pay2_pct), pay3_pct: num(settings.pay3_pct), del_preis: num(settings.del_preis), def_kupfer_multi: num(settings.def_kupfer_multi), efb_bgk: num(settings.efb_bgk), efb_gewinn: num(settings.efb_gewinn), efb_wagnis_betrieb: num(settings.efb_wagnis_betrieb), efb_wagnis_leistung: num(settings.efb_wagnis_leistung), updated_at: new Date().toISOString() }, { onConflict: "company_id" });
     if (error) { setMsg("Fehler beim Speichern der Einstellungen: " + error.message); return; }
     setMsg("Einstellungen gespeichert.");
   }
@@ -647,7 +647,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
       if (!o.items.some((x: any) => x.kind === "position")) { setMsg("Keine Positionen für EFB-Formblätter vorhanden."); return; }
       const cust = customers.find((k: any) => k.id === o.customer_id);
       const customerNo = cust ? String(cust.customer_no || cust.debitor || cust.kreditor || "") : "";
-      await generateEfbPdf(o, { customerNo });
+      await generateEfbPdf(o, { customerNo, efb: { bgk: num(settings.efb_bgk), gewinn: num(settings.efb_gewinn), wagnisBetrieb: num(settings.efb_wagnis_betrieb), wagnisLeistung: num(settings.efb_wagnis_leistung) } });
     } catch (e: any) {
       setMsg("Fehler beim EFB-PDF: " + (e?.message || String(e)));
     }
@@ -720,6 +720,15 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
               <label className="flex flex-col text-sm">MwSt %<input className="border p-2 rounded-lg text-black bg-white" value={settings.vat_rate} onChange={(e) => setSettings((x: any) => ({ ...x, vat_rate: e.target.value }))} /></label>
               <label className="flex flex-col text-sm">Kupfer €/kg (DEL, Standard)<input className="border p-2 rounded-lg text-black bg-white" value={settings.del_preis} onChange={(e) => setSettings((x: any) => ({ ...x, del_preis: e.target.value }))} /></label>
               <label className="flex flex-col text-sm">Standard-Kupfer-Multi<input className="border p-2 rounded-lg text-black bg-white" value={settings.def_kupfer_multi} onChange={(e) => setSettings((x: any) => ({ ...x, def_kupfer_multi: e.target.value }))} /></label>
+              <div className="md:col-span-2 border-t border-slate-200 pt-2 mt-1">
+                <p className="text-sm font-medium mb-1">EFB-Formblatt 221 — Aufteilung der Zuschläge <span className="font-normal text-gray-500">(Zeile 2.2 AGK = Rest, automatisch)</span></p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <label className="flex flex-col text-sm">2.1 BGK %<input className="border p-2 rounded-lg text-black bg-white" value={settings.efb_bgk} onChange={(e) => setSettings((x: any) => ({ ...x, efb_bgk: e.target.value }))} /></label>
+                  <label className="flex flex-col text-sm">2.3.1 Gewinn %<input className="border p-2 rounded-lg text-black bg-white" value={settings.efb_gewinn} onChange={(e) => setSettings((x: any) => ({ ...x, efb_gewinn: e.target.value }))} /></label>
+                  <label className="flex flex-col text-sm">2.3.2 betr. Wagnis %<input className="border p-2 rounded-lg text-black bg-white" value={settings.efb_wagnis_betrieb} onChange={(e) => setSettings((x: any) => ({ ...x, efb_wagnis_betrieb: e.target.value }))} /></label>
+                  <label className="flex flex-col text-sm">2.3.3 leist. Wagnis %<input className="border p-2 rounded-lg text-black bg-white" value={settings.efb_wagnis_leistung} onChange={(e) => setSettings((x: any) => ({ ...x, efb_wagnis_leistung: e.target.value }))} /></label>
+                </div>
+              </div>
             </div>
           </div>
         )}

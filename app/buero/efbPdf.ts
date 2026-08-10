@@ -98,7 +98,9 @@ function globalNachlass(o: any, net: number) {
 }
 
 // ── PDF-Erzeugung ───────────────────────────────────────────────────
-export async function generateEfbPdf(o: any, opts: { customerNo?: string; sheets?: ("221" | "222" | "223")[] } = {}) {
+export type EfbZuschlaege = { bgk: number; gewinn: number; wagnisBetrieb: number; wagnisLeistung: number };
+
+export async function generateEfbPdf(o: any, opts: { customerNo?: string; sheets?: ("221" | "222" | "223")[]; efb?: EfbZuschlaege } = {}) {
   const { jsPDF } = await import("jspdf");
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const sheets = opts.sheets && opts.sheets.length ? opts.sheets : ["221", "222", "223"];
@@ -232,17 +234,23 @@ export async function generateEfbPdf(o: any, opts: { customerNo?: string; sheets
     }
     y += 12;
     line(mL, y, mR, y);
-    // Datenzeilen — Zuschläge vollständig als AGK ausgewiesen (s. Erläuterung 4)
-    const vals = { agk: [zLohn, zMat, zGer, zSonst, 0], null5: [0, 0, 0, 0, 0] };
+    // Datenzeilen — feste Sätze für BGK/Gewinn/Wagnis (aus den ⚙️-Einstellungen),
+    // AGK (Zeile 2.2) = Rest, damit die Summe exakt dem echten Gesamtzuschlag entspricht.
+    // Spalten ohne Zuschlag (Gesamt = 0) bleiben komplett 0.
+    const cfg = opts.efb || { bgk: 10, gewinn: 4.45, wagnisBetrieb: 2.22, wagnisLeistung: 2.22 };
+    const totals5 = [zLohn, zMat, zGer, zSonst, 0];
+    const fix = (satz: number) => totals5.map((t) => (Math.abs(t) < 0.005 ? 0 : satz));
+    const vBgk = fix(cfg.bgk), vGew = fix(cfg.gewinn), vWb = fix(cfg.wagnisBetrieb), vWl = fix(cfg.wagnisLeistung);
+    const vAgk = totals5.map((t, k) => (Math.abs(t) < 0.005 ? 0 : t - vBgk[k] - vGew[k] - vWb[k] - vWl[k]));
     type R2 = { nr: string; t: string; v?: number[]; cross?: boolean; bold?: boolean };
     const rows2: R2[] = [
-      { nr: "2.1", t: "Baustellengemeinkosten", v: vals.null5 },
-      { nr: "2.2", t: "Allgemeine Geschäftskosten", v: vals.agk },
+      { nr: "2.1", t: "Baustellengemeinkosten", v: vBgk },
+      { nr: "2.2", t: "Allgemeine Geschäftskosten", v: vAgk },
       { nr: "2.3", t: "Wagnis und Gewinn", cross: true },
-      { nr: "2.3.1", t: "Gewinn", v: vals.null5 },
-      { nr: "2.3.2", t: "betriebsbezogenes Wagnis", v: vals.null5 },
-      { nr: "2.3.3", t: "leistungsbezogenes Wagnis", v: vals.null5 },
-      { nr: "2.4", t: "Gesamtzuschläge", v: vals.agk, bold: true },
+      { nr: "2.3.1", t: "Gewinn", v: vGew },
+      { nr: "2.3.2", t: "betriebsbezogenes Wagnis", v: vWb },
+      { nr: "2.3.3", t: "leistungsbezogenes Wagnis", v: vWl },
+      { nr: "2.4", t: "Gesamtzuschläge", v: totals5, bold: true },
     ];
     for (const r of rows2) {
       const h = 6.5;
@@ -321,7 +329,7 @@ export async function generateEfbPdf(o: any, opts: { customerNo?: string; sheets
       "1) Die Abweichung der Angebotssumme aus dem EFB zur Angebotssumme aus dem LV entsteht durch Run-\ndungsdifferenzen aufgrund unterschiedlicher Zusammenzählung der Einzelkosten.",
       "2) Evtl. Angaben zur Aufteilung des Zuschlagssatzes zu BGK in Zeile 2.1 nach bauzeitabhängigen und bauzeit-\nunabhängigen Anteilen.",
       "3) Evtl. Aufgliederung des Zuschlagssatzes in Zeile 2.3 zu W&G nach einem Anteil für Wagnis und einem Anteil\nfür Gewinn.",
-      "4) Die Gesamtzuschläge (Zeile 2.4) sind vollständig in Zeile 2.2 ausgewiesen; eine gesonderte Aufteilung auf\nBGK sowie Wagnis und Gewinn erfolgt nicht.",
+      "4) BGK, Gewinn und Wagnis gemäß betrieblichen Sätzen; Allgemeine Geschäftskosten (Zeile 2.2) als\nAusgleichswert, damit die Gesamtzuschläge der tatsächlichen Kalkulation entsprechen.",
     ];
     if (nachlass > 0) notes.push(`5) In der Angebotssumme lt. Angebot ist zusätzlich ein Nachlass/Rabatt von ${fmt(nachlass)} € berücksichtigt (Angebotssumme danach: ${fmt(angebotssumme)} €).`);
     doc.setFontSize(8.2);
