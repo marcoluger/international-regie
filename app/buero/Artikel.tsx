@@ -30,7 +30,7 @@ function articleEp(a: any) {
 }
 
 function blankForm() {
-  return { id: null as string | null, number: "", category: "", short_text: "", long_text: "", unit: "St", mat_ek: "", mat_multi: "1.28", lohn_ek: "", lohn_multi: "1.5715", minutes: "", preiseinheit: "1", kupfer_kg: "", kupfer_multi: "", components: [] as any[] };
+  return { id: null as string | null, number: "", category: "", short_text: "", long_text: "", unit: "St", mat_ek: "", mat_multi: "1.28", lohn_ek: "35", lohn_multi: "1.5715", minutes: "", preiseinheit: "1", kupfer_kg: "", kupfer_multi: "", components: [] as any[] };
 }
 
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }

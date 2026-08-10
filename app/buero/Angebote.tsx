@@ -78,7 +78,7 @@ function articleToItem(a: any, qty: string, defMat: string, defLohn: string, def
     id: uid(), kind: "position", oz: "", article_id: a.id || null,
     short_text: text, long_text: a.long_text || "",
     qty: qty && String(qty).trim() ? String(qty) : "1", unit: a.unit || "St",
-    mat_ek: s(matEk), mat_multi: mm, lohn_ek: isSup ? "" : s(a.lohn_ek), lohn_multi: lm,
+    mat_ek: s(matEk), mat_multi: mm, lohn_ek: isSup || s(a.lohn_ek) === "" ? "35" : s(a.lohn_ek), lohn_multi: lm,
     minutes: isSup ? "" : s(a.minutes), fremd_vk: "", geraet_vk: "", discount_pct: "",
     preiseinheit: pe, verschnitt: "1", kupfer_kg: cuKg, kupfer_multi: cuMulti,
   };
@@ -111,7 +111,7 @@ function newItem(kind: string) {
   const base: any = { id: uid(), kind, oz: "" };
   if (kind === "titel") return { ...base, title: "" };
   if (kind === "text") return { ...base, short_text: "", long_text: "" };
-  return { ...base, short_text: "", long_text: "", qty: "1", unit: "St", mat_ek: "", mat_multi: "1.28", lohn_ek: "", lohn_multi: "1.5715", minutes: "", fremd_vk: "", geraet_vk: "", discount_pct: "", preiseinheit: "1", verschnitt: "1", kupfer_kg: "", kupfer_multi: "1.05" };
+  return { ...base, short_text: "", long_text: "", qty: "1", unit: "St", mat_ek: "", mat_multi: "1.28", lohn_ek: "35", lohn_multi: "1.5715", minutes: "", fremd_vk: "", geraet_vk: "", discount_pct: "", preiseinheit: "1", verschnitt: "1", kupfer_kg: "", kupfer_multi: "1.05" };
 }
 
 // ── Dokumentarten (Stufe 6a): Angebot -> Auftragsbestätigung -> Rechnung ──
@@ -663,7 +663,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
         return {
           id: uid(), kind: "position", oz: g.oz || "", rno: g.rno || "", short_text: g.short_text || "", long_text: g.long_text || "",
           qty: String(g.qty ?? "1"), unit: g.unit || "St",
-          mat_ek: "", mat_multi: mm, lohn_ek: "", lohn_multi: lm, minutes: "", fremd_vk: "", geraet_vk: "", discount_pct: "",
+          mat_ek: "", mat_multi: mm, lohn_ek: "35", lohn_multi: lm, minutes: "", fremd_vk: "", geraet_vk: "", discount_pct: "",
         };
       });
       setO((p: any) => ({
