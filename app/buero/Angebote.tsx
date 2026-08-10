@@ -5,7 +5,7 @@ import { generateAngebotPdf, generateAbPdf, generateRechnungPdf } from "./angebo
 import { parseTaifunXlsx, normTokens, topMatches, similarity } from "./taifunArchiv";
 import { generateEfbPdf } from "./efbPdf";
 import { parseGaebX83 } from "./gaebImport";
-import { downloadGaebX84 } from "./gaebExport";
+import { downloadGaebX84, buildGaebX84Xml, buildGaebX84Preview, type GaebPreview } from "./gaebExport";
 
 // ── Hilfsfunktionen ────────────────────────────────────────────────
 const num = (v: any) => Number(String(v ?? "").replace(",", ".")) || 0;
@@ -174,6 +174,10 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
   // Prüfliste des Preisvorschlags: je unsicherer Position bis zu 5 Kandidaten zur Auswahl.
   const [sugList, setSugList] = useState<{ id: string; oz: string; text: string; cands: { row: any; score: number }[] }[]>([]);
   const [kiBusy, setKiBusy] = useState(false);
+  // GAEB-Vorschau (X84) vor dem Export
+  const [gaebPrev, setGaebPrev] = useState<GaebPreview | null>(null);
+  const [gaebXml, setGaebXml] = useState("");
+  const [gaebXmlOpen, setGaebXmlOpen] = useState(false);
   const [artSearch, setArtSearch] = useState("");
   const [artCat, setArtCat] = useState("");
   const [supResults, setSupResults] = useState<any[]>([]);
@@ -1063,12 +1067,73 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
           <label className="bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs cursor-pointer">⬆ GAEB (X83) importieren
             <input type="file" accept=".x83,.X83,.xml,.X81,.x81" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) importGaeb(f); e.target.value = ""; }} />
           </label>
+          <button type="button" onClick={() => { setGaebPrev(buildGaebX84Preview(o)); setGaebXml(buildGaebX84Xml(o)); setGaebXmlOpen(false); }} className="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-xs" title="Zeigt vor dem Export, was in der GAEB-Datei (X84) landet">👁 GAEB-Vorschau</button>
           <button type="button" onClick={exportGaeb} className="bg-emerald-800 text-white px-3 py-1.5 rounded-lg text-xs">⬇ GAEB (X84) exportieren</button>
           <button type="button" onClick={openArtPicker} className="bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-xs">📦 aus Artikelstamm</button>
           <button type="button" onClick={suggestPrices} className="bg-amber-600 text-white px-3 py-1.5 rounded-lg text-xs" title="Unkalkulierte Positionen mit der ähnlichsten Alt-Position aus dem Taifun-Preisarchiv befüllen">💡 Preise vorschlagen</button>
           <button type="button" onClick={suggestPricesAi} disabled={kiBusy} className="bg-purple-700 disabled:bg-gray-300 text-white px-3 py-1.5 rounded-lg text-xs" title="Fehlende Werte von der KI schätzen lassen: Material-/Gerät-EK und/oder Minuten je Einheit — nur was leer ist, wird gefüllt. Schätzwerte, bitte prüfen">{kiBusy ? "🤖 schätzt…" : "🤖 Preise durch KI"}</button>
           <button type="button" onClick={() => setPosView((p) => (p === "zeilen" ? "tabelle" : "zeilen"))} className="bg-slate-500 text-white px-3 py-1.5 rounded-lg text-xs ml-auto" title="Zwischen Zeilenansicht und Taifun-Kalkulationstabelle wechseln">{posView === "zeilen" ? "📊 Tabelle" : "📋 Zeilen"}</button>
         </div>
+
+        {/* 👁 GAEB-Vorschau: zeigt vor dem Export den Inhalt der X84-Datei */}
+        {gaebPrev && (
+          <div className="border border-emerald-300 bg-emerald-50/40 rounded-xl p-3 space-y-2">
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <h4 className="font-bold text-sm">👁 GAEB-Vorschau (X84) <span className="font-normal text-gray-600">— {gaebPrev.posCount} Position{gaebPrev.posCount === 1 ? "" : "en"}, so landet es in der Datei</span></h4>
+              <div className="flex gap-2">
+                <button type="button" onClick={() => setGaebXmlOpen((p) => !p)} className="bg-slate-600 text-white px-3 py-1.5 rounded-lg text-xs">{gaebXmlOpen ? "Datei-Inhalt ausblenden" : "⌨ Datei-Inhalt (XML) anzeigen"}</button>
+                <button type="button" onClick={() => { exportGaeb(); }} className="bg-emerald-800 text-white px-3 py-1.5 rounded-lg text-xs">⬇ Jetzt exportieren</button>
+                <button type="button" onClick={() => setGaebPrev(null)} className="bg-gray-200 px-3 py-1.5 rounded-lg text-xs">Schließen</button>
+              </div>
+            </div>
+            {gaebPrev.warnings.length > 0 && (
+              <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-lg p-2 text-xs space-y-0.5">
+                {gaebPrev.warnings.map((w, i) => <div key={i}>⚠️ {w}</div>)}
+              </div>
+            )}
+            <div className="max-h-80 overflow-y-auto border border-slate-200 rounded-lg bg-white">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="bg-slate-100 text-slate-700 sticky top-0">
+                    <th className="px-2 py-1 text-left">Pos</th>
+                    <th className="px-2 py-1 text-left">Bezeichnung</th>
+                    <th className="px-2 py-1 text-right">Menge</th>
+                    <th className="px-2 py-1 text-left">Einh</th>
+                    <th className="px-2 py-1 text-right">EP €</th>
+                    <th className="px-2 py-1 text-right">GP €</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {gaebPrev.rows.map((r, i) => r.kind === "titel" ? (
+                    <tr key={i} className="bg-slate-50 border-t border-slate-200 font-bold">
+                      <td className="px-2 py-1">{r.oz}</td>
+                      <td className="px-2 py-1" colSpan={4}>{r.text}</td>
+                      <td className="px-2 py-1 text-right">{fmt(r.sum || 0)}</td>
+                    </tr>
+                  ) : (
+                    <tr key={i} className="border-t border-slate-100">
+                      <td className="px-2 py-1 whitespace-nowrap">{r.oz}</td>
+                      <td className="px-2 py-1">{r.text}</td>
+                      <td className="px-2 py-1 text-right whitespace-nowrap">{fmt(r.qty || 0)}</td>
+                      <td className="px-2 py-1">{r.unit}</td>
+                      <td className={`px-2 py-1 text-right whitespace-nowrap ${Math.abs(r.up || 0) < 0.005 ? "text-red-600 font-medium" : ""}`}>{fmt(r.up || 0)}</td>
+                      <td className="px-2 py-1 text-right whitespace-nowrap">{fmt(r.it || 0)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="text-sm text-right space-x-4">
+              <span>Netto <strong>{fmt(gaebPrev.net)} €</strong></span>
+              <span>USt. {fmt(gaebPrev.vat)} €</span>
+              <span>Brutto <strong>{fmt(gaebPrev.gross)} €</strong></span>
+            </div>
+            {gaebXmlOpen && (
+              <pre className="max-h-72 overflow-auto bg-slate-900 text-slate-100 rounded-lg p-2 text-[10px] leading-snug whitespace-pre-wrap">{gaebXml}</pre>
+            )}
+            <p className="text-xs text-gray-500">Hinweis: Der Rabatt je Position ist im Einheitspreis eingerechnet; ein globaler Rabatt/Nachlass des Angebots erscheint im X84 nicht (das Format kennt nur Positionspreise).</p>
+          </div>
+        )}
 
         {artPickerOpen && (
           <div className="border border-indigo-200 bg-indigo-50/40 rounded-xl p-3 space-y-2">

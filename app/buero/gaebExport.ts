@@ -148,6 +148,52 @@ ${body.join("\n")}
 `;
 }
 
+// Vorschau: zeigt VOR dem Export, was in der X84 landet (gleiche Rundung/Nummerierung
+// wie buildGaebX84Xml) — inkl. Warnungen zu Textpositionen, fehlenden Nummern, EP 0,00.
+export type GaebPreviewRow = { kind: "titel" | "position"; oz: string; text: string; qty?: number; unit?: string; up?: number; it?: number; sum?: number };
+export type GaebPreview = { rows: GaebPreviewRow[]; warnings: string[]; net: number; vat: number; gross: number; posCount: number };
+
+export function buildGaebX84Preview(o: any): GaebPreview {
+  const items: any[] = Array.isArray(o.items) ? o.items : [];
+  const groups = groupItems(items);
+  const warnings: string[] = [];
+  const textCount = items.filter((x: any) => x.kind === "text").length;
+  if (textCount) warnings.push(`${textCount} Textposition${textCount === 1 ? "" : "en"} werden im X84 NICHT ausgegeben (das Preisblatt enthält nur bepreiste Positionen).`);
+  const rows: GaebPreviewRow[] = [];
+  let net = 0, posCount = 0, ii = 0, zeroEp = 0, autoNo = 0, emptyTitel = 0;
+  for (const g of groups) {
+    let grpTotal = 0;
+    const grpRows: GaebPreviewRow[] = [];
+    for (const p of g.positions) {
+      const c = calcItem(p, num(o.del_preis));
+      const qty = num(p.qty);
+      const up = qty > 0 ? c.gp / qty : c.ep;
+      const itR = Math.round((Math.round(up * 1000) / 1000) * qty * 100) / 100;
+      grpTotal += itR;
+      const rno = digits(p.rno) || lastSeg(p.oz);
+      if (!rno) autoNo++;
+      if (Math.abs(up) < 0.005) zeroEp++;
+      grpRows.push({ kind: "position", oz: p.oz || rno || `(auto ${(ii + 1) * 10})`, text: String(p.short_text || p.long_text || "").split("\n")[0], qty, unit: p.unit || "", up: Math.round(up * 1000) / 1000, it: itR });
+      ii++; posCount++;
+    }
+    grpTotal = Math.round(grpTotal * 100) / 100;
+    net += grpTotal;
+    if (g.titel) {
+      if (!g.positions.length) emptyTitel++;
+      rows.push({ kind: "titel", oz: g.titel.oz || g.rno, text: g.titel.title || "(Titel)", sum: grpTotal });
+    }
+    rows.push(...grpRows);
+  }
+  if (autoNo) warnings.push(`${autoNo} Position${autoNo === 1 ? "" : "en"} ohne Positionsnummer — im Export wird automatisch nummeriert.`);
+  if (zeroEp) warnings.push(`${zeroEp} Position${zeroEp === 1 ? "" : "en"} mit Einheitspreis 0,00 — bitte prüfen, ob das gewollt ist.`);
+  if (emptyTitel) warnings.push(`${emptyTitel} Titel ohne Positionen.`);
+  if (!posCount) warnings.push("Keine bepreisbaren Positionen — die Datei wäre leer.");
+  net = Math.round(net * 100) / 100;
+  const vat = Math.round(net * num(o.vat_rate)) / 100;
+  const gross = Math.round((net + vat) * 100) / 100;
+  return { rows, warnings, net, vat, gross, posCount };
+}
+
 export function downloadGaebX84(o: any) {
   const xml = buildGaebX84Xml(o);
   const blob = new Blob([xml], { type: "application/xml" });
