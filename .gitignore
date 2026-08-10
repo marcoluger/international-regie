@@ -45,3 +45,6 @@ translator.env.local
 
 # Grosse DATANORM-Katalogdateien / Scan-Hilfen nicht ins Repo
 /Datanorm/
+
+# Alt-Angebote aus Taifun (Kundendaten, werden per Browser ins Preisarchiv importiert)
+/Archiv Angebote/
