@@ -62,13 +62,18 @@ export async function POST(req: Request) {
               `Du bist erfahrener Kalkulator in einem deutschen Elektrotechnik-Handwerksbetrieb. ` +
               `Du bekommst Angebotspositionen (JSON-Liste mit id, text, unit, qty). ` +
               `Schätze für JEDE Position die Kalkulationswerte JE EINHEIT (unit), nicht für die Gesamtmenge: ` +
-              `"mat_ek" = marktüblicher Netto-Material-Einkaufspreis im deutschen Elektrogroßhandel in EUR je Einheit ` +
-              `(0 bei reinen Dienstleistungen wie Anmeldung, Dokumentation, Einweisung); ` +
-              `"minutes" = realistische Montage-/Arbeitszeit in Minuten je Einheit inkl. üblicher Nebenarbeiten; ` +
+              `"mat_ek" = Netto-EINKAUFSPREIS (EK) des Materials in EUR je Einheit, wie ihn ein Elektrobetrieb ` +
+              `im deutschen Großhandel nach üblichen Handwerksrabatten tatsächlich ZAHLT — ausdrücklich NICHT der ` +
+              `UVP, Listen-, Endkunden- oder Verkaufspreis (der EK liegt oft 30-60 % unter dem Listenpreis; ` +
+              `0 bei reinen Dienstleistungen wie Anmeldung, Dokumentation, Einweisung und bei Gerätepositionen); ` +
+              `"geraet" = NUR bei Geräte-/Maschinenpositionen (z. B. Hebebühne, Arbeitsbühne, Teleskopbühne, ` +
+              `Gerüst, Kran, Bagger, Stapler, Miet- und Baustellengeräte) die Netto-Miet-/Einsatzkosten in EUR ` +
+              `je Einheit — dann mat_ek = 0; bei normalem Material ist geraet = 0; ` +
+              `"minutes" = realistische Montage-/Arbeits-/Rüstzeit in Minuten je Einheit inkl. üblicher Nebenarbeiten; ` +
               `"note" = sehr kurze Annahme (max. 10 Wörter, Deutsch). ` +
               `Bei Pauschalpositionen (psch/Psch) gilt: je 1 Pauschale. ` +
               `Antworte AUSSCHLIESSLICH als JSON-Objekt exakt in dieser Form: ` +
-              `{"items":[{"id":"...","mat_ek":0.00,"minutes":0,"note":"..."}]}`,
+              `{"items":[{"id":"...","mat_ek":0.00,"geraet":0.00,"minutes":0,"note":"..."}]}`,
           },
           { role: "user", content: JSON.stringify(list) },
         ],
@@ -91,10 +96,11 @@ export async function POST(req: Request) {
       .map((it: any) => ({
         id: String(it?.id ?? ""),
         mat_ek: Number.isFinite(Number(it?.mat_ek)) ? Math.max(0, Math.round(Number(it.mat_ek) * 100) / 100) : null,
+        geraet: Number.isFinite(Number(it?.geraet)) ? Math.max(0, Math.round(Number(it.geraet) * 100) / 100) : null,
         minutes: Number.isFinite(Number(it?.minutes)) ? Math.max(0, Math.round(Number(it.minutes) * 10) / 10) : null,
         note: String(it?.note ?? "").slice(0, 120),
       }))
-      .filter((it: any) => it.id && (it.mat_ek !== null || it.minutes !== null));
+      .filter((it: any) => it.id && (it.mat_ek !== null || it.geraet !== null || it.minutes !== null));
 
     return NextResponse.json({ items: clean });
   } catch (err: any) {

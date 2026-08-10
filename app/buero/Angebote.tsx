@@ -516,7 +516,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
     const review: { id: string; oz: string; text: string; cands: { row: any; score: number }[] }[] = [];
     const items = o.items.map((it: any) => {
       if (it.kind !== "position") return it;
-      const unkalkuliert = num(it.mat_ek) === 0 && num(it.minutes) === 0 && String(it.ep_fix ?? "").trim() === "";
+      const unkalkuliert = num(it.mat_ek) === 0 && num(it.minutes) === 0 && num(it.geraet_vk) === 0 && num(it.fremd_vk) === 0 && String(it.ep_fix ?? "").trim() === "";
       if (!unkalkuliert) { hadCalc++; return it; }
       const cands = topMatches([it.short_text, it.long_text].filter(Boolean).join(" "), archive, 5, 0.25);
       if (!cands.length) { none++; return it; }
@@ -534,7 +534,8 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
   async function suggestPricesAi() {
     const targets = o.items.filter((it: any) =>
       it.kind === "position" &&
-      num(it.mat_ek) === 0 && num(it.minutes) === 0 && String(it.ep_fix ?? "").trim() === "" &&
+      num(it.mat_ek) === 0 && num(it.minutes) === 0 && num(it.geraet_vk) === 0 && num(it.fremd_vk) === 0 &&
+      String(it.ep_fix ?? "").trim() === "" &&
       String(it.short_text || it.long_text || "").trim() !== ""
     );
     if (!targets.length) { setMsg("🤖 Alle Positionen haben schon Preise — nichts zu schätzen."); return; }
@@ -544,7 +545,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
       const { data: sess } = await supabase.auth.getSession();
       const token = sess?.session?.access_token;
       if (!token) { setMsg("Nicht angemeldet — bitte neu einloggen."); setKiBusy(false); return; }
-      const byId: Record<string, { mat_ek: number | null; minutes: number | null; note: string }> = {};
+      const byId: Record<string, { mat_ek: number | null; geraet: number | null; minutes: number | null; note: string }> = {};
       for (let i = 0; i < targets.length; i += 25) {
         const chunk = targets.slice(i, i + 25).map((it: any) => ({
           id: it.id,
@@ -571,9 +572,10 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
           filled++;
           return {
             ...it,
-            mat_ek: r.mat_ek != null ? String(r.mat_ek) : it.mat_ek,
+            mat_ek: r.mat_ek != null && r.mat_ek > 0 ? String(r.mat_ek) : it.mat_ek,
+            geraet_vk: r.geraet != null && r.geraet > 0 ? String(r.geraet) : it.geraet_vk,
             minutes: r.minutes != null ? String(r.minutes) : it.minutes,
-            suggest_note: `🤖 KI-Schätzung${r.note ? ` (${r.note})` : ""} — Marktpreis-Schätzung, bitte prüfen!`,
+            suggest_note: `🤖 KI-Schätzung${r.note ? ` (${r.note})` : ""}${r.geraet != null && r.geraet > 0 ? " — Gerätekosten im Feld Gerät-Vk" : ""} — EK-Schätzwerte, bitte prüfen!`,
           };
         }),
       }));
