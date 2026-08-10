@@ -174,6 +174,10 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
   // Prüfliste des Preisvorschlags: je unsicherer Position bis zu 5 Kandidaten zur Auswahl.
   const [sugList, setSugList] = useState<{ id: string; oz: string; text: string; cands: { row: any; score: number }[] }[]>([]);
   const [kiBusy, setKiBusy] = useState(false);
+  // Leistung/Artikel in eine BESTEHENDE Position übernehmen (Picker je Position)
+  const [posPick, setPosPick] = useState<string | null>(null);
+  const [posPickSearch, setPosPickSearch] = useState("");
+  const [posPickArt, setPosPickArt] = useState<"leistung" | "artikel">("leistung");
   // GAEB-Vorschau (X84) vor dem Export
   const [gaebPrev, setGaebPrev] = useState<GaebPreview | null>(null);
   const [gaebXml, setGaebXml] = useState("");
@@ -545,6 +549,69 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
   }
   function skipSuggestion(itemId: string) {
     setSugList((p) => p.filter((e) => e.id !== itemId));
+  }
+
+  // Kalkulation einer Leistung / eines Artikels in eine bestehende Position übernehmen.
+  // withText: auch Bezeichnung/Langtext/Einheit übernehmen (sonst bleibt der LV-Text stehen).
+  function applyLeistungToItem(itemId: string, a: any, withText: boolean) {
+    setO((p: any) => ({
+      ...p,
+      items: p.items.map((it: any) => {
+        if (it.id !== itemId) return it;
+        const t = articleToItem(a, it.qty || "1", p.def_mat_multi, p.def_lohn_multi, settings.def_kupfer_multi);
+        return {
+          ...it,
+          article_id: t.article_id,
+          mat_ek: t.mat_ek, mat_multi: t.mat_multi,
+          lohn_ek: t.lohn_ek, lohn_multi: t.lohn_multi, minutes: t.minutes,
+          preiseinheit: t.preiseinheit, verschnitt: t.verschnitt,
+          kupfer_kg: t.kupfer_kg, kupfer_multi: t.kupfer_multi,
+          ep_fix: "", // fester EP würde die übernommene Kalkulation überschreiben
+          ...(withText ? { short_text: t.short_text, long_text: t.long_text, unit: t.unit } : {}),
+          suggest_note: `Kalkulation aus ${(a.art || "leistung") === "artikel" ? "Artikel" : "Leistung"} „${String(a.short_text || "").slice(0, 60)}" übernommen`,
+        };
+      }),
+    }));
+    setPosPick(null);
+    setPosPickSearch("");
+  }
+
+  // Picker-Block direkt unter der Position: Leistung/Artikel suchen und übernehmen.
+  function posPickBlockFor(itemId: string) {
+    if (posPick !== itemId) return null;
+    const q = posPickSearch.trim().toLowerCase();
+    const hits = articles
+      .filter((a: any) => (a.art || "leistung") === posPickArt)
+      .filter((a: any) => (q ? [a.number, a.short_text, a.long_text, a.category].some((x: any) => String(x || "").toLowerCase().includes(q)) : true))
+      .slice(0, 30);
+    const epCa = (a: any) => {
+      const pe = num(a.preiseinheit) || 1;
+      return num(a.mat_ek) * (num(a.mat_multi) || 1.28) / pe + num(a.lohn_ek) * (num(a.lohn_multi) || 1.5715) * (num(a.minutes) / 60);
+    };
+    return (
+      <div className="border-t border-cyan-200 bg-cyan-50/50 p-2 space-y-1.5">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-xs font-medium text-cyan-900">🔧 In diese Position übernehmen:</span>
+          <button type="button" onClick={() => setPosPickArt("leistung")} className={`px-2 py-0.5 rounded-full text-xs font-medium ${posPickArt === "leistung" ? "bg-cyan-700 text-white" : "bg-white border border-slate-300 text-slate-600"}`}>🔧 Leistungen</button>
+          <button type="button" onClick={() => setPosPickArt("artikel")} className={`px-2 py-0.5 rounded-full text-xs font-medium ${posPickArt === "artikel" ? "bg-cyan-700 text-white" : "bg-white border border-slate-300 text-slate-600"}`}>📦 Artikel</button>
+          <input autoFocus className="border p-1.5 rounded text-black bg-white flex-1 min-w-[10rem] text-xs" placeholder="Suche: Nr., Kurztext, Kategorie…" value={posPickSearch} onChange={(e) => setPosPickSearch(e.target.value)} />
+          <button type="button" onClick={() => setPosPick(null)} className="bg-gray-200 px-2 py-1 rounded text-xs">Schließen</button>
+        </div>
+        <div className="max-h-56 overflow-y-auto space-y-1">
+          {hits.map((a: any) => (
+            <div key={a.id} className="border border-slate-200 rounded-lg p-1.5 text-xs bg-white flex flex-wrap items-center gap-x-3 gap-y-1">
+              {a.category ? <span className="bg-slate-100 text-slate-700 rounded px-1.5 py-0.5">{a.category}</span> : null}
+              {a.number ? <span className="text-gray-500">Nr. {a.number}</span> : null}
+              <strong className="min-w-0 flex-1 truncate" title={a.short_text}>{a.short_text || "(ohne Kurztext)"}</strong>
+              <span className="text-gray-600 whitespace-nowrap">Mat {a.mat_ek != null ? fmt(num(a.mat_ek)) + " €" : "—"} · {a.minutes != null ? num(a.minutes) + " min" : "—"} · EP ca. {fmt(epCa(a))} €</span>
+              <button type="button" onClick={() => applyLeistungToItem(itemId, a, false)} className="bg-cyan-700 text-white px-2 py-1 rounded text-xs whitespace-nowrap" title="Nur die Kalkulation übernehmen — der Positionstext bleibt">Kalkulation übernehmen</button>
+              <button type="button" onClick={() => applyLeistungToItem(itemId, a, true)} className="bg-slate-600 text-white px-2 py-1 rounded text-xs whitespace-nowrap" title="Kalkulation UND Bezeichnung/Langtext/Einheit übernehmen">mit Text</button>
+            </div>
+          ))}
+          {hits.length === 0 && <p className="text-xs text-gray-500">{posPickArt === "leistung" ? "Keine Leistung gefunden — im Reiter „🔧 Leistungen“ anlegen." : "Kein Artikel gefunden — im Reiter „📦 Artikel“ anlegen."}</p>}
+        </div>
+      </div>
+    );
   }
 
   // Kandidaten-Block direkt unter der jeweiligen Position (Zeilen- und Tabellenansicht).
@@ -1282,9 +1349,13 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
                         <input className={`border p-1 rounded text-right w-full ${epFixed ? "bg-amber-50 border-amber-400 text-black font-medium" : "bg-white text-black"}`} placeholder={fmt(it.ep)} title="E-Preis: Zahl eintippen = fester Preis. Feld leeren = automatisch." value={it.ep_fix ?? ""} onChange={(e) => setItem(it.id, "ep_fix", e.target.value)} />
                       </td>
                       <td className="px-1.5 text-right font-bold whitespace-nowrap">{fmt(it.gp)}</td>
-                      <td className="px-1 py-1 whitespace-nowrap">{itemButtons(it.id)}</td>
+                      <td className="px-1 py-1 whitespace-nowrap">
+                        <button type="button" onClick={() => { setPosPick(posPick === it.id ? null : it.id); setPosPickSearch(""); }} className={`px-1.5 py-1 rounded text-xs mr-1 ${posPick === it.id ? "bg-cyan-700 text-white" : "bg-cyan-50 border border-cyan-300 text-cyan-800"}`} title="Leistung oder Artikel auswählen und in diese Position übernehmen">🔧</button>
+                        {itemButtons(it.id)}
+                      </td>
                     </tr>
                     {sugg && <tr><td colSpan={15} className="p-0">{sugg}</td></tr>}
+                    {posPick === it.id && <tr><td colSpan={15} className="p-0">{posPickBlockFor(it.id)}</td></tr>}
                     </Fragment>
                   );
                 })}
@@ -1339,9 +1410,11 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
                   onChange={(e) => setItem(it.id, "ep_fix", e.target.value)}
                 />
                 <span className="text-sm font-bold text-right w-24 whitespace-nowrap" title="Gesamtpreis">{fmt(it.gp)} €</span>
+                <button type="button" onClick={() => { setPosPick(posPick === it.id ? null : it.id); setPosPickSearch(""); }} className={`px-2 py-1.5 rounded text-sm ${posPick === it.id ? "bg-cyan-700 text-white" : "bg-cyan-50 border border-cyan-300 text-cyan-800"}`} title="Leistung oder Artikel auswählen und in diese Position übernehmen">🔧</button>
                 {itemButtons(it.id)}
               </div>
               {suggBlockFor(it.id)}
+              {posPickBlockFor(it.id)}
               {opened && (
                 <div className="px-2 pb-2 space-y-2">
                   <textarea className="border p-1.5 rounded text-black bg-white w-full text-sm" rows={2} placeholder="Langtext" value={it.long_text} onChange={(e) => setItem(it.id, "long_text", e.target.value)} />
