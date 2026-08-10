@@ -50,11 +50,14 @@ function calcItem(it: any, del: number = 0) {
   const lohnVk = lohnSatzVk * (num(it.minutes) / 60);
   const kupferEk = num(it.kupfer_kg) * del;                       // Kupfer-EK je Preiseinheit
   const kupferVk = kupferEk * (num(it.kupfer_multi) || 1) / pe;   // Kupfer-VK je Einheit
-  const epCalc = matVk + lohnVk + kupferVk + num(it.fremd_vk) + num(it.geraet_vk);
+  // Fremd/Gerät: EK×Multi wenn ein EK eingetragen ist, sonst direktes Vk-Feld (Alt-Daten).
+  const fremdVk = it.fremd_ek !== undefined && it.fremd_ek !== null && String(it.fremd_ek) !== "" ? num(it.fremd_ek) * (num(it.fremd_multi) || 1) : num(it.fremd_vk);
+  const geraetVk = it.geraet_ek !== undefined && it.geraet_ek !== null && String(it.geraet_ek) !== "" ? num(it.geraet_ek) * (num(it.geraet_multi) || 1) : num(it.geraet_vk);
+  const epCalc = matVk + lohnVk + kupferVk + fremdVk + geraetVk;
   // Fester E-Preis (ep_fix): manuell eingetippter Preis überschreibt die Kalkulation. Leer = automatisch.
   const ep = it.ep_fix !== undefined && it.ep_fix !== null && String(it.ep_fix).trim() !== "" ? num(it.ep_fix) : epCalc;
   const gp = ep * num(it.qty) * (1 - num(it.discount_pct) / 100);
-  return { ...it, mat_vk: matVk, lohn_satz_vk: lohnSatzVk, lohn_vk: lohnVk, kupfer_ek: kupferEk, kupfer_vk: kupferVk, ep, gp };
+  return { ...it, mat_vk: matVk, lohn_satz_vk: lohnSatzVk, lohn_vk: lohnVk, kupfer_ek: kupferEk, kupfer_vk: kupferVk, fremd_vk_eff: fremdVk, geraet_vk_eff: geraetVk, ep, gp };
 }
 
 // Artikel → Angebotsposition (Kalkulationswerte übernehmen, Multis ggf. aus Angebot)
@@ -516,7 +519,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
     const review: { id: string; oz: string; text: string; cands: { row: any; score: number }[] }[] = [];
     const items = o.items.map((it: any) => {
       if (it.kind !== "position") return it;
-      const unkalkuliert = num(it.mat_ek) === 0 && num(it.minutes) === 0 && num(it.geraet_vk) === 0 && num(it.fremd_vk) === 0 && String(it.ep_fix ?? "").trim() === "";
+      const unkalkuliert = num(it.mat_ek) === 0 && num(it.minutes) === 0 && num(it.geraet_vk) === 0 && num(it.fremd_vk) === 0 && num(it.geraet_ek) === 0 && num(it.fremd_ek) === 0 && String(it.ep_fix ?? "").trim() === "";
       if (!unkalkuliert) { hadCalc++; return it; }
       const cands = topMatches([it.short_text, it.long_text].filter(Boolean).join(" "), archive, 5, 0.25);
       if (!cands.length) { none++; return it; }
@@ -535,6 +538,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
     const targets = o.items.filter((it: any) =>
       it.kind === "position" &&
       num(it.mat_ek) === 0 && num(it.minutes) === 0 && num(it.geraet_vk) === 0 && num(it.fremd_vk) === 0 &&
+      num(it.geraet_ek) === 0 && num(it.fremd_ek) === 0 &&
       String(it.ep_fix ?? "").trim() === "" &&
       String(it.short_text || it.long_text || "").trim() !== ""
     );
@@ -573,9 +577,9 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
           return {
             ...it,
             mat_ek: r.mat_ek != null && r.mat_ek > 0 ? String(r.mat_ek) : it.mat_ek,
-            geraet_vk: r.geraet != null && r.geraet > 0 ? String(r.geraet) : it.geraet_vk,
+            geraet_ek: r.geraet != null && r.geraet > 0 ? String(r.geraet) : it.geraet_ek,
             minutes: r.minutes != null ? String(r.minutes) : it.minutes,
-            suggest_note: `🤖 KI-Schätzung${r.note ? ` (${r.note})` : ""}${r.geraet != null && r.geraet > 0 ? " — Gerätekosten im Feld Gerät-Vk" : ""} — EK-Schätzwerte, bitte prüfen!`,
+            suggest_note: `🤖 KI-Schätzung${r.note ? ` (${r.note})` : ""}${r.geraet != null && r.geraet > 0 ? " — Gerätekosten im Feld Gerät-Ek" : ""} — EK-Schätzwerte, bitte prüfen!`,
           };
         }),
       }));
@@ -1076,8 +1080,8 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
                       <td className="px-1 py-1 w-16"><input className={`${tin} text-right`} value={it.lohn_ek} onChange={(e) => setItem(it.id, "lohn_ek", e.target.value)} /></td>
                       <td className="px-1 py-1 w-16"><input className={`${tin} text-right`} value={it.minutes} onChange={(e) => setItem(it.id, "minutes", e.target.value)} /></td>
                       <td className="px-1.5 text-right text-gray-500 whitespace-nowrap">{fmt(it.lohn_vk)}</td>
-                      <td className="px-1 py-1 w-16"><input className={`${tin} text-right`} value={it.fremd_vk} onChange={(e) => setItem(it.id, "fremd_vk", e.target.value)} /></td>
-                      <td className="px-1 py-1 w-16"><input className={`${tin} text-right`} value={it.geraet_vk} onChange={(e) => setItem(it.id, "geraet_vk", e.target.value)} /></td>
+                      <td className="px-1 py-1 w-16"><input disabled={String(it.fremd_ek ?? "") !== ""} title={String(it.fremd_ek ?? "") !== "" ? `Aus Fremd-Ek ${it.fremd_ek} × Multi (in der Zeilenansicht aufklappen)` : "Fremd-Vk direkt — oder Fremd-Ek in der Zeilenansicht"} className={`border p-1 rounded text-right w-full ${String(it.fremd_ek ?? "") !== "" ? "bg-gray-100 text-black" : "bg-white text-black"}`} value={String(it.fremd_ek ?? "") !== "" ? fmt(it.fremd_vk_eff) : it.fremd_vk} onChange={(e) => setItem(it.id, "fremd_vk", e.target.value)} /></td>
+                      <td className="px-1 py-1 w-16"><input disabled={String(it.geraet_ek ?? "") !== ""} title={String(it.geraet_ek ?? "") !== "" ? `Aus Gerät-Ek ${it.geraet_ek} × Multi (in der Zeilenansicht aufklappen)` : "Gerät-Vk direkt — oder Gerät-Ek in der Zeilenansicht"} className={`border p-1 rounded text-right w-full ${String(it.geraet_ek ?? "") !== "" ? "bg-gray-100 text-black" : "bg-white text-black"}`} value={String(it.geraet_ek ?? "") !== "" ? fmt(it.geraet_vk_eff) : it.geraet_vk} onChange={(e) => setItem(it.id, "geraet_vk", e.target.value)} /></td>
                       <td className="px-1 py-1 w-20">
                         <input className={`border p-1 rounded text-right w-full ${epFixed ? "bg-amber-50 border-amber-400 text-black font-medium" : "bg-white text-black"}`} placeholder={fmt(it.ep)} title="E-Preis: Zahl eintippen = fester Preis. Feld leeren = automatisch." value={it.ep_fix ?? ""} onChange={(e) => setItem(it.id, "ep_fix", e.target.value)} />
                       </td>
@@ -1155,8 +1159,12 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
                     <label className="flex flex-col text-gray-500">Lohn-Satz Vk<input className="border p-1.5 rounded bg-gray-100" value={fmt(it.lohn_satz_vk)} readOnly /></label>
                     <label className="flex flex-col">Minuten<input className="border p-1.5 rounded text-black bg-white" value={it.minutes} onChange={(e) => setItem(it.id, "minutes", e.target.value)} /></label>
                     <label className="flex flex-col text-gray-500">Lohn-Vk<input className="border p-1.5 rounded bg-gray-100" value={fmt(it.lohn_vk)} readOnly /></label>
-                    <label className="flex flex-col">Fremd-Vk<input className="border p-1.5 rounded text-black bg-white" value={it.fremd_vk} onChange={(e) => setItem(it.id, "fremd_vk", e.target.value)} /></label>
-                    <label className="flex flex-col">Gerät-Vk<input className="border p-1.5 rounded text-black bg-white" value={it.geraet_vk} onChange={(e) => setItem(it.id, "geraet_vk", e.target.value)} /></label>
+                    <label className="flex flex-col" title="Einkauf Fremdleistung (Nachunternehmer) je Einheit">Fremd-Ek<input className="border p-1.5 rounded text-black bg-white" value={it.fremd_ek ?? ""} onChange={(e) => setItem(it.id, "fremd_ek", e.target.value)} /></label>
+                    <label className="flex flex-col" title="Multiplikator auf den Fremd-Ek. Leer = 1.">Fremd-Multi<input className="border p-1.5 rounded text-black bg-white" placeholder="1" value={it.fremd_multi ?? ""} onChange={(e) => setItem(it.id, "fremd_multi", e.target.value)} /></label>
+                    <label className="flex flex-col" title={String(it.fremd_ek ?? "") !== "" ? "Berechnet aus Fremd-Ek × Multi" : "Direkter Vk (nur wenn kein Fremd-Ek eingetragen ist)"}>Fremd-Vk{String(it.fremd_ek ?? "") !== "" ? " (Ek×M)" : ""}<input disabled={String(it.fremd_ek ?? "") !== ""} className={`border p-1.5 rounded text-black ${String(it.fremd_ek ?? "") !== "" ? "bg-gray-100" : "bg-white"}`} value={String(it.fremd_ek ?? "") !== "" ? fmt(it.fremd_vk_eff) : it.fremd_vk} onChange={(e) => setItem(it.id, "fremd_vk", e.target.value)} /></label>
+                    <label className="flex flex-col" title="Einkauf Gerät/Miete (z. B. Hebebühne) je Einheit">Gerät-Ek<input className="border p-1.5 rounded text-black bg-white" value={it.geraet_ek ?? ""} onChange={(e) => setItem(it.id, "geraet_ek", e.target.value)} /></label>
+                    <label className="flex flex-col" title="Multiplikator auf den Gerät-Ek. Leer = 1.">Gerät-Multi<input className="border p-1.5 rounded text-black bg-white" placeholder="1" value={it.geraet_multi ?? ""} onChange={(e) => setItem(it.id, "geraet_multi", e.target.value)} /></label>
+                    <label className="flex flex-col" title={String(it.geraet_ek ?? "") !== "" ? "Berechnet aus Gerät-Ek × Multi" : "Direkter Vk (nur wenn kein Gerät-Ek eingetragen ist)"}>Gerät-Vk{String(it.geraet_ek ?? "") !== "" ? " (Ek×M)" : ""}<input disabled={String(it.geraet_ek ?? "") !== ""} className={`border p-1.5 rounded text-black ${String(it.geraet_ek ?? "") !== "" ? "bg-gray-100" : "bg-white"}`} value={String(it.geraet_ek ?? "") !== "" ? fmt(it.geraet_vk_eff) : it.geraet_vk} onChange={(e) => setItem(it.id, "geraet_vk", e.target.value)} /></label>
                     <label className="flex flex-col text-gray-500">E-Preis{String(it.ep_fix ?? "").trim() !== "" ? " (fest, s. Zeile oben)" : ""}<input className="border p-1.5 rounded bg-gray-100 font-medium" value={fmt(it.ep)} readOnly /></label>
                     <label className="flex flex-col text-gray-500">G-Preis<input className="border p-1.5 rounded bg-gray-100 font-bold" value={fmt(it.gp)} readOnly /></label>
                   </div>

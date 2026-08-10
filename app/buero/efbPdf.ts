@@ -40,19 +40,22 @@ function calcParts(it: any, del: number = 0) {
   const zeit = num(it.minutes) / 60;                 // Zeitansatz je Einheit (Std)
   const lohnVk = lohnSatzVk * zeit;                  // Lohn-Vk je Einheit
   const lohnEkE = lohnEk * zeit;                     // Lohn-EK je Einheit
+  // Fremd/Gerät: EK×Multi wenn ein EK eingetragen ist, sonst direktes Vk-Feld — identisch zu Angebote.tsx.
+  const fremdVkE = it.fremd_ek !== undefined && it.fremd_ek !== null && String(it.fremd_ek) !== "" ? num(it.fremd_ek) * (num(it.fremd_multi) || 1) : num(it.fremd_vk);
+  const geraetVkE = it.geraet_ek !== undefined && it.geraet_ek !== null && String(it.geraet_ek) !== "" ? num(it.geraet_ek) * (num(it.geraet_multi) || 1) : num(it.geraet_vk);
   // Fester E-Preis (ep_fix, wie in Angebote.tsx): Differenz wird den Stoffkosten zugeschlagen,
   // damit die EFB-Summen den Angebotspreis ergeben. (Clamp bei 0, falls fix < Lohn+Fremd+Gerät.)
   const fixed = it.ep_fix !== undefined && it.ep_fix !== null && String(it.ep_fix).trim() !== "";
-  const matVkEff = fixed ? Math.max(0, num(it.ep_fix) - lohnVk - num(it.fremd_vk) - num(it.geraet_vk)) : matVk;
-  const ep = (matVkEff + lohnVk + num(it.fremd_vk) + num(it.geraet_vk)) * disc;
+  const matVkEff = fixed ? Math.max(0, num(it.ep_fix) - lohnVk - fremdVkE - geraetVkE) : matVk;
+  const ep = (matVkEff + lohnVk + fremdVkE + geraetVkE) * disc;
   return {
     zeit,
     matEk: matEkE,
     matVk: matVkEff * disc,
     lohnEk: lohnEkE,
     lohnVk: lohnVk * disc,
-    geraet: num(it.geraet_vk) * disc,
-    fremd: num(it.fremd_vk) * disc,
+    geraet: geraetVkE * disc,
+    fremd: fremdVkE * disc,
     ep,
   };
 }

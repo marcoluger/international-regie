@@ -13,7 +13,10 @@ function calcItem(it: any, del: number = 0) {
   const lohnSatzVk = lohnEk * (num(it.lohn_multi) || 1);
   const lohnVk = lohnSatzVk * (num(it.minutes) / 60);
   const kupferVk = num(it.kupfer_kg) * del * (num(it.kupfer_multi) || 1) / pe;
-  const epCalc = matVk + lohnVk + kupferVk + num(it.fremd_vk) + num(it.geraet_vk);
+  // Fremd/Gerät: EK×Multi wenn ein EK eingetragen ist, sonst direktes Vk-Feld — identisch zu Angebote.tsx.
+  const fremdVk = it.fremd_ek !== undefined && it.fremd_ek !== null && String(it.fremd_ek) !== "" ? num(it.fremd_ek) * (num(it.fremd_multi) || 1) : num(it.fremd_vk);
+  const geraetVk = it.geraet_ek !== undefined && it.geraet_ek !== null && String(it.geraet_ek) !== "" ? num(it.geraet_ek) * (num(it.geraet_multi) || 1) : num(it.geraet_vk);
+  const epCalc = matVk + lohnVk + kupferVk + fremdVk + geraetVk;
   // Fester E-Preis (ep_fix) überschreibt die Kalkulation — identisch zu Angebote.tsx.
   const ep = it.ep_fix !== undefined && it.ep_fix !== null && String(it.ep_fix).trim() !== "" ? num(it.ep_fix) : epCalc;
   const gp = ep * num(it.qty) * (1 - num(it.discount_pct) / 100);
