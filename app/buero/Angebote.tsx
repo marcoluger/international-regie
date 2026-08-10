@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { generateAngebotPdf, generateAbPdf, generateRechnungPdf } from "./angebotPdf";
+import { parseTaifunXlsx, normTokens, bestMatch } from "./taifunArchiv";
 import { generateEfbPdf } from "./efbPdf";
 import { parseGaebX83 } from "./gaebImport";
 import { downloadGaebX84 } from "./gaebExport";
@@ -160,6 +161,13 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
   const [artPickerOpen, setArtPickerOpen] = useState(false);
   const [artSource, setArtSource] = useState<string>("leistung"); // "leistung" | "artikel" oder supplier_id
   const isOwnSrc = (s: string) => s === "leistung" || s === "artikel"; // eigener Stamm (nach Art) vs. Lieferanten-Katalog
+
+  // Stufe 9: Taifun-Tabellenansicht + Preisarchiv
+  const [posView, setPosView] = useState<"zeilen" | "tabelle">("zeilen");
+  const [archOpen, setArchOpen] = useState(false);
+  const [archCount, setArchCount] = useState<number | null>(null);
+  const [archBusy, setArchBusy] = useState(false);
+  const [archMsg, setArchMsg] = useState("");
   const [artSearch, setArtSearch] = useState("");
   const [artCat, setArtCat] = useState("");
   const [supResults, setSupResults] = useState<any[]>([]);
@@ -399,6 +407,83 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
     }
   }
 
+  // ── Stufe 9b: Taifun-Preisarchiv ─────────────────────────────────
+  async function loadArchCount() {
+    const { count } = await supabase.from("office_price_archive").select("id", { count: "exact", head: true }).eq("company_id", companyId);
+    setArchCount(count ?? 0);
+  }
+  async function importTaifunFiles(fileList: FileList | null) {
+    if (!fileList || !fileList.length) return;
+    setArchBusy(true); setArchMsg("Lese Dateien…");
+    let total = 0, skippedAll = 0;
+    const warns: string[] = [];
+    try {
+      for (const f of Array.from(fileList)) {
+        const { rows, skipped, warn } = await parseTaifunXlsx(f);
+        if (warn) { warns.push(warn); continue; }
+        skippedAll += skipped;
+        const payload = rows.map((r) => ({
+          company_id: companyId, source: f.name, pos: r.pos || null, unit: r.unit || null,
+          text: r.text, norm_text: Array.from(normTokens(r.text)).join(" "),
+          mat_ek: r.mat_ek, mat_multi: r.mat_multi, lohn_ek: r.lohn_ek, minutes: r.minutes,
+          fremd_vk: r.fremd_vk, geraet_vk: r.geraet_vk, ep: r.ep,
+        }));
+        for (let i = 0; i < payload.length; i += 500) {
+          const { error } = await supabase.from("office_price_archive").insert(payload.slice(i, i + 500));
+          if (error) throw new Error(`${f.name}: ${error.message}`);
+        }
+        total += payload.length;
+        setArchMsg(`Importiere… ${f.name}: ${payload.length} Positionen`);
+      }
+      setArchMsg(`Fertig: ${total} Positionen importiert${skippedAll ? ` (${skippedAll} Titel-/Textzeilen übersprungen)` : ""}.${warns.length ? " ⚠️ " + warns.join(" ") : ""}`);
+    } catch (e: any) {
+      setArchMsg("Fehler beim Import: " + (e?.message || String(e)));
+    }
+    setArchBusy(false);
+    await loadArchCount();
+  }
+  async function clearArchive() {
+    if (typeof window !== "undefined" && !window.confirm("Preisarchiv wirklich komplett leeren?")) return;
+    setArchBusy(true);
+    const { error } = await supabase.from("office_price_archive").delete().eq("company_id", companyId);
+    setArchBusy(false);
+    setArchMsg(error ? "Fehler beim Leeren: " + error.message : "Preisarchiv geleert.");
+    await loadArchCount();
+  }
+
+  // 💡 Unkalkulierte Positionen (kein Mat-EK, keine Minuten, kein fester EP) aus dem Archiv befüllen.
+  async function suggestPrices() {
+    setMsg("💡 Suche passende Alt-Positionen…");
+    const { data, error } = await supabase.from("office_price_archive")
+      .select("source,unit,text,mat_ek,mat_multi,lohn_ek,minutes,fremd_vk,geraet_vk,ep")
+      .eq("company_id", companyId);
+    if (error) { setMsg("Fehler beim Laden des Archivs: " + error.message); return; }
+    const archive = (data || []).map((r: any) => ({ row: r, tokens: normTokens(r.text) }));
+    if (!archive.length) { setMsg("Preisarchiv ist leer — zuerst in der Angebotsliste über 🗄️ Preisarchiv die Taifun-Exporte importieren."); return; }
+    let filled = 0, none = 0, hadCalc = 0;
+    const items = o.items.map((it: any) => {
+      if (it.kind !== "position") return it;
+      const unkalkuliert = num(it.mat_ek) === 0 && num(it.minutes) === 0 && String(it.ep_fix ?? "").trim() === "";
+      if (!unkalkuliert) { hadCalc++; return it; }
+      const m = bestMatch([it.short_text, it.long_text].filter(Boolean).join(" "), archive);
+      if (!m || m.score < 0.35) { none++; return it; }
+      const r = m.row;
+      filled++;
+      return {
+        ...it,
+        mat_ek: r.mat_ek != null ? String(r.mat_ek) : it.mat_ek,
+        mat_multi: r.mat_multi != null && num(r.mat_multi) > 0 ? String(r.mat_multi) : it.mat_multi,
+        lohn_ek: r.lohn_ek != null && num(r.lohn_ek) > 0 ? String(r.lohn_ek) : it.lohn_ek,
+        minutes: r.minutes != null ? String(r.minutes) : it.minutes,
+        fremd_vk: r.fremd_vk != null && num(r.fremd_vk) > 0 ? String(r.fremd_vk) : it.fremd_vk,
+        geraet_vk: r.geraet_vk != null && num(r.geraet_vk) > 0 ? String(r.geraet_vk) : it.geraet_vk,
+        suggest_note: `${Math.round(m.score * 100)} % ähnlich: „${String(r.text).split("\n")[0].slice(0, 70)}" (${r.source || "Archiv"}${r.ep != null ? `, EP damals ${fmt(num(r.ep))} €` : ""})`,
+      };
+    });
+    setO((p: any) => ({ ...p, items }));
+    setMsg(`💡 ${filled} Position${filled === 1 ? "" : "en"} aus dem Archiv vorgeschlagen — mit 💡 gekennzeichnet, bitte prüfen${none ? ` · ${none} ohne passenden Treffer` : ""}${hadCalc ? ` · ${hadCalc} bereits kalkuliert (unverändert)` : ""}.`);
+  }
+
   async function efbPdf() {
     try {
       if (!o.items.some((x: any) => x.kind === "position")) { setMsg("Keine Positionen für EFB-Formblätter vorhanden."); return; }
@@ -553,12 +638,31 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
           <h2 className="text-xl font-bold">{DOC_ICON[docFilter]} {DOC_LABEL_PLURAL[docFilter]} <span className="text-sm font-normal text-gray-500">({listRows.length})</span></h2>
           <div className="flex gap-2">
             {docFilter === "angebot" && (<>
+              <button type="button" onClick={() => { setArchOpen((p) => !p); if (archCount === null) loadArchCount(); }} className="bg-slate-500 text-white px-4 py-2 rounded-lg text-sm" title="Alt-Angebote aus Taifun als Preisgedächtnis importieren">🗄️ Preisarchiv</button>
               <button type="button" onClick={() => { setMode("settings"); setMsg(""); }} className="bg-slate-600 text-white px-4 py-2 rounded-lg text-sm">⚙️ Einstellungen</button>
               <button type="button" onClick={startNew} className="bg-cyan-700 text-white px-4 py-2 rounded-lg text-sm">＋ Neues Angebot</button>
             </>)}
           </div>
         </div>
         {msg && <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-lg p-2 text-sm">{msg}</div>}
+
+        {/* Stufe 9b: Taifun-Preisarchiv (Import der Alt-Angebote) */}
+        {archOpen && docFilter === "angebot" && (
+          <div className="border border-slate-200 rounded-2xl p-4 bg-gray-50 space-y-3">
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <h3 className="font-bold">🗄️ Preisarchiv <span className="text-sm font-normal text-gray-500">{archCount === null ? "" : `(${archCount.toLocaleString("de-DE")} Alt-Positionen)`}</span></h3>
+              <div className="flex gap-2">
+                <label className={`px-3 py-2 rounded-lg text-sm cursor-pointer text-white ${archBusy ? "bg-gray-300" : "bg-emerald-700"}`}>⬆ Taifun-Excel importieren
+                  <input type="file" multiple accept=".xlsx,.xls" className="hidden" disabled={archBusy} onChange={(e) => { importTaifunFiles(e.target.files); e.currentTarget.value = ""; }} />
+                </label>
+                {(archCount ?? 0) > 0 && <button type="button" onClick={clearArchive} disabled={archBusy} className="bg-red-600 disabled:bg-gray-300 text-white px-3 py-2 rounded-lg text-sm">🗑️ Archiv leeren</button>}
+                <button type="button" onClick={() => setArchOpen(false)} className="bg-gray-200 px-3 py-2 rounded-lg text-sm">Schließen</button>
+              </div>
+            </div>
+            {archMsg && <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-lg p-2 text-sm">{archMsg}</div>}
+            <p className="text-xs text-gray-500">Erwartet Taifun-Excel-Exporte im Format der Kalkulationstabelle (Spalten Position, Menge, Beschreibung, Mat.-Ek, Mat.-Multi, Std.Lohn, min, …) — mehrere Dateien auf einmal möglich. Titel- und reine Textzeilen werden übersprungen. Im Angebots-Editor holt „💡 Preise vorschlagen" dann für unkalkulierte Positionen die ähnlichste Alt-Position.</p>
+          </div>
+        )}
         <div className="space-y-2">
           {listRows.map((row: any) => (
             <div key={row.id} className="border border-slate-200 rounded-xl p-3 shadow-sm flex flex-wrap items-center justify-between gap-2">
@@ -721,6 +825,8 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
           </label>
           <button type="button" onClick={exportGaeb} className="bg-emerald-800 text-white px-3 py-1.5 rounded-lg text-xs">⬇ GAEB (X84) exportieren</button>
           <button type="button" onClick={openArtPicker} className="bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-xs">📦 aus Artikelstamm</button>
+          <button type="button" onClick={suggestPrices} className="bg-amber-600 text-white px-3 py-1.5 rounded-lg text-xs" title="Unkalkulierte Positionen mit der ähnlichsten Alt-Position aus dem Taifun-Preisarchiv befüllen">💡 Preise vorschlagen</button>
+          <button type="button" onClick={() => setPosView((p) => (p === "zeilen" ? "tabelle" : "zeilen"))} className="bg-slate-500 text-white px-3 py-1.5 rounded-lg text-xs ml-auto" title="Zwischen Zeilenansicht und Taifun-Kalkulationstabelle wechseln">{posView === "zeilen" ? "📊 Tabelle" : "📋 Zeilen"}</button>
         </div>
 
         {artPickerOpen && (
@@ -792,7 +898,85 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
           </div>
         )}
 
-        {o.items.map((raw: any, idx: number) => {
+        {/* Stufe 9a: Taifun-Kalkulationstabelle (umschaltbar) */}
+        {posView === "tabelle" && (
+          <div className="overflow-x-auto border border-slate-200 rounded-lg">
+            <table className="w-full min-w-[1150px] text-xs">
+              <thead>
+                <tr className="bg-slate-100 text-slate-700">
+                  {["Pos", "Menge", "Einh", "Beschreibung", "Mat-Ek", "Mat-Multi", "Mat-Vk", "Std.Lohn", "min", "Lohn-Vk", "Fremd-Vk", "Gerät-Vk", "E-Preis", "G-Preis", ""].map((h) => (
+                    <th key={h} className={`px-1.5 py-1.5 font-semibold whitespace-nowrap ${["Mat-Ek", "Mat-Multi", "Mat-Vk", "Std.Lohn", "min", "Lohn-Vk", "Fremd-Vk", "Gerät-Vk", "E-Preis", "G-Preis", "Menge"].includes(h) ? "text-right" : "text-left"}`}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {o.items.map((raw: any, idx: number) => {
+                  const it = calcItem(raw, num(o.del_preis));
+                  const tin = "border p-1 rounded text-black bg-white w-full";
+                  if (it.kind === "titel") {
+                    return (
+                      <tr key={it.id} className="border-t border-slate-200 bg-slate-50">
+                        <td className="px-1 py-1 w-16"><input className={tin} value={it.oz} onChange={(e) => setItem(it.id, "oz", e.target.value)} /></td>
+                        <td colSpan={2} className="px-1.5 text-slate-500">Titel</td>
+                        <td colSpan={9} className="px-1 py-1"><input className={`${tin} font-bold`} placeholder="Titel / Überschrift" value={it.title} onChange={(e) => setItem(it.id, "title", e.target.value)} /></td>
+                        <td className="px-1.5 text-right" />
+                        <td className="px-1.5 text-right font-bold whitespace-nowrap">{fmt(titleSum(o.items, idx, num(o.del_preis)))}</td>
+                        <td className="px-1 py-1 whitespace-nowrap">{itemButtons(it.id)}</td>
+                      </tr>
+                    );
+                  }
+                  if (it.kind === "text") {
+                    return (
+                      <tr key={it.id} className="border-t border-slate-200">
+                        <td className="px-1 py-1 w-16"><input className={tin} value={it.oz} onChange={(e) => setItem(it.id, "oz", e.target.value)} /></td>
+                        <td colSpan={2} className="px-1.5 text-slate-400">Text</td>
+                        <td colSpan={11} className="px-1 py-1">
+                          <input className={tin} placeholder="Kurztext (Textposition)" value={it.short_text} onChange={(e) => setItem(it.id, "short_text", e.target.value)} />
+                        </td>
+                        <td className="px-1 py-1 whitespace-nowrap">{itemButtons(it.id)}</td>
+                      </tr>
+                    );
+                  }
+                  const epFixed = String(it.ep_fix ?? "").trim() !== "";
+                  return (
+                    <tr key={it.id} className={`border-t border-slate-200 ${it.suggest_note ? "bg-amber-50/60" : ""}`}>
+                      <td className="px-1 py-1 w-16"><input className={tin} value={it.oz} onChange={(e) => setItem(it.id, "oz", e.target.value)} /></td>
+                      <td className="px-1 py-1 w-16"><input className={`${tin} text-right`} value={it.qty} onChange={(e) => setItem(it.id, "qty", e.target.value)} /></td>
+                      <td className="px-1 py-1 w-16">
+                        <select className="border p-1 rounded text-black bg-white w-full" value={it.unit} onChange={(e) => setItem(it.id, "unit", e.target.value)}>
+                          {(it.unit && !UNITS.includes(it.unit) ? [it.unit, ...UNITS] : UNITS).map((u: string) => <option key={u} value={u}>{u}</option>)}
+                        </select>
+                      </td>
+                      <td className="px-1 py-1 min-w-[16rem]">
+                        <div className="flex items-center gap-1">
+                          {it.suggest_note ? <span title={`Vorschlag aus Preisarchiv — ${it.suggest_note}`}>💡</span> : null}
+                          <input className={`${tin} font-medium`} placeholder="Kurztext" value={it.short_text} onChange={(e) => setItem(it.id, "short_text", e.target.value)} />
+                        </div>
+                        {it.long_text ? <div className="text-[10px] text-gray-400 truncate max-w-[24rem]" title={it.long_text}>{String(it.long_text).split("\n")[0]}</div> : null}
+                      </td>
+                      <td className="px-1 py-1 w-20"><input className={`${tin} text-right`} value={it.mat_ek} onChange={(e) => setItem(it.id, "mat_ek", e.target.value)} /></td>
+                      <td className="px-1 py-1 w-16"><input className={`${tin} text-right`} value={it.mat_multi} onChange={(e) => setItem(it.id, "mat_multi", e.target.value)} /></td>
+                      <td className="px-1.5 text-right text-gray-500 whitespace-nowrap">{fmt(it.mat_vk)}</td>
+                      <td className="px-1 py-1 w-16"><input className={`${tin} text-right`} value={it.lohn_ek} onChange={(e) => setItem(it.id, "lohn_ek", e.target.value)} /></td>
+                      <td className="px-1 py-1 w-16"><input className={`${tin} text-right`} value={it.minutes} onChange={(e) => setItem(it.id, "minutes", e.target.value)} /></td>
+                      <td className="px-1.5 text-right text-gray-500 whitespace-nowrap">{fmt(it.lohn_vk)}</td>
+                      <td className="px-1 py-1 w-16"><input className={`${tin} text-right`} value={it.fremd_vk} onChange={(e) => setItem(it.id, "fremd_vk", e.target.value)} /></td>
+                      <td className="px-1 py-1 w-16"><input className={`${tin} text-right`} value={it.geraet_vk} onChange={(e) => setItem(it.id, "geraet_vk", e.target.value)} /></td>
+                      <td className="px-1 py-1 w-20">
+                        <input className={`border p-1 rounded text-right w-full ${epFixed ? "bg-amber-50 border-amber-400 text-black font-medium" : "bg-white text-black"}`} placeholder={fmt(it.ep)} title="E-Preis: Zahl eintippen = fester Preis. Feld leeren = automatisch." value={it.ep_fix ?? ""} onChange={(e) => setItem(it.id, "ep_fix", e.target.value)} />
+                      </td>
+                      <td className="px-1.5 text-right font-bold whitespace-nowrap">{fmt(it.gp)}</td>
+                      <td className="px-1 py-1 whitespace-nowrap">{itemButtons(it.id)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+            {o.items.length === 0 && <p className="text-gray-500 text-sm p-3">Noch keine Positionen.</p>}
+          </div>
+        )}
+
+        {posView === "zeilen" && o.items.map((raw: any, idx: number) => {
           const it = calcItem(raw, num(o.del_preis));
           const opened = !!openItem[it.id];
           if (it.kind === "titel") {
@@ -827,6 +1011,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
                 <select className="border p-1.5 rounded text-black bg-white w-20 text-sm" value={it.unit} onChange={(e) => setItem(it.id, "unit", e.target.value)}>
                   {(it.unit && !UNITS.includes(it.unit) ? [it.unit, ...UNITS] : UNITS).map((u: string) => <option key={u} value={u}>{u}</option>)}
                 </select>
+                {it.suggest_note ? <span className="text-sm" title={`Vorschlag aus Preisarchiv — ${it.suggest_note}`}>💡</span> : null}
                 <input className="border p-1.5 rounded text-black bg-white flex-1 text-sm font-medium" placeholder="Kurztext" value={it.short_text} onChange={(e) => setItem(it.id, "short_text", e.target.value)} />
                 <input
                   className={`border p-1.5 rounded text-sm text-right w-20 ${String(it.ep_fix ?? "").trim() !== "" ? "bg-amber-50 border-amber-400 text-black font-medium" : "bg-white text-black"}`}
