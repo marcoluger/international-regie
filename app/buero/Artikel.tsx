@@ -21,16 +21,16 @@ function cuKgPer100m(text: string): number | null {
 }
 
 function articleEp(a: any) {
-  // Leere/0-Multiplikatoren fallen auf den App-Standard 1,28 zurück (wie im Angebot).
+  // Leere/0-Multiplikatoren: Material 1,28 · Lohn 1,5715 (wie im Angebot).
   const pe = num(a.preiseinheit) || 1;
   const matVk = num(a.mat_ek) * (num(a.mat_multi) || 1.28) / pe;
-  const lohnSatzVk = num(a.lohn_ek) * (num(a.lohn_multi) || 1.28);
+  const lohnSatzVk = num(a.lohn_ek) * (num(a.lohn_multi) || 1.5715);
   const lohnVk = lohnSatzVk * (num(a.minutes) / 60);
   return matVk + lohnVk;
 }
 
 function blankForm() {
-  return { id: null as string | null, number: "", category: "", short_text: "", long_text: "", unit: "St", mat_ek: "", mat_multi: "1.28", lohn_ek: "", lohn_multi: "1.28", minutes: "", preiseinheit: "1", kupfer_kg: "", kupfer_multi: "", components: [] as any[] };
+  return { id: null as string | null, number: "", category: "", short_text: "", long_text: "", unit: "St", mat_ek: "", mat_multi: "1.28", lohn_ek: "", lohn_multi: "1.5715", minutes: "", preiseinheit: "1", kupfer_kg: "", kupfer_multi: "", components: [] as any[] };
 }
 
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
@@ -197,7 +197,7 @@ export default function Artikel({ supabase, companyId, art = "leistung" }: { sup
   function setField(field: string, val: any) { setF((p: any) => ({ ...p, [field]: val })); }
   function startNew() { setF(blankForm()); setFormOpen(true); setMsg(""); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }
   function startEdit(a: any) {
-    setF({ id: a.id, number: a.number ?? "", category: a.category ?? "", short_text: a.short_text ?? "", long_text: a.long_text ?? "", unit: a.unit || "St", mat_ek: a.mat_ek ?? "", mat_multi: a.mat_multi ?? "1.28", lohn_ek: a.lohn_ek ?? "", lohn_multi: a.lohn_multi ?? "1.28", minutes: a.minutes ?? "", preiseinheit: a.preiseinheit ?? "1", kupfer_kg: a.kupfer_kg ?? "", kupfer_multi: a.kupfer_multi ?? "", components: Array.isArray(a.components) ? a.components : [] });
+    setF({ id: a.id, number: a.number ?? "", category: a.category ?? "", short_text: a.short_text ?? "", long_text: a.long_text ?? "", unit: a.unit || "St", mat_ek: a.mat_ek ?? "", mat_multi: a.mat_multi ?? "1.28", lohn_ek: a.lohn_ek ?? "", lohn_multi: a.lohn_multi ?? "1.5715", minutes: a.minutes ?? "", preiseinheit: a.preiseinheit ?? "1", kupfer_kg: a.kupfer_kg ?? "", kupfer_multi: a.kupfer_multi ?? "", components: Array.isArray(a.components) ? a.components : [] });
     setFormOpen(true); setMsg("");
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   }

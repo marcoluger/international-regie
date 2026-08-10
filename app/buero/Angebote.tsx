@@ -67,7 +67,7 @@ function articleToItem(a: any, qty: string, defMat: string, defLohn: string, def
   const isSup = "ek" in a; // Lieferanten-Katalogzeile: Netto-EK steht in a.ek
   const matEk = isSup ? (a.ek ?? a.net_ek ?? a.list_ek) : a.mat_ek;
   const mm = (a.mat_multi === null || a.mat_multi === undefined || a.mat_multi === "") ? (defMat || "1.28") : String(a.mat_multi);
-  const lm = (a.lohn_multi === null || a.lohn_multi === undefined || a.lohn_multi === "") ? (defLohn || "1.28") : String(a.lohn_multi);
+  const lm = (a.lohn_multi === null || a.lohn_multi === undefined || a.lohn_multi === "") ? (defLohn || "1.5715") : String(a.lohn_multi);
   const text = a.short_text || (isSup && a.article_no ? "Art. " + a.article_no : "");
   // Preiseinheit + Kupfer nur bei eigenen Artikeln; Katalogpreise sind bereits je Einheit umgerechnet.
   const has = (v: any) => !isSup && v !== null && v !== undefined && String(v) !== "";
@@ -111,7 +111,7 @@ function newItem(kind: string) {
   const base: any = { id: uid(), kind, oz: "" };
   if (kind === "titel") return { ...base, title: "" };
   if (kind === "text") return { ...base, short_text: "", long_text: "" };
-  return { ...base, short_text: "", long_text: "", qty: "1", unit: "St", mat_ek: "", mat_multi: "1.28", lohn_ek: "", lohn_multi: "1.28", minutes: "", fremd_vk: "", geraet_vk: "", discount_pct: "", preiseinheit: "1", verschnitt: "1", kupfer_kg: "", kupfer_multi: "1.05" };
+  return { ...base, short_text: "", long_text: "", qty: "1", unit: "St", mat_ek: "", mat_multi: "1.28", lohn_ek: "", lohn_multi: "1.5715", minutes: "", fremd_vk: "", geraet_vk: "", discount_pct: "", preiseinheit: "1", verschnitt: "1", kupfer_kg: "", kupfer_multi: "1.05" };
 }
 
 // ── Dokumentarten (Stufe 6a): Angebot -> Auftragsbestätigung -> Rechnung ──
@@ -134,7 +134,7 @@ function blankOffer() {
     offer_date: "", valid_until: "",
     customer_id: "", customer_name: "", customer_anrede: "", customer_street: "", customer_zip: "", customer_city: "",
     vat_rate: "19", rabatt_pct: "0", nachlass: "0", skonto_pct: "0", skonto_tage: "0",
-    def_mat_multi: "1.28", def_lohn_multi: "1.28", binde_weeks: "",
+    def_mat_multi: "1.28", def_lohn_multi: "1.5715", binde_weeks: "",
     tax_mode: "standard", tax_note: "", vortext: "", nachtext: "", pay1_pct: "50", pay2_pct: "30", pay3_pct: "20",
     del_preis: "0",
     items: [] as any[],
@@ -152,7 +152,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
   const [custSearch, setCustSearch] = useState("");
   const [pickerOpen, setPickerOpen] = useState(false);
   const [openItem, setOpenItem] = useState<Record<string, boolean>>({});
-  const [settings, setSettings] = useState<any>({ def_mat_multi: "1.28", def_lohn_multi: "1.28", binde_weeks: "4", vat_rate: "19", def_rabatt_pct: "0", def_nachlass: "0", def_skonto_pct: "0", def_skonto_tage: "0", pv_text: PV_DEFAULT, b13_text: B13_DEFAULT, vortext: VORTEXT_DEFAULT, nachtext: NACHTEXT_DEFAULT, pay1_pct: "50", pay2_pct: "30", pay3_pct: "20", del_preis: "0", def_kupfer_multi: "1.05" });
+  const [settings, setSettings] = useState<any>({ def_mat_multi: "1.28", def_lohn_multi: "1.5715", binde_weeks: "4", vat_rate: "19", def_rabatt_pct: "0", def_nachlass: "0", def_skonto_pct: "0", def_skonto_tage: "0", pv_text: PV_DEFAULT, b13_text: B13_DEFAULT, vortext: VORTEXT_DEFAULT, nachtext: NACHTEXT_DEFAULT, pay1_pct: "50", pay2_pct: "30", pay3_pct: "20", del_preis: "0", def_kupfer_multi: "1.05" });
   const [settingsTab, setSettingsTab] = useState("allgemein");
   const [textModules, setTextModules] = useState<any[]>([]);
   const [tmKind, setTmKind] = useState("vor");
@@ -207,7 +207,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
   }
   async function loadSettings() {
     const { data } = await supabase.from("office_offer_settings").select("*").eq("company_id", companyId).maybeSingle();
-    if (data) setSettings({ def_mat_multi: String(data.def_mat_multi ?? "1.28"), def_lohn_multi: String(data.def_lohn_multi ?? "1.28"), binde_weeks: String(data.binde_weeks ?? "4"), vat_rate: String(data.vat_rate ?? "19"), def_rabatt_pct: String(data.def_rabatt_pct ?? "0"), def_nachlass: String(data.def_nachlass ?? "0"), def_skonto_pct: String(data.def_skonto_pct ?? "0"), def_skonto_tage: String(data.def_skonto_tage ?? "0"), pv_text: data.pv_text ?? PV_DEFAULT, b13_text: data.b13_text ?? B13_DEFAULT, vortext: data.vortext ?? VORTEXT_DEFAULT, nachtext: data.nachtext ?? NACHTEXT_DEFAULT, pay1_pct: String(data.pay1_pct ?? "50"), pay2_pct: String(data.pay2_pct ?? "30"), pay3_pct: String(data.pay3_pct ?? "20"), del_preis: String(data.del_preis ?? "0"), def_kupfer_multi: String(data.def_kupfer_multi ?? "1.05") });
+    if (data) setSettings({ def_mat_multi: String(data.def_mat_multi ?? "1.28"), def_lohn_multi: String(data.def_lohn_multi ?? "1.5715"), binde_weeks: String(data.binde_weeks ?? "4"), vat_rate: String(data.vat_rate ?? "19"), def_rabatt_pct: String(data.def_rabatt_pct ?? "0"), def_nachlass: String(data.def_nachlass ?? "0"), def_skonto_pct: String(data.def_skonto_pct ?? "0"), def_skonto_tage: String(data.def_skonto_tage ?? "0"), pv_text: data.pv_text ?? PV_DEFAULT, b13_text: data.b13_text ?? B13_DEFAULT, vortext: data.vortext ?? VORTEXT_DEFAULT, nachtext: data.nachtext ?? NACHTEXT_DEFAULT, pay1_pct: String(data.pay1_pct ?? "50"), pay2_pct: String(data.pay2_pct ?? "30"), pay3_pct: String(data.pay3_pct ?? "20"), del_preis: String(data.del_preis ?? "0"), def_kupfer_multi: String(data.def_kupfer_multi ?? "1.05") });
   }
   async function saveSettings() {
     const { error } = await supabase.from("office_offer_settings").upsert({ company_id: companyId, def_mat_multi: num(settings.def_mat_multi), def_lohn_multi: num(settings.def_lohn_multi), binde_weeks: Math.round(num(settings.binde_weeks)), vat_rate: num(settings.vat_rate), def_rabatt_pct: num(settings.def_rabatt_pct), def_nachlass: num(settings.def_nachlass), def_skonto_pct: num(settings.def_skonto_pct), def_skonto_tage: Math.round(num(settings.def_skonto_tage)), pv_text: settings.pv_text || null, b13_text: settings.b13_text || null, vortext: settings.vortext || null, nachtext: settings.nachtext || null, pay1_pct: num(settings.pay1_pct), pay2_pct: num(settings.pay2_pct), pay3_pct: num(settings.pay3_pct), del_preis: num(settings.del_preis), def_kupfer_multi: num(settings.def_kupfer_multi), updated_at: new Date().toISOString() }, { onConflict: "company_id" });
@@ -258,7 +258,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
   function startNew() {
     const b: any = blankOffer();
     b.def_mat_multi = settings.def_mat_multi || "1.28";
-    b.def_lohn_multi = settings.def_lohn_multi || "1.28";
+    b.def_lohn_multi = settings.def_lohn_multi || "1.5715";
     b.binde_weeks = settings.binde_weeks || "";
     b.vat_rate = settings.vat_rate || "19";
     b.rabatt_pct = settings.def_rabatt_pct || "0";
@@ -277,7 +277,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
   }
   // DB-Zeile in den bearbeitbaren Zustand normalisieren (Zahlen als Strings).
   function rowToState(row: any) {
-    return { ...blankOffer(), ...row, vat_rate: String(row.vat_rate ?? "19"), rabatt_pct: String(row.rabatt_pct ?? "0"), nachlass: String(row.nachlass ?? "0"), skonto_pct: String(row.skonto_pct ?? "0"), skonto_tage: String(row.skonto_tage ?? "0"), def_mat_multi: String(row.def_mat_multi ?? "1.28"), def_lohn_multi: String(row.def_lohn_multi ?? "1.28"), binde_weeks: String(row.binde_weeks ?? ""), tax_mode: row.tax_mode || "standard", tax_note: row.tax_note ?? "", vortext: row.vortext ?? "", nachtext: row.nachtext ?? "", pay1_pct: String(row.pay1_pct ?? "50"), pay2_pct: String(row.pay2_pct ?? "30"), pay3_pct: String(row.pay3_pct ?? "20"), del_preis: String(row.del_preis ?? "0"), doc_type: row.doc_type || "angebot", parent_id: row.parent_id || null, doc_date: row.doc_date || "", leistung_von: row.leistung_von || "", leistung_bis: row.leistung_bis || "", zahlungsziel_tage: row.zahlungsziel_tage != null ? String(row.zahlungsziel_tage) : "", items: Array.isArray(row.items) ? row.items : [] };
+    return { ...blankOffer(), ...row, vat_rate: String(row.vat_rate ?? "19"), rabatt_pct: String(row.rabatt_pct ?? "0"), nachlass: String(row.nachlass ?? "0"), skonto_pct: String(row.skonto_pct ?? "0"), skonto_tage: String(row.skonto_tage ?? "0"), def_mat_multi: String(row.def_mat_multi ?? "1.28"), def_lohn_multi: String(row.def_lohn_multi ?? "1.5715"), binde_weeks: String(row.binde_weeks ?? ""), tax_mode: row.tax_mode || "standard", tax_note: row.tax_note ?? "", vortext: row.vortext ?? "", nachtext: row.nachtext ?? "", pay1_pct: String(row.pay1_pct ?? "50"), pay2_pct: String(row.pay2_pct ?? "30"), pay3_pct: String(row.pay3_pct ?? "20"), del_preis: String(row.del_preis ?? "0"), doc_type: row.doc_type || "angebot", parent_id: row.parent_id || null, doc_date: row.doc_date || "", leistung_von: row.leistung_von || "", leistung_bis: row.leistung_bis || "", zahlungsziel_tage: row.zahlungsziel_tage != null ? String(row.zahlungsziel_tage) : "", items: Array.isArray(row.items) ? row.items : [] };
   }
   function editOffer(row: any) {
     setO(rowToState(row));
@@ -319,7 +319,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
   function addItem(kind: string) {
     setO((p: any) => {
       const it: any = newItem(kind);
-      if (kind === "position") { it.mat_multi = p.def_mat_multi || "1.28"; it.lohn_multi = p.def_lohn_multi || "1.28"; it.kupfer_multi = settings.def_kupfer_multi || "1.05"; }
+      if (kind === "position") { it.mat_multi = p.def_mat_multi || "1.28"; it.lohn_multi = p.def_lohn_multi || "1.5715"; it.kupfer_multi = settings.def_kupfer_multi || "1.05"; }
       return { ...p, items: [...p.items, it] };
     });
   }
@@ -657,7 +657,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
       const text = await file.text();
       const res = parseGaebX83(text);
       const mm = o.def_mat_multi || "1.28";
-      const lm = o.def_lohn_multi || "1.28";
+      const lm = o.def_lohn_multi || "1.5715";
       const imported = res.items.map((g: any) => {
         if (g.kind === "titel") return { id: uid(), kind: "titel", oz: g.oz || "", rno: g.rno || "", title: g.title || "" };
         return {
