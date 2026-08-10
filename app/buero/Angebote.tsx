@@ -79,7 +79,7 @@ function articleToItem(a: any, qty: string, defMat: string, defLohn: string, def
     short_text: text, long_text: a.long_text || "",
     qty: qty && String(qty).trim() ? String(qty) : "1", unit: a.unit || "St",
     mat_ek: s(matEk), mat_multi: mm, lohn_ek: isSup || s(a.lohn_ek) === "" ? "35" : s(a.lohn_ek), lohn_multi: lm,
-    minutes: isSup ? "" : s(a.minutes), fremd_vk: "", geraet_vk: "", discount_pct: "",
+    minutes: isSup ? "" : s(a.minutes), fremd_vk: "", geraet_vk: "", geraet_multi: "1.5", discount_pct: "",
     preiseinheit: pe, verschnitt: "1", kupfer_kg: cuKg, kupfer_multi: cuMulti,
   };
 }
@@ -111,7 +111,7 @@ function newItem(kind: string) {
   const base: any = { id: uid(), kind, oz: "" };
   if (kind === "titel") return { ...base, title: "" };
   if (kind === "text") return { ...base, short_text: "", long_text: "" };
-  return { ...base, short_text: "", long_text: "", qty: "1", unit: "St", mat_ek: "", mat_multi: "1.28", lohn_ek: "35", lohn_multi: "1.5715", minutes: "", fremd_vk: "", geraet_vk: "", discount_pct: "", preiseinheit: "1", verschnitt: "1", kupfer_kg: "", kupfer_multi: "1.05" };
+  return { ...base, short_text: "", long_text: "", qty: "1", unit: "St", mat_ek: "", mat_multi: "1.28", lohn_ek: "35", lohn_multi: "1.5715", minutes: "", fremd_vk: "", geraet_vk: "", geraet_multi: "1.5", discount_pct: "", preiseinheit: "1", verschnitt: "1", kupfer_kg: "", kupfer_multi: "1.05" };
 }
 
 // ── Dokumentarten (Stufe 6a): Angebot -> Auftragsbestätigung -> Rechnung ──
@@ -626,6 +626,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
             ...it,
             mat_ek: f.needCost && r.mat_ek != null && r.mat_ek > 0 ? String(r.mat_ek) : it.mat_ek,
             geraet_ek: f.needCost && r.geraet != null && r.geraet > 0 ? String(r.geraet) : it.geraet_ek,
+            geraet_multi: f.needCost && r.geraet != null && r.geraet > 0 && String(it.geraet_multi ?? "") === "" ? "1.5" : it.geraet_multi,
             minutes: f.needMin && r.minutes != null ? String(r.minutes) : it.minutes,
             suggest_note: `${it.suggest_note ? it.suggest_note + " · " : ""}🤖 KI${!f.needCost ? " (nur Minuten ergänzt)" : ""}${r.note ? ` (${r.note})` : ""}${f.needCost && r.geraet != null && r.geraet > 0 ? " — Gerätekosten im Feld Gerät-Ek" : ""} — Schätzwerte, bitte prüfen!`,
           };
@@ -663,7 +664,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
         return {
           id: uid(), kind: "position", oz: g.oz || "", rno: g.rno || "", short_text: g.short_text || "", long_text: g.long_text || "",
           qty: String(g.qty ?? "1"), unit: g.unit || "St",
-          mat_ek: "", mat_multi: mm, lohn_ek: "35", lohn_multi: lm, minutes: "", fremd_vk: "", geraet_vk: "", discount_pct: "",
+          mat_ek: "", mat_multi: mm, lohn_ek: "35", lohn_multi: lm, minutes: "", fremd_vk: "", geraet_vk: "", geraet_multi: "1.5", discount_pct: "",
         };
       });
       setO((p: any) => ({
