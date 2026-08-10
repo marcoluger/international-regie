@@ -98,7 +98,13 @@ function globalNachlass(o: any, net: number) {
 }
 
 // ── PDF-Erzeugung ───────────────────────────────────────────────────
-export type EfbZuschlaege = { bgk: number; gewinn: number; wagnisBetrieb: number; wagnisLeistung: number };
+// Einstellbare Zuschläge (wie Taifun): BGK/AGK je Kostenart [Lohn, Material, Geräte, Fremd],
+// Wagnis+Gewinn = Rest nach BGK+AGK (aufgeteilt nach Anteilen), Lohn-Zeilen 1.2/1.3 in % auf ML.
+export type EfbZuschlaege = {
+  bgk: number[]; agk: number[];
+  anteilGewinn: number; anteilWagnisBetrieb: number; anteilWagnisLeistung: number;
+  lohnzusatz: number; lohnneben: number;
+};
 
 export async function generateEfbPdf(o: any, opts: { customerNo?: string; sheets?: ("221" | "222" | "223")[]; efb?: EfbZuschlaege } = {}) {
   const { jsPDF } = await import("jspdf");
@@ -172,16 +178,23 @@ export async function generateEfbPdf(o: any, opts: { customerNo?: string; sheets
     doc.text("Angaben zur Kalkulation mit vorbestimmten Zuschlägen", mL, y);
     y += 6;
 
+    const cfg: EfbZuschlaege = opts.efb || { bgk: [5, 5, 0, 0], agk: [5, 5, 0, 0], anteilGewinn: 50, anteilWagnisBetrieb: 25, anteilWagnisLeistung: 25, lohnzusatz: 15.19, lohnneben: 16 };
+    // Tabelle 1: 1.2/1.3 als konfigurierte Sätze auf ML, 1.5 = Rest (VL bleibt exakt).
+    const e12 = ml * cfg.lohnzusatz / 100;
+    const e13 = ml * cfg.lohnneben / 100;
+    const kl = ml + e12 + e13;
+    const z15 = kl > 0 ? (vl / kl - 1) * 100 : 0;
+
     // Tabelle 1: Verrechnungslohn — Spalten: Nr | Text | Zuschlag % | €/h
     const xNr = mL, xTxt = mL + 13, xPz = 150, xEh = 171;
     type R1 = { nr: string; t1: string; t2?: string; z?: string; e?: string; bold?: boolean };
     const rows1: R1[] = [
       { nr: "1.", t1: "Angaben über den Verrechnungslohn", z: "Zuschlag\n%", e: "€/h", bold: true },
       { nr: "1.1", t1: "Mittellohn ML", t2: "einschl. Lohnzulagen u. Lohnerhöhungen, wenn keine Lohngleitklausel vereinbart wird.", e: fmt(ml), bold: true },
-      { nr: "1.2", t1: "Lohnzusatzkosten", t2: "Sozialkosten, Soziallöhne und lohnbezogene Kosten, als Zuschlag auf ML", z: pct(0), e: fmt(0) },
-      { nr: "1.3", t1: "Lohnnebenkosten", t2: "Auslösung, Fahrgelder, als Zuschlag auf ML", z: pct(0), e: fmt(0) },
-      { nr: "1.4", t1: "Kalkulationslohn KL", t2: "(Summe 1.1 bis 1.3)", e: fmt(ml), bold: true },
-      { nr: "1.5", t1: "Zuschläge auf Kalkulationslohn", t2: "(aus Zeile 2.4, Spalte 1)", z: pct(zLohn), e: fmt(vl - ml) },
+      { nr: "1.2", t1: "Lohnzusatzkosten", t2: "Sozialkosten, Soziallöhne und lohnbezogene Kosten, als Zuschlag auf ML", z: pct(cfg.lohnzusatz), e: fmt(e12) },
+      { nr: "1.3", t1: "Lohnnebenkosten", t2: "Auslösung, Fahrgelder, als Zuschlag auf ML", z: pct(cfg.lohnneben), e: fmt(e13) },
+      { nr: "1.4", t1: "Kalkulationslohn KL", t2: "(Summe 1.1 bis 1.3)", e: fmt(kl), bold: true },
+      { nr: "1.5", t1: "Zuschläge auf Kalkulationslohn", t2: "(aus Zeile 2.4, Spalte 1)", z: pct(z15), e: fmt(vl - kl) },
       { nr: "1.6", t1: "Verrechnungslohn VL", t2: "(Summe aus 1.4 und 1.5)", e: fmt(vl), bold: true },
     ];
     const t1Top = y;
@@ -234,14 +247,22 @@ export async function generateEfbPdf(o: any, opts: { customerNo?: string; sheets
     }
     y += 12;
     line(mL, y, mR, y);
-    // Datenzeilen — feste Sätze für BGK/Gewinn/Wagnis (aus den ⚙️-Einstellungen),
-    // AGK (Zeile 2.2) = Rest, damit die Summe exakt dem echten Gesamtzuschlag entspricht.
-    // Spalten ohne Zuschlag (Gesamt = 0) bleiben komplett 0.
-    const cfg = opts.efb || { bgk: 10, gewinn: 4.45, wagnisBetrieb: 2.22, wagnisLeistung: 2.22 };
+    // Datenzeilen — BGK/AGK je Kostenart fest (aus den ⚙️-Einstellungen, wie Taifun),
+    // Wagnis und Gewinn = Rest (Gesamtzuschlag − BGK − AGK), aufgeteilt nach den Anteilen.
+    // So entspricht Zeile 2.4 immer exakt der echten Kalkulation. Spalten ohne Zuschlag bleiben 0.
     const totals5 = [zLohn, zMat, zGer, zSonst, 0];
-    const fix = (satz: number) => totals5.map((t) => (Math.abs(t) < 0.005 ? 0 : satz));
-    const vBgk = fix(cfg.bgk), vGew = fix(cfg.gewinn), vWb = fix(cfg.wagnisBetrieb), vWl = fix(cfg.wagnisLeistung);
-    const vAgk = totals5.map((t, k) => (Math.abs(t) < 0.005 ? 0 : t - vBgk[k] - vGew[k] - vWb[k] - vWl[k]));
+    const anteileSum = (cfg.anteilGewinn + cfg.anteilWagnisBetrieb + cfg.anteilWagnisLeistung) || 100;
+    const sG = cfg.anteilGewinn / anteileSum, sWb = cfg.anteilWagnisBetrieb / anteileSum, sWl = cfg.anteilWagnisLeistung / anteileSum;
+    const vBgk: number[] = [], vAgk: number[] = [], vGew: number[] = [], vWb: number[] = [], vWl: number[] = [];
+    for (let k = 0; k < 5; k++) {
+      const t = totals5[k];
+      if (Math.abs(t) < 0.005) { vBgk.push(0); vAgk.push(0); vGew.push(0); vWb.push(0); vWl.push(0); continue; }
+      const bgk = k < 4 ? num(cfg.bgk[k]) : 0;
+      const agk = k < 4 ? num(cfg.agk[k]) : 0;
+      const wg = t - bgk - agk; // Rest für Wagnis und Gewinn (kann negativ sein)
+      vBgk.push(bgk); vAgk.push(agk);
+      vGew.push(wg * sG); vWb.push(wg * sWb); vWl.push(wg * sWl);
+    }
     type R2 = { nr: string; t: string; v?: number[]; cross?: boolean; bold?: boolean };
     const rows2: R2[] = [
       { nr: "2.1", t: "Baustellengemeinkosten", v: vBgk },
@@ -329,7 +350,7 @@ export async function generateEfbPdf(o: any, opts: { customerNo?: string; sheets
       "1) Die Abweichung der Angebotssumme aus dem EFB zur Angebotssumme aus dem LV entsteht durch Run-\ndungsdifferenzen aufgrund unterschiedlicher Zusammenzählung der Einzelkosten.",
       "2) Evtl. Angaben zur Aufteilung des Zuschlagssatzes zu BGK in Zeile 2.1 nach bauzeitabhängigen und bauzeit-\nunabhängigen Anteilen.",
       "3) Evtl. Aufgliederung des Zuschlagssatzes in Zeile 2.3 zu W&G nach einem Anteil für Wagnis und einem Anteil\nfür Gewinn.",
-      "4) BGK, Gewinn und Wagnis gemäß betrieblichen Sätzen; Allgemeine Geschäftskosten (Zeile 2.2) als\nAusgleichswert, damit die Gesamtzuschläge der tatsächlichen Kalkulation entsprechen.",
+      "4) BGK und AGK gemäß betrieblichen Sätzen je Kostenart; Wagnis und Gewinn (Zeile 2.3) als verbleibender\nAnteil, damit die Gesamtzuschläge (Zeile 2.4) der tatsächlichen Kalkulation entsprechen.",
     ];
     if (nachlass > 0) notes.push(`5) In der Angebotssumme lt. Angebot ist zusätzlich ein Nachlass/Rabatt von ${fmt(nachlass)} € berücksichtigt (Angebotssumme danach: ${fmt(angebotssumme)} €).`);
     doc.setFontSize(8.2);
