@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import Angebote from "./Angebote";
 import Artikel from "./Artikel";
-import Datev from "./Datev";
+import Buchhaltung from "./Buchhaltung";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || "",
@@ -20,7 +20,7 @@ const BUERO_TABS = [
   { key: "angebote", label: "🧾 Angebote" },
   { key: "ab", label: "📋 Auftragsbestätigung" },
   { key: "rechnung", label: "💶 Rechnung" },
-  { key: "datev", label: "📚 Buchhaltung" },
+  { key: "buchhaltung", label: "💰 Buchhaltung" },
 ];
 
 export default function BueroPage() {
@@ -234,7 +234,7 @@ export default function BueroPage() {
     <div className="min-h-full bg-slate-50">
       {/* Kopfzeile */}
       <div className="bg-gradient-to-br from-cyan-700 to-cyan-900 text-white">
-        <div className="max-w-5xl mx-auto px-4 py-5 flex items-center justify-between gap-3">
+        <div className="max-w-[1800px] mx-auto px-4 py-5 flex items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold">🏢 Büro</h1>
             <p className="text-cyan-100 text-sm">{companyName ? companyName + " · " : ""}Auftragsverwaltung</p>
@@ -243,7 +243,7 @@ export default function BueroPage() {
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 py-6 space-y-4">
+      <div className="max-w-[1800px] mx-auto px-4 py-6 space-y-4">
         {message && <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-lg p-3 text-sm">{message}</div>}
 
         {loading ? (
@@ -546,8 +546,8 @@ export default function BueroPage() {
 
             {tab === "rechnung" && <Angebote supabase={supabase} companyId={companyId} customers={customers} doc="rechnung" />}
 
-            {/* Buchhaltung: DATEV-Export der Ausgangsrechnungen (Stufe 8a) */}
-            {tab === "datev" && <Datev supabase={supabase} companyId={companyId} customers={customers} />}
+            {/* Buchhaltung (Stufe 8a): DATEV-Export der Ausgangsrechnungen */}
+            {tab === "buchhaltung" && <Buchhaltung supabase={supabase} companyId={companyId} customers={customers} />}
           </div>
         )}
       </div>
