@@ -2,7 +2,7 @@
 
 import { Fragment, useEffect, useState } from "react";
 import { generateAngebotPdf, generateAbPdf, generateRechnungPdf } from "./angebotPdf";
-import { parseTaifunXlsx, normTokens, topMatches } from "./taifunArchiv";
+import { parseTaifunXlsx, normTokens, topMatches, similarity } from "./taifunArchiv";
 import { generateEfbPdf } from "./efbPdf";
 import { parseGaebX83 } from "./gaebImport";
 import { downloadGaebX84 } from "./gaebExport";
@@ -457,8 +457,9 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
     await loadArchCount();
   }
 
-  // Werte eines Archiv-Kandidaten in eine Position übernehmen (mit 💡-Kennzeichnung).
+  // Werte eines Kandidaten (Archiv ODER DATANORM-Katalog) in eine Position übernehmen.
   function applyCandidate(it: any, r: any, score: number) {
+    const matOnly = r.minutes == null && r.lohn_ek == null; // Katalogartikel: nur echter Material-EK
     return {
       ...it,
       mat_ek: r.mat_ek != null ? String(r.mat_ek) : it.mat_ek,
@@ -467,8 +468,33 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
       minutes: r.minutes != null ? String(r.minutes) : it.minutes,
       fremd_vk: r.fremd_vk != null && num(r.fremd_vk) > 0 ? String(r.fremd_vk) : it.fremd_vk,
       geraet_vk: r.geraet_vk != null && num(r.geraet_vk) > 0 ? String(r.geraet_vk) : it.geraet_vk,
-      suggest_note: `${Math.round(score * 100)} % ähnlich: „${String(r.text).split("\n")[0].slice(0, 70)}" (${r.source || "Archiv"}${r.ep != null ? `, EP damals ${fmt(num(r.ep))} €` : ""})`,
+      suggest_note: `${Math.round(score * 100)} % ähnlich: „${String(r.text).split("\n")[0].slice(0, 70)}" (${r.source || "Archiv"}${r.ep != null ? `, EP damals ${fmt(num(r.ep))} €` : ""})${matOnly ? " — nur Material-EK aus dem Katalog, Minuten fehlen noch (🤖 kann sie schätzen)" : ""}`,
     };
+  }
+
+  // DATANORM-Katalog-Kandidaten für eine Position: echte EKs aus office_supplier_articles.
+  async function catalogCandidates(text: string): Promise<{ row: any; score: number }[]> {
+    const toks = Array.from(normTokens(text)).filter((w) => w.length >= 4 && !/^\d+$/.test(w)).sort((a, b) => b.length - a.length).slice(0, 3);
+    if (!toks.length) return [];
+    try {
+      const { data } = await supabase.from("office_supplier_articles")
+        .select("supplier_id,article_no,short_text,unit,ek,net_ek")
+        .eq("company_id", companyId)
+        .or(toks.map((t) => `short_text.ilike.*${t.replace(/[,()%*]/g, "")}*`).join(","))
+        .limit(15);
+      const t = normTokens(text);
+      const out: { row: any; score: number }[] = [];
+      for (const a of data || []) {
+        const ek = a.ek != null ? a.ek : a.net_ek;
+        if (ek == null) continue;
+        const score = similarity(t, normTokens(a.short_text || ""));
+        if (score < 0.25) continue;
+        const supNm = suppliers.find((s: any) => s.id === a.supplier_id)?.name || "Katalog";
+        out.push({ score, row: { source: `🏭 ${supNm}${a.article_no ? " " + a.article_no : ""}`, unit: a.unit || "", text: a.short_text || ("Art. " + a.article_no), mat_ek: ek, mat_multi: null, lohn_ek: null, minutes: null, fremd_vk: null, geraet_vk: null, ep: null } });
+      }
+      out.sort((x, y) => y.score - x.score);
+      return out.slice(0, 3);
+    } catch { return []; }
   }
   function pickSuggestion(itemId: string, cand: { row: any; score: number }) {
     setO((p: any) => ({ ...p, items: p.items.map((it: any) => (it.id === itemId ? applyCandidate(it, cand.row, cand.score) : it)) }));
@@ -508,43 +534,64 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
   // Sehr sichere Treffer (>= 80 %) werden direkt übernommen; alles Ähnliche (>= 25 %) landet in
   // der Prüfliste — dort wählt Marco je Position, WELCHER Kandidat (Preis/Zeit) übernommen wird.
   async function suggestPrices() {
-    setMsg("💡 Suche passende Alt-Positionen…");
+    setMsg("💡 Suche passende Alt-Positionen und Katalogartikel…");
     const { data, error } = await supabase.from("office_price_archive")
       .select("source,unit,text,mat_ek,mat_multi,lohn_ek,minutes,fremd_vk,geraet_vk,ep")
       .eq("company_id", companyId);
     if (error) { setMsg("Fehler beim Laden des Archivs: " + error.message); return; }
     const archive = (data || []).map((r: any) => ({ row: r, tokens: normTokens(r.text) }));
-    if (!archive.length) { setMsg("Preisarchiv ist leer — zuerst in der Angebotsliste über 🗄️ Preisarchiv die Taifun-Exporte importieren."); return; }
     let filled = 0, none = 0, hadCalc = 0;
-    const review: { id: string; oz: string; text: string; cands: { row: any; score: number }[] }[] = [];
+    // 1. Durchgang: Archiv (sichere Treffer sofort übernehmen, Rest sammeln)
+    const pending: { it: any; cands: { row: any; score: number }[] }[] = [];
     const items = o.items.map((it: any) => {
       if (it.kind !== "position") return it;
       const unkalkuliert = num(it.mat_ek) === 0 && num(it.minutes) === 0 && num(it.geraet_vk) === 0 && num(it.fremd_vk) === 0 && num(it.geraet_ek) === 0 && num(it.fremd_ek) === 0 && String(it.ep_fix ?? "").trim() === "";
       if (!unkalkuliert) { hadCalc++; return it; }
-      const cands = topMatches([it.short_text, it.long_text].filter(Boolean).join(" "), archive, 5, 0.25);
-      if (!cands.length) { none++; return it; }
-      if (cands[0].score >= 0.8) { filled++; return applyCandidate(it, cands[0].row, cands[0].score); }
-      review.push({ id: it.id, oz: it.oz || "", text: it.short_text || "(ohne Kurztext)", cands });
+      const cands = archive.length ? topMatches([it.short_text, it.long_text].filter(Boolean).join(" "), archive, 5, 0.25) : [];
+      if (cands.length && cands[0].score >= 0.8) { filled++; return applyCandidate(it, cands[0].row, cands[0].score); }
+      pending.push({ it, cands });
       return it;
     });
     setO((p: any) => ({ ...p, items }));
+    // 2. Durchgang: DATANORM-Kataloge dazuholen (echte EKs), dann Kandidaten mischen
+    const review: { id: string; oz: string; text: string; cands: { row: any; score: number }[] }[] = [];
+    for (let i = 0; i < pending.length; i += 6) {
+      const batch = pending.slice(i, i + 6);
+      const catResults = await Promise.all(batch.map((p) => catalogCandidates([p.it.short_text, p.it.long_text].filter(Boolean).join(" "))));
+      batch.forEach((p, j) => {
+        const merged = [...p.cands, ...catResults[j]].sort((a, b) => b.score - a.score).slice(0, 6);
+        if (!merged.length) { none++; return; }
+        review.push({ id: p.it.id, oz: p.it.oz || "", text: p.it.short_text || "(ohne Kurztext)", cands: merged });
+      });
+      if (pending.length > 6) setMsg(`💡 Suche… ${Math.min(i + 6, pending.length)} / ${pending.length} Positionen geprüft`);
+    }
     setSugList(review);
-    setMsg(`💡 ${filled} sicher übernommen (≥ 80 %)${review.length ? ` · ${review.length} zum Auswählen (Prüfliste unten)` : ""}${none ? ` · ${none} ohne Treffer` : ""}${hadCalc ? ` · ${hadCalc} bereits kalkuliert` : ""}.`);
+    if (!archive.length && !review.length && !filled) {
+      setMsg("Keine Treffer — Preisarchiv ist leer (🗄️ in der Angebotsliste) und die Kataloge haben nichts Passendes.");
+      return;
+    }
+    setMsg(`💡 ${filled} sicher übernommen (≥ 80 % aus Alt-Angeboten)${review.length ? ` · ${review.length} zum Auswählen (Kandidaten unter den Positionen: Alt-Angebote + 🏭 Katalog-EKs)` : ""}${none ? ` · ${none} ohne Treffer` : ""}${hadCalc ? ` · ${hadCalc} bereits kalkuliert` : ""}.`);
   }
 
   // 🤖 Stufe 9c: KI-Schätzung für ALLE Positionen ohne Preis (Route /api/price-ai, gpt-4o-mini).
   // Werte kommen als 🤖-Vorschlag (mat_ek + minutes je Einheit) — Kennzeichnung wie beim Archiv.
   async function suggestPricesAi() {
-    const targets = o.items.filter((it: any) =>
-      it.kind === "position" &&
-      num(it.mat_ek) === 0 && num(it.minutes) === 0 && num(it.geraet_vk) === 0 && num(it.fremd_vk) === 0 &&
-      num(it.geraet_ek) === 0 && num(it.fremd_ek) === 0 &&
-      String(it.ep_fix ?? "").trim() === "" &&
-      String(it.short_text || it.long_text || "").trim() !== ""
-    );
-    if (!targets.length) { setMsg("🤖 Alle Positionen haben schon Preise — nichts zu schätzen."); return; }
+    // Fehlt Material/Gerät (needCost) und/oder fehlen Minuten (needMin)? Nur Fehlendes wird gefüllt —
+    // so ergänzt die KI z. B. die Minuten zu einem echten Katalog-EK aus dem 💡-Vorschlag.
+    const flags: Record<string, { needCost: boolean; needMin: boolean }> = {};
+    const targets = o.items.filter((it: any) => {
+      if (it.kind !== "position") return false;
+      if (String(it.ep_fix ?? "").trim() !== "") return false;
+      if (String(it.short_text || it.long_text || "").trim() === "") return false;
+      const needCost = num(it.mat_ek) === 0 && num(it.geraet_vk) === 0 && num(it.fremd_vk) === 0 && num(it.geraet_ek) === 0 && num(it.fremd_ek) === 0;
+      const needMin = num(it.minutes) === 0;
+      if (!needCost && !needMin) return false;
+      flags[it.id] = { needCost, needMin };
+      return true;
+    });
+    if (!targets.length) { setMsg("🤖 Alle Positionen haben schon Preise und Minuten — nichts zu schätzen."); return; }
     setKiBusy(true);
-    setMsg(`🤖 KI schätzt ${targets.length} Position${targets.length === 1 ? "" : "en"}…`);
+    setMsg(`🤖 KI schätzt fehlende Werte bei ${targets.length} Position${targets.length === 1 ? "" : "en"}…`);
     try {
       const { data: sess } = await supabase.auth.getSession();
       const token = sess?.session?.access_token;
@@ -574,12 +621,13 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
           const r = byId[it.id];
           if (!r) return it;
           filled++;
+          const f = flags[it.id] || { needCost: true, needMin: true };
           return {
             ...it,
-            mat_ek: r.mat_ek != null && r.mat_ek > 0 ? String(r.mat_ek) : it.mat_ek,
-            geraet_ek: r.geraet != null && r.geraet > 0 ? String(r.geraet) : it.geraet_ek,
-            minutes: r.minutes != null ? String(r.minutes) : it.minutes,
-            suggest_note: `🤖 KI-Schätzung${r.note ? ` (${r.note})` : ""}${r.geraet != null && r.geraet > 0 ? " — Gerätekosten im Feld Gerät-Ek" : ""} — EK-Schätzwerte, bitte prüfen!`,
+            mat_ek: f.needCost && r.mat_ek != null && r.mat_ek > 0 ? String(r.mat_ek) : it.mat_ek,
+            geraet_ek: f.needCost && r.geraet != null && r.geraet > 0 ? String(r.geraet) : it.geraet_ek,
+            minutes: f.needMin && r.minutes != null ? String(r.minutes) : it.minutes,
+            suggest_note: `${it.suggest_note ? it.suggest_note + " · " : ""}🤖 KI${!f.needCost ? " (nur Minuten ergänzt)" : ""}${r.note ? ` (${r.note})` : ""}${f.needCost && r.geraet != null && r.geraet > 0 ? " — Gerätekosten im Feld Gerät-Ek" : ""} — Schätzwerte, bitte prüfen!`,
           };
         }),
       }));
@@ -935,7 +983,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
           <button type="button" onClick={exportGaeb} className="bg-emerald-800 text-white px-3 py-1.5 rounded-lg text-xs">⬇ GAEB (X84) exportieren</button>
           <button type="button" onClick={openArtPicker} className="bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-xs">📦 aus Artikelstamm</button>
           <button type="button" onClick={suggestPrices} className="bg-amber-600 text-white px-3 py-1.5 rounded-lg text-xs" title="Unkalkulierte Positionen mit der ähnlichsten Alt-Position aus dem Taifun-Preisarchiv befüllen">💡 Preise vorschlagen</button>
-          <button type="button" onClick={suggestPricesAi} disabled={kiBusy} className="bg-purple-700 disabled:bg-gray-300 text-white px-3 py-1.5 rounded-lg text-xs" title="Alle Positionen ohne Preis von der KI schätzen lassen (Material-EK + Minuten je Einheit) — Schätzwerte, bitte prüfen">{kiBusy ? "🤖 schätzt…" : "🤖 Preise durch KI"}</button>
+          <button type="button" onClick={suggestPricesAi} disabled={kiBusy} className="bg-purple-700 disabled:bg-gray-300 text-white px-3 py-1.5 rounded-lg text-xs" title="Fehlende Werte von der KI schätzen lassen: Material-/Gerät-EK und/oder Minuten je Einheit — nur was leer ist, wird gefüllt. Schätzwerte, bitte prüfen">{kiBusy ? "🤖 schätzt…" : "🤖 Preise durch KI"}</button>
           <button type="button" onClick={() => setPosView((p) => (p === "zeilen" ? "tabelle" : "zeilen"))} className="bg-slate-500 text-white px-3 py-1.5 rounded-lg text-xs ml-auto" title="Zwischen Zeilenansicht und Taifun-Kalkulationstabelle wechseln">{posView === "zeilen" ? "📊 Tabelle" : "📋 Zeilen"}</button>
         </div>
 
@@ -1069,7 +1117,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
                       </td>
                       <td className="px-1 py-1 min-w-[16rem]">
                         <div className="flex items-center gap-1">
-                          {it.suggest_note ? <span title={it.suggest_note}>{String(it.suggest_note).startsWith("🤖") ? "🤖" : "💡"}</span> : null}
+                          {it.suggest_note ? <span title={it.suggest_note}>{String(it.suggest_note).includes("🤖") ? "🤖" : "💡"}</span> : null}
                           <input className={`${tin} font-medium`} placeholder="Kurztext" value={it.short_text} onChange={(e) => setItem(it.id, "short_text", e.target.value)} />
                         </div>
                         {it.long_text ? <div className="text-[10px] text-gray-400 truncate max-w-[24rem]" title={it.long_text}>{String(it.long_text).split("\n")[0]}</div> : null}
@@ -1133,7 +1181,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
                 <select className="border p-1.5 rounded text-black bg-white w-20 text-sm" value={it.unit} onChange={(e) => setItem(it.id, "unit", e.target.value)}>
                   {(it.unit && !UNITS.includes(it.unit) ? [it.unit, ...UNITS] : UNITS).map((u: string) => <option key={u} value={u}>{u}</option>)}
                 </select>
-                {it.suggest_note ? <span className="text-sm" title={it.suggest_note}>{String(it.suggest_note).startsWith("🤖") ? "🤖" : "💡"}</span> : null}
+                {it.suggest_note ? <span className="text-sm" title={it.suggest_note}>{String(it.suggest_note).includes("🤖") ? "🤖" : "💡"}</span> : null}
                 <input className="border p-1.5 rounded text-black bg-white flex-1 text-sm font-medium" placeholder="Kurztext" value={it.short_text} onChange={(e) => setItem(it.id, "short_text", e.target.value)} />
                 <input
                   className={`border p-1.5 rounded text-sm text-right w-20 ${String(it.ep_fix ?? "").trim() !== "" ? "bg-amber-50 border-amber-400 text-black font-medium" : "bg-white text-black"}`}

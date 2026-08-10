@@ -71,6 +71,12 @@ export async function POST(req: Request) {
               `je Einheit — dann mat_ek = 0; bei normalem Material ist geraet = 0; ` +
               `"minutes" = realistische Montage-/Arbeits-/Rüstzeit in Minuten je Einheit inkl. üblicher Nebenarbeiten; ` +
               `"note" = sehr kurze Annahme (max. 10 Wörter, Deutsch). ` +
+              `KALIBRIERUNG (typische Netto-EKs im Elektrogroßhandel, daran orientieren): ` +
+              `Schuko-Steckdose UP 3-6 €; Serienschalter UP 4-8 €; LS-Schalter B16 4-8 €; FI/LS 25-45 €; ` +
+              `NYM-J 3x1,5 0,45-0,70 €/m; NYM-J 5x2,5 1,20-1,80 €/m; Kabelkanal 60x60 5-8 €/m; ` +
+              `Gitterrinne 100mm 8-15 €/m; LED-Panel 62x62 25-45 €; Kleinverteiler AP 4-reihig 60-120 €; ` +
+              `Solarmodul 430-450 Wp 55-85 €; Solarkabel 6mm2 0,30-0,60 €/m; MC4-Stecker 0,50-1,50 €. ` +
+              `Im Zweifel eher NIEDRIG schätzen (EK, nicht Verkaufspreis — der Nutzer prüft). ` +
               `Bei Pauschalpositionen (psch/Psch) gilt: je 1 Pauschale. ` +
               `Antworte AUSSCHLIESSLICH als JSON-Objekt exakt in dieser Form: ` +
               `{"items":[{"id":"...","mat_ek":0.00,"geraet":0.00,"minutes":0,"note":"..."}]}`,
