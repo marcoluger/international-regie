@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { generateAngebotPdf, generateAbPdf, generateRechnungPdf } from "./angebotPdf";
-import { parseTaifunXlsx, normTokens, bestMatch } from "./taifunArchiv";
+import { parseTaifunXlsx, normTokens, topMatches } from "./taifunArchiv";
 import { generateEfbPdf } from "./efbPdf";
 import { parseGaebX83 } from "./gaebImport";
 import { downloadGaebX84 } from "./gaebExport";
@@ -168,6 +168,8 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
   const [archCount, setArchCount] = useState<number | null>(null);
   const [archBusy, setArchBusy] = useState(false);
   const [archMsg, setArchMsg] = useState("");
+  // Prüfliste des Preisvorschlags: je unsicherer Position bis zu 5 Kandidaten zur Auswahl.
+  const [sugList, setSugList] = useState<{ id: string; oz: string; text: string; cands: { row: any; score: number }[] }[]>([]);
   const [artSearch, setArtSearch] = useState("");
   const [artCat, setArtCat] = useState("");
   const [supResults, setSupResults] = useState<any[]>([]);
@@ -451,7 +453,30 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
     await loadArchCount();
   }
 
+  // Werte eines Archiv-Kandidaten in eine Position übernehmen (mit 💡-Kennzeichnung).
+  function applyCandidate(it: any, r: any, score: number) {
+    return {
+      ...it,
+      mat_ek: r.mat_ek != null ? String(r.mat_ek) : it.mat_ek,
+      mat_multi: r.mat_multi != null && num(r.mat_multi) > 0 ? String(r.mat_multi) : it.mat_multi,
+      lohn_ek: r.lohn_ek != null && num(r.lohn_ek) > 0 ? String(r.lohn_ek) : it.lohn_ek,
+      minutes: r.minutes != null ? String(r.minutes) : it.minutes,
+      fremd_vk: r.fremd_vk != null && num(r.fremd_vk) > 0 ? String(r.fremd_vk) : it.fremd_vk,
+      geraet_vk: r.geraet_vk != null && num(r.geraet_vk) > 0 ? String(r.geraet_vk) : it.geraet_vk,
+      suggest_note: `${Math.round(score * 100)} % ähnlich: „${String(r.text).split("\n")[0].slice(0, 70)}" (${r.source || "Archiv"}${r.ep != null ? `, EP damals ${fmt(num(r.ep))} €` : ""})`,
+    };
+  }
+  function pickSuggestion(itemId: string, cand: { row: any; score: number }) {
+    setO((p: any) => ({ ...p, items: p.items.map((it: any) => (it.id === itemId ? applyCandidate(it, cand.row, cand.score) : it)) }));
+    setSugList((p) => p.filter((e) => e.id !== itemId));
+  }
+  function skipSuggestion(itemId: string) {
+    setSugList((p) => p.filter((e) => e.id !== itemId));
+  }
+
   // 💡 Unkalkulierte Positionen (kein Mat-EK, keine Minuten, kein fester EP) aus dem Archiv befüllen.
+  // Sehr sichere Treffer (>= 80 %) werden direkt übernommen; alles Ähnliche (>= 25 %) landet in
+  // der Prüfliste — dort wählt Marco je Position, WELCHER Kandidat (Preis/Zeit) übernommen wird.
   async function suggestPrices() {
     setMsg("💡 Suche passende Alt-Positionen…");
     const { data, error } = await supabase.from("office_price_archive")
@@ -461,27 +486,20 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
     const archive = (data || []).map((r: any) => ({ row: r, tokens: normTokens(r.text) }));
     if (!archive.length) { setMsg("Preisarchiv ist leer — zuerst in der Angebotsliste über 🗄️ Preisarchiv die Taifun-Exporte importieren."); return; }
     let filled = 0, none = 0, hadCalc = 0;
+    const review: { id: string; oz: string; text: string; cands: { row: any; score: number }[] }[] = [];
     const items = o.items.map((it: any) => {
       if (it.kind !== "position") return it;
       const unkalkuliert = num(it.mat_ek) === 0 && num(it.minutes) === 0 && String(it.ep_fix ?? "").trim() === "";
       if (!unkalkuliert) { hadCalc++; return it; }
-      const m = bestMatch([it.short_text, it.long_text].filter(Boolean).join(" "), archive);
-      if (!m || m.score < 0.35) { none++; return it; }
-      const r = m.row;
-      filled++;
-      return {
-        ...it,
-        mat_ek: r.mat_ek != null ? String(r.mat_ek) : it.mat_ek,
-        mat_multi: r.mat_multi != null && num(r.mat_multi) > 0 ? String(r.mat_multi) : it.mat_multi,
-        lohn_ek: r.lohn_ek != null && num(r.lohn_ek) > 0 ? String(r.lohn_ek) : it.lohn_ek,
-        minutes: r.minutes != null ? String(r.minutes) : it.minutes,
-        fremd_vk: r.fremd_vk != null && num(r.fremd_vk) > 0 ? String(r.fremd_vk) : it.fremd_vk,
-        geraet_vk: r.geraet_vk != null && num(r.geraet_vk) > 0 ? String(r.geraet_vk) : it.geraet_vk,
-        suggest_note: `${Math.round(m.score * 100)} % ähnlich: „${String(r.text).split("\n")[0].slice(0, 70)}" (${r.source || "Archiv"}${r.ep != null ? `, EP damals ${fmt(num(r.ep))} €` : ""})`,
-      };
+      const cands = topMatches([it.short_text, it.long_text].filter(Boolean).join(" "), archive, 5, 0.25);
+      if (!cands.length) { none++; return it; }
+      if (cands[0].score >= 0.8) { filled++; return applyCandidate(it, cands[0].row, cands[0].score); }
+      review.push({ id: it.id, oz: it.oz || "", text: it.short_text || "(ohne Kurztext)", cands });
+      return it;
     });
     setO((p: any) => ({ ...p, items }));
-    setMsg(`💡 ${filled} Position${filled === 1 ? "" : "en"} aus dem Archiv vorgeschlagen — mit 💡 gekennzeichnet, bitte prüfen${none ? ` · ${none} ohne passenden Treffer` : ""}${hadCalc ? ` · ${hadCalc} bereits kalkuliert (unverändert)` : ""}.`);
+    setSugList(review);
+    setMsg(`💡 ${filled} sicher übernommen (≥ 80 %)${review.length ? ` · ${review.length} zum Auswählen (Prüfliste unten)` : ""}${none ? ` · ${none} ohne Treffer` : ""}${hadCalc ? ` · ${hadCalc} bereits kalkuliert` : ""}.`);
   }
 
   async function efbPdf() {
@@ -895,6 +913,40 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
               <span className="text-xs text-gray-500">{cartCount} im Warenkorb</span>
               <button type="button" onClick={addCartToOffer} disabled={cartCount === 0} className="bg-emerald-700 disabled:bg-gray-300 text-white px-3 py-1.5 rounded-lg text-xs">Warenkorb übernehmen ({cartCount})</button>
             </div>
+          </div>
+        )}
+
+        {/* 💡 Prüfliste: unsichere Vorschläge — je Position Kandidaten zur Auswahl */}
+        {sugList.length > 0 && (
+          <div className="border border-amber-300 bg-amber-50/50 rounded-xl p-3 space-y-3">
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <h4 className="font-bold text-sm">💡 Vorschläge prüfen <span className="font-normal text-gray-600">({sugList.length} Position{sugList.length === 1 ? "" : "en"} — Kandidat anklicken = übernehmen)</span></h4>
+              <button type="button" onClick={() => setSugList([])} className="bg-gray-200 px-3 py-1.5 rounded-lg text-xs">Alle überspringen / schließen</button>
+            </div>
+            {sugList.slice(0, 15).map((e) => (
+              <div key={e.id} className="border border-amber-200 bg-white rounded-lg p-2 space-y-1.5">
+                <div className="flex items-center gap-2 text-sm">
+                  {e.oz ? <span className="text-xs text-gray-500">Pos {e.oz}</span> : null}
+                  <strong className="min-w-0 flex-1 truncate" title={e.text}>{e.text}</strong>
+                  <button type="button" onClick={() => skipSuggestion(e.id)} className="bg-gray-200 px-2 py-1 rounded text-xs whitespace-nowrap">Überspringen</button>
+                </div>
+                <div className="space-y-1">
+                  {e.cands.map((c, i) => (
+                    <button key={i} type="button" onClick={() => pickSuggestion(e.id, c)}
+                      className="w-full text-left border border-slate-200 rounded-lg p-1.5 text-xs bg-white hover:bg-emerald-50 flex flex-wrap items-center gap-x-3 gap-y-0.5"
+                      title={String(c.row.text)}>
+                      <span className={`font-bold rounded px-1.5 py-0.5 ${c.score >= 0.6 ? "bg-emerald-100 text-emerald-800" : c.score >= 0.4 ? "bg-amber-100 text-amber-800" : "bg-slate-100 text-slate-600"}`}>{Math.round(c.score * 100)} %</span>
+                      <span className="min-w-0 flex-1 truncate font-medium">{String(c.row.text).split("\n")[0]}</span>
+                      <span className="text-gray-600 whitespace-nowrap">Mat {c.row.mat_ek != null ? fmt(num(c.row.mat_ek)) + " €" : "—"}{c.row.mat_multi != null && num(c.row.mat_multi) > 0 ? ` ×${c.row.mat_multi}` : ""}</span>
+                      <span className="text-gray-600 whitespace-nowrap">Lohn {c.row.lohn_ek != null && num(c.row.lohn_ek) > 0 ? fmt(num(c.row.lohn_ek)) + " €/h" : "—"} · {c.row.minutes != null ? num(c.row.minutes) + " min" : "—"}</span>
+                      <span className="text-gray-800 font-medium whitespace-nowrap">EP damals {c.row.ep != null ? fmt(num(c.row.ep)) + " €" : "—"}</span>
+                      <span className="text-gray-400 whitespace-nowrap">{c.row.source || ""}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+            {sugList.length > 15 && <p className="text-xs text-gray-600">… und {sugList.length - 15} weitere — erst die obigen entscheiden, dann rücken die nächsten nach.</p>}
           </div>
         )}
 

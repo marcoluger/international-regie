@@ -104,3 +104,30 @@ export function bestMatch(
   }
   return best ? { row: best, score: bestScore } : null;
 }
+
+// Die n besten Kandidaten ab Mindest-Ähnlichkeit (für die Prüfliste "welche Position nehmen?").
+// Doppelte Alt-Positionen (gleicher Text + gleiche Werte) werden zusammengefasst.
+export function topMatches(
+  text: string,
+  archive: { row: any; tokens: Set<string> }[],
+  n: number = 5,
+  min: number = 0.25,
+): { row: any; score: number }[] {
+  const t = normTokens(text);
+  const scored: { row: any; score: number }[] = [];
+  for (const a of archive) {
+    const s = similarity(t, a.tokens);
+    if (s >= min) scored.push({ row: a.row, score: s });
+  }
+  scored.sort((x, y) => y.score - x.score);
+  const seen = new Set<string>();
+  const out: { row: any; score: number }[] = [];
+  for (const c of scored) {
+    const key = [c.row.text, c.row.mat_ek, c.row.mat_multi, c.row.lohn_ek, c.row.minutes].join("|");
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(c);
+    if (out.length >= n) break;
+  }
+  return out;
+}
