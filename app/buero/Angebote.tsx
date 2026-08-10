@@ -378,13 +378,49 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
       if (error) { setMsg("Fehler beim Speichern: " + error.message); return; }
       if (data?.id) { savedId = data.id; setO((p: any) => ({ ...p, id: data.id })); }
     }
-    // Manuell kalkulierte Angebote fließen automatisch ins Preisarchiv (💡-Vorschläge lernen mit).
-    let archCnt = 0;
+    // Manuell kalkulierte Angebote fließen automatisch ins Preisarchiv (💡-Vorschläge lernen mit)
+    // und neue Positionen werden als Leistungen im 🔧-Stamm angelegt.
+    let archCnt = 0, leistCnt = 0;
     if ((o.doc_type || "angebot") === "angebot" && savedId) {
       archCnt = await syncOfferToArchive(savedId, o.number || "", o.items);
+      leistCnt = await syncOfferToLeistungen(o.items);
     }
     await loadOffers();
-    setMsg(`${DOC_LABEL[o.doc_type || "angebot"]} gespeichert.${archCnt ? ` ${archCnt} kalkulierte Position${archCnt === 1 ? "" : "en"} ins Preisarchiv übernommen.` : ""}`);
+    if (leistCnt) await loadArticles();
+    setMsg(`${DOC_LABEL[o.doc_type || "angebot"]} gespeichert.${archCnt ? ` ${archCnt} Position${archCnt === 1 ? "" : "en"} ins Preisarchiv übernommen.` : ""}${leistCnt ? ` ${leistCnt} neue Leistung${leistCnt === 1 ? "" : "en"} im 🔧-Stamm angelegt (Kategorie „Aus Angebot").` : ""}`);
+  }
+
+  // Kalkulierte Positionen, die es im Leistungsstamm noch nicht gibt, dort neu anlegen.
+  // Vorhandene Leistungen (gleicher Kurztext) und aus dem Stamm eingefügte Positionen
+  // (article_id gesetzt) werden übersprungen — nichts wird überschrieben.
+  async function syncOfferToLeistungen(items: any[]): Promise<number> {
+    try {
+      const normKey = (s: any) => String(s || "").toLowerCase().replace(/\s+/g, " ").trim();
+      const cand = items.filter((it: any) => it.kind === "position" && !it.article_id &&
+        String(it.short_text || "").trim() !== "" && (num(it.mat_ek) > 0 || num(it.minutes) > 0));
+      if (!cand.length) return 0;
+      const { data } = await supabase.from("office_articles").select("short_text").eq("company_id", companyId).eq("art", "leistung");
+      const seen = new Set((data || []).map((r: any) => normKey(r.short_text)));
+      const rows: any[] = [];
+      for (const it of cand) {
+        const key = normKey(it.short_text);
+        if (!key || seen.has(key)) continue;
+        seen.add(key);
+        rows.push({
+          company_id: companyId, art: "leistung", category: "Aus Angebot",
+          short_text: String(it.short_text).slice(0, 300), long_text: it.long_text || null, unit: it.unit || "St",
+          mat_ek: num(it.mat_ek) || null, mat_multi: num(it.mat_multi) || null,
+          lohn_ek: num(it.lohn_ek) || null, lohn_multi: num(it.lohn_multi) || null,
+          minutes: num(it.minutes) || null, preiseinheit: num(it.preiseinheit) || 1,
+          kupfer_kg: num(it.kupfer_kg) || null, kupfer_multi: num(it.kupfer_multi) || null,
+        });
+      }
+      for (let i = 0; i < rows.length; i += 200) {
+        const { error } = await supabase.from("office_articles").insert(rows.slice(i, i + 200));
+        if (error) return 0;
+      }
+      return rows.length;
+    } catch { return 0; /* Stamm-Sync ist optional — das Speichern bleibt davon unberührt */ }
   }
 
   // Beim Speichern eines Angebots: kalkulierte Positionen ins Preisarchiv übernehmen
