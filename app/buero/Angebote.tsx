@@ -361,15 +361,54 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
       zahlungsziel_tage: o.zahlungsziel_tage ? Math.round(num(o.zahlungsziel_tage)) : null,
       items: o.items, net_total: t.netAfter, vat_total: t.vat, gross_total: t.gross, updated_at: new Date().toISOString(),
     };
+    let savedId: string | null = o.id || null;
     if (o.id) {
       const { error } = await supabase.from("office_offers").update(payload).eq("id", o.id);
       if (error) { setMsg("Fehler beim Speichern: " + error.message); return; }
     } else {
       const { data, error } = await supabase.from("office_offers").insert(payload).select("id").single();
       if (error) { setMsg("Fehler beim Speichern: " + error.message); return; }
-      if (data?.id) setO((p: any) => ({ ...p, id: data.id }));
+      if (data?.id) { savedId = data.id; setO((p: any) => ({ ...p, id: data.id })); }
     }
-    await loadOffers(); setMsg(`${DOC_LABEL[o.doc_type || "angebot"]} gespeichert.`);
+    // Manuell kalkulierte Angebote fließen automatisch ins Preisarchiv (💡-Vorschläge lernen mit).
+    let archCnt = 0;
+    if ((o.doc_type || "angebot") === "angebot" && savedId) {
+      archCnt = await syncOfferToArchive(savedId, o.number || "", o.items);
+    }
+    await loadOffers();
+    setMsg(`${DOC_LABEL[o.doc_type || "angebot"]} gespeichert.${archCnt ? ` ${archCnt} kalkulierte Position${archCnt === 1 ? "" : "en"} ins Preisarchiv übernommen.` : ""}`);
+  }
+
+  // Beim Speichern eines Angebots: kalkulierte Positionen ins Preisarchiv übernehmen
+  // (Quelle = dieses Angebot per source_ref; alte Archivzeilen desselben Angebots werden ersetzt).
+  async function syncOfferToArchive(offerId: string, number: string, items: any[]): Promise<number> {
+    try {
+      const rows = items
+        .filter((it: any) => it.kind === "position" && String(it.short_text || "").trim() !== "" &&
+          (num(it.mat_ek) > 0 || num(it.minutes) > 0 || num(it.fremd_vk) > 0 || num(it.geraet_vk) > 0 || num(it.fremd_ek) > 0 || num(it.geraet_ek) > 0 || String(it.ep_fix ?? "").trim() !== ""))
+        .map((it: any) => {
+          const c = calcItem(it, num(o.del_preis));
+          return {
+            company_id: companyId, source: `Angebot ${number || "(ohne Nr.)"}`, source_ref: offerId,
+            pos: it.oz || null, unit: it.unit || null,
+            text: [it.short_text, it.long_text].filter(Boolean).join("\n").slice(0, 2000),
+            norm_text: Array.from(normTokens([it.short_text, it.long_text].filter(Boolean).join(" "))).join(" "),
+            mat_ek: it.mat_ek !== "" && it.mat_ek != null ? num(it.mat_ek) : null,
+            mat_multi: it.mat_multi !== "" && it.mat_multi != null ? num(it.mat_multi) : null,
+            lohn_ek: it.lohn_ek !== "" && it.lohn_ek != null ? num(it.lohn_ek) : null,
+            minutes: it.minutes !== "" && it.minutes != null ? num(it.minutes) : null,
+            fremd_vk: c.fremd_vk_eff > 0 ? Math.round(c.fremd_vk_eff * 100) / 100 : null,
+            geraet_vk: c.geraet_vk_eff > 0 ? Math.round(c.geraet_vk_eff * 100) / 100 : null,
+            ep: Math.round(c.ep * 100) / 100,
+          };
+        });
+      await supabase.from("office_price_archive").delete().eq("company_id", companyId).eq("source_ref", offerId);
+      for (let i = 0; i < rows.length; i += 500) {
+        const { error } = await supabase.from("office_price_archive").insert(rows.slice(i, i + 500));
+        if (error) return 0;
+      }
+      return rows.length;
+    } catch { return 0; /* Archiv-Sync ist optional — das Speichern bleibt davon unberührt */ }
   }
 
   async function pdfOffer() {
