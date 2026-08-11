@@ -152,7 +152,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
   const [custSearch, setCustSearch] = useState("");
   const [pickerOpen, setPickerOpen] = useState(false);
   const [openItem, setOpenItem] = useState<Record<string, boolean>>({});
-  const [settings, setSettings] = useState<any>({ def_mat_multi: "1.28", def_lohn_multi: "1.5715", binde_weeks: "4", vat_rate: "19", def_rabatt_pct: "0", def_nachlass: "0", def_skonto_pct: "0", def_skonto_tage: "0", pv_text: PV_DEFAULT, b13_text: B13_DEFAULT, vortext: VORTEXT_DEFAULT, nachtext: NACHTEXT_DEFAULT, pay1_pct: "50", pay2_pct: "30", pay3_pct: "20", del_preis: "0", def_kupfer_multi: "1.05", efb_bgk_lohn: "5", efb_agk_lohn: "5", efb_bgk_mat: "5", efb_agk_mat: "5", efb_bgk_geraet: "0", efb_agk_geraet: "0", efb_bgk_fremd: "0", efb_agk_fremd: "0", efb_anteil_gewinn: "50", efb_anteil_wagnis_betrieb: "25", efb_anteil_wagnis_leistung: "25", efb_lohnzusatz: "15.19", efb_lohnneben: "16" });
+  const [settings, setSettings] = useState<any>({ def_mat_multi: "1.28", def_lohn_multi: "1.5715", binde_weeks: "4", vat_rate: "19", def_rabatt_pct: "0", def_nachlass: "0", def_skonto_pct: "0", def_skonto_tage: "0", pv_text: PV_DEFAULT, b13_text: B13_DEFAULT, vortext: VORTEXT_DEFAULT, nachtext: NACHTEXT_DEFAULT, pay1_pct: "50", pay2_pct: "30", pay3_pct: "20", del_preis: "0", def_kupfer_multi: "1.05", nr_angebot: "1000001", nr_ab: "2000001", nr_rechnung: "3000001", efb_bgk_lohn: "5", efb_agk_lohn: "5", efb_bgk_mat: "5", efb_agk_mat: "5", efb_bgk_geraet: "0", efb_agk_geraet: "0", efb_bgk_fremd: "0", efb_agk_fremd: "0", efb_anteil_gewinn: "50", efb_anteil_wagnis_betrieb: "25", efb_anteil_wagnis_leistung: "25", efb_lohnzusatz: "15.19", efb_lohnneben: "16" });
   const [settingsTab, setSettingsTab] = useState("allgemein");
   const [textModules, setTextModules] = useState<any[]>([]);
   const [tmKind, setTmKind] = useState("vor");
@@ -215,12 +215,31 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
   }
   async function loadSettings() {
     const { data } = await supabase.from("office_offer_settings").select("*").eq("company_id", companyId).maybeSingle();
-    if (data) setSettings({ def_mat_multi: String(data.def_mat_multi ?? "1.28"), def_lohn_multi: String(data.def_lohn_multi ?? "1.5715"), binde_weeks: String(data.binde_weeks ?? "4"), vat_rate: String(data.vat_rate ?? "19"), def_rabatt_pct: String(data.def_rabatt_pct ?? "0"), def_nachlass: String(data.def_nachlass ?? "0"), def_skonto_pct: String(data.def_skonto_pct ?? "0"), def_skonto_tage: String(data.def_skonto_tage ?? "0"), pv_text: data.pv_text ?? PV_DEFAULT, b13_text: data.b13_text ?? B13_DEFAULT, vortext: data.vortext ?? VORTEXT_DEFAULT, nachtext: data.nachtext ?? NACHTEXT_DEFAULT, pay1_pct: String(data.pay1_pct ?? "50"), pay2_pct: String(data.pay2_pct ?? "30"), pay3_pct: String(data.pay3_pct ?? "20"), del_preis: String(data.del_preis ?? "0"), def_kupfer_multi: String(data.def_kupfer_multi ?? "1.05"), efb_bgk_lohn: String(data.efb_bgk_lohn ?? "5"), efb_agk_lohn: String(data.efb_agk_lohn ?? "5"), efb_bgk_mat: String(data.efb_bgk_mat ?? "5"), efb_agk_mat: String(data.efb_agk_mat ?? "5"), efb_bgk_geraet: String(data.efb_bgk_geraet ?? "0"), efb_agk_geraet: String(data.efb_agk_geraet ?? "0"), efb_bgk_fremd: String(data.efb_bgk_fremd ?? "0"), efb_agk_fremd: String(data.efb_agk_fremd ?? "0"), efb_anteil_gewinn: String(data.efb_anteil_gewinn ?? "50"), efb_anteil_wagnis_betrieb: String(data.efb_anteil_wagnis_betrieb ?? "25"), efb_anteil_wagnis_leistung: String(data.efb_anteil_wagnis_leistung ?? "25"), efb_lohnzusatz: String(data.efb_lohnzusatz ?? "15.19"), efb_lohnneben: String(data.efb_lohnneben ?? "16") });
+    if (data) setSettings((x: any) => ({ ...x, def_mat_multi: String(data.def_mat_multi ?? "1.28"), def_lohn_multi: String(data.def_lohn_multi ?? "1.5715"), binde_weeks: String(data.binde_weeks ?? "4"), vat_rate: String(data.vat_rate ?? "19"), def_rabatt_pct: String(data.def_rabatt_pct ?? "0"), def_nachlass: String(data.def_nachlass ?? "0"), def_skonto_pct: String(data.def_skonto_pct ?? "0"), def_skonto_tage: String(data.def_skonto_tage ?? "0"), pv_text: data.pv_text ?? PV_DEFAULT, b13_text: data.b13_text ?? B13_DEFAULT, vortext: data.vortext ?? VORTEXT_DEFAULT, nachtext: data.nachtext ?? NACHTEXT_DEFAULT, pay1_pct: String(data.pay1_pct ?? "50"), pay2_pct: String(data.pay2_pct ?? "30"), pay3_pct: String(data.pay3_pct ?? "20"), del_preis: String(data.del_preis ?? "0"), def_kupfer_multi: String(data.def_kupfer_multi ?? "1.05"), efb_bgk_lohn: String(data.efb_bgk_lohn ?? "5"), efb_agk_lohn: String(data.efb_agk_lohn ?? "5"), efb_bgk_mat: String(data.efb_bgk_mat ?? "5"), efb_agk_mat: String(data.efb_agk_mat ?? "5"), efb_bgk_geraet: String(data.efb_bgk_geraet ?? "0"), efb_agk_geraet: String(data.efb_agk_geraet ?? "0"), efb_bgk_fremd: String(data.efb_bgk_fremd ?? "0"), efb_agk_fremd: String(data.efb_agk_fremd ?? "0"), efb_anteil_gewinn: String(data.efb_anteil_gewinn ?? "50"), efb_anteil_wagnis_betrieb: String(data.efb_anteil_wagnis_betrieb ?? "25"), efb_anteil_wagnis_leistung: String(data.efb_anteil_wagnis_leistung ?? "25"), efb_lohnzusatz: String(data.efb_lohnzusatz ?? "15.19"), efb_lohnneben: String(data.efb_lohnneben ?? "16") }));
+    // Nummernkreise (eigene Tabelle office_number_ranges): nächste Nummer je Dokumentart anzeigen.
+    const { data: nrRows } = await supabase.from("office_number_ranges").select("doc_type,next_number").eq("company_id", companyId);
+    if (nrRows && nrRows.length) {
+      const by: Record<string, any> = {};
+      for (const r of nrRows) by[r.doc_type] = r.next_number;
+      setSettings((x: any) => ({ ...x, nr_angebot: by.angebot != null ? String(by.angebot) : x.nr_angebot, nr_ab: by.ab != null ? String(by.ab) : x.nr_ab, nr_rechnung: by.rechnung != null ? String(by.rechnung) : x.nr_rechnung }));
+    }
   }
   async function saveSettings() {
     const { error } = await supabase.from("office_offer_settings").upsert({ company_id: companyId, def_mat_multi: num(settings.def_mat_multi), def_lohn_multi: num(settings.def_lohn_multi), binde_weeks: Math.round(num(settings.binde_weeks)), vat_rate: num(settings.vat_rate), def_rabatt_pct: num(settings.def_rabatt_pct), def_nachlass: num(settings.def_nachlass), def_skonto_pct: num(settings.def_skonto_pct), def_skonto_tage: Math.round(num(settings.def_skonto_tage)), pv_text: settings.pv_text || null, b13_text: settings.b13_text || null, vortext: settings.vortext || null, nachtext: settings.nachtext || null, pay1_pct: num(settings.pay1_pct), pay2_pct: num(settings.pay2_pct), pay3_pct: num(settings.pay3_pct), del_preis: num(settings.del_preis), def_kupfer_multi: num(settings.def_kupfer_multi), efb_bgk_lohn: num(settings.efb_bgk_lohn), efb_agk_lohn: num(settings.efb_agk_lohn), efb_bgk_mat: num(settings.efb_bgk_mat), efb_agk_mat: num(settings.efb_agk_mat), efb_bgk_geraet: num(settings.efb_bgk_geraet), efb_agk_geraet: num(settings.efb_agk_geraet), efb_bgk_fremd: num(settings.efb_bgk_fremd), efb_agk_fremd: num(settings.efb_agk_fremd), efb_anteil_gewinn: num(settings.efb_anteil_gewinn), efb_anteil_wagnis_betrieb: num(settings.efb_anteil_wagnis_betrieb), efb_anteil_wagnis_leistung: num(settings.efb_anteil_wagnis_leistung), efb_lohnzusatz: num(settings.efb_lohnzusatz), efb_lohnneben: num(settings.efb_lohnneben), updated_at: new Date().toISOString() }, { onConflict: "company_id" });
     if (error) { setMsg("Fehler beim Speichern der Einstellungen: " + error.message); return; }
-    setMsg("Einstellungen gespeichert.");
+    // Nummernkreise: nur gültige Werte (ganze Zahl > 0) schreiben; leere Felder bleiben unangetastet.
+    const nrUpserts = [
+      { doc_type: "angebot", v: settings.nr_angebot },
+      { doc_type: "ab", v: settings.nr_ab },
+      { doc_type: "rechnung", v: settings.nr_rechnung },
+    ].filter((r) => String(r.v ?? "").trim() !== "" && Number.isFinite(num(r.v)) && num(r.v) > 0)
+      .map((r) => ({ company_id: companyId, doc_type: r.doc_type, next_number: Math.round(num(r.v)), updated_at: new Date().toISOString() }));
+    let nrNote = "";
+    if (nrUpserts.length) {
+      const { error: nrErr } = await supabase.from("office_number_ranges").upsert(nrUpserts, { onConflict: "company_id,doc_type" });
+      if (nrErr) nrNote = ` Nummernkreise NICHT gespeichert: ${nrErr.message} (office_number_ranges.sql in Supabase ausführen?)`;
+    }
+    setMsg("Einstellungen gespeichert." + nrNote);
   }
   async function loadTextModules() {
     const { data } = await supabase.from("office_offer_texts").select("*").eq("company_id", companyId).order("created_at", { ascending: true });
@@ -293,13 +312,15 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
   }
   // Folgedokument erzeugen (Angebot -> AB, Angebot/AB -> Rechnung).
   // Kopiert alle Positionen (neue IDs), verweist per parent_id auf die Quelle.
-  // Nummer wird als editierbarer Vorschlag von der Quelle uebernommen (Nummernkreise kommen spaeter).
+  // Nummer bleibt leer und wird beim ersten Speichern automatisch aus dem Nummernkreis
+  // der NEUEN Dokumentart vergeben (manuell eintippen geht weiterhin).
   function deriveDoc(row: any, newType: string) {
     const s: any = rowToState(row);
     s.id = null;
     s.doc_type = newType;
     s.parent_id = row.id;
     s.status = "entwurf";
+    s.number = "";
     s.doc_date = new Date().toISOString().slice(0, 10);
     s.items = (Array.isArray(row.items) ? row.items : []).map((it: any) => ({ ...it, id: uid() }));
     if (newType === "rechnung" && !s.zahlungsziel_tage) s.zahlungsziel_tage = "14";
@@ -354,8 +375,17 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
 
   async function saveOffer() {
     const t = offerTotals(o.items, o);
+    // Nummernkreis: neue Dokumente ohne manuell eingetragene Nummer bekommen beim ersten
+    // Speichern automatisch die nächste Nummer ihrer Dokumentart (atomar in der DB, RPC
+    // office_next_number — keine Doppelvergabe, auch bei zwei offenen Browsern nicht).
+    let numberFinal = String(o.number ?? "").trim();
+    if (!o.id && !numberFinal) {
+      const { data: nr, error: nrErr } = await supabase.rpc("office_next_number", { p_company: companyId, p_doc_type: o.doc_type || "angebot" });
+      if (nrErr || nr == null) { setMsg(`Speichern abgebrochen: Nummernkreis nicht verfügbar (${nrErr?.message || "keine Nummer erhalten"}). Bitte office_number_ranges.sql in Supabase ausführen — oder die Nummer manuell eintragen.`); return; }
+      numberFinal = String(nr);
+    }
     const payload: any = {
-      company_id: companyId, number: o.number || null, status: o.status || "entwurf", subject: o.subject || null,
+      company_id: companyId, number: numberFinal || null, status: o.status || "entwurf", subject: o.subject || null,
       offer_date: o.offer_date || null, valid_until: (o.binde_weeks ? addWeeks(o.offer_date, num(o.binde_weeks)) : o.valid_until) || null, binde_weeks: o.binde_weeks ? Math.round(num(o.binde_weeks)) : null,
       customer_id: o.customer_id || null, customer_name: o.customer_name || null, customer_anrede: o.customer_anrede || null,
       customer_street: o.customer_street || null, customer_zip: o.customer_zip || null, customer_city: o.customer_city || null,
@@ -376,18 +406,18 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
     } else {
       const { data, error } = await supabase.from("office_offers").insert(payload).select("id").single();
       if (error) { setMsg("Fehler beim Speichern: " + error.message); return; }
-      if (data?.id) { savedId = data.id; setO((p: any) => ({ ...p, id: data.id })); }
+      if (data?.id) { savedId = data.id; setO((p: any) => ({ ...p, id: data.id, number: numberFinal })); }
     }
     // Manuell kalkulierte Angebote fließen automatisch ins Preisarchiv (💡-Vorschläge lernen mit)
     // und neue Positionen werden als Leistungen im 🔧-Stamm angelegt.
     let archCnt = 0, leistCnt = 0;
     if ((o.doc_type || "angebot") === "angebot" && savedId) {
-      archCnt = await syncOfferToArchive(savedId, o.number || "", o.items);
+      archCnt = await syncOfferToArchive(savedId, numberFinal, o.items);
       leistCnt = await syncOfferToLeistungen(o.items);
     }
     await loadOffers();
     if (leistCnt) await loadArticles();
-    setMsg(`${DOC_LABEL[o.doc_type || "angebot"]} gespeichert.${archCnt ? ` ${archCnt} Position${archCnt === 1 ? "" : "en"} ins Preisarchiv übernommen.` : ""}${leistCnt ? ` ${leistCnt} neue Leistung${leistCnt === 1 ? "" : "en"} im 🔧-Stamm angelegt (Kategorie „Aus Angebot").` : ""}`);
+    setMsg(`${DOC_LABEL[o.doc_type || "angebot"]} ${numberFinal || "(ohne Nr.)"} gespeichert.${archCnt ? ` ${archCnt} Position${archCnt === 1 ? "" : "en"} ins Preisarchiv übernommen.` : ""}${leistCnt ? ` ${leistCnt} neue Leistung${leistCnt === 1 ? "" : "en"} im 🔧-Stamm angelegt (Kategorie „Aus Angebot").` : ""}`);
   }
 
   // Kalkulierte Positionen, die es im Leistungsstamm noch nicht gibt, dort neu anlegen.
@@ -866,6 +896,15 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
               <label className="flex flex-col text-sm">MwSt %<input className="border p-2 rounded-lg text-black bg-white" value={settings.vat_rate} onChange={(e) => setSettings((x: any) => ({ ...x, vat_rate: e.target.value }))} /></label>
               <label className="flex flex-col text-sm">Kupfer €/kg (DEL, Standard)<input className="border p-2 rounded-lg text-black bg-white" value={settings.del_preis} onChange={(e) => setSettings((x: any) => ({ ...x, del_preis: e.target.value }))} /></label>
               <label className="flex flex-col text-sm">Standard-Kupfer-Multi<input className="border p-2 rounded-lg text-black bg-white" value={settings.def_kupfer_multi} onChange={(e) => setSettings((x: any) => ({ ...x, def_kupfer_multi: e.target.value }))} /></label>
+              <div className="md:col-span-2 border-t border-slate-200 pt-3 mt-1 space-y-2">
+                <p className="text-sm font-medium">Nummernkreise</p>
+                <p className="text-xs text-gray-500">Nächste Nummer je Dokumentart (7-stellig). Neue Dokumente ohne manuell eingetragene Nummer bekommen beim ersten Speichern automatisch diese Nummer; der Zähler zählt danach weiter.</p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <label className="flex flex-col text-sm">Nächste Angebotsnummer<input className="border p-2 rounded-lg text-black bg-white" value={settings.nr_angebot} onChange={(e) => setSettings((x: any) => ({ ...x, nr_angebot: e.target.value }))} /></label>
+                  <label className="flex flex-col text-sm">Nächste Auftragsbestätigungsnummer<input className="border p-2 rounded-lg text-black bg-white" value={settings.nr_ab} onChange={(e) => setSettings((x: any) => ({ ...x, nr_ab: e.target.value }))} /></label>
+                  <label className="flex flex-col text-sm">Nächste Rechnungsnummer<input className="border p-2 rounded-lg text-black bg-white" value={settings.nr_rechnung} onChange={(e) => setSettings((x: any) => ({ ...x, nr_rechnung: e.target.value }))} /></label>
+                </div>
+              </div>
               <div className="md:col-span-2 border-t border-slate-200 pt-3 mt-1 space-y-4">
                 <div>
                   <p className="text-sm font-medium">EFB-Formblatt 221 — Zuschläge</p>
@@ -1088,7 +1127,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
 
       {/* Kopf */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 border border-slate-200 rounded-xl p-3 bg-gray-50">
-        <input className="border p-2 rounded-lg text-black bg-white" placeholder={`${DOC_LABEL[dt]}snummer (Start später automatisch)`} value={o.number} onChange={(e) => set("number", e.target.value)} />
+        <input className="border p-2 rounded-lg text-black bg-white" placeholder={`${DOC_LABEL[dt]}snummer (leer = automatisch vergeben)`} value={o.number} onChange={(e) => set("number", e.target.value)} />
         <input className="border p-2 rounded-lg text-black bg-white" placeholder="Betreff / Projekt" value={o.subject} onChange={(e) => set("subject", e.target.value)} />
         {dt === "angebot" ? (
           <label className="text-sm text-gray-600 flex items-center gap-2">Datum <input type="date" className="border p-2 rounded-lg text-black bg-white flex-1" value={o.offer_date || ""} onChange={(e) => set("offer_date", e.target.value)} /></label>
