@@ -280,6 +280,43 @@ export default function Artikel({ supabase, companyId, art = "leistung" }: { sup
     }
     setBusy(false);
   }
+  // Supabase bricht einzelne SQL-Anweisungen nach wenigen Sekunden ab (statement timeout).
+  // Bei sehr großen Katalogen reißt sowohl das Löschen des Altbestands als auch ein zu
+  // großes Einfüge-Paket dieses Limit — deshalb Häppchen + automatische Wiederholung.
+  const isTimeout = (m: any) => /timeout|57014/i.test(String(m || ""));
+  async function deleteSupplierRows(table: string, supplierId: string, label: string) {
+    const first = await supabase.from(table).delete().eq("supplier_id", supplierId);
+    if (!first.error) return;
+    if (!isTimeout(first.error.message)) throw new Error(`${label} löschen: ${first.error.message}`);
+    // Timeout beim großen Löschen: IDs holen und in Häppchen löschen, bis nichts mehr da ist.
+    for (;;) {
+      const { data, error } = await supabase.from(table).select("id").eq("supplier_id", supplierId).limit(2000);
+      if (error) throw new Error(`${label} löschen: ${error.message}`);
+      if (!data || !data.length) return;
+      for (let i = 0; i < data.length; i += 500) {
+        const ids = data.slice(i, i + 500).map((r: any) => r.id);
+        const { error: e2 } = await supabase.from(table).delete().in("id", ids);
+        if (e2 && !isTimeout(e2.message)) throw new Error(`${label} löschen: ${e2.message}`);
+      }
+      setImpMsg(`Räume alten Bestand auf (${label})…`);
+    }
+  }
+  async function insertRows(table: string, rows: any[], label: string) {
+    let i = 0, B = 500, tries = 0;
+    while (i < rows.length) {
+      const { error } = await supabase.from(table).insert(rows.slice(i, i + B));
+      if (error) {
+        if (isTimeout(error.message)) {
+          if (B > 50) { B = Math.floor(B / 2); continue; } // gleiches Paket nochmal, nur kleiner
+          if (++tries <= 5) continue;                       // kleinstes Paket: bis zu 5× erneut
+        }
+        throw new Error(`${label}: ${error.message}`);
+      }
+      tries = 0;
+      i += B;
+      setImpMsg(`Importiere ${label}… ${int(Math.min(i, rows.length))} / ${int(rows.length)}`);
+    }
+  }
   async function runImport(s: any, res: DnResult) {
     // Schlanker Import: nur Artikel mit echtem Netto-EK (Kunden-Preisdatei) übernehmen.
     const arts = impNetOnly ? res.articles.filter((a) => a.net_ek != null) : res.articles;
@@ -287,35 +324,32 @@ export default function Artikel({ supabase, companyId, art = "leistung" }: { sup
     const hasDisc = res.discounts.length > 0;
     if (!hasArt && !hasDisc) { setImpMsg("Nichts zu importieren."); return; }
     setBusy(true); setImpMsg("Bereite Import vor…");
-
-    // Rabattgruppen: nur ersetzen, wenn welche in der Datei sind.
-    if (hasDisc) {
-      await supabase.from("office_supplier_discounts").delete().eq("supplier_id", s.id);
-      const drows = res.discounts.map((d) => ({ company_id: companyId, supplier_id: s.id, discount_group: d.discount_group, discount_pct: d.discount_pct, description: d.description || null }));
-      for (let i = 0; i < drows.length; i += 1000) {
-        const { error } = await supabase.from("office_supplier_discounts").insert(drows.slice(i, i + 1000));
-        if (error) { setImpMsg("Fehler bei Rabattgruppen: " + error.message); setBusy(false); return; }
-        setImpMsg(`Importiere Rabattgruppen… ${int(Math.min(i + 1000, drows.length))} / ${int(drows.length)}`);
+    try {
+      // Rabattgruppen: nur ersetzen, wenn welche in der Datei sind.
+      if (hasDisc) {
+        await deleteSupplierRows("office_supplier_discounts", s.id, "Rabattgruppen");
+        const drows = res.discounts.map((d) => ({ company_id: companyId, supplier_id: s.id, discount_group: d.discount_group, discount_pct: d.discount_pct, description: d.description || null }));
+        await insertRows("office_supplier_discounts", drows, "Rabattgruppen");
       }
-    }
-
-    // Artikel: nur ersetzen, wenn die Datei Artikel enthält (sonst bleiben bestehende erhalten).
-    if (hasArt) {
-      await supabase.from("office_supplier_articles").delete().eq("supplier_id", s.id);
-      const rows = arts.map((a) => ({
-        company_id: companyId, supplier_id: s.id, article_no: a.article_no, short_text: a.short_text || null, long_text: a.long_text || null,
-        unit: a.unit || null, ean: a.ean || null, discount_group: a.discount_group || null, list_ek: a.list_ek, net_ek: a.net_ek, ek: a.ek,
-      }));
-      const B = 1000;
-      for (let i = 0; i < rows.length; i += B) {
-        const { error } = await supabase.from("office_supplier_articles").insert(rows.slice(i, i + B));
-        if (error) { setImpMsg("Fehler beim Import: " + error.message); setBusy(false); await loadSuppliers(); return; }
-        setImpMsg(`Importiere… ${int(Math.min(i + B, rows.length))} / ${int(rows.length)} Artikel`);
+      // Artikel: nur ersetzen, wenn die Datei Artikel enthält (sonst bleiben bestehende erhalten).
+      if (hasArt) {
+        setImpMsg("Räume alten Bestand auf…");
+        await deleteSupplierRows("office_supplier_articles", s.id, "Artikel");
+        const rows = arts.map((a) => ({
+          company_id: companyId, supplier_id: s.id, article_no: a.article_no, short_text: a.short_text || null, long_text: a.long_text || null,
+          unit: a.unit || null, ean: a.ean || null, discount_group: a.discount_group || null, list_ek: a.list_ek, net_ek: a.net_ek, ek: a.ek,
+        }));
+        await insertRows("office_supplier_articles", rows, "Artikel");
+        await supabase.from("office_suppliers").update({ datanorm_version: res.version, currency: res.currency, catalog_date: res.catalogDate || null, article_count: rows.length, updated_at: new Date().toISOString() }).eq("id", s.id);
+      } else {
+        // Nur Rabatte importiert – Artikelzahl unverändert lassen, Zeitstempel aktualisieren.
+        await supabase.from("office_suppliers").update({ updated_at: new Date().toISOString() }).eq("id", s.id);
       }
-      await supabase.from("office_suppliers").update({ datanorm_version: res.version, currency: res.currency, catalog_date: res.catalogDate || null, article_count: rows.length, updated_at: new Date().toISOString() }).eq("id", s.id);
-    } else {
-      // Nur Rabatte importiert – Artikelzahl unverändert lassen, Zeitstempel aktualisieren.
-      await supabase.from("office_suppliers").update({ updated_at: new Date().toISOString() }).eq("id", s.id);
+    } catch (e: any) {
+      setImpMsg(`Fehler beim Import: ${e?.message || String(e)} — einfach erneut auf „Importieren" klicken, der Bestand wird dabei sauber neu aufgebaut.`);
+      setBusy(false);
+      await loadSuppliers();
+      return;
     }
 
     setBusy(false); setPreview(null);

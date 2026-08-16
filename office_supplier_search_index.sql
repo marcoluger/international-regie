@@ -1,23 +1,19 @@
--- office_supplier_search_index.sql (Suchindex fuer grosse Lieferanten-Kataloge)
--- Zweck: Die Katalogsuche (📦-Picker, 💡-Kandidaten aus DATANORM) sucht mit ILIKE '%...%'
---   in office_supplier_articles.short_text und article_no. Ab ~100.000 Artikeln wird das
---   ohne Index spuerbar langsam (kompletter Tabellendurchlauf je Suche).
---   pg_trgm-GIN-Indexe beschleunigen genau diese Teilwort-Suchen.
--- Idempotent: kann mehrfach ausgefuehrt werden. (Anlegen kann bei vollen Katalogen
--- eine Minute dauern - einfach warten.)
+-- office_supplier_search_index.sql (KORREKTUR - Duplikat-Indexe entfernen)
+-- Hintergrund: office_datanorm.sql legt die Suchindexe fuer die Katalogsuche
+--   (pg_trgm-GIN auf short_text und article_no) BEREITS an:
+--   office_supplier_articles_txt_idx und office_supplier_articles_no_idx.
+--   Eine fruehere Version dieser Datei hat versehentlich zwei DUPLIKATE angelegt
+--   (..._st_trgm / ..._no_trgm). Doppelte Indexe bringen nichts, kosten Platz und
+--   bremsen jeden Import. Diese Datei entfernt die Duplikate wieder.
+-- Idempotent: kann mehrfach ausgefuehrt werden (auch wenn die Duplikate nie angelegt wurden).
 
-create extension if not exists pg_trgm;
+drop index if exists public.office_supplier_articles_st_trgm;
+drop index if exists public.office_supplier_articles_no_trgm;
 
-create index if not exists office_supplier_articles_st_trgm
-  on public.office_supplier_articles using gin (short_text gin_trgm_ops);
-
-create index if not exists office_supplier_articles_no_trgm
-  on public.office_supplier_articles using gin (article_no gin_trgm_ops);
-
--- Kontrolle: muss 2 Zeilen zeigen (die beiden _trgm-Indexe)
+-- Kontrolle: muss GENAU 2 Zeilen zeigen (txt_idx und no_idx - die Original-Suchindexe)
 select indexname
 from pg_indexes
 where schemaname = 'public'
   and tablename  = 'office_supplier_articles'
-  and indexname like '%\_trgm' escape '\'
+  and (indexname like '%trgm%' or indexname like '%txt_idx' or indexname like '%no_idx')
 order by indexname;
