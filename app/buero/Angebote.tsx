@@ -177,6 +177,10 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
   // 🌙 Autopilot: LV in einem Rutsch bepreisen + KI-Prüfbericht
   const [autoBusy, setAutoBusy] = useState(false);
   const [autoReport, setAutoReport] = useState<{ rows: any[]; findings: number; summary: string } | null>(null);
+  // Position als neue Leistung im 🔧-Stamm ablegen (💾-Knopf je Position, Name wird abgefragt)
+  const [makeLeist, setMakeLeist] = useState<string | null>(null);
+  const [makeLeistName, setMakeLeistName] = useState("");
+  const [makeLeistBusy, setMakeLeistBusy] = useState(false);
   // Leistung/Artikel in eine BESTEHENDE Position übernehmen (Picker je Position)
   const [posPick, setPosPick] = useState<string | null>(null);
   const [posPickSearch, setPosPickSearch] = useState("");
@@ -643,6 +647,60 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
     }));
     setPosPick(null);
     setPosPickSearch("");
+  }
+
+  // 💾 Position als neue Leistung ablegen: Namensvorschlag = Kurztext (sonst erste Langtext-Zeile).
+  function leistungNameSuggestion(it: any) {
+    const s = (String(it.short_text || "").trim() || String(it.long_text || "").split("\n")[0].trim()).replace(/\s+/g, " ").slice(0, 120);
+    return s || "Neue Leistung";
+  }
+  function openMakeLeistung(it: any) {
+    setMakeLeist((p) => (p === it.id ? null : it.id));
+    setMakeLeistName(leistungNameSuggestion(it));
+  }
+  async function saveItemAsLeistung(itemId: string) {
+    const it = o.items.find((x: any) => x.id === itemId);
+    if (!it) return;
+    const name = makeLeistName.replace(/\s+/g, " ").trim();
+    if (!name) { setMsg("Bitte einen Namen für die Leistung eingeben."); return; }
+    if (num(it.mat_ek) === 0 && num(it.minutes) === 0) { setMsg("Diese Position hat noch keine Kalkulation (Material-EK oder Minuten) — erst kalkulieren, dann als Leistung ablegen."); return; }
+    const normKey = (s: any) => String(s || "").toLowerCase().replace(/\s+/g, " ").trim();
+    if (articles.some((a: any) => (a.art || "leistung") === "leistung" && normKey(a.short_text) === normKey(name))) {
+      setMsg(`Im 🔧-Stamm gibt es schon eine Leistung „${name}" — bitte einen anderen Namen wählen.`);
+      return;
+    }
+    setMakeLeistBusy(true);
+    const { data, error } = await supabase.from("office_articles").insert({
+      company_id: companyId, art: "leistung", category: "Aus Angebot",
+      short_text: name.slice(0, 300), long_text: it.long_text || null, unit: it.unit || "St",
+      mat_ek: num(it.mat_ek) || null, mat_multi: num(it.mat_multi) || null,
+      lohn_ek: num(it.lohn_ek) || null, lohn_multi: num(it.lohn_multi) || null,
+      minutes: num(it.minutes) || null, preiseinheit: num(it.preiseinheit) || 1,
+      kupfer_kg: num(it.kupfer_kg) || null, kupfer_multi: num(it.kupfer_multi) || null,
+    }).select("id").single();
+    setMakeLeistBusy(false);
+    if (error) { setMsg("Fehler beim Ablegen der Leistung: " + error.message); return; }
+    // Position mit der neuen Leistung verknüpfen — so legt der Auto-Sync beim Speichern
+    // des Angebots nicht noch einmal dieselbe Leistung an (article_id wird übersprungen).
+    if (data?.id) setItem(itemId, "article_id", data.id);
+    setMakeLeist(null);
+    await loadArticles();
+    setMsg(`💾 Leistung „${name}" im 🔧-Stamm abgelegt (Kategorie „Aus Angebot").`);
+  }
+  // Abfrage-Block direkt unter der Position: Namen bestätigen/ändern und ablegen.
+  function makeLeistBlockFor(itemId: string) {
+    if (makeLeist !== itemId) return null;
+    return (
+      <div className="border-t border-emerald-200 bg-emerald-50/50 p-2 space-y-1.5">
+        <span className="text-xs font-medium text-emerald-900">💾 Diese Position als Leistung im 🔧-Stamm ablegen — wie soll die Leistung heißen?</span>
+        <div className="flex items-center gap-2 flex-wrap">
+          <input className="border p-1.5 rounded-lg text-black bg-white text-xs flex-1 min-w-[16rem]" value={makeLeistName} onChange={(e) => setMakeLeistName(e.target.value)} placeholder="Name der Leistung" onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); saveItemAsLeistung(itemId); } }} />
+          <button type="button" disabled={makeLeistBusy} onClick={() => saveItemAsLeistung(itemId)} className="bg-emerald-700 disabled:bg-gray-300 text-white px-3 py-1.5 rounded-lg text-xs">{makeLeistBusy ? "legt ab…" : "✔ Als Leistung ablegen"}</button>
+          <button type="button" onClick={() => setMakeLeist(null)} className="bg-gray-200 px-3 py-1.5 rounded-lg text-xs">Abbrechen</button>
+        </div>
+        <p className="text-xs text-gray-600">Übernommen wird die aktuelle Kalkulation der Position (Material-EK, Multis, Lohn, Minuten, Kupfer, Preiseinheit) samt Langtext. Der Namensvorschlag ist der Kurztext — gerne anpassen.</p>
+      </div>
+    );
   }
 
   // Picker-Block direkt unter der Position: Leistung/Artikel suchen und übernehmen.
@@ -1593,11 +1651,13 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
                       <td className="px-1.5 text-right font-bold whitespace-nowrap">{fmt(it.gp)}</td>
                       <td className="px-1 py-1 whitespace-nowrap">
                         <button type="button" onClick={() => { setPosPick(posPick === it.id ? null : it.id); setPosPickSearch(""); }} className={`px-1.5 py-1 rounded text-xs mr-1 ${posPick === it.id ? "bg-cyan-700 text-white" : "bg-cyan-50 border border-cyan-300 text-cyan-800"}`} title="Leistung oder Artikel auswählen und in diese Position übernehmen">🔧</button>
+                        <button type="button" onClick={() => openMakeLeistung(it)} className={`px-1.5 py-1 rounded text-xs mr-1 ${makeLeist === it.id ? "bg-emerald-700 text-white" : "bg-emerald-50 border border-emerald-300 text-emerald-800"}`} title="Diese Position — so wie sie gerade kalkuliert ist — als neue Leistung im 🔧-Stamm ablegen (Name wird vorher abgefragt)">💾</button>
                         {itemButtons(it.id)}
                       </td>
                     </tr>
                     {sugg && <tr><td colSpan={15} className="p-0">{sugg}</td></tr>}
                     {posPick === it.id && <tr><td colSpan={15} className="p-0">{posPickBlockFor(it.id)}</td></tr>}
+                    {makeLeist === it.id && <tr><td colSpan={15} className="p-0">{makeLeistBlockFor(it.id)}</td></tr>}
                     </Fragment>
                   );
                 })}
@@ -1653,10 +1713,12 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
                 />
                 <span className="text-sm font-bold text-right w-24 whitespace-nowrap" title="Gesamtpreis">{fmt(it.gp)} €</span>
                 <button type="button" onClick={() => { setPosPick(posPick === it.id ? null : it.id); setPosPickSearch(""); }} className={`px-2 py-1.5 rounded text-sm ${posPick === it.id ? "bg-cyan-700 text-white" : "bg-cyan-50 border border-cyan-300 text-cyan-800"}`} title="Leistung oder Artikel auswählen und in diese Position übernehmen">🔧</button>
+                <button type="button" onClick={() => openMakeLeistung(it)} className={`px-2 py-1.5 rounded text-sm ${makeLeist === it.id ? "bg-emerald-700 text-white" : "bg-emerald-50 border border-emerald-300 text-emerald-800"}`} title="Diese Position — so wie sie gerade kalkuliert ist — als neue Leistung im 🔧-Stamm ablegen (Name wird vorher abgefragt)">💾</button>
                 {itemButtons(it.id)}
               </div>
               {suggBlockFor(it.id)}
               {posPickBlockFor(it.id)}
+              {makeLeistBlockFor(it.id)}
               {opened && (
                 <div className="px-2 pb-2 space-y-2">
                   <textarea className="border p-1.5 rounded text-black bg-white w-full text-sm" rows={2} placeholder="Langtext" value={it.long_text} onChange={(e) => setItem(it.id, "long_text", e.target.value)} />
