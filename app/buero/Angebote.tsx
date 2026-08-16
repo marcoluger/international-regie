@@ -588,6 +588,10 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
       minutes: r.minutes != null ? String(r.minutes) : it.minutes,
       fremd_vk: r.fremd_vk != null && num(r.fremd_vk) > 0 ? String(r.fremd_vk) : it.fremd_vk,
       geraet_vk: r.geraet_vk != null && num(r.geraet_vk) > 0 ? String(r.geraet_vk) : it.geraet_vk,
+      // Reine Anzeige: welcher Katalog-Artikel gewählt wurde (Lieferant, Artikelnummer, Text).
+      kat_lieferant: r.lieferant || "",
+      kat_art_no: r.art_no || "",
+      kat_text: r.lieferant ? String(r.text || "").split("\n")[0].slice(0, 140) : "",
       suggest_note: `${Math.round(score * 100)} % ähnlich: „${String(r.text).split("\n")[0].slice(0, 70)}" (${r.source || "Archiv"}${r.ep != null ? `, EP damals ${fmt(num(r.ep))} €` : ""})${matOnly ? " — nur Material-EK aus dem Katalog, Minuten fehlen noch (🤖 kann sie schätzen)" : ""}`,
     };
   }
@@ -610,7 +614,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
         const score = similarity(t, normTokens(a.short_text || ""));
         if (score < 0.25) continue;
         const supNm = suppliers.find((s: any) => s.id === a.supplier_id)?.name || "Katalog";
-        out.push({ score, row: { source: `🏭 ${supNm}${a.article_no ? " " + a.article_no : ""}`, unit: a.unit || "", text: a.short_text || ("Art. " + a.article_no), mat_ek: ek, mat_multi: null, lohn_ek: null, minutes: null, fremd_vk: null, geraet_vk: null, ep: null } });
+        out.push({ score, row: { source: `🏭 ${supNm}${a.article_no ? " " + a.article_no : ""}`, lieferant: supNm, art_no: a.article_no || "", unit: a.unit || "", text: a.short_text || ("Art. " + a.article_no), mat_ek: ek, mat_multi: null, lohn_ek: null, minutes: null, fremd_vk: null, geraet_vk: null, ep: null } });
       }
       out.sort((x, y) => y.score - x.score);
       return out.slice(0, 3);
@@ -921,10 +925,15 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
         const catResults = await Promise.all(batch.map((p) => catalogCandidates([items[p.idx].short_text, items[p.idx].long_text].filter(Boolean).join(" "))));
         batch.forEach((p, j) => {
           const merged = [...p.cands, ...catResults[j]].sort((a, b) => b.score - a.score).slice(0, 6);
-          if (merged.length && merged[0].score >= 0.8) {
-            const src = String(merged[0].row.source || "").startsWith("🏭") ? "Katalog" : "Archiv";
-            quelle[items[p.idx].id] = `${src} ${Math.round(merged[0].score * 100)} %`;
-            items[p.idx] = applyCandidate(items[p.idx], merged[0].row, merged[0].score);
+          const qual = merged.filter((c) => c.score >= 0.8);
+          if (qual.length) {
+            // Eigenes Archiv zuerst (echte Kalkulation samt Minuten). Sonst unter den passenden
+            // Katalogtreffern (BTI/Pferdekämpfer/Rexel) IMMER den günstigsten Material-EK nehmen.
+            const arch = qual.find((c) => !c.row.lieferant);
+            const cats = qual.filter((c) => c.row.lieferant).sort((a, b) => num(a.row.mat_ek) - num(b.row.mat_ek));
+            const chosen = arch || cats[0];
+            quelle[items[p.idx].id] = arch ? `Archiv ${Math.round(chosen.score * 100)} %` : `🏭 ${chosen.row.lieferant} ${Math.round(chosen.score * 100)} %`;
+            items[p.idx] = applyCandidate(items[p.idx], chosen.row, chosen.score);
           } else if (merged.length) {
             review.push({ id: items[p.idx].id, oz: items[p.idx].oz || "", text: items[p.idx].short_text || "(ohne Kurztext)", cands: merged });
           }
@@ -994,7 +1003,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
       setAutoReport({
         rows,
         findings: nFind,
-        summary: `${rows.length} Positionen · ${cnt("Archiv")} aus Alt-Angeboten · ${cnt("Katalog")} aus Katalog · ${rows.filter((r: any) => r.quelle.includes("🤖")).length} mit KI-Schätzung · ${cnt("vorhanden") + cnt("fester")} schon kalkuliert · ${cnt("ungeklärt")} ungeklärt${review.length ? ` · ${review.length} mit Kandidaten zum Auswählen (unter den Positionen)` : ""} · ${nFind} Prüfer-Hinweis${nFind === 1 ? "" : "e"}`,
+        summary: `${rows.length} Positionen · ${cnt("Archiv")} aus Alt-Angeboten · ${cnt("🏭")} aus Katalog (günstigster Lieferant) · ${rows.filter((r: any) => r.quelle.includes("🤖")).length} mit KI-Schätzung · ${cnt("vorhanden") + cnt("fester")} schon kalkuliert · ${cnt("ungeklärt")} ungeklärt${review.length ? ` · ${review.length} mit Kandidaten zum Auswählen (unter den Positionen)` : ""} · ${nFind} Prüfer-Hinweis${nFind === 1 ? "" : "e"}`,
       });
       setMsg(`🌙 Autopilot fertig — Bericht mit Preisquelle je Position${nFind ? ` und ${nFind} Prüfer-Hinweis${nFind === 1 ? "" : "en"}` : ""}. Bitte durchsehen, dann speichern.`);
     } catch (e: any) {
@@ -1438,7 +1447,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
                 </tbody>
               </table>
             </div>
-            <p className="text-xs text-gray-500">Preisquellen: „Archiv x %" = ähnlichste Alt-Position aus dem Preisarchiv · „Katalog x %" = echter DATANORM-EK · „🤖 KI" = Schätzung (bitte prüfen!) · „vorhanden"/„fester EP" = war schon kalkuliert · „ungeklärt" = bitte von Hand kalkulieren oder unten einen Kandidaten wählen. Der Prüfer ist eine zweite KI — seine Hinweise sind Anregungen, kein Urteil.</p>
+            <p className="text-xs text-gray-500">Preisquellen: „Archiv x %" = ähnlichste Alt-Position aus dem Preisarchiv · „🏭 BTI/Pferdekämpfer/Rexel x %" = echter Katalog-EK dieses Lieferanten (bei mehreren passenden Treffern automatisch der günstigste) · „🤖 KI" = Schätzung (bitte prüfen!) · „vorhanden"/„fester EP" = war schon kalkuliert · „ungeklärt" = bitte von Hand kalkulieren oder unten einen Kandidaten wählen. Der Prüfer ist eine zweite KI — seine Hinweise sind Anregungen, kein Urteil.</p>
           </div>
         )}
 
@@ -1636,6 +1645,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
                           <input className={`${tin} font-medium`} placeholder="Kurztext" value={it.short_text} onChange={(e) => setItem(it.id, "short_text", e.target.value)} />
                         </div>
                         {it.long_text ? <div className="text-[10px] text-gray-400 truncate max-w-[24rem]" title={it.long_text}>{String(it.long_text).split("\n")[0]}</div> : null}
+                        {it.kat_art_no ? <div className="text-[10px] text-cyan-700 truncate max-w-[24rem]" title={`Gewählter Katalog-Artikel: ${it.kat_lieferant} · Art.-Nr. ${it.kat_art_no} · ${it.kat_text}`}>🏭 {it.kat_lieferant} · Art. {it.kat_art_no} · {it.kat_text}</div> : null}
                       </td>
                       <td className="px-1 py-1 w-20"><input className={`${tin} text-right`} value={it.mat_ek} onChange={(e) => setItem(it.id, "mat_ek", e.target.value)} /></td>
                       <td className="px-1 py-1 w-16"><input className={`${tin} text-right`} value={it.mat_multi} onChange={(e) => setItem(it.id, "mat_multi", e.target.value)} /></td>
@@ -1716,6 +1726,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
                 <button type="button" onClick={() => openMakeLeistung(it)} className={`px-2 py-1.5 rounded text-sm ${makeLeist === it.id ? "bg-emerald-700 text-white" : "bg-emerald-50 border border-emerald-300 text-emerald-800"}`} title="Diese Position — so wie sie gerade kalkuliert ist — als neue Leistung im 🔧-Stamm ablegen (Name wird vorher abgefragt)">💾</button>
                 {itemButtons(it.id)}
               </div>
+              {it.kat_art_no ? <div className="px-2 pb-1 -mt-1 text-xs text-cyan-700 truncate" title={`Gewählter Katalog-Artikel: ${it.kat_lieferant} · Art.-Nr. ${it.kat_art_no} · ${it.kat_text}`}>🏭 {it.kat_lieferant} · Art. {it.kat_art_no} · {it.kat_text}</div> : null}
               {suggBlockFor(it.id)}
               {posPickBlockFor(it.id)}
               {makeLeistBlockFor(it.id)}
