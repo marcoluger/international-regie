@@ -46,6 +46,11 @@ export async function POST(req: Request) {
       text: String(p?.text ?? "").slice(0, 500),
       unit: String(p?.unit ?? "St").slice(0, 10),
       qty: Number(p?.qty) || 1,
+      // Optionale Kandidaten (Archiv/Katalog mit echten EKs): die KI wählt per Index ("pick"),
+      // wenn einer die beschriebene Leistung / das Material wirklich trifft.
+      ...(Array.isArray(p?.cands) && p.cands.length
+        ? { cands: p.cands.slice(0, 5).map((c: any, i: number) => ({ i, text: String(c?.text ?? "").slice(0, 160), unit: String(c?.unit ?? "").slice(0, 10), ek: Number(c?.ek) || 0, minutes: c?.minutes != null && Number.isFinite(Number(c.minutes)) ? Number(c.minutes) : null })) }
+        : {}),
     })).filter((p) => p.id && p.text.trim());
 
     const res = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -78,8 +83,16 @@ export async function POST(req: Request) {
               `Solarmodul 430-450 Wp 55-85 €; Solarkabel 6mm2 0,30-0,60 €/m; MC4-Stecker 0,50-1,50 €. ` +
               `Im Zweifel eher NIEDRIG schätzen (EK, nicht Verkaufspreis — der Nutzer prüft). ` +
               `Bei Pauschalpositionen (psch/Psch) gilt: je 1 Pauschale. ` +
+              `KANDIDATEN: Manche Positionen enthalten "cands" — eine Liste ECHTER Artikel aus dem ` +
+              `Großhandelskatalog bzw. alten Angeboten des Betriebs, mit Index i, Text, Einheit und ` +
+              `echtem EK. Wenn einer davon die beschriebene Leistung / das beschriebene Material ` +
+              `WIRKLICH trifft (gleiches Produkt, passende Dimension/Typ — nicht nur ähnliches Thema), ` +
+              `setze "pick" auf dessen Index i und schätze mat_ek/geraet NICHT (0 lassen); "minutes" ` +
+              `trotzdem schätzen, falls der Kandidat keine minutes hat. Passen mehrere gleich gut, ` +
+              `nimm den mit dem NIEDRIGSTEN ek. Passt keiner sicher, setze "pick" auf null und ` +
+              `schätze wie üblich. Ohne "cands" ist "pick" immer null. ` +
               `Antworte AUSSCHLIESSLICH als JSON-Objekt exakt in dieser Form: ` +
-              `{"items":[{"id":"...","mat_ek":0.00,"geraet":0.00,"minutes":0,"note":"..."}]}`,
+              `{"items":[{"id":"...","pick":null,"mat_ek":0.00,"geraet":0.00,"minutes":0,"note":"..."}]}`,
           },
           { role: "user", content: JSON.stringify(list) },
         ],
@@ -101,12 +114,13 @@ export async function POST(req: Request) {
     const clean = items
       .map((it: any) => ({
         id: String(it?.id ?? ""),
+        pick: Number.isInteger(it?.pick) && it.pick >= 0 && it.pick < 5 ? it.pick : null,
         mat_ek: Number.isFinite(Number(it?.mat_ek)) ? Math.max(0, Math.round(Number(it.mat_ek) * 100) / 100) : null,
         geraet: Number.isFinite(Number(it?.geraet)) ? Math.max(0, Math.round(Number(it.geraet) * 100) / 100) : null,
         minutes: Number.isFinite(Number(it?.minutes)) ? Math.max(0, Math.round(Number(it.minutes) * 10) / 10) : null,
         note: String(it?.note ?? "").slice(0, 120),
       }))
-      .filter((it: any) => it.id && (it.mat_ek !== null || it.geraet !== null || it.minutes !== null));
+      .filter((it: any) => it.id && (it.pick !== null || it.mat_ek !== null || it.geraet !== null || it.minutes !== null));
 
     return NextResponse.json({ items: clean });
   } catch (err: any) {

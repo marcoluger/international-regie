@@ -596,28 +596,56 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
     };
   }
 
+  // Abdeckungs-Ähnlichkeit für Katalogtreffer: Wie viel vom KNAPPEN Katalog-Kurztext steckt im
+  // (langen) LV-Text? Jaccard bestraft lange LV-Texte — Katalogtexte kämen nie über 80 %.
+  // Teil-Treffer zählen (nym ↔ nym-j, steckdose ↔ schuko-steckdose); reine Zahlen-/Kürzel-Tokens
+  // des Katalogtexts (Herstellercodes) werden ignoriert.
+  function coverageScore(lvToks: Set<string>, catText: string): number {
+    const cat = Array.from(normTokens(catText)).filter((w) => w.length >= 3 && !/^\d+$/.test(w));
+    if (!cat.length) return 0;
+    let hit = 0;
+    for (const c of cat) {
+      if (lvToks.has(c)) { hit++; continue; }
+      if (c.length >= 4) { for (const l of lvToks) { if (l.length >= 4 && (l.includes(c) || c.includes(l))) { hit++; break; } } }
+    }
+    const cov = hit / cat.length;
+    return hit < 2 ? Math.min(cov, 0.5) : cov; // 1 Allerweltswort allein reicht nicht
+  }
   // DATANORM-Katalog-Kandidaten für eine Position: echte EKs aus office_supplier_articles.
   async function catalogCandidates(text: string): Promise<{ row: any; score: number }[]> {
-    const toks = Array.from(normTokens(text)).filter((w) => w.length >= 4 && !/^\d+$/.test(w)).sort((a, b) => b.length - a.length).slice(0, 3);
-    if (!toks.length) return [];
+    const all = Array.from(normTokens(text));
+    // LV-Füllwörter nicht als Suchbegriff verwenden (bringen nur Zufallstreffer).
+    const QSTOP = new Set(["liefern", "montieren", "montage", "lieferung", "anschliessen", "einbauen", "demontage", "demontieren", "fabrikat", "hersteller", "gleichwertig", "komplett", "betriebsfertig", "angeboten", "angebotenes", "verlegen", "anklemmen"]);
+    const toks = all.filter((w) => w.length >= 4 && !/^\d+$/.test(w) && !QSTOP.has(w)).sort((a, b) => b.length - a.length).slice(0, 3);
+    // Typen-/Artikelnummern im LV-Text (Buchstaben + Ziffern gemischt, ab 5 Zeichen) → auch in der Artikelnummer suchen.
+    const typeToks = all.filter((w) => w.length >= 5 && /\d/.test(w) && /[a-z]/.test(w)).slice(0, 2);
+    if (!toks.length && !typeToks.length) return [];
     try {
+      const ors = [
+        ...toks.map((t) => `short_text.ilike.*${t.replace(/[,()%*]/g, "")}*`),
+        ...typeToks.map((t) => `article_no.ilike.*${t.replace(/[,()%*]/g, "")}*`),
+      ];
       const { data } = await supabase.from("office_supplier_articles")
         .select("supplier_id,article_no,short_text,unit,ek,net_ek")
         .eq("company_id", companyId)
-        .or(toks.map((t) => `short_text.ilike.*${t.replace(/[,()%*]/g, "")}*`).join(","))
-        .limit(15);
+        .or(ors.join(","))
+        .limit(20);
       const t = normTokens(text);
+      const lowText = String(text || "").toLowerCase();
       const out: { row: any; score: number }[] = [];
       for (const a of data || []) {
         const ek = a.ek != null ? a.ek : a.net_ek;
         if (ek == null) continue;
-        const score = similarity(t, normTokens(a.short_text || ""));
+        let score = coverageScore(t, a.short_text || "");
+        // Artikelnummer wörtlich im LV-Text → sehr sicherer Treffer.
+        const no = String(a.article_no || "").toLowerCase();
+        if (no.length >= 5 && lowText.includes(no)) score = Math.max(score, 0.95);
         if (score < 0.25) continue;
         const supNm = suppliers.find((s: any) => s.id === a.supplier_id)?.name || "Katalog";
         out.push({ score, row: { source: `🏭 ${supNm}${a.article_no ? " " + a.article_no : ""}`, lieferant: supNm, art_no: a.article_no || "", unit: a.unit || "", text: a.short_text || ("Art. " + a.article_no), mat_ek: ek, mat_multi: null, lohn_ek: null, minutes: null, fremd_vk: null, geraet_vk: null, ep: null } });
       }
       out.sort((x, y) => y.score - x.score);
-      return out.slice(0, 3);
+      return out.slice(0, 5);
     } catch { return []; }
   }
   function pickSuggestion(itemId: string, cand: { row: any; score: number }) {
@@ -954,11 +982,22 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
       const { data: sess } = await supabase.auth.getSession();
       const token = sess?.session?.access_token || "";
       if (!token) throw new Error("Nicht angemeldet — bitte neu einloggen.");
+      // Positionen, die die KI über einen KANDIDATEN versorgt hat (echter Katalog-/Archiv-EK).
+      const applied = new Set<string>();
+      const candsById = new Map(review.map((e) => [e.id, e.cands] as const));
       if (kiTargets.length) {
         const byId: Record<string, any> = {};
         for (let i = 0; i < kiTargets.length; i += 25) {
-          setMsg(`🌙 Autopilot 3/4: KI schätzt… ${Math.min(i + 25, kiTargets.length)} / ${kiTargets.length}`);
-          const chunk = kiTargets.slice(i, i + 25).map((it: any) => ({ id: it.id, text: [it.short_text, it.long_text].filter(Boolean).join("\n").slice(0, 500), unit: it.unit || "St", qty: num(it.qty) || 1 }));
+          setMsg(`🌙 Autopilot 3/4: KI wählt Artikel / schätzt Lücken… ${Math.min(i + 25, kiTargets.length)} / ${kiTargets.length}`);
+          const chunk = kiTargets.slice(i, i + 25).map((it: any) => ({
+            id: it.id,
+            text: [it.short_text, it.long_text].filter(Boolean).join("\n").slice(0, 500),
+            unit: it.unit || "St",
+            qty: num(it.qty) || 1,
+            // Gefundene Kandidaten (Archiv + Katalog) mitgeben — die KI wählt den passenden
+            // Artikel aus (echter EK), statt frei zu schätzen.
+            cands: (candsById.get(it.id) || []).slice(0, 5).map((c: any) => ({ text: String(c.row.text || "").split("\n")[0].slice(0, 160), unit: c.row.unit || "", ek: num(c.row.mat_ek) || 0, minutes: c.row.minutes != null ? num(c.row.minutes) : null })),
+          }));
           const res = await fetch("/api/price-ai", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ positions: chunk }) });
           const data = await res.json();
           if (!res.ok) throw new Error(data?.error || `Fehler ${res.status}`);
@@ -968,6 +1007,17 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
           const r = byId[it.id];
           if (!r) return it;
           const f = flags[it.id] || { needCost: true, needMin: true };
+          const cl: any[] = candsById.get(it.id) || [];
+          // KI hat einen Kandidaten gewählt → dessen echte Kalkulation übernehmen,
+          // fehlende Minuten aus der KI-Schätzung ergänzen.
+          if (f.needCost && r.pick != null && cl[r.pick]) {
+            const c: any = cl[r.pick];
+            let ni = applyCandidate(it, c.row, c.score);
+            if (num(ni.minutes) === 0 && r.minutes != null && r.minutes > 0) ni = { ...ni, minutes: String(r.minutes), suggest_note: `${ni.suggest_note || ""} · 🤖 Minuten geschätzt${r.note ? ` (${r.note})` : ""}` };
+            quelle[it.id] = c.row.lieferant ? `🏭 ${c.row.lieferant} (KI-gewählt)` : "Archiv (KI-gewählt)";
+            applied.add(it.id);
+            return ni;
+          }
           quelle[it.id] = quelle[it.id] === "offen" ? "🤖 KI" : `${quelle[it.id]} + 🤖`;
           return {
             ...it,
@@ -996,14 +1046,16 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
       }
       // 5) Übernehmen + Bericht je Position
       setO((p: any) => ({ ...p, items }));
-      setSugList(review);
+      // Positionen, die die KI über einen Kandidaten versorgt hat, brauchen keine Prüfliste mehr.
+      const reviewLeft = review.filter((e) => !applied.has(e.id));
+      setSugList(reviewLeft);
       const rows = posRows.map(({ it, calc }) => ({ id: it.id, oz: it.oz || "", text: it.short_text || String(it.long_text || "").split("\n")[0] || "(ohne Text)", unit: it.unit || "", qty: num(it.qty) || 0, ep: calc.ep || 0, quelle: quelle[it.id] || "", note: it.suggest_note || "", findings: findingsById[it.id] || [] }));
       const nFind = rows.reduce((s: number, r: any) => s + r.findings.length, 0);
       const cnt = (pfx: string) => rows.filter((r: any) => r.quelle.startsWith(pfx)).length;
       setAutoReport({
         rows,
         findings: nFind,
-        summary: `${rows.length} Positionen · ${cnt("Archiv")} aus Alt-Angeboten · ${cnt("🏭")} aus Katalog (günstigster Lieferant) · ${rows.filter((r: any) => r.quelle.includes("🤖")).length} mit KI-Schätzung · ${cnt("vorhanden") + cnt("fester")} schon kalkuliert · ${cnt("ungeklärt")} ungeklärt${review.length ? ` · ${review.length} mit Kandidaten zum Auswählen (unter den Positionen)` : ""} · ${nFind} Prüfer-Hinweis${nFind === 1 ? "" : "e"}`,
+        summary: `${rows.length} Positionen · ${cnt("Archiv")} aus Alt-Angeboten · ${cnt("🏭")} aus Katalog (günstigster bzw. KI-gewählt) · ${rows.filter((r: any) => r.quelle.includes("🤖")).length} mit KI-Schätzung · ${cnt("vorhanden") + cnt("fester")} schon kalkuliert · ${cnt("ungeklärt")} ungeklärt${reviewLeft.length ? ` · ${reviewLeft.length} mit Kandidaten zum Auswählen (unter den Positionen)` : ""} · ${nFind} Prüfer-Hinweis${nFind === 1 ? "" : "e"}`,
       });
       setMsg(`🌙 Autopilot fertig — Bericht mit Preisquelle je Position${nFind ? ` und ${nFind} Prüfer-Hinweis${nFind === 1 ? "" : "en"}` : ""}. Bitte durchsehen, dann speichern.`);
     } catch (e: any) {
@@ -1447,7 +1499,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
                 </tbody>
               </table>
             </div>
-            <p className="text-xs text-gray-500">Preisquellen: „Archiv x %" = ähnlichste Alt-Position aus dem Preisarchiv · „🏭 BTI/Pferdekämpfer/Rexel x %" = echter Katalog-EK dieses Lieferanten (bei mehreren passenden Treffern automatisch der günstigste) · „🤖 KI" = Schätzung (bitte prüfen!) · „vorhanden"/„fester EP" = war schon kalkuliert · „ungeklärt" = bitte von Hand kalkulieren oder unten einen Kandidaten wählen. Der Prüfer ist eine zweite KI — seine Hinweise sind Anregungen, kein Urteil.</p>
+            <p className="text-xs text-gray-500">Preisquellen: „Archiv x %" = ähnlichste Alt-Position aus dem Preisarchiv · „🏭 BTI/Pferdekämpfer/Rexel x %" = echter Katalog-EK dieses Lieferanten (bei mehreren passenden Treffern automatisch der günstigste) · „(KI-gewählt)" = die KI hat unter den gefundenen Kandidaten den passenden Artikel ausgesucht — EK ist echt, nur die Auswahl kam von der KI · „🤖 KI" = freie Schätzung (bitte prüfen!) · „vorhanden"/„fester EP" = war schon kalkuliert · „ungeklärt" = bitte von Hand kalkulieren oder unten einen Kandidaten wählen. Der Prüfer ist eine zweite KI — seine Hinweise sind Anregungen, kein Urteil.</p>
           </div>
         )}
 
