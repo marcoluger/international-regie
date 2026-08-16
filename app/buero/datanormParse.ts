@@ -158,7 +158,8 @@ export function parseDatanormFiles(files: InFile[]): DnResult {
         const no = (f[2] || "").trim();
         if (!no) continue;
         const a = ensure(no);
-        a.short_text = ((f[4] || "") + (f[5] || "")).trim();
+        // Kurztext 1 + 2 mit Leerzeichen verbinden (sonst kleben die Wörter zusammen, z. B. Rexel).
+        a.short_text = [(f[4] || "").trim(), (f[5] || "").trim()].filter(Boolean).join(" ");
         a.unit = (f[8] || "").trim();
         a.discount_group = (f[10] || "").trim();
         a.list_ek = priceToEur(f[9] || "", f[7] || "", "4");
@@ -175,7 +176,7 @@ export function parseDatanormFiles(files: InFile[]): DnResult {
         const no = (f[2] || "").trim();
         if (!no) continue;
         const a = ensure(no);
-        a.short_text = ((f[3] || "") + (f[4] || "")).trim();
+        a.short_text = [(f[3] || "").trim(), (f[4] || "").trim()].filter(Boolean).join(" ");
         a.unit = (f[5] || "").trim();
         a.discount_group = (f[9] || "").trim();
         const price = priceToEur(f[8] || "", f[7] || "", "5");

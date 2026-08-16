@@ -82,6 +82,8 @@ export default function Artikel({ supabase, companyId, art = "leistung" }: { sup
   const [preview, setPreview] = useState<{ supplierId: string; res: DnResult; files: string[] } | null>(null);
   const [impMsg, setImpMsg] = useState("");
   const [busy, setBusy] = useState(false);
+  // Schlanker Import: nur Artikel mit echtem Netto-EK (Kunden-Preisdatei) übernehmen.
+  const [impNetOnly, setImpNetOnly] = useState(false);
 
   useEffect(() => { if (companyId) { loadArticles(); loadSuppliers(); } /* eslint-disable-next-line */ }, [companyId]);
 
@@ -269,6 +271,8 @@ export default function Artikel({ supabase, companyId, art = "leistung" }: { sup
         files.push({ name: file.name, data: new Uint8Array(await file.arrayBuffer()) });
       }
       const res = parseDatanormFiles(files);
+      // Bei großen Sortimenten mit teilweisem Netto-EK den schlanken Import vorab ankreuzen.
+      setImpNetOnly(res.articles.length > 100000 && res.stats.withNet > 0 && res.stats.withNet < res.articles.length);
       setPreview({ supplierId: s.id, res, files: files.map((x) => x.name) });
       setImpMsg("");
     } catch (e: any) {
@@ -277,7 +281,9 @@ export default function Artikel({ supabase, companyId, art = "leistung" }: { sup
     setBusy(false);
   }
   async function runImport(s: any, res: DnResult) {
-    const hasArt = res.articles.length > 0;
+    // Schlanker Import: nur Artikel mit echtem Netto-EK (Kunden-Preisdatei) übernehmen.
+    const arts = impNetOnly ? res.articles.filter((a) => a.net_ek != null) : res.articles;
+    const hasArt = arts.length > 0;
     const hasDisc = res.discounts.length > 0;
     if (!hasArt && !hasDisc) { setImpMsg("Nichts zu importieren."); return; }
     setBusy(true); setImpMsg("Bereite Import vor…");
@@ -296,7 +302,7 @@ export default function Artikel({ supabase, companyId, art = "leistung" }: { sup
     // Artikel: nur ersetzen, wenn die Datei Artikel enthält (sonst bleiben bestehende erhalten).
     if (hasArt) {
       await supabase.from("office_supplier_articles").delete().eq("supplier_id", s.id);
-      const rows = res.articles.map((a) => ({
+      const rows = arts.map((a) => ({
         company_id: companyId, supplier_id: s.id, article_no: a.article_no, short_text: a.short_text || null, long_text: a.long_text || null,
         unit: a.unit || null, ean: a.ean || null, discount_group: a.discount_group || null, list_ek: a.list_ek, net_ek: a.net_ek, ek: a.ek,
       }));
@@ -314,7 +320,7 @@ export default function Artikel({ supabase, companyId, art = "leistung" }: { sup
 
     setBusy(false); setPreview(null);
     const parts: string[] = [];
-    if (hasArt) parts.push(`${int(res.articles.length)} Artikel`);
+    if (hasArt) parts.push(`${int(arts.length)} Artikel${impNetOnly && arts.length < res.articles.length ? ` (nur mit Netto-EK; ${int(res.articles.length - arts.length)} ohne Nettopreis übersprungen)` : ""}`);
     if (hasDisc) parts.push(`${int(res.discounts.length)} Rabattgruppen`);
     setImpMsg(`Fertig: ${parts.join(" und ")} importiert.`);
     await loadSuppliers();
@@ -611,8 +617,14 @@ export default function Artikel({ supabase, companyId, art = "leistung" }: { sup
                   {preview.res.articles.length === 0 && preview.res.discounts.length > 0 && (
                     <p className="text-xs text-slate-600">Nur Rabattgruppen in dieser Datei — beim Import bleiben die bereits importierten Artikel dieses Lieferanten erhalten.</p>
                   )}
+                  {preview.res.stats.withNet > 0 && preview.res.stats.withNet < preview.res.articles.length && (
+                    <label className="flex items-start gap-2 text-xs text-slate-700 bg-white border border-slate-200 rounded-lg px-2 py-1.5 cursor-pointer">
+                      <input type="checkbox" className="mt-0.5" checked={impNetOnly} onChange={(e) => setImpNetOnly(e.target.checked)} />
+                      <span><strong>Nur Artikel mit echtem Netto-EK importieren</strong> ({int(preview.res.stats.withNet)} von {int(preview.res.articles.length)}) — empfohlen bei großen Sortimenten: Die übrigen {int(preview.res.articles.length - preview.res.stats.withNet)} Artikel haben nur den Listenpreis (ohne Rabattabzug) und würden den EK zu hoch ausweisen.</span>
+                    </label>
+                  )}
                   <div className="flex gap-2">
-                    <button type="button" onClick={() => runImport(s, preview.res)} disabled={busy || (!preview.res.articles.length && !preview.res.discounts.length)} className="bg-cyan-700 disabled:bg-gray-300 text-white px-4 py-2 rounded-lg text-sm">{busy ? "Import läuft…" : preview.res.articles.length ? `Importieren (${int(preview.res.articles.length)} Artikel)` : `Rabattgruppen importieren (${int(preview.res.discounts.length)})`}</button>
+                    <button type="button" onClick={() => runImport(s, preview.res)} disabled={busy || (!preview.res.articles.length && !preview.res.discounts.length)} className="bg-cyan-700 disabled:bg-gray-300 text-white px-4 py-2 rounded-lg text-sm">{busy ? "Import läuft…" : preview.res.articles.length ? `Importieren (${int(impNetOnly ? preview.res.stats.withNet : preview.res.articles.length)} Artikel)` : `Rabattgruppen importieren (${int(preview.res.discounts.length)})`}</button>
                     <button type="button" onClick={() => setPreview(null)} disabled={busy} className="bg-gray-200 px-4 py-2 rounded-lg text-sm">Abbrechen</button>
                   </div>
                   <p className="text-xs text-gray-500">Beim Import wird der jeweilige Datenbestand (Artikel bzw. Rabattgruppen) dieses Lieferanten ersetzt. Große Kataloge (100.000+ Artikel) können einige Minuten dauern — Fenster offen lassen.</p>
