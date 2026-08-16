@@ -174,6 +174,9 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
   // Prüfliste des Preisvorschlags: je unsicherer Position bis zu 5 Kandidaten zur Auswahl.
   const [sugList, setSugList] = useState<{ id: string; oz: string; text: string; cands: { row: any; score: number }[] }[]>([]);
   const [kiBusy, setKiBusy] = useState(false);
+  // 🌙 Autopilot: LV in einem Rutsch bepreisen + KI-Prüfbericht
+  const [autoBusy, setAutoBusy] = useState(false);
+  const [autoReport, setAutoReport] = useState<{ rows: any[]; findings: number; summary: string } | null>(null);
   // Leistung/Artikel in eine BESTEHENDE Position übernehmen (Picker je Position)
   const [posPick, setPosPick] = useState<string | null>(null);
   const [posPickSearch, setPosPickSearch] = useState("");
@@ -818,6 +821,130 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
     setKiBusy(false);
   }
 
+  // 🌙 Autopilot: das ganze LV in einem Rutsch bepreisen und gegenprüfen.
+  // Je Position: 1) Preisarchiv (≥ 80 % sofort übernehmen), 2) DATANORM-Kataloge dazu,
+  // 3) KI für alles, was danach noch ohne Kosten/Minuten ist (füllt NUR Lücken),
+  // 4) zweiter KI-Prüfer liest das fertige LV gegen (Route /api/lv-check),
+  // 5) Bericht je Position mit Preisquelle. Alle Schritte laufen auf einer Arbeitskopie
+  // der Positionen — EIN setO am Ende (keine veralteten Zwischenstände).
+  async function runAutopilot() {
+    if (autoBusy || kiBusy) return;
+    setAutoBusy(true);
+    setAutoReport(null);
+    const quelle: Record<string, string> = {}; // id -> Preisquelle für den Bericht
+    try {
+      let items: any[] = o.items.map((it: any) => ({ ...it }));
+      const isPos = (it: any) => it.kind === "position";
+      const unkalk = (it: any) => num(it.mat_ek) === 0 && num(it.minutes) === 0 && num(it.geraet_vk) === 0 && num(it.fremd_vk) === 0 && num(it.geraet_ek) === 0 && num(it.fremd_ek) === 0 && String(it.ep_fix ?? "").trim() === "";
+      for (const it of items) {
+        if (!isPos(it)) continue;
+        quelle[it.id] = String(it.ep_fix ?? "").trim() !== "" ? "fester EP" : unkalk(it) ? "offen" : "vorhanden";
+      }
+      // 1) Preisarchiv (ähnlichste Alt-Positionen)
+      setMsg("🌙 Autopilot 1/4: Preisarchiv…");
+      const { data: archData, error: archErr } = await supabase.from("office_price_archive")
+        .select("source,unit,text,mat_ek,mat_multi,lohn_ek,minutes,fremd_vk,geraet_vk,ep")
+        .eq("company_id", companyId);
+      if (archErr) throw new Error("Preisarchiv: " + archErr.message);
+      const archive = (archData || []).map((r: any) => ({ row: r, tokens: normTokens(r.text) }));
+      const pending: { idx: number; cands: { row: any; score: number }[] }[] = [];
+      items = items.map((it: any, idx: number) => {
+        if (!isPos(it) || quelle[it.id] !== "offen") return it;
+        const cands = archive.length ? topMatches([it.short_text, it.long_text].filter(Boolean).join(" "), archive, 5, 0.25) : [];
+        if (cands.length && cands[0].score >= 0.8) { quelle[it.id] = `Archiv ${Math.round(cands[0].score * 100)} %`; return applyCandidate(it, cands[0].row, cands[0].score); }
+        pending.push({ idx, cands });
+        return it;
+      });
+      // 2) DATANORM-Kataloge (echte EKs) zu den offenen dazuholen
+      const review: { id: string; oz: string; text: string; cands: { row: any; score: number }[] }[] = [];
+      for (let i = 0; i < pending.length; i += 6) {
+        const batch = pending.slice(i, i + 6);
+        setMsg(`🌙 Autopilot 2/4: Kataloge… ${Math.min(i + 6, pending.length)} / ${pending.length}`);
+        const catResults = await Promise.all(batch.map((p) => catalogCandidates([items[p.idx].short_text, items[p.idx].long_text].filter(Boolean).join(" "))));
+        batch.forEach((p, j) => {
+          const merged = [...p.cands, ...catResults[j]].sort((a, b) => b.score - a.score).slice(0, 6);
+          if (merged.length && merged[0].score >= 0.8) {
+            const src = String(merged[0].row.source || "").startsWith("🏭") ? "Katalog" : "Archiv";
+            quelle[items[p.idx].id] = `${src} ${Math.round(merged[0].score * 100)} %`;
+            items[p.idx] = applyCandidate(items[p.idx], merged[0].row, merged[0].score);
+          } else if (merged.length) {
+            review.push({ id: items[p.idx].id, oz: items[p.idx].oz || "", text: items[p.idx].short_text || "(ohne Kurztext)", cands: merged });
+          }
+        });
+      }
+      // 3) KI für alles, was noch ohne Kosten und/oder Minuten ist (füllt NUR Lücken)
+      const flags: Record<string, { needCost: boolean; needMin: boolean }> = {};
+      const kiTargets = items.filter((it: any) => {
+        if (!isPos(it)) return false;
+        if (String(it.ep_fix ?? "").trim() !== "") return false;
+        if (String(it.short_text || it.long_text || "").trim() === "") return false;
+        const needCost = num(it.mat_ek) === 0 && num(it.geraet_vk) === 0 && num(it.fremd_vk) === 0 && num(it.geraet_ek) === 0 && num(it.fremd_ek) === 0;
+        const needMin = num(it.minutes) === 0;
+        if (!needCost && !needMin) return false;
+        flags[it.id] = { needCost, needMin };
+        return true;
+      });
+      const { data: sess } = await supabase.auth.getSession();
+      const token = sess?.session?.access_token || "";
+      if (!token) throw new Error("Nicht angemeldet — bitte neu einloggen.");
+      if (kiTargets.length) {
+        const byId: Record<string, any> = {};
+        for (let i = 0; i < kiTargets.length; i += 25) {
+          setMsg(`🌙 Autopilot 3/4: KI schätzt… ${Math.min(i + 25, kiTargets.length)} / ${kiTargets.length}`);
+          const chunk = kiTargets.slice(i, i + 25).map((it: any) => ({ id: it.id, text: [it.short_text, it.long_text].filter(Boolean).join("\n").slice(0, 500), unit: it.unit || "St", qty: num(it.qty) || 1 }));
+          const res = await fetch("/api/price-ai", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ positions: chunk }) });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data?.error || `Fehler ${res.status}`);
+          for (const r of data?.items || []) byId[r.id] = r;
+        }
+        items = items.map((it: any) => {
+          const r = byId[it.id];
+          if (!r) return it;
+          const f = flags[it.id] || { needCost: true, needMin: true };
+          quelle[it.id] = quelle[it.id] === "offen" ? "🤖 KI" : `${quelle[it.id]} + 🤖`;
+          return {
+            ...it,
+            mat_ek: f.needCost && r.mat_ek != null && r.mat_ek > 0 ? String(r.mat_ek) : it.mat_ek,
+            geraet_ek: f.needCost && r.geraet != null && r.geraet > 0 ? String(r.geraet) : it.geraet_ek,
+            geraet_multi: f.needCost && r.geraet != null && r.geraet > 0 && String(it.geraet_multi ?? "") === "" ? "1.5" : it.geraet_multi,
+            minutes: f.needMin && r.minutes != null ? String(r.minutes) : it.minutes,
+            suggest_note: `${it.suggest_note ? it.suggest_note + " · " : ""}🤖 KI${!f.needCost ? " (nur Minuten ergänzt)" : ""}${r.note ? ` (${r.note})` : ""}${f.needCost && r.geraet != null && r.geraet > 0 ? " — Gerätekosten im Feld Gerät-Ek" : ""} — Schätzwerte, bitte prüfen!`,
+          };
+        });
+      }
+      // Wer jetzt noch offen ist, bleibt „ungeklärt" (von Hand kalkulieren oder Kandidat wählen).
+      for (const it of items) { if (isPos(it) && quelle[it.id] === "offen") quelle[it.id] = unkalk(it) ? "ungeklärt" : "vorhanden"; }
+      // 4) Zweiter KI-Prüfer liest das fertige LV gegen (Ausreißer, Zeiten, Einheiten)
+      const del = num(o.del_preis);
+      const posRows = items.filter(isPos).map((it: any) => ({ it, calc: calcItem(it, del) }));
+      const findingsById: Record<string, { schwere: string; problem: string }[]> = {};
+      for (let i = 0; i < posRows.length; i += 25) {
+        setMsg(`🌙 Autopilot 4/4: KI-Prüfer liest gegen… ${Math.min(i + 25, posRows.length)} / ${posRows.length}`);
+        const chunk = posRows.slice(i, i + 25).map(({ it, calc }) => ({ id: it.id, oz: it.oz || "", text: [it.short_text, it.long_text].filter(Boolean).join("\n").slice(0, 300), unit: it.unit || "St", qty: num(it.qty) || 1, ep: Math.round((calc.ep || 0) * 100) / 100, minutes: num(it.minutes), mat_ek: num(it.mat_ek), quelle: quelle[it.id] || "" }));
+        try {
+          const res = await fetch("/api/lv-check", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ positions: chunk }) });
+          const data = await res.json();
+          if (res.ok) { for (const f of data?.findings || []) (findingsById[f.id] = findingsById[f.id] || []).push({ schwere: f.schwere, problem: f.problem }); }
+        } catch { /* Prüfer ist optional — der Bericht kommt trotzdem */ }
+      }
+      // 5) Übernehmen + Bericht je Position
+      setO((p: any) => ({ ...p, items }));
+      setSugList(review);
+      const rows = posRows.map(({ it, calc }) => ({ id: it.id, oz: it.oz || "", text: it.short_text || String(it.long_text || "").split("\n")[0] || "(ohne Text)", unit: it.unit || "", qty: num(it.qty) || 0, ep: calc.ep || 0, quelle: quelle[it.id] || "", note: it.suggest_note || "", findings: findingsById[it.id] || [] }));
+      const nFind = rows.reduce((s: number, r: any) => s + r.findings.length, 0);
+      const cnt = (pfx: string) => rows.filter((r: any) => r.quelle.startsWith(pfx)).length;
+      setAutoReport({
+        rows,
+        findings: nFind,
+        summary: `${rows.length} Positionen · ${cnt("Archiv")} aus Alt-Angeboten · ${cnt("Katalog")} aus Katalog · ${rows.filter((r: any) => r.quelle.includes("🤖")).length} mit KI-Schätzung · ${cnt("vorhanden") + cnt("fester")} schon kalkuliert · ${cnt("ungeklärt")} ungeklärt${review.length ? ` · ${review.length} mit Kandidaten zum Auswählen (unter den Positionen)` : ""} · ${nFind} Prüfer-Hinweis${nFind === 1 ? "" : "e"}`,
+      });
+      setMsg(`🌙 Autopilot fertig — Bericht mit Preisquelle je Position${nFind ? ` und ${nFind} Prüfer-Hinweis${nFind === 1 ? "" : "en"}` : ""}. Bitte durchsehen, dann speichern.`);
+    } catch (e: any) {
+      setMsg("Fehler im Autopilot: " + (e?.message || String(e)));
+    }
+    setAutoBusy(false);
+  }
+
   async function efbPdf() {
     try {
       if (!o.items.some((x: any) => x.kind === "position")) { setMsg("Keine Positionen für EFB-Formblätter vorhanden."); return; }
@@ -1214,8 +1341,48 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
           <button type="button" onClick={openArtPicker} className="bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-xs">📦 aus Artikelstamm</button>
           <button type="button" onClick={suggestPrices} className="bg-amber-600 text-white px-3 py-1.5 rounded-lg text-xs" title="Unkalkulierte Positionen mit der ähnlichsten Alt-Position aus dem Taifun-Preisarchiv befüllen">💡 Preise vorschlagen</button>
           <button type="button" onClick={suggestPricesAi} disabled={kiBusy} className="bg-purple-700 disabled:bg-gray-300 text-white px-3 py-1.5 rounded-lg text-xs" title="Fehlende Werte von der KI schätzen lassen: Material-/Gerät-EK und/oder Minuten je Einheit — nur was leer ist, wird gefüllt. Schätzwerte, bitte prüfen">{kiBusy ? "🤖 schätzt…" : "🤖 Preise durch KI"}</button>
+          <button type="button" onClick={runAutopilot} disabled={autoBusy || kiBusy} className="bg-slate-900 disabled:bg-gray-300 text-white px-3 py-1.5 rounded-lg text-xs" title="Das ganze LV in einem Rutsch bepreisen: erst Preisarchiv, dann DATANORM-Kataloge, dann KI für den Rest — danach liest ein zweiter KI-Prüfer alles gegen und du bekommst einen Bericht je Position (Preisquelle + Auffälligkeiten)">{autoBusy ? "🌙 Autopilot läuft…" : "🌙 Autopilot"}</button>
           <button type="button" onClick={() => setPosView((p) => (p === "zeilen" ? "tabelle" : "zeilen"))} className="bg-slate-500 text-white px-3 py-1.5 rounded-lg text-xs ml-auto" title="Zwischen Zeilenansicht und Taifun-Kalkulationstabelle wechseln">{posView === "zeilen" ? "📊 Tabelle" : "📋 Zeilen"}</button>
         </div>
+
+        {/* 🌙 Autopilot-Bericht: jede Position mit Preisquelle + Hinweisen des KI-Prüfers */}
+        {autoReport && (
+          <div className="border border-indigo-300 bg-indigo-50/40 rounded-xl p-3 space-y-2">
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <h4 className="font-bold text-sm">🌙 Autopilot-Bericht <span className="font-normal text-gray-600">— {autoReport.summary}</span></h4>
+              <button type="button" onClick={() => setAutoReport(null)} className="bg-gray-200 px-3 py-1.5 rounded-lg text-xs">Schließen</button>
+            </div>
+            <div className="max-h-96 overflow-y-auto border border-slate-200 rounded-lg bg-white">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="bg-slate-100 text-slate-700 sticky top-0">
+                    <th className="px-2 py-1 text-left">Pos</th>
+                    <th className="px-2 py-1 text-left">Bezeichnung</th>
+                    <th className="px-2 py-1 text-right">Menge</th>
+                    <th className="px-2 py-1 text-right">EP</th>
+                    <th className="px-2 py-1 text-left">Preisquelle</th>
+                    <th className="px-2 py-1 text-left">Prüfer</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {autoReport.rows.map((r: any) => (
+                    <tr key={r.id} className={`border-t border-slate-100 align-top ${r.quelle === "ungeklärt" ? "bg-rose-50" : r.findings.length ? "bg-amber-50" : ""}`}>
+                      <td className="px-2 py-1 whitespace-nowrap">{r.oz}</td>
+                      <td className="px-2 py-1" title={r.note}>{r.text}</td>
+                      <td className="px-2 py-1 text-right whitespace-nowrap">{fmt(r.qty)} {r.unit}</td>
+                      <td className="px-2 py-1 text-right whitespace-nowrap">{r.ep ? fmt(r.ep) + " €" : "—"}</td>
+                      <td className="px-2 py-1 whitespace-nowrap">{r.quelle}</td>
+                      <td className="px-2 py-1">{r.findings.length ? r.findings.map((f: any, i: number) => (
+                        <div key={i} className={f.schwere === "hoch" ? "text-rose-700" : f.schwere === "mittel" ? "text-amber-700" : "text-slate-500"}>{f.schwere === "hoch" ? "🔴" : f.schwere === "mittel" ? "🟡" : "ℹ️"} {f.problem}</div>
+                      )) : <span className="text-emerald-700">✓</span>}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="text-xs text-gray-500">Preisquellen: „Archiv x %" = ähnlichste Alt-Position aus dem Preisarchiv · „Katalog x %" = echter DATANORM-EK · „🤖 KI" = Schätzung (bitte prüfen!) · „vorhanden"/„fester EP" = war schon kalkuliert · „ungeklärt" = bitte von Hand kalkulieren oder unten einen Kandidaten wählen. Der Prüfer ist eine zweite KI — seine Hinweise sind Anregungen, kein Urteil.</p>
+          </div>
+        )}
 
         {/* 👁 GAEB-Vorschau: zeigt vor dem Export den Inhalt der X84-Datei */}
         {gaebPrev && (
