@@ -853,15 +853,15 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
     setO((p: any) => ({ ...p, items }));
     // 2. Durchgang: DATANORM-Kataloge dazuholen (echte EKs), dann Kandidaten mischen
     const review: { id: string; oz: string; text: string; cands: { row: any; score: number }[] }[] = [];
-    for (let i = 0; i < pending.length; i += 6) {
-      const batch = pending.slice(i, i + 6);
+    for (let i = 0; i < pending.length; i += 2) {
+      const batch = pending.slice(i, i + 2);
       const catResults = await Promise.all(batch.map((p) => catalogCandidates([p.it.short_text, p.it.long_text].filter(Boolean).join(" "))));
       batch.forEach((p, j) => {
         const merged = [...p.cands, ...catResults[j]].sort((a, b) => b.score - a.score).slice(0, 6);
         if (!merged.length) { none++; return; }
         review.push({ id: p.it.id, oz: p.it.oz || "", text: p.it.short_text || "(ohne Kurztext)", cands: merged });
       });
-      if (pending.length > 6) setMsg(`💡 Suche… ${Math.min(i + 6, pending.length)} / ${pending.length} Positionen geprüft`);
+      if (pending.length > 2) setMsg(`💡 Suche… ${Math.min(i + 2, pending.length)} / ${pending.length} Positionen geprüft`);
     }
     setSugList(review);
     if (!archive.length && !review.length && !filled) {
@@ -980,9 +980,9 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
       });
       // 2) DATANORM-Kataloge (echte EKs) zu den offenen dazuholen
       const review: { id: string; oz: string; text: string; cands: { row: any; score: number }[] }[] = [];
-      for (let i = 0; i < pending.length; i += 6) {
-        const batch = pending.slice(i, i + 6);
-        setMsg(`🌙 Autopilot 2/4: Kataloge… ${Math.min(i + 6, pending.length)} / ${pending.length}`);
+      for (let i = 0; i < pending.length; i += 2) {
+        const batch = pending.slice(i, i + 2);
+        setMsg(`🌙 Autopilot 2/4: Kataloge… ${Math.min(i + 2, pending.length)} / ${pending.length}`);
         const catResults = await Promise.all(batch.map((p) => catalogCandidates([items[p.idx].short_text, items[p.idx].long_text].filter(Boolean).join(" "))));
         batch.forEach((p, j) => {
           const merged = [...p.cands, ...catResults[j]].sort((a, b) => b.score - a.score).slice(0, 6);
