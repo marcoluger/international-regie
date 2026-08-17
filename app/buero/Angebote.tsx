@@ -141,6 +141,9 @@ function blankOffer() {
   };
 }
 
+// Letzter Fehler der Katalogsuche (Diagnose: taucht im Autopilot-Ergebnis auf, statt still zu scheitern).
+let lastCatalogError = "";
+
 // ── Komponente ─────────────────────────────────────────────────────
 export default function Angebote({ supabase, companyId, customers, doc = "angebot" }: { supabase: any; companyId: string; customers: any[]; doc?: string }) {
   const [offers, setOffers] = useState<any[]>([]);
@@ -638,7 +641,10 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
       const results = await Promise.all(queries);
       const seen = new Set<string>();
       const rowsIn: any[] = [];
-      for (const r of results) for (const a of r.data || []) { const k = `${a.supplier_id}|${a.article_no}`; if (!seen.has(k)) { seen.add(k); rowsIn.push(a); } }
+      for (const r of results) {
+        if (r.error) { lastCatalogError = r.error.message || String(r.error); continue; } // Fehler sichtbar machen statt stumm schlucken
+        for (const a of r.data || []) { const k = `${a.supplier_id}|${a.article_no}`; if (!seen.has(k)) { seen.add(k); rowsIn.push(a); } }
+      }
       const lv = normTokens(text);
       const lowText = String(text || "").toLowerCase();
       // Zahlen nur mit Wortgrenze werten (10096089 darf nicht in 6710096089 zünden).
@@ -937,14 +943,18 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
     if (autoBusy || kiBusy) return;
     setAutoBusy(true);
     setAutoReport(null);
+    lastCatalogError = "";
     const quelle: Record<string, string> = {}; // id -> Preisquelle für den Bericht
     try {
       let items: any[] = o.items.map((it: any) => ({ ...it }));
       const isPos = (it: any) => it.kind === "position";
       const unkalk = (it: any) => num(it.mat_ek) === 0 && num(it.minutes) === 0 && num(it.geraet_vk) === 0 && num(it.fremd_vk) === 0 && num(it.geraet_ek) === 0 && num(it.fremd_ek) === 0 && String(it.ep_fix ?? "").trim() === "";
+      // Rein KI-geschätzte Positionen (kein Archiv-/Katalog-/Stamm-Bezug) werden beim nächsten
+      // Lauf NEU gegen Archiv und Kataloge geprüft — ein späterer echter EK schlägt die Schätzung.
+      const kiOnly = (it: any) => !unkalk(it) && String(it.ep_fix ?? "").trim() === "" && !it.article_id && !it.kat_art_no && String(it.suggest_note || "").includes("🤖 KI") && !String(it.suggest_note || "").includes("% ähnlich");
       for (const it of items) {
         if (!isPos(it)) continue;
-        quelle[it.id] = String(it.ep_fix ?? "").trim() !== "" ? "fester EP" : unkalk(it) ? "offen" : "vorhanden";
+        quelle[it.id] = String(it.ep_fix ?? "").trim() !== "" ? "fester EP" : unkalk(it) || kiOnly(it) ? "offen" : "vorhanden";
       }
       // 1) Preisarchiv (ähnlichste Alt-Positionen)
       setMsg("🌙 Autopilot 1/4: Preisarchiv…");
@@ -984,15 +994,19 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
         });
       }
       // 3) KI für alles, was noch ohne Kosten und/oder Minuten ist (füllt NUR Lücken)
-      const flags: Record<string, { needCost: boolean; needMin: boolean }> = {};
+      const candsById = new Map(review.map((e) => [e.id, e.cands] as const));
+      const flags: Record<string, { needCost: boolean; needMin: boolean; reprice: boolean }> = {};
       const kiTargets = items.filter((it: any) => {
         if (!isPos(it)) return false;
         if (String(it.ep_fix ?? "").trim() !== "") return false;
         if (String(it.short_text || it.long_text || "").trim() === "") return false;
         const needCost = num(it.mat_ek) === 0 && num(it.geraet_vk) === 0 && num(it.fremd_vk) === 0 && num(it.geraet_ek) === 0 && num(it.fremd_ek) === 0;
         const needMin = num(it.minutes) === 0;
-        if (!needCost && !needMin) return false;
-        flags[it.id] = { needCost, needMin };
+        // Neu-Prüfung: rein KI-geschätzte Position, für die es jetzt Kandidaten gibt — die KI
+        // darf einen echten Artikel wählen; ohne Pick bleibt die Schätzung unverändert.
+        const reprice = kiOnly(it) && (candsById.get(it.id) || []).length > 0;
+        if (!needCost && !needMin && !reprice) return false;
+        flags[it.id] = { needCost, needMin, reprice };
         return true;
       });
       const { data: sess } = await supabase.auth.getSession();
@@ -1000,7 +1014,6 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
       if (!token) throw new Error("Nicht angemeldet — bitte neu einloggen.");
       // Positionen, die die KI über einen KANDIDATEN versorgt hat (echter Katalog-/Archiv-EK).
       const applied = new Set<string>();
-      const candsById = new Map(review.map((e) => [e.id, e.cands] as const));
       if (kiTargets.length) {
         const byId: Record<string, any> = {};
         for (let i = 0; i < kiTargets.length; i += 25) {
@@ -1022,11 +1035,11 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
         items = items.map((it: any) => {
           const r = byId[it.id];
           if (!r) return it;
-          const f = flags[it.id] || { needCost: true, needMin: true };
+          const f = flags[it.id] || { needCost: true, needMin: true, reprice: false };
           const cl: any[] = candsById.get(it.id) || [];
           // KI hat einen Kandidaten gewählt → dessen echte Kalkulation übernehmen,
           // fehlende Minuten aus der KI-Schätzung ergänzen.
-          if (f.needCost && r.pick != null && cl[r.pick]) {
+          if ((f.needCost || f.reprice) && r.pick != null && cl[r.pick]) {
             const c: any = cl[r.pick];
             let ni = applyCandidate(it, c.row, c.score);
             if (num(ni.minutes) === 0 && r.minutes != null && r.minutes > 0) ni = { ...ni, minutes: String(r.minutes), suggest_note: `${ni.suggest_note || ""} · 🤖 Minuten geschätzt${r.note ? ` (${r.note})` : ""}` };
@@ -1034,6 +1047,8 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
             applied.add(it.id);
             return ni;
           }
+          // Reine Neu-Prüfung ohne Pick: die bisherige KI-Schätzung bleibt unangetastet.
+          if (!f.needCost && !f.needMin) return it;
           quelle[it.id] = quelle[it.id] === "offen" ? "🤖 KI" : `${quelle[it.id]} + 🤖`;
           return {
             ...it,
@@ -1046,7 +1061,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
         });
       }
       // Wer jetzt noch offen ist, bleibt „ungeklärt" (von Hand kalkulieren oder Kandidat wählen).
-      for (const it of items) { if (isPos(it) && quelle[it.id] === "offen") quelle[it.id] = unkalk(it) ? "ungeklärt" : "vorhanden"; }
+      for (const it of items) { if (isPos(it) && quelle[it.id] === "offen") quelle[it.id] = unkalk(it) ? "ungeklärt" : kiOnly(it) ? "🤖 KI (unverändert)" : "vorhanden"; }
       // 4) Zweiter KI-Prüfer liest das fertige LV gegen (Ausreißer, Zeiten, Einheiten)
       const del = num(o.del_preis);
       const posRows = items.filter(isPos).map((it: any) => ({ it, calc: calcItem(it, del) }));
@@ -1073,7 +1088,8 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
         findings: nFind,
         summary: `${rows.length} Positionen · ${cnt("Archiv")} aus Alt-Angeboten · ${cnt("🏭")} aus Katalog (günstigster bzw. KI-gewählt) · ${rows.filter((r: any) => r.quelle.includes("🤖")).length} mit KI-Schätzung · ${cnt("vorhanden") + cnt("fester")} schon kalkuliert · ${cnt("ungeklärt")} ungeklärt${reviewLeft.length ? ` · ${reviewLeft.length} mit Kandidaten zum Auswählen (unter den Positionen)` : ""} · ${nFind} Prüfer-Hinweis${nFind === 1 ? "" : "e"}`,
       });
-      setMsg(`🌙 Autopilot fertig — Bericht mit Preisquelle je Position${nFind ? ` und ${nFind} Prüfer-Hinweis${nFind === 1 ? "" : "en"}` : ""}. Bitte durchsehen, dann speichern.`);
+      const katWarn = !rows.some((r: any) => r.quelle.startsWith("🏭")) && lastCatalogError ? ` ⚠️ Die Katalogsuche meldete einen Fehler: ${lastCatalogError}` : "";
+      setMsg(`🌙 Autopilot fertig — Bericht mit Preisquelle je Position${nFind ? ` und ${nFind} Prüfer-Hinweis${nFind === 1 ? "" : "en"}` : ""}. Bitte durchsehen, dann speichern.${katWarn}`);
     } catch (e: any) {
       setMsg("Fehler im Autopilot: " + (e?.message || String(e)));
     }
