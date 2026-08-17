@@ -635,15 +635,17 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
     if (!typeToks.length && !words.length) return [];
     try {
       const clean = (t: string) => t.replace(/[,()%*]/g, "");
-      const sel = "supplier_id,article_no,short_text,unit,ek,net_ek";
+      // Suche über die Datenbank-Funktion office_catalog_search (erzwingt den Suchindex —
+      // direkte Abfragen kippten je nach Planer-Laune in den Komplett-Scan → statement timeout).
+      const search = (pattern: string) => supabase.rpc("office_catalog_search", { p_company: companyId, p_pattern: pattern, p_limit: 10 });
       // Gattungstexte („Wechselrichter 50 kVA", „Solarmodul 450 Wp"): Hauptwort + Kennzahl
       // KOMBINIERT suchen, damit die richtige Leistungsklasse in die Kandidatenliste kommt.
       const measureNums = all.map((w) => { const m = w.match(/^(\d{2,4})[a-z]{1,3}$/); return m ? m[1] : null; }).filter(Boolean) as string[];
       const kennzahlen = Array.from(new Set([...all.filter((w) => /^\d{2,4}$/.test(w)), ...measureNums])).slice(0, 2);
       const queries = [
-        ...typeToks.map((t) => supabase.from("office_supplier_articles").select(sel).eq("company_id", companyId).or(`short_text.ilike.*${clean(t)}*,article_no.ilike.*${clean(t)}*`).limit(10)),
-        ...words.map((t) => supabase.from("office_supplier_articles").select(sel).eq("company_id", companyId).ilike("short_text", `%${clean(t)}%`).limit(10)),
-        ...(words.length ? kennzahlen.map((n) => supabase.from("office_supplier_articles").select(sel).eq("company_id", companyId).ilike("short_text", `%${clean(words[0])}%${n}%`).limit(10)) : []),
+        ...typeToks.map((t) => search(`%${clean(t)}%`)),
+        ...words.map((t) => search(`%${clean(t)}%`)),
+        ...(words.length ? kennzahlen.map((n) => search(`%${clean(words[0])}%${n}%`)) : []),
       ];
       const results = await Promise.all(queries);
       const seen = new Set<string>();

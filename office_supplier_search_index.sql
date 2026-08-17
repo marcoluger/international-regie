@@ -1,10 +1,11 @@
--- office_supplier_search_index.sql (v3 - REPARATUR: Suchindexe sicherstellen)
--- Befund 17.08.: Die Katalogsuche bricht mit "canceling statement due to statement timeout"
--- ab - die Datenbank durchsucht offenbar alle 253.000+ Katalogzeilen OHNE Index.
--- Diese Datei stellt die beiden pg_trgm-Suchindexe sicher (egal, was vorher lief),
--- entfernt eventuelle Duplikate und frischt die Planer-Statistik nach dem Grossimport auf.
--- Idempotent: kann mehrfach ausgefuehrt werden.
--- ACHTUNG: Das Anlegen der Indexe kann 1-2 Minuten dauern - warten, nicht abbrechen.
+-- office_supplier_search_index.sql (v4 - REPARATUR mit Zeit-Budget und Beweis)
+-- Befund: Katalogsuche bricht weiter mit "statement timeout" ab. Moeglich ist, dass die
+-- Index-Erstellung selbst abgebrochen wurde (der SQL-Editor bricht lange Anweisungen ab,
+-- zwei GIN-Indexe ueber 253.000 Zeilen brauchen Zeit). Diese Version genehmigt sich selbst
+-- ein grosses Zeit-Budget und MISST am Ende, ob die Suche wirklich schnell ist.
+-- Idempotent. Bitte KOMPLETT laufen lassen - kann einige Minuten dauern, nicht abbrechen.
+
+set statement_timeout = '15min';
 
 create extension if not exists pg_trgm;
 
@@ -26,8 +27,11 @@ where schemaname = 'public' and tablename = 'office_supplier_articles'
   and (indexname like '%txt\_idx' escape '\' or indexname like '%no\_idx' escape '\' or indexname like '%trgm%')
 order by indexname;
 
--- Kontrolle 2: Testsuche - muss in deutlich unter 1 Sekunde ein Ergebnis liefern.
--- Dauert sie mehrere Sekunden, greifen die Indexe nicht -> bitte melden.
-select count(*) as treffer_steckdose
+-- Kontrolle 2: Testsuche wie sie die App stellt, MIT Zeitmessung.
+-- Im Ergebnis unten auf die Zeile "Execution Time: ... ms" achten und mir den Wert nennen.
+-- Unter ~200 ms = gut. Mehrere Sekunden = Index greift nicht -> Ausgabe komplett an mich.
+explain analyze
+select supplier_id, article_no, short_text, unit, ek, net_ek
 from public.office_supplier_articles
-where short_text ilike '%steckdose%';
+where (short_text ilike '%steckdose%' or article_no ilike '%steckdose%')
+limit 10;
