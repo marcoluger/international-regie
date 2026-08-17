@@ -207,8 +207,16 @@ export function parseDatanormFiles(files: InFile[]): DnResult {
   // Lag eine Artikeldatei bei, sind reine Preis-Einträge ohne Text „Phantome" → verwerfen.
   let articles = Array.from(byNo.values());
   if (stats.articleFiles > 0) articles = articles.filter((a) => a.short_text);
+  // EK-Bestimmung: echter Nettopreis > Listenpreis minus Rabattgruppe > Listenpreis.
+  // (Rexel-Großhandelssortiment liefert Listenpreise + Rabattdatei — erst der Abzug ergibt den EK.)
+  const discBy = new Map(discounts.map((d) => [d.discount_group, d.discount_pct]));
   for (const a of articles) {
-    a.ek = a.net_ek != null ? a.net_ek : a.list_ek;
+    const rab = a.discount_group ? discBy.get(a.discount_group) : undefined;
+    a.ek = a.net_ek != null
+      ? a.net_ek
+      : a.list_ek != null && rab != null && rab > 0 && rab < 100
+        ? Math.round(a.list_ek * (1 - rab / 100) * 10000) / 10000
+        : a.list_ek;
     if (a.short_text) stats.withText++;
     if (a.net_ek != null) stats.withNet++;
     if (a.ean) stats.withEan++;

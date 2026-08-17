@@ -612,34 +612,50 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
     return hit < 2 ? Math.min(cov, 0.5) : cov; // 1 Allerweltswort allein reicht nicht
   }
   // DATANORM-Katalog-Kandidaten für eine Position: echte EKs aus office_supplier_articles.
+  // Suchstrategie (an echten LVs kalibriert): Typencodes (K96W, NBN116, DK7151.005) und
+  // Herstellernummern zuerst — je Begriff eine EIGENE kleine Abfrage, damit häufige Wörter
+  // („HAGER") die Trefferliste nicht fluten. Nur echte Typencodes boosten die Ähnlichkeit;
+  // Maße (12x5mm), Kennwerte (IP44, IK03, UGR19) und Messwerte (24,50W) nicht.
+  const isTypeTok = (w: string) => w.length >= 3 && /\d/.test(w) && /[a-z]/.test(w)
+    && !/^\d+(x\d+(\.\d+)?)?$/.test(w) && !/^\d+[a-z]+$/.test(w)
+    && !/^(ip|ik|ugr|ral|din|en|iec|vde|sk)\d/.test(w) && !/^[a-z]{1,2}\./.test(w) && !/^t\d$/.test(w);
   async function catalogCandidates(text: string): Promise<{ row: any; score: number }[]> {
     const all = Array.from(normTokens(text));
     // LV-Füllwörter nicht als Suchbegriff verwenden (bringen nur Zufallstreffer).
     const QSTOP = new Set(["liefern", "montieren", "montage", "lieferung", "anschliessen", "einbauen", "demontage", "demontieren", "fabrikat", "hersteller", "gleichwertig", "komplett", "betriebsfertig", "angeboten", "angebotenes", "verlegen", "anklemmen"]);
-    const toks = all.filter((w) => w.length >= 4 && !/^\d+$/.test(w) && !QSTOP.has(w)).sort((a, b) => b.length - a.length).slice(0, 3);
-    // Typen-/Artikelnummern im LV-Text (Buchstaben + Ziffern gemischt, ab 5 Zeichen) → auch in der Artikelnummer suchen.
-    const typeToks = all.filter((w) => w.length >= 5 && /\d/.test(w) && /[a-z]/.test(w)).slice(0, 2);
-    if (!toks.length && !typeToks.length) return [];
+    const numToks = all.filter((w) => /^\d{5,}$/.test(w)).slice(0, 2);
+    const typeToks = all.filter(isTypeTok).slice(0, 3).concat(numToks);
+    const strongToks = typeToks.filter((w) => w.length >= 4 && !/^\d+x\d+/.test(w) && !/^[a-z]\d+$/.test(w) && !/^\d{1,4}(\.\d+)?[a-z]{0,3}$/.test(w));
+    const words = all.filter((w) => w.length >= 4 && !/\d/.test(w) && !QSTOP.has(w)).sort((a, b) => b.length - a.length).slice(0, 2);
+    if (!typeToks.length && !words.length) return [];
     try {
-      const ors = [
-        ...toks.map((t) => `short_text.ilike.*${t.replace(/[,()%*]/g, "")}*`),
-        ...typeToks.map((t) => `article_no.ilike.*${t.replace(/[,()%*]/g, "")}*`),
+      const clean = (t: string) => t.replace(/[,()%*]/g, "");
+      const sel = "supplier_id,article_no,short_text,unit,ek,net_ek";
+      const queries = [
+        ...typeToks.map((t) => supabase.from("office_supplier_articles").select(sel).eq("company_id", companyId).or(`short_text.ilike.*${clean(t)}*,article_no.ilike.*${clean(t)}*`).limit(10)),
+        ...words.map((t) => supabase.from("office_supplier_articles").select(sel).eq("company_id", companyId).ilike("short_text", `%${clean(t)}%`).limit(10)),
       ];
-      const { data } = await supabase.from("office_supplier_articles")
-        .select("supplier_id,article_no,short_text,unit,ek,net_ek")
-        .eq("company_id", companyId)
-        .or(ors.join(","))
-        .limit(20);
-      const t = normTokens(text);
+      const results = await Promise.all(queries);
+      const seen = new Set<string>();
+      const rowsIn: any[] = [];
+      for (const r of results) for (const a of r.data || []) { const k = `${a.supplier_id}|${a.article_no}`; if (!seen.has(k)) { seen.add(k); rowsIn.push(a); } }
+      const lv = normTokens(text);
       const lowText = String(text || "").toLowerCase();
+      // Zahlen nur mit Wortgrenze werten (10096089 darf nicht in 6710096089 zünden).
+      const bound = (hay: string, t: string) => { const i = hay.indexOf(t); if (i < 0) return false; if (!/^\d+$/.test(t)) return true; const b = hay[i - 1], x = hay[i + t.length]; return !(b >= "0" && b <= "9") && !(x >= "0" && x <= "9"); };
+      // Variantenschutz: nennt das LV harte Kennzeichen (Typencode, Zahlen ab 3 Stellen) und der
+      // Kandidat trägt KEINES davon, wird er nicht automatisch übernommen (max. 75 % → KI-Auswahl).
+      const hardToks = Array.from(new Set([...typeToks, ...all.filter((w) => /^\d{3,}$/.test(w))]));
       const out: { row: any; score: number }[] = [];
-      for (const a of data || []) {
+      for (const a of rowsIn) {
         const ek = a.ek != null ? a.ek : a.net_ek;
         if (ek == null) continue;
-        let score = coverageScore(t, a.short_text || "");
-        // Artikelnummer wörtlich im LV-Text → sehr sicherer Treffer.
-        const no = String(a.article_no || "").toLowerCase();
-        if (no.length >= 5 && lowText.includes(no)) score = Math.max(score, 0.95);
+        const stLow = String(a.short_text || "").toLowerCase();
+        const noLow = String(a.article_no || "").toLowerCase();
+        let score = coverageScore(lv, a.short_text || "");
+        if (strongToks.some((ty) => bound(stLow, ty) || bound(noLow, ty))) score = Math.max(score, score >= 0.3 ? 0.9 : 0.7);
+        if (noLow.length >= 5 && lowText.includes(noLow)) score = Math.max(score, 0.95);
+        if (hardToks.length && !hardToks.some((h) => stLow.includes(h) || noLow.includes(h))) score = Math.min(score, 0.75);
         if (score < 0.25) continue;
         const supNm = suppliers.find((s: any) => s.id === a.supplier_id)?.name || "Katalog";
         out.push({ score, row: { source: `🏭 ${supNm}${a.article_no ? " " + a.article_no : ""}`, lieferant: supNm, art_no: a.article_no || "", unit: a.unit || "", text: a.short_text || ("Art. " + a.article_no), mat_ek: ek, mat_multi: null, lohn_ek: null, minutes: null, fremd_vk: null, geraet_vk: null, ep: null } });
