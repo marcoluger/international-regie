@@ -89,8 +89,14 @@ export async function POST(req: Request) {
               `WIRKLICH trifft (gleiches Produkt, passende Dimension/Typ — nicht nur ähnliches Thema), ` +
               `setze "pick" auf dessen Index i und schätze mat_ek/geraet NICHT (0 lassen); "minutes" ` +
               `trotzdem schätzen, falls der Kandidat keine minutes hat. Passen mehrere gleich gut, ` +
-              `nimm den mit dem NIEDRIGSTEN ek. Passt keiner sicher, setze "pick" auf null und ` +
-              `schätze wie üblich. Ohne "cands" ist "pick" immer null. ` +
+              `nimm den mit dem NIEDRIGSTEN ek. WICHTIG bei GATTUNGSTEXTEN ohne Herstellerangabe ` +
+              `(z. B. "Wechselrichter 50 kVA", "Solarmodul mind. 450 Wp", "Steckdose 230V 16A"): ` +
+              `Erfüllt ein Kandidat die geforderten Kennwerte (Leistung, Strom, Spannung, Abmessung, ` +
+              `Schutzart, Typklasse), dann WÄHLE ihn — bei mehreren passenden den GÜNSTIGSTEN. ` +
+              `Ein echter Katalog-EK ist einer freien Schätzung immer vorzuziehen. ` +
+              `Nur wenn KEIN Kandidat die geforderten Kennwerte erfüllt (falsche Leistungsklasse, ` +
+              `völlig anderes Produkt), setze "pick" auf null und schätze wie üblich. ` +
+              `Ohne "cands" ist "pick" immer null. ` +
               `Antworte AUSSCHLIESSLICH als JSON-Objekt exakt in dieser Form: ` +
               `{"items":[{"id":"...","pick":null,"mat_ek":0.00,"geraet":0.00,"minutes":0,"note":"..."}]}`,
           },
