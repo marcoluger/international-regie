@@ -1021,12 +1021,14 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
       if (!token) throw new Error("Nicht angemeldet — bitte neu einloggen.");
       // Positionen, die die KI über einen KANDIDATEN versorgt hat (echter Katalog-/Archiv-EK).
       const applied = new Set<string>();
-      if (autoNoKi && kiTargets.length) setMsg("🌙 Autopilot 3/4 übersprungen (ohne KI-Schätzung) — offene Positionen behalten ihre Kandidatenlisten.");
-      if (!autoNoKi && kiTargets.length) {
+      // „ohne KI-Schätzung": die KI darf trotzdem unter den ECHTEN Kandidaten (Archiv/Katalog)
+      // WÄHLEN — sie erfindet aber weder Preise noch Minuten. Ohne Kandidaten bleibt die Position offen.
+      const pickTargets = autoNoKi ? kiTargets.filter((it: any) => (candsById.get(it.id) || []).length > 0) : kiTargets;
+      if (pickTargets.length) {
         const byId: Record<string, any> = {};
-        for (let i = 0; i < kiTargets.length; i += 25) {
-          setMsg(`🌙 Autopilot 3/4: KI wählt Artikel / schätzt Lücken… ${Math.min(i + 25, kiTargets.length)} / ${kiTargets.length}`);
-          const chunk = kiTargets.slice(i, i + 25).map((it: any) => ({
+        for (let i = 0; i < pickTargets.length; i += 25) {
+          setMsg(`🌙 Autopilot 3/4: ${autoNoKi ? "KI wählt unter echten Kandidaten (ohne Schätzung)" : "KI wählt Artikel / schätzt Lücken"}… ${Math.min(i + 25, pickTargets.length)} / ${pickTargets.length}`);
+          const chunk = pickTargets.slice(i, i + 25).map((it: any) => ({
             id: it.id,
             text: [it.short_text, it.long_text].filter(Boolean).join("\n").slice(0, 500),
             unit: it.unit || "St",
@@ -1050,11 +1052,14 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
           if ((f.needCost || f.reprice) && r.pick != null && cl[r.pick]) {
             const c: any = cl[r.pick];
             let ni = applyCandidate(it, c.row, c.score);
-            if (num(ni.minutes) === 0 && r.minutes != null && r.minutes > 0) ni = { ...ni, minutes: String(r.minutes), suggest_note: `${ni.suggest_note || ""} · 🤖 Minuten geschätzt${r.note ? ` (${r.note})` : ""}` };
+            if (num(ni.minutes) === 0 && r.minutes != null && r.minutes > 0 && !autoNoKi) ni = { ...ni, minutes: String(r.minutes), suggest_note: `${ni.suggest_note || ""} · 🤖 Minuten geschätzt${r.note ? ` (${r.note})` : ""}` };
+            else if (num(ni.minutes) === 0 && autoNoKi) ni = { ...ni, suggest_note: `${ni.suggest_note || ""} — Minuten bitte eintragen` };
             quelle[it.id] = c.row.lieferant ? `🏭 ${c.row.lieferant} (KI-gewählt)` : "Archiv (KI-gewählt)";
             applied.add(it.id);
             return ni;
           }
+          // „ohne KI-Schätzung": kein Pick → Position bleibt unverändert offen (Kandidaten stehen darunter).
+          if (autoNoKi) return it;
           // Reine Neu-Prüfung ohne Pick: die bisherige KI-Schätzung bleibt unangetastet.
           if (!f.needCost && !f.needMin) return it;
           quelle[it.id] = quelle[it.id] === "offen" ? "🤖 KI" : `${quelle[it.id]} + 🤖`;
@@ -1501,7 +1506,7 @@ export default function Angebote({ supabase, companyId, customers, doc = "angebo
           <button type="button" onClick={suggestPrices} className="bg-amber-600 text-white px-3 py-1.5 rounded-lg text-xs" title="Unkalkulierte Positionen mit der ähnlichsten Alt-Position aus dem Taifun-Preisarchiv befüllen">💡 Preise vorschlagen</button>
           <button type="button" onClick={suggestPricesAi} disabled={kiBusy} className="bg-purple-700 disabled:bg-gray-300 text-white px-3 py-1.5 rounded-lg text-xs" title="Fehlende Werte von der KI schätzen lassen: Material-/Gerät-EK und/oder Minuten je Einheit — nur was leer ist, wird gefüllt. Schätzwerte, bitte prüfen">{kiBusy ? "🤖 schätzt…" : "🤖 Preise durch KI"}</button>
           <button type="button" onClick={runAutopilot} disabled={autoBusy || kiBusy} className="bg-slate-900 disabled:bg-gray-300 text-white px-3 py-1.5 rounded-lg text-xs" title="Das ganze LV in einem Rutsch bepreisen: erst Preisarchiv, dann DATANORM-Kataloge, dann KI für den Rest — danach liest ein zweiter KI-Prüfer alles gegen und du bekommst einen Bericht je Position (Preisquelle + Auffälligkeiten)">{autoBusy ? "🌙 Autopilot läuft…" : "🌙 Autopilot"}</button>
-          <label className="flex items-center gap-1 text-xs text-slate-600 whitespace-nowrap cursor-pointer" title="Angehakt: Autopilot nutzt NUR Preisarchiv und Kataloge — keine KI-Schätzung, keine KI-Auswahl. Offene Positionen behalten ihre Kandidatenlisten zum Anklicken."><input type="checkbox" checked={autoNoKi} onChange={(e) => setAutoNoKi(e.target.checked)} /> ohne KI-Schätzung</label>
+          <label className="flex items-center gap-1 text-xs text-slate-600 whitespace-nowrap cursor-pointer" title="Angehakt: Die KI ERFINDET keine Preise und keine Minuten. Sie darf nur unter den ECHTEN Kandidaten aus Preisarchiv und Katalogen den passenden auswählen (günstigster passender bei Gattungstexten) — der EK ist dann immer ein echter Preis. Ohne Haken schätzt die KI zusätzlich alles, was offen bleibt."><input type="checkbox" checked={autoNoKi} onChange={(e) => setAutoNoKi(e.target.checked)} /> ohne KI-Schätzung</label>
           <button type="button" onClick={() => setPosView((p) => (p === "zeilen" ? "tabelle" : "zeilen"))} className="bg-slate-500 text-white px-3 py-1.5 rounded-lg text-xs ml-auto" title="Zwischen Zeilenansicht und Taifun-Kalkulationstabelle wechseln">{posView === "zeilen" ? "📊 Tabelle" : "📋 Zeilen"}</button>
         </div>
 
